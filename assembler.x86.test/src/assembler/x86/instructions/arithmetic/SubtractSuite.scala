@@ -1,0 +1,34 @@
+package assembler.x86.instructions.arithmetic
+
+import org.scalatest.ShouldMatchers
+import org.scalatest.WordSpec
+
+import assembler.MemoryPage
+import assembler.Hex
+import assembler.x86.ProcessorMode
+import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.operands.ImmediateValue.byteToImmediate
+import assembler.x86.operands.registers.Register._
+
+class SubtractSuite extends WordSpec with ShouldMatchers {
+
+    implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Instruction])
+
+  // Subtract inherits from BasicInteraction, which is covered by the Xor instruction.
+  // This suite covers two basic cases.
+
+  "an Subtract instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+      
+      "correctly encode sub al, 0x40" in {
+        Subtract(0x40.toByte, AL).encode should be (Hex("2C 40")) 
+      }
+  
+      "correctly encode sub bl, 0x40" in {
+        Subtract(0x40.toByte, BL).encode should be (Hex("80 EB 40"))
+      }
+    }
+  }
+}
