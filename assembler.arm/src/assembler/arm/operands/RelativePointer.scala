@@ -4,7 +4,10 @@ import assembler.ListExtensions._
 import scala.language.implicitConversions
 
 class RelativePointer private(val displacement: Int) extends Operand {
-//  assume(displacement.length == 3)
+  assume((displacement > -8388608) && (displacement < 8388607))
+
+  def encode = displacement & 0xFFFFFF
+  
   override val toString = s"${(displacement * 4).toString()}"
 }
 

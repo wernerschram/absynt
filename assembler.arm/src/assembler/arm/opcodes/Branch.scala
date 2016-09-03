@@ -15,7 +15,7 @@ class BranchImmediate(val code: Byte)(implicit mnemonic: String)
 
       override def encodeWord()(implicit page: MemoryPage) = 
         // TODO: apply lBit
-        (super.encodeWord() | ((code & 0xF0) << 20) | (destination.displacement))
+        (super.encodeWord() | ((code & 0xF0) << 20) | (destination.encode))
       override val toString = s"${BranchImmediate.this.mnemonic}${condition.mnemonicExtension} ${destination.toString}"
   }
 }

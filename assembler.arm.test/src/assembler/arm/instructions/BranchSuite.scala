@@ -19,12 +19,16 @@ class BranchSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode b 0x3F0" in {
+      "correctly encode b PC+0x3e8" in {
         Branch(0x3e8).encode should be(Hex.MSB("ea0000fa"))
       }
 
-      "correctly encode beq 0x1111118" in {
+      "correctly encode beq PC+0x1111110" in {
         Branch(0x1111110, Condition.Equal).encode should be(Hex.MSB("0a444444"))
+      }
+
+      "correctly encode blt PC-0x08" in {
+        Branch(-0x08, Condition.SignedLessThan).encode should be(Hex.MSB("bafffffe"))
       }
     }
   }
