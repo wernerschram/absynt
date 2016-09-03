@@ -60,7 +60,8 @@ class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: In
 }
 
 class ShiftImmediateWithRotate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
-  override val encode = 0x02000000 | (rotateValue << 8) | immediate
+  assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
+  override val encode = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
 }
 
 object Shifter {
