@@ -1,17 +1,16 @@
-package assembler.arm.instructions.dataprocessing
+package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-import assembler.MemoryPage
+
 import assembler.Hex
+import assembler.MemoryPage
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.operands.Condition._
-import assembler.arm.operands.Shifter
+import assembler.arm.instructions.dataprocessing.Multiply
+import assembler.arm.instructions.dataprocessing.MultiplyAccumulate
 import assembler.arm.operands.Condition
-import assembler.arm.operands.LeftImmediateShiftValue
-import assembler.arm.instructions.AddCarry
+import assembler.arm.operands.Shifter.apply
+import assembler.arm.operands.registers.GeneralRegister._
 
 class MultiplySuite extends WordSpec with ShouldMatchers {
 

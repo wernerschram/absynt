@@ -1,20 +1,14 @@
-package assembler.arm.instructions.branch
+package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
+
 import assembler.Hex
-import assembler.ListExtensions._
 import assembler.MemoryPage
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.Condition
+import assembler.arm.operands.RelativePointer.apply
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.instructions.BranchLinkExchange
-import assembler.arm.instructions.BranchLink
-import assembler.arm.instructions.BranchExchangeJazelle
-import assembler.arm.instructions.BranchExchange
-import assembler.arm.instructions.Branch
 
 class BranchSuite extends WordSpec with ShouldMatchers {
 
@@ -34,7 +28,7 @@ class BranchSuite extends WordSpec with ShouldMatchers {
       }
     }
   }
-  
+
   "an BranchLink instruction" when {
     "in a32 mode" should {
 
@@ -45,7 +39,7 @@ class BranchSuite extends WordSpec with ShouldMatchers {
       }
     }
   }
-  
+
   "an BranchLinkExchange instruction" when {
     "in a32 mode" should {
 
@@ -60,7 +54,7 @@ class BranchSuite extends WordSpec with ShouldMatchers {
       }
     }
   }
-   
+
   "a BranchExchange instruction" when {
     "in a32 mode" should {
 

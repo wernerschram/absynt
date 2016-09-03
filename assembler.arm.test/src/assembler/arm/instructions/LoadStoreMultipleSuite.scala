@@ -1,16 +1,13 @@
-package assembler.arm.instructions.dataprocessing
+package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
+
 import assembler.Hex
 import assembler.MemoryPage
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.LoadMultiple
 import assembler.arm.opcodes.UpdateMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.instructions.StoreMultiple
-import assembler.arm.instructions.ReturnFromException
 
 class LoadStoreMultipleSuite extends WordSpec with ShouldMatchers {
 

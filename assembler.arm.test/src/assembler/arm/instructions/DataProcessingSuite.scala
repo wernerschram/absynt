@@ -1,4 +1,4 @@
-package assembler.arm.instructions.dataprocessing
+package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
@@ -6,10 +6,10 @@ import assembler.MemoryPage
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.instructions.ARMInstruction
 import assembler.arm.operands.Condition._
 import assembler.arm.operands._
 import assembler.arm.instructions._
+import assembler.arm.operands.Shifter.apply
 class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
@@ -74,7 +74,7 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode adc r1, r2, #1073741824" in {
-        AddCarry(R2, Shifter.ShiftImmediateWithRotate(1.toByte,1.toByte), R1).encode should be(Hex.MSB("e2a21101"))
+        AddCarry(R2, Shifter.ShiftImmediateWithRotate(1.toByte,2.toByte), R1).encode should be(Hex.MSB("e2a21101"))
       }
     }
   }

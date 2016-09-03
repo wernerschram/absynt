@@ -1,16 +1,11 @@
-package assembler.arm.instructions.dataprocessing
+package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-import assembler.MemoryPage
+
 import assembler.Hex
+import assembler.MemoryPage
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.operands.Condition._
-import assembler.arm.operands.Shifter
-import assembler.arm.operands.Condition
-import assembler.arm.instructions.Breakpoint
 
 class MiscellaneousSuite extends WordSpec with ShouldMatchers {
 
