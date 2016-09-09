@@ -59,7 +59,7 @@ class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: In
   override val toString = s"${register} ${mnemonic} ${shiftValue}"
 }
 
-class ShiftImmediateWithRotate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
+class RightRotateImmediate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
   assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
   override val encode = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
 }
@@ -105,7 +105,7 @@ object Shifter {
   def RightRotateExtend(register: GeneralRegister) = 
     new ShiftRegister(0x60, "rrx", register) 
 
-  def ShiftImmediateWithRotate(immediate: Byte, rotateValue: Byte) = 
-    new ShiftImmediateWithRotate(immediate: Byte, rotateValue: Byte)
+  def RightRotateImmediate(immediate: Byte, rotateValue: Byte) = 
+    new RightRotateImmediate(immediate: Byte, rotateValue: Byte)
 
 }
