@@ -6,9 +6,9 @@ import assembler.PageLocation
 import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.x86.instructions.ReferencingInstructionOnPage
 import assembler.x86.instructions.ReferencingX86Instruction
 import assembler.x86.operands.memoryaccess.NearPointer
+import assembler.x86.ReferencingInstructionOnPage
 
 abstract class JumpInstructionOnPage(
   private val thisLocation: PageLocation,

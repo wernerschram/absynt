@@ -8,6 +8,7 @@ import assembler.PageLocation
 import assembler.Label
 import assembler.LabeledEncodable
 import assembler.LabelCondition
+import assembler.x86.ReferencingInstructionOnPage
 
 abstract class FixedSizeX86Instruction() extends X86Instruction() {
   def size()(implicit page: MemoryPage) = encode.length
@@ -19,20 +20,7 @@ class LabeledX86Instruction(instruction: X86Instruction, override val label: Lab
   override def encode()(implicit page: MemoryPage): List[Byte] = instruction.encode()
   
   override def toString() = s"${label.toString}: ${instruction.toString()}"
-}
-
-abstract class ReferencingInstructionOnPage()(implicit page: MemoryPage, processorMode: ProcessorMode) {
- 
-  def minimumEstimatedSize: Int
-  def maximumEstimatedSize: Int
   
-  def sizeIsKnown: Boolean
-
-  def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int
-  
-  def size: Int
-  
-  def encode: List[Byte]
 }
 
 abstract class ReferencingX86Instruction[T <: ReferencingInstructionOnPage]()

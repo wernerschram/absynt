@@ -1,4 +1,5 @@
-import assembler.x86.ProcessorMode
+package assembler.x86
+
 import assembler.MemoryPage
 
 abstract class ReferencingInstructionOnPage()(implicit page: MemoryPage, processorMode: ProcessorMode) {
