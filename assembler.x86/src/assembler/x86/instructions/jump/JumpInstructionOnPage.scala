@@ -11,11 +11,9 @@ import assembler.x86.instructions.ReferencingX86Instruction
 import assembler.x86.operands.memoryaccess.NearPointer
 
 abstract class JumpInstructionOnPage(
-  //private val factory: JumpInstructionFactory,
   private val thisLocation: PageLocation,
   private val destinationLocation: PageLocation)(implicit page: MemoryPage, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage() {
-
     
   def minimumSize: Int
   def maximumSize: Int
@@ -28,10 +26,6 @@ abstract class JumpInstructionOnPage(
   private val forward = (thisLocation < destinationLocation)
 
   private val intermediateInstructions = page.slice(thisLocation, destinationLocation)
-
-//  private lazy val independentIntermediates: List[Encodable[_]] = intermediateInstructions.collect {
-//    case instruction: Encodable[_] if (!instruction.isInstanceOf[ReferencingX86Instruction[_]]) => instruction
-//  }
   
   private lazy val independentIntermediates: List[Encodable[_]] = intermediateInstructions.filter {
     case instruction: ReferencingX86Instruction[_] => false
@@ -43,10 +37,6 @@ abstract class JumpInstructionOnPage(
     case _ => false
   }.map{i => i.asInstanceOf[ReferencingX86Instruction[ReferencingInstructionOnPage]]}
   
-//  private lazy val dependentIntermediates = intermediateInstructions.collect {
-//    case instruction: ReferencingX86Instruction[_] => instruction
-//  }
-
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum
 
