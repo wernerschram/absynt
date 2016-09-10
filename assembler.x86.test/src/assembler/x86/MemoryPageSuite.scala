@@ -15,17 +15,17 @@ import assembler.x86.instructions.jump.Jump
 class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
   def filler(size: Int) = { 
-    val filler = stub[Encodable[Byte]]
+    val filler = stub[Encodable]
     (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.encode()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
+    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
     filler
   }
 
   def labeledFiller(size: Int, label: String) = {
-    val filler = stub[LabeledEncodable[Byte]]
+    val filler = stub[LabeledEncodable]
     (filler.size()(_: MemoryPage)).when(*).returns(size)
     (filler.label _).when.returns(new StringLabel(label))
-    (filler.encode()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
+    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
     filler
   }
 
@@ -40,7 +40,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encode() should be(Hex("EB 01 00 00"))
+        p.encodeByte() should be(Hex.LSB("EB 01 00 00"))
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
@@ -50,7 +50,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             Jump(StringLabelCondition("Label")) ::
             Nil)
 
-        p.encode() should be(Hex("00 00 EB FC"))
+        p.encodeByte() should be(Hex.LSB("00 00 EB FC"))
       }
 
       "Encode a simple program with an indirect forward near jump instruction" in {
@@ -60,7 +60,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encode() should be(Hex("E9 00 01" + " 00" * 257))
+        p.encodeByte() should be(Hex.LSB("E9 00 01" + " 00" * 257))
       }
 
       "Encode a simple program with an indirect backward near jump instruction" in {
@@ -70,7 +70,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             Jump(StringLabelCondition("Label")) ::
             Nil)
 
-        p.encode() should be(Hex("00 " * 257 + "E9 FC FE"))
+        p.encodeByte() should be(Hex.LSB("00 " * 257 + "E9 FC FE"))
       }
 
       "Encode a program with two indirect short jump instructions of which one jumps across the other" in {
@@ -82,7 +82,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             Jump(StringLabelCondition("Label1")) ::
             Nil)
 
-        p.encode() should be(Hex("00 EB 01 " + "00 " * 2 + "EB F9"))
+        p.encodeByte() should be(Hex.LSB("00 EB 01 " + "00 " * 2 + "EB F9"))
       }
 
       "Encode a program with two indirect short jump instructions of which one jumps across the other and depends on the size of the other for its size" in {
@@ -101,7 +101,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             Jump(StringLabelCondition("Label1")) ::
             Nil)
 
-        p.encode() should be(Hex("00 EB 7A " + "00 " * 123 + "EB 80"))
+        p.encodeByte() should be(Hex.LSB("00 EB 7A " + "00 " * 123 + "EB 80"))
       }
 
       "Encode a program with two indirect short jump instructions that jump across eachother and depends on the size of the other for its size" in {
@@ -121,7 +121,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label2") ::
             Nil)
 
-        p.encode() should be(Hex("00 EB 7F " + "00 " * 123 + "EB 80 00 00 00"))
+        p.encodeByte() should be(Hex.LSB("00 EB 7F " + "00 " * 123 + "EB 80 00 00 00"))
       }
 
       "Encode a program with two indirect near jump instructions that jump across eachother and depends on the size of the other for its size" in {
@@ -141,7 +141,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label2") ::
             Nil)
 
-        p.encode() should be(Hex("00 E9 80 00 " + "00 " * 123 + "E9 7E FF 00 00 00 00"))
+        p.encodeByte() should be(Hex.LSB("00 E9 80 00 " + "00 " * 123 + "E9 7E FF 00 00 00 00"))
       }
 
       "Encode a program with three indirect short jump instructions that jump across eachother and depends on the size of the others for its size" in {
@@ -168,7 +168,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label3") ::
             Nil)
 
-        p.encode() should be(Hex("00 EB 7F " + "00 " * 60 + "EB 7F " + "00 " * 61 + "EB 80" + " 00" * 65))
+        p.encodeByte() should be(Hex.LSB("00 EB 7F " + "00 " * 60 + "EB 7F " + "00 " * 61 + "EB 80" + " 00" * 65))
       }
 
       "Encode a program with three indirect near jump instructions that jump across eachother and depends on the size of the others for its size" in {
@@ -195,7 +195,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label3") ::
             Nil)
 
-        p.encode() should be(Hex("00 E9 80 00 " + "00 " * 60 + "E9 80 00 " + "00 " * 61 + "E9 7E FF" + " 00" * 66))
+        p.encodeByte() should be(Hex.LSB("00 E9 80 00 " + "00 " * 60 + "E9 80 00 " + "00 " * 61 + "E9 7E FF" + " 00" * 66))
       }
     }
 
@@ -209,7 +209,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             Jump(StringLabelCondition("Label")) ::
             Nil)
 
-        p.encode() should be(Hex("00 00 EB FC"))
+        p.encodeByte() should be(Hex.LSB("00 00 EB FC"))
       }
 
       "Encode a simple program with an indirect forward near jump instruction" in {
@@ -219,7 +219,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encode() should be(Hex("E9 00 01 00 00" + " 00" * 257))
+        p.encodeByte() should be(Hex.LSB("E9 00 01 00 00" + " 00" * 257))
       }
 
     }

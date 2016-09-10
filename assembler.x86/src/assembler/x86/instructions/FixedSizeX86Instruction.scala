@@ -11,14 +11,14 @@ import assembler.LabelCondition
 import assembler.x86.ReferencingInstructionOnPage
 
 abstract class FixedSizeX86Instruction() extends X86Instruction() {
-  def size()(implicit page: MemoryPage) = encode.length
-  def withLabel(label: Label): LabeledEncodable[Byte] = new LabeledX86Instruction(this, label)
+  def size()(implicit page: MemoryPage) = encodeByte().length
+  def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
 }
 
-class LabeledX86Instruction(instruction: X86Instruction, override val label: Label) extends FixedSizeX86Instruction with LabeledEncodable[Byte] {
+class LabeledX86Instruction(instruction: X86Instruction, override val label: Label) extends FixedSizeX86Instruction with LabeledEncodable {
   override def size()(implicit page: MemoryPage) = instruction.size()
-  override def encode()(implicit page: MemoryPage): List[Byte] = instruction.encode()
-  
+  override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
+    
   override def toString() = s"${label.toString}: ${instruction.toString()}"
   
 }
@@ -35,7 +35,7 @@ abstract class ReferencingX86Instruction[T <: ReferencingInstructionOnPage]()
   def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: MemoryPage) = getOrElseCreateInstruction.estimatedSize(sizeAssumptions)
 
   def size()(implicit page: MemoryPage) = getOrElseCreateInstruction.size
-  def encode()(implicit page: MemoryPage) = getOrElseCreateInstruction.encode 
+  def encodeByte()(implicit page: MemoryPage) = getOrElseCreateInstruction.encodeByte 
 }
 
 class DeferedReferencingX86Instruction[T <: ReferencingInstructionOnPage](
@@ -58,10 +58,10 @@ class DeferedReferencingX86Instruction[T <: ReferencingInstructionOnPage](
 
 class LabeledReferencingX86Instruction[T <: ReferencingInstructionOnPage](
     instruction: ReferencingX86Instruction[T],
-    val label: Label) extends ReferencingX86Instruction[T]() with LabeledEncodable[Byte] {
+    val label: Label) extends ReferencingX86Instruction[T]() with LabeledEncodable {
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = instruction.getOrElseCreateInstruction()
 
   override def size()(implicit page: MemoryPage) = instruction.size()
-  override def encode()(implicit page: MemoryPage): List[Byte] = instruction.encode()
+  override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
   override def withLabel(label: Label) = new LabeledReferencingX86Instruction[T](this, label)
 }

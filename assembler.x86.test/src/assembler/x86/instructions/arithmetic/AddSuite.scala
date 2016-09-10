@@ -23,11 +23,11 @@ class AddSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode add al, 0x40" in {
-        Add(0x40.toByte, AL).encode should be(Hex("04 40"))
+        Add(0x40.toByte, AL).encodeByte should be(Hex.LSB("04 40"))
       }
 
       "correctly encode add bl, 0x40" in {
-        Add(0x40.toByte, BL).encode should be(Hex("80 C3 40"))
+        Add(0x40.toByte, BL).encodeByte should be(Hex.LSB("80 C3 40"))
       }
     }
   }

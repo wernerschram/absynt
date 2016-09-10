@@ -23,11 +23,11 @@ class SubtractSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
       
       "correctly encode sub al, 0x40" in {
-        Subtract(0x40.toByte, AL).encode should be (Hex("2C 40")) 
+        Subtract(0x40.toByte, AL).encodeByte should be (Hex.LSB("2C 40")) 
       }
   
       "correctly encode sub bl, 0x40" in {
-        Subtract(0x40.toByte, BL).encode should be (Hex("80 EB 40"))
+        Subtract(0x40.toByte, BL).encodeByte should be (Hex.LSB("80 EB 40"))
       }
     }
   }

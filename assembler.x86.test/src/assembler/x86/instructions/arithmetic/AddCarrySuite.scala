@@ -21,12 +21,12 @@ class AddCarrySuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.Real
       
-      "correctly encode adc al, 0x40" in {
-        AddCarry(0x40.toByte, AL).encode should be (Hex("14 40")) 
+      "correctly encodeByte adc al, 0x40" in {
+        AddCarry(0x40.toByte, AL).encodeByte should be (Hex.LSB("14 40")) 
       }
   
-      "correctly encode adc bl, 0x40" in {
-        AddCarry(0x40.toByte, BL).encode should be (Hex("80 D3 40"))
+      "correctly encodeByte adc bl, 0x40" in {
+        AddCarry(0x40.toByte, BL).encodeByte should be (Hex.LSB("80 D3 40"))
       }
     }
   }

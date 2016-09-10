@@ -23,11 +23,11 @@ class AndSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
       
       "correctly encode and al, 0x40" in {
-        And(0x40.toByte, AL).encode should be (Hex("24 40")) 
+        And(0x40.toByte, AL).encodeByte should be (Hex.LSB("24 40")) 
       }
 
       "correctly encode and bl, 0x40" in {
-        And(0x40.toByte, BL).encode should be (Hex("80 E3 40"))
+        And(0x40.toByte, BL).encodeByte should be (Hex.LSB("80 E3 40"))
       }
     }
   }

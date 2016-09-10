@@ -35,7 +35,7 @@ abstract class OneOperand[OperandType <: Operand](val parameterPosition: Paramet
   def apply(operand: OperandType)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
     new FixedSizeX86Instruction() {
       assume(validate(operand))
-      override def encode()(implicit page: MemoryPage): List[Byte] = {
+      override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
         val operandSize = getOperandSize(operand)
         Opcode.optionalOperandSizePrefix(operandSize) :::
           Opcode.optionalAddressSizePrefix(getAddressSize(operand)) :::

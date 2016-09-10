@@ -56,22 +56,22 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage, processorMode: ProcessorMode) = {
       if (forward) {
         if (distance <= forwardShortNearBoundary) {
-          apply(NearPointer(distance.toByte.encodeLittleEndian)).encode
+          apply(NearPointer(distance.toByte.encodeLittleEndian)).encodeByte
         } else {
           if (processorMode == ProcessorMode.Real) {
-            apply(NearPointer(distance.toShort.encodeLittleEndian)).encode
+            apply(NearPointer(distance.toShort.encodeLittleEndian)).encodeByte
           } else {
-            apply(NearPointer(distance.toInt.encodeLittleEndian)).encode
+            apply(NearPointer(distance.toInt.encodeLittleEndian)).encodeByte
           }
         }
       } else {
         if (distance <= backwardShortNearBoundary) {
-          apply(NearPointer((-distance - shortJumpSize).toByte.encodeLittleEndian)).encode
+          apply(NearPointer((-distance - shortJumpSize).toByte.encodeLittleEndian)).encodeByte
         } else {
           if (processorMode == ProcessorMode.Real) {
-            apply(NearPointer((-distance - nearJumpSize).toShort.encodeLittleEndian)).encode
+            apply(NearPointer((-distance - nearJumpSize).toShort.encodeLittleEndian)).encodeByte
           } else {
-            apply(NearPointer((-distance - nearJumpSize).toInt.encodeLittleEndian)).encode
+            apply(NearPointer((-distance - nearJumpSize).toInt.encodeLittleEndian)).encodeByte
           }
         }
       }

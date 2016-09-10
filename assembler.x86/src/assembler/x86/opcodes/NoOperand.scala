@@ -20,7 +20,7 @@ abstract class NoOperand(val mnemonic: String) {
   def apply()(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
     new FixedSizeX86Instruction() {
       assume(validate())
-      override def encode()(implicit page: MemoryPage): List[Byte] = getCode()
+      override def encodeByte()(implicit page: MemoryPage): List[Byte] = getCode()
       override def toString() = NoOperand.this.toString()
     }
   }

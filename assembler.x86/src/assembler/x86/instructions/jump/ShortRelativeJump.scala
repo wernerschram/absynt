@@ -29,9 +29,9 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
 
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage, processorMode: ProcessorMode) = {
       if (forward) {
-        apply(NearPointer(distance.toByte.encodeLittleEndian)).encode
+        apply(NearPointer(distance.toByte.encodeLittleEndian)).encodeByte
       } else {
-        apply(NearPointer((-distance - shortJumpSize).toByte.encodeLittleEndian)).encode
+        apply(NearPointer((-distance - shortJumpSize).toByte.encodeLittleEndian)).encodeByte
       }
     }
   }

@@ -26,7 +26,7 @@ abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
   def apply(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
     new FixedSizeX86Instruction() {
       assume(validate(operand1, operand2))
-      override def encode()(implicit page: MemoryPage): List[Byte] = {
+      override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
         val rexRequirements = operand1.getRexRequirements(parameter1Position) ::: operand2.getRexRequirements(parameter2Position)
 
         Opcode.optionalSegmentOverridePrefix(TwoOperand.getSegmentOverride(operand1, operand2)) :::

@@ -13,5 +13,5 @@ abstract class ReferencingInstructionOnPage()(implicit page: MemoryPage, process
   
   def size: Int
   
-  def encode: List[Byte]
+  def encodeByte: List[Byte]
 }

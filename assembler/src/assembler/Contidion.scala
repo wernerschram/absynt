@@ -4,10 +4,10 @@ abstract class Condition {
   def filterList[T](list: List[T]): List[T]
 }
 
-class LabelCondition(labelMatcher: LabeledEncodable[_] => Boolean) extends Condition {
+class LabelCondition(labelMatcher: LabeledEncodable => Boolean) extends Condition {
   def filterList[T](list: List[T]) =
     list.filter {
-      case x: LabeledEncodable[_] => labelMatcher(x);
+      case x: LabeledEncodable => labelMatcher(x);
       case default => false
     }
 }

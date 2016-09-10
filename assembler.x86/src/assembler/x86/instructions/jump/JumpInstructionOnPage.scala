@@ -27,7 +27,7 @@ abstract class JumpInstructionOnPage(
 
   private val intermediateInstructions = page.slice(thisLocation, destinationLocation)
   
-  private lazy val independentIntermediates: List[Encodable[_]] = intermediateInstructions.filter {
+  private lazy val independentIntermediates: List[Encodable] = intermediateInstructions.filter {
     case instruction: ReferencingX86Instruction[_] => false
     case _ => true
   }
@@ -85,5 +85,5 @@ abstract class JumpInstructionOnPage(
     estimation
   }
 
-  override lazy val encode = encodeForDistance(forward, actualDistance) 
+  override lazy val encodeByte = encodeForDistance(forward, actualDistance) 
 }

@@ -17,7 +17,7 @@ class MiscellaneousSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode bkpt 0x00cc" in {
-        Breakpoint(0xf15.toShort).encode should be(Hex.MSB("e120f175"))
+        Breakpoint(0xf15.toShort).encodeByte should be(Hex.MSB("e120f175"))
       }
       
     }

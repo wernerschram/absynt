@@ -6,16 +6,13 @@ import assembler.Label
 import assembler.MemoryPage
 import assembler.arm.operands.Condition._
 
-abstract class ARMInstruction() extends Encodable[Int]() {
-  def withLabel(label: Label): LabeledEncodable[Int] = ???
+abstract class ARMInstruction() extends Encodable() {
+  def withLabel(label: Label): LabeledEncodable = ???
   override def size()(implicit page: MemoryPage) = 4
 
   def encodeWord()(implicit page: MemoryPage): Int
 
-  override final def encode()(implicit page: MemoryPage): List[Int] =
-    encodeWord :: Nil
-
-  def encodeByte()(implicit page: MemoryPage): List[Byte] = encode.flatMap { x => x.encodeLittleEndian }
+  def encodeByte()(implicit page: MemoryPage): List[Byte] = encodeWord.encodeLittleEndian
 }
 
 object ARMInstruction {

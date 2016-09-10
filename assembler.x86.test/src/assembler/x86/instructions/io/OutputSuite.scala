@@ -20,7 +20,7 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
       
       "correctly encode out 0x10, al" in {
-        Output(AL, 0x10.toByte).encode should be (Hex("E6 10")) 
+        Output(AL, 0x10.toByte).encodeByte should be (Hex.LSB("E6 10")) 
       }
 
       "throw an Exception for out 0x0010, al" in {
@@ -30,42 +30,42 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       }    
 
       "correctly encode out 0x20, ax" in {
-        Output(AX, 0x20.toByte).encode should be (Hex("E7 20"))
+        Output(AX, 0x20.toByte).encodeByte should be (Hex.LSB("E7 20"))
       }
 
       "correctly encode out dx, al" in {
-        Output(AL, DX).encode should be (Hex("EE"))
+        Output(AL, DX).encodeByte should be (Hex.LSB("EE"))
       }
 
       "correctly encode out dx, ax" in {
-        Output(AX, DX).encode should be (Hex("EF"))
+        Output(AX, DX).encodeByte should be (Hex.LSB("EF"))
       }
 
       "correctly encode out dx, eax" in {
-        Output(EAX, DX).encode should be (Hex("EF"))
+        Output(EAX, DX).encodeByte should be (Hex.LSB("EF"))
       }
     }
     "in protected mode" should {
       implicit val processorMode = ProcessorMode.Protected
 
       "correctly encode out 0x10, al" in {
-        Output(AL, 0x10.toByte).encode should be (Hex("E6 10")) 
+        Output(AL, 0x10.toByte).encodeByte should be (Hex.LSB("E6 10")) 
       }
 
       "correctly encode out 0x40, al" in {
-        Output(AX, 0x20.toByte).encode should be (Hex("E7 20"))
+        Output(AX, 0x20.toByte).encodeByte should be (Hex.LSB("E7 20"))
       }
 
       "correctly encode out dx, al" in {
-        Output(AL, DX).encode should be (Hex("EE"))
+        Output(AL, DX).encodeByte should be (Hex.LSB("EE"))
       }
 
       "correctly encode out dx, ax" in {
-        Output(AX, DX).encode should be (Hex("EF"))
+        Output(AX, DX).encodeByte should be (Hex.LSB("EF"))
       }
 
       "correctly encode out dx, eax" in {
-        Output(EAX, DX).encode should be (Hex("EF"))
+        Output(EAX, DX).encodeByte should be (Hex.LSB("EF"))
       }
 
     }
@@ -74,23 +74,23 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Long
 
       "correctly encode out 0x10, al" in {
-        Output(AL, 0x10.toByte).encode should be (Hex("E6 10")) 
+        Output(AL, 0x10.toByte).encodeByte should be (Hex.LSB("E6 10")) 
       }
 
       "correctly encode out 0x20, ax" in {
-        Output(AX, 0x20.toByte).encode should be (Hex("E7 20"))
+        Output(AX, 0x20.toByte).encodeByte should be (Hex.LSB("E7 20"))
       }
 
       "correctly encode out dx, al" in {
-        Output(AL, DX).encode should be (Hex("EE"))
+        Output(AL, DX).encodeByte should be (Hex.LSB("EE"))
       }
 
       "correctly encode out dx, ax" in {
-        Output(AX, DX).encode should be (Hex("EF"))
+        Output(AX, DX).encodeByte should be (Hex.LSB("EF"))
       }
 
       "correctly encode out dx, eax" in {
-        Output(EAX, DX).encode should be (Hex("EF"))
+        Output(EAX, DX).encodeByte should be (Hex.LSB("EF"))
       }
       
       "throw an Exception for out dx, rax" in {

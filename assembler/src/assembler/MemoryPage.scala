@@ -2,8 +2,8 @@ package assembler
 
 import scala.collection.immutable.HashMap
 
-class MemoryPage(val content: List[Encodable[Z] forSome { type Z <: AnyVal } ]) {
-  def encodableLocation(encodable: Encodable[Z] forSome { type Z <: AnyVal }) = new PageLocation(content.indexOf(encodable))
+class MemoryPage(val content: List[Encodable]) {
+  def encodableLocation(encodable: Encodable) = new PageLocation(content.indexOf(encodable))
 
   def getInstructionByCondition(condition: Condition) =
     condition.filterList(content).head
@@ -15,7 +15,6 @@ class MemoryPage(val content: List[Encodable[Z] forSome { type Z <: AnyVal } ]) 
       content.slice(to.value, from.value)
     }
     
-  def encode() = content.flatMap { x => x.encode()(this) }
   def encodeByte() = content.flatMap { x => x.encodeByte()(this) }
 }
 

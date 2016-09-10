@@ -21,11 +21,11 @@ class NotSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode not BYTE PTR [0x01]" in {
-        Not(MemoryAddress.byteSize(0x0001.toShort.encodeLittleEndian)).encode should be(Hex("F6 16 01 00"))
+        Not(MemoryAddress.byteSize(0x0001.toShort.encodeLittleEndian)).encodeByte should be(Hex.LSB("F6 16 01 00"))
       }
 
       "correctly encode not WORD PTR [0x0001]" in {
-        Not(MemoryAddress.wordSize(0x0001.toShort.encodeLittleEndian)).encode should be(Hex("F7 16 01 00"))
+        Not(MemoryAddress.wordSize(0x0001.toShort.encodeLittleEndian)).encodeByte should be(Hex.LSB("F7 16 01 00"))
       }
     }
     "in protected mode" should {
@@ -33,7 +33,7 @@ class NotSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Protected
 
       "correctly encode not eax" in {
-        Not(EAX).encode should be(Hex("F7 D0"))
+        Not(EAX).encodeByte should be(Hex.LSB("F7 D0"))
       }
     }
 
@@ -42,7 +42,7 @@ class NotSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Long
 
       "correctly encode not QWORD PTR [rax]" in {
-        Not(RegisterMemoryLocation.quadWordSize(RAX)).encode should be(Hex("48 F7 10"))
+        Not(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(Hex.LSB("48 F7 10"))
       }
     }
   }

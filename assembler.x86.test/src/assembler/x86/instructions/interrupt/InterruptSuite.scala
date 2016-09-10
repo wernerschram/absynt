@@ -22,7 +22,7 @@ class InterruptSuite extends WordSpec with ShouldMatchers with MockFactory {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode int 0x03" in {
-        Interrupt(0x03.toByte).encode should be (Hex("CC"))
+        Interrupt(0x03.toByte).encodeByte should be (Hex.LSB("CC"))
       }  
     }
     "in long mode" should {
@@ -30,7 +30,7 @@ class InterruptSuite extends WordSpec with ShouldMatchers with MockFactory {
       implicit val processorMode = ProcessorMode.Long
 
       "correctly encode int 0x01" in {
-        Interrupt(0x01.toByte).encode should be (Hex("CD 01"))
+        Interrupt(0x01.toByte).encodeByte should be (Hex.LSB("CD 01"))
       }
 
       "throw an AssertionError for INT 0x0001" in {

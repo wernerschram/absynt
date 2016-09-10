@@ -23,11 +23,11 @@ class SubtractCarrySuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
       
       "correctly encode sbb al, 0x40" in {
-        SubtractCarry(0x40.toByte, AL).encode should be (Hex("1C 40")) 
+        SubtractCarry(0x40.toByte, AL).encodeByte should be (Hex.LSB("1C 40")) 
       }
   
       "correctly encode sbb bl, 0x40" in {
-        SubtractCarry(0x40.toByte, BL).encode should be (Hex("80 DB 40"))
+        SubtractCarry(0x40.toByte, BL).encodeByte should be (Hex.LSB("80 DB 40"))
       }
     }
   }

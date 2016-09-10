@@ -23,11 +23,11 @@ class CompareSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
       
       "correctly encode cmp al, 0x40" in {
-        Compare(0x40.toByte, AL).encode should be (Hex("3C 40")) 
+        Compare(0x40.toByte, AL).encodeByte should be (Hex.LSB("3C 40")) 
       }
   
       "correctly encode cmp bl, 0x40" in {
-        Compare(0x40.toByte, BL).encode should be (Hex("80 FB 40"))
+        Compare(0x40.toByte, BL).encodeByte should be (Hex.LSB("80 FB 40"))
       }
     }
   }

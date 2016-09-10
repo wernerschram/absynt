@@ -19,7 +19,7 @@ class PushFlagsSuite extends WordSpec with ShouldMatchers with MockFactory {
       implicit val processorMode = ProcessorMode.Long
       
       "correctly encode pushf" in {
-        PushFlags().encode should be (Hex("9C"))
+        PushFlags().encodeByte should be (Hex.LSB("9C"))
       }
     }
   }

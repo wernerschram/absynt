@@ -23,11 +23,11 @@ class OrSuite extends WordSpec with ShouldMatchers {
       implicit val processorMode = ProcessorMode.Real
       
       "correctly encode or al, 0x40" in {
-        Or(0x40.toByte, AL).encode should be (Hex("0C 40")) 
+        Or(0x40.toByte, AL).encodeByte should be (Hex.LSB("0C 40")) 
       }
   
       "correctly encode or bl, 0x40" in {
-        Or(0x40.toByte, BL).encode should be (Hex("80 CB 40"))
+        Or(0x40.toByte, BL).encodeByte should be (Hex.LSB("80 CB 40"))
       }
     }
   }

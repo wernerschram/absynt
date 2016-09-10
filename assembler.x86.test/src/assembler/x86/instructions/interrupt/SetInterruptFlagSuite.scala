@@ -21,7 +21,7 @@ class SetInterruptFlagSuite extends WordSpec with ShouldMatchers with MockFactor
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode sti" in {
-          SetInterruptFlag().encode should be (Hex("FB"))
+          SetInterruptFlag().encodeByte should be (Hex.LSB("FB"))
       }     
     }
     "in long mode" should {
@@ -30,7 +30,7 @@ class SetInterruptFlagSuite extends WordSpec with ShouldMatchers with MockFactor
 
 
       "correctly encode sti" in {
-          SetInterruptFlag().encode should be (Hex("FB"))
+          SetInterruptFlag().encodeByte should be (Hex.LSB("FB"))
       } 
     }
   }
