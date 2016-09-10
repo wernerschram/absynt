@@ -73,8 +73,13 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         AddCarry(R2, Shifter.RightRotateExtend(R3), R1).encodeByte should be(Hex.MSB("e0a21063"))
       }
 
-      "correctly encode adc r1, r2, #1073741824" in {
+      "correctly encode adc r1, r2, 1, 2" in {
         AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,2.toByte), R1).encodeByte should be(Hex.MSB("e2a21101"))
+      }
+
+      info("Not that there are different ways of encoding adc r1, r2, #1073741824. This test could result in false negatives")
+      "correctly encode adc r1, r2, #1073741824" in {
+        AddCarry(R2, Shifter.ForImmediate(1073741824), R1).encodeByte should be(Hex.MSB("e2a21101"))
       }
 
       "throw an AssertionError for adc r1, r2, 1, 1" in {
