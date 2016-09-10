@@ -110,15 +110,30 @@ object Shifter {
     new RightRotateImmediate(immediate: Byte, rotateValue: Byte)
 
   def ForImmediate(immediate: Int) = { 
-    val options = 0 to 30 by 2
-    
-    val rotateValue = options.find { x => ((Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x)) }
+    val rotateValue = (0 to 30 by 2).find { x => ((Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x)) }
     assume(rotateValue.isDefined)
-    val rotate = rotateValue.get.toByte
     
+    val rotate = rotateValue.get.toByte
     new RightRotateImmediate(Integer.rotateLeft(immediate, rotate).toByte, rotate)
-
   }
+
+  def CreateShifters(value: Int, minRotate: Int): List[RightRotateImmediate] = {
+    if (value == 0) return Shifter.RightRotateImmediate(0, 0) :: Nil
+    
+	  val rotateValue = (minRotate to 30 by 2).find { x => ((Integer.rotateLeft(value, x) & 0xC0) != 0) }
+	  val rotate = rotateValue.get.toByte
+	  
+    val intermediateValue = Integer.rotateLeft(value, rotate)
+    if ((intermediateValue & 0xFF) == (intermediateValue))
+    	return Shifter.RightRotateImmediate(intermediateValue.toByte, rotate) :: Nil
+    else
+    	return Shifter.RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) :: CreateShifters(value & Integer.rotateRight(0xFFFFFF00, rotate), rotate)
+  }                               
+  
+  implicit def apply(immediate: Int) = CreateShifters(immediate, 0)
+  
+//  implicit def apply(immediate: Int) = ForImmediate(immediate)
+  
 }
 
 
