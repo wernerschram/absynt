@@ -56,7 +56,12 @@ object LoadStoreOffset {
     override val toString: String = s"#${updateDirection.sign}${offset}"
   }
 
-  implicit def apply(offset: Short): LoadStoreOffset = apply(offset, UpdateDirection.Increment)
+  implicit def apply(offset: Short): LoadStoreOffset = {
+    if (offset >= 0)
+      apply(offset, UpdateDirection.Increment)
+    else 
+      apply((-offset).toShort, UpdateDirection.Decrement)
+  }
 
   implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreOffset(updateDirection) {
     override val encode = 0x06000000 | offsetRegister.registerCode | updateDirection.bitMask
