@@ -52,3 +52,13 @@ object ReturnFromException {
   def withUpdateBase(baseRegister: GeneralRegister, addressingMode: UpdateMode)(implicit processorMode: ProcessorMode) = 
     Immed(baseRegister, addressingMode, true)
 }
+
+object Push {
+  def apply(registers: List[GeneralRegister])(implicit processorMode: ProcessorMode) = 
+    LoadMultiple.withUpdateBase(registers, GeneralRegister.SP, UpdateMode.DecrementAfter)
+}
+
+object Pop {
+  def apply(registers: List[GeneralRegister])(implicit processorMode: ProcessorMode) = 
+    StoreMultiple.withUpdateBase(registers, GeneralRegister.SP, UpdateMode.IncrementBefore)
+}
