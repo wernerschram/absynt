@@ -4,7 +4,7 @@ import assembler.LabelCondition
 import assembler.MemoryPage
 import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.DeferedReferencingX86Instruction
+import assembler.x86.instructions.ReferencingX86Instruction
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.memoryaccess.NearPointer
 import assembler.PageLocation
@@ -37,7 +37,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   }
 
   def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new DeferedReferencingX86Instruction[JumpInstructionOnPage](
+    new ReferencingX86Instruction[JumpInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>  
         new ShortJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
         mnemonic, condition)

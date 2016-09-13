@@ -9,7 +9,7 @@ import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.x86.ProcessorMode
 
-class DeferedReferencingX86Instruction[T <: ReferencingInstructionOnPage](
+class ReferencingX86Instruction[T <: ReferencingInstructionOnPage](
   factory: (PageLocation, PageLocation, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)
