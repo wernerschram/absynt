@@ -1,8 +1,8 @@
-package assembler.x86
+package assembler.reference
 
 import assembler.MemoryPage
 
-abstract class ReferencingInstructionOnPage()(implicit page: MemoryPage, processorMode: ProcessorMode) {
+abstract class ReferencingInstructionOnPage()(implicit page: MemoryPage) {
  
   def minimumEstimatedSize: Int
   def maximumEstimatedSize: Int

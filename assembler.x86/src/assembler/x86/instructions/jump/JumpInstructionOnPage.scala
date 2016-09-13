@@ -6,9 +6,9 @@ import assembler.PageLocation
 import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.x86.instructions.ReferencingX86Instruction
 import assembler.x86.operands.memoryaccess.NearPointer
-import assembler.x86.ReferencingInstructionOnPage
+import assembler.reference.ReferencingInstruction
+import assembler.reference.ReferencingInstructionOnPage
 
 abstract class JumpInstructionOnPage(
   private val thisLocation: PageLocation,
@@ -28,14 +28,14 @@ abstract class JumpInstructionOnPage(
   private val intermediateInstructions = page.slice(thisLocation, destinationLocation)
   
   private lazy val independentIntermediates: List[Encodable] = intermediateInstructions.filter {
-    case instruction: ReferencingX86Instruction[_] => false
+    case instruction: ReferencingInstruction[_] => false
     case _ => true
   }
   
   private lazy val dependentIntermediates = intermediateInstructions.filter {
-    case instruction: ReferencingX86Instruction[_] => true
+    case instruction: ReferencingInstruction[_] => true
     case _ => false
-  }.map{i => i.asInstanceOf[ReferencingX86Instruction[ReferencingInstructionOnPage]]}
+  }.map{i => i.asInstanceOf[ReferencingInstruction[ReferencingInstructionOnPage]]}
   
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum
