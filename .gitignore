@@ -51,3 +51,7 @@ local.properties
 
 # Scala cache
 .cache-main
+
+# Scala worksheets
+*.sc
+.worksheet/
