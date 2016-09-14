@@ -54,6 +54,8 @@ object ListExtensions {
   implicit class ListToImmediate(value: List[Byte]) {
     def decimalString() = decimal.toString()
 
+    def hexString() : String = value.reverse.map("%02X" format _).mkString
+    
     def decimal(): Long = value.length match {
       case 1 => value.head
       case 2 => ByteBuffer.wrap(value.reverse.toArray).getShort

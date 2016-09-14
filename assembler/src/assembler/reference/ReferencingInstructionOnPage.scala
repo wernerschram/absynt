@@ -2,7 +2,7 @@ package assembler.reference
 
 import assembler.MemoryPage
 
-abstract class ReferencingInstructionOnPage()(implicit page: MemoryPage) {
+trait ReferencingInstructionOnPage {
  
   def minimumEstimatedSize: Int
   def maximumEstimatedSize: Int

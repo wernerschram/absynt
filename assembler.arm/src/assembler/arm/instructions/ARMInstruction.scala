@@ -6,7 +6,7 @@ import assembler.Label
 import assembler.MemoryPage
 import assembler.arm.operands.Condition._
 
-abstract class ARMInstruction() extends Encodable() {
+trait ARMInstruction extends Encodable() {
   def withLabel(label: Label): LabeledEncodable = new LabeledARMInstruction(this, label)
   override def size()(implicit page: MemoryPage) = 4
 

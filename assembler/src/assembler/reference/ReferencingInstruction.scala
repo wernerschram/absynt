@@ -16,8 +16,8 @@ trait ReferencingInstruction[T <: ReferencingInstructionOnPage]
 
   def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: MemoryPage) = getOrElseCreateInstruction.estimatedSize(sizeAssumptions)
 
-  def size()(implicit page: MemoryPage) = getOrElseCreateInstruction.size
-  def encodeByte()(implicit page: MemoryPage) = getOrElseCreateInstruction.encodeByte
+//  def size()(implicit page: MemoryPage) = getOrElseCreateInstruction.size
+  override def encodeByte()(implicit page: MemoryPage) = getOrElseCreateInstruction.encodeByte
   
   override def withLabel(label: Label) = new LabeledReferencingInstruction[T](this, label)
 }

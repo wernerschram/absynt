@@ -6,12 +6,46 @@ import assembler.arm.opcodes.BranchRegister
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.reference.BranchInstructionOnPage
+import assembler.PageLocation
+import assembler.MemoryPage
+import assembler.LabelCondition
 
 class Branch(code: Byte, val opcode: String) {
   private val Immediate = new BranchImmediate(code)(opcode)
 
   def apply(destination: RelativePointer, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     Immediate(destination, condition)
+  
+  class ARMBranchInstructionOnPage private[Branch](thisLocation: PageLocation, destinationLocation: PageLocation, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
+      extends BranchInstructionOnPage(thisLocation, destinationLocation) {
+    
+    val branchSize = 1
+    override val minimumSize = branchSize
+    override val maximumSize = branchSize
+
+    override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
+
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
+      if (forward) {
+        apply(RelativePointer(distance - 4), condition).encodeByte
+      } else {
+        apply(RelativePointer(-distance - branchSize - 8), condition).encodeByte
+      }
+    }
+  }
+  
+  def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMInstruction[BranchInstructionOnPage](
+      (thisLocation, targetLocation, memoryPage, processorMode) =>  
+        new ARMBranchInstructionOnPage(thisLocation, targetLocation, Always)(memoryPage, processorMode), 
+        opcode, labelCondition)  
+
+  def apply(labelCondition: LabelCondition, condition: Condition)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMInstruction[BranchInstructionOnPage](
+      (thisLocation, targetLocation, memoryPage, processorMode) =>  
+        new ARMBranchInstructionOnPage(thisLocation, targetLocation, condition)(memoryPage, processorMode), 
+        opcode, labelCondition)  
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
@@ -28,6 +62,30 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(destination: RelativePointer)(implicit processorMode: ProcessorMode) =
     Immediate(destination, Unpredictable)
+    
+  class ARMBranchInstructionOnPage private[BranchLinkExchange](thisLocation: PageLocation, destinationLocation: PageLocation)(implicit page: MemoryPage, processorMode: ProcessorMode)
+      extends BranchInstructionOnPage(thisLocation, destinationLocation) {
+    
+    val branchSize = 1
+    override val minimumSize = branchSize
+    override val maximumSize = branchSize
+
+    override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
+
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
+      if (forward) {
+        apply(RelativePointer(distance - 4)).encodeByte
+      } else {
+        apply(RelativePointer(-distance - branchSize - 8)).encodeByte
+      }
+    }
+  }    
+  
+  def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMInstruction[BranchInstructionOnPage](
+      (thisLocation, targetLocation, memoryPage, processorMode) =>  
+        new ARMBranchInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
+        opcode, labelCondition)  
 
 }
 
