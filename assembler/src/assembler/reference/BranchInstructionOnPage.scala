@@ -1,42 +1,35 @@
-package assembler.x86.instructions.jump
+package assembler.reference
 
 import assembler.Encodable
 import assembler.MemoryPage
 import assembler.PageLocation
-import assembler.ListExtensions._
-import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.x86.operands.memoryaccess.NearPointer
-import assembler.reference.ReferencingInstruction
-import assembler.reference.ReferencingInstructionOnPage
 
-abstract class JumpInstructionOnPage(
+abstract class BranchInstructionOnPage(
   private val thisLocation: PageLocation,
-  private val destinationLocation: PageLocation)(implicit page: MemoryPage, processorMode: ProcessorMode)
+  private val destinationLocation: PageLocation)(implicit page: MemoryPage)
     extends ReferencingInstructionOnPage() {
-    
+
   def minimumSize: Int
   def maximumSize: Int
-  
+
   def getSizeForDistance(forward: Boolean, distance: Int): Int
 
-  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage, processorMode: ProcessorMode): List[Byte]
+  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte]
 
-  
   private val forward = (thisLocation < destinationLocation)
 
   private val intermediateInstructions = page.slice(thisLocation, destinationLocation)
-  
+
   private lazy val independentIntermediates: List[Encodable] = intermediateInstructions.filter {
     case instruction: ReferencingInstruction[_] => false
     case _ => true
   }
-  
+
   private lazy val dependentIntermediates = intermediateInstructions.filter {
     case instruction: ReferencingInstruction[_] => true
     case _ => false
-  }.map{i => i.asInstanceOf[ReferencingInstruction[ReferencingInstructionOnPage]]}
-  
+  }.map { i => i.asInstanceOf[ReferencingInstruction[ReferencingInstructionOnPage]] }
+
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum
 
@@ -69,7 +62,8 @@ abstract class JumpInstructionOnPage(
   override def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
-    while (assumption.exists { value => value < newAssumption }) { {
+    while (assumption.exists { value => value < newAssumption }) {
+      {
         assumption = Some(newAssumption)
         newAssumption = getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
       }
@@ -85,5 +79,5 @@ abstract class JumpInstructionOnPage(
     estimation
   }
 
-  override lazy val encodeByte = encodeForDistance(forward, actualDistance) 
+  override lazy val encodeByte = encodeForDistance(forward, actualDistance)
 }

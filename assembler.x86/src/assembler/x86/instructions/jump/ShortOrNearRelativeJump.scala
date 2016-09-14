@@ -1,13 +1,14 @@
 package assembler.x86.instructions.jump
 
 import assembler.LabelCondition
-import assembler.MemoryPage
 import assembler.ListExtensions._
+import assembler.MemoryPage
+import assembler.PageLocation
+import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.ReferencingX86Instruction
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.memoryaccess.NearPointer
-import assembler.PageLocation
 
 abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: List[Byte], mnemonic: String) extends ShortRelativeJump(shortOpcode, mnemonic) {
   val validate: PartialFunction[(NearPointer, ProcessorMode), Boolean] = {
@@ -27,7 +28,7 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
   }
 
   class ShortOrNearJumpInstructionOnPage(thisLocation: PageLocation, destinationLocation: PageLocation)(implicit page: MemoryPage, processorMode: ProcessorMode)
-      extends JumpInstructionOnPage(thisLocation, destinationLocation) {
+      extends BranchInstructionOnPage(thisLocation, destinationLocation) {
     val shortJumpSize = shortOpcode.length + 1
     val nearJumpSize = processorMode match {
       case ProcessorMode.Real => nearOpcode.length + 2
@@ -53,7 +54,7 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
           nearJumpSize
       }
 
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage, processorMode: ProcessorMode) = {
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
       if (forward) {
         if (distance <= forwardShortNearBoundary) {
           apply(NearPointer(distance.toByte.encodeLittleEndian)).encodeByte
@@ -79,7 +80,7 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
   }
   
   override def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new ReferencingX86Instruction[JumpInstructionOnPage](
+    new ReferencingX86Instruction[BranchInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>  
         new ShortOrNearJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
         mnemonic, condition)
