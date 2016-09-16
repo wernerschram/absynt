@@ -16,7 +16,7 @@ abstract class BranchInstructionOnPage(
 
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte]
 
-  private val forward = (thisLocation < destinationLocation)
+  val forward = (thisLocation < destinationLocation)
 
   private val intermediateInstructions = page.slice(thisLocation, destinationLocation)
 
@@ -43,7 +43,7 @@ abstract class BranchInstructionOnPage(
     case false => maximumSize
   }).sum
 
-  private lazy val actualDistance = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
+  lazy val actualDistance = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
   override def minimumEstimatedSize: Int = getSizeForDistance(forward, minimumDistance)
   override def maximumEstimatedSize: Int = getSizeForDistance(forward, maximumDistance)

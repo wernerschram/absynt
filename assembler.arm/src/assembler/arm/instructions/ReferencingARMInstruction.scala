@@ -9,11 +9,15 @@ import assembler.reference.ReferencingInstructionOnPage
 import assembler.arm.ProcessorMode
 import assembler.Encodable
 
-class ReferencingARMInstruction[T <: ReferencingInstructionOnPage](
+trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
+  def encodeWord: Int
+}
+
+class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
   factory: (PageLocation, PageLocation, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)
-    extends Encodable() with ReferencingInstruction[T] {
+    extends ARMInstruction with ReferencingInstruction[T] {
   val pageMap = new TrieMap[MemoryPage, T]
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = {
@@ -21,6 +25,7 @@ class ReferencingARMInstruction[T <: ReferencingInstructionOnPage](
     pageMap.getOrElseUpdate(page, { factory(page.encodableLocation(this), target, page, processorMode) })
   }
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
+  override def encodeWord()(implicit page: MemoryPage) = getOrElseCreateInstruction().encodeWord
   
   override def toString() = s"${mnemonic} ${condition}"
 }
