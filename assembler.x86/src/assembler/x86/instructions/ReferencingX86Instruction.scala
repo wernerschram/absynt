@@ -16,7 +16,7 @@ class ReferencingX86Instruction[T <: ReferencingInstructionOnPage](
   val pageMap = new TrieMap[MemoryPage, T]
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = {
-    val target = page.encodableLocation(page.getInstructionByCondition(condition))
+    val target = page.encodableLocation(page.getEncodableByCondition(condition))
     pageMap.getOrElseUpdate(page, { factory(page.encodableLocation(this), target, page, processorMode) })
   }
 
