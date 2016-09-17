@@ -17,7 +17,7 @@ abstract class BranchInstructionOnPage(
 
   val forward = (thisLocation < destinationLocation)
 
-  private val intermediateInstructions = page.slice(thisLocation, destinationLocation)
+  private val intermediateInstructions = page.intermediateEncodables(thisLocation, destinationLocation)
 
   private lazy val independentIntermediates: Seq[Encodable] = intermediateInstructions.filter {
     case instruction: ReferencingInstruction[_] => false
