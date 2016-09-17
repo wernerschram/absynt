@@ -5,9 +5,9 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
 import assembler.Encodable
+import assembler.Hex
 import assembler.LabeledEncodable
 import assembler.memory.MemoryPage
-import assembler.Hex
 import assembler.x86.instructions.jump.Jump
 
 class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {

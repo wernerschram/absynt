@@ -2,8 +2,8 @@ package assembler.x86.opcodes
 
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeEncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.registers.SegmentRegister
 
 class ModSegmentRMStatic(code: List[Byte], includeRexW: Boolean = true)(implicit mnemonic: String) 

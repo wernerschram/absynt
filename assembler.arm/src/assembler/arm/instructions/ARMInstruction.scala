@@ -1,10 +1,11 @@
 package assembler.arm.instructions
-import assembler.ListExtensions._
+
 import assembler.Encodable
-import assembler.LabeledEncodable
 import assembler.Label
+import assembler.LabeledEncodable
+import assembler.ListExtensions._
+import assembler.arm.operands.Condition.Condition
 import assembler.memory.MemoryPage
-import assembler.arm.operands.Condition._
 
 trait ARMInstruction extends Encodable() {
   def withLabel(label: Label): LabeledEncodable = new LabeledARMInstruction(this, label)

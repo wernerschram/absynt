@@ -1,11 +1,11 @@
 package assembler.arm.opcodes
 
-import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
 import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.memory.MemoryPage
 
 class LoadStoreMultipleOperation(val bitmask: Int)
 

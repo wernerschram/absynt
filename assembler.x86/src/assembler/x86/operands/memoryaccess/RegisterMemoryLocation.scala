@@ -1,5 +1,7 @@
 package assembler.x86.operands.memoryaccess
 
+import scala.language.implicitConversions
+
 import assembler.ListExtensions._
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
@@ -7,7 +9,6 @@ import assembler.x86.RexExtendedRequirement
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.registers._
-import scala.language.implicitConversions
 
 sealed class RegisterMemoryLocation private (val index: IndexRegister, displacement: List[Byte], segment: SegmentRegister)
     extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)

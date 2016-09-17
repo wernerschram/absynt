@@ -4,14 +4,10 @@ import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.ModRMStatic
 import assembler.x86.opcodes.RegisterEncoded
 import assembler.x86.opcodes.Static
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.FixedSizeEncodableOperand
-import assembler.x86.operands.ImmediateValue
-import assembler.x86.operands.registers.Register
-import assembler.x86.operands.registers.SegmentRegister
-import assembler.x86.operands.registers.WideRegister
 import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
+import assembler.x86.operands.ImmediateValue
+import assembler.x86.operands.registers._
 
 final object Push {
   implicit val opcode = "push"

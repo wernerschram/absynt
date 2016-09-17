@@ -1,5 +1,6 @@
 package assembler.x86.opcodes
 
+import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
@@ -8,8 +9,6 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.FarPointer
 import assembler.x86.operands.memoryaccess.NearPointer
-import assembler.memory.MemoryPage
-import assembler.Label
 import assembler.x86.operands.registers.Register
 
 abstract class NoOperand(val mnemonic: String) {

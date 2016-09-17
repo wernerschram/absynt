@@ -1,7 +1,7 @@
 package assembler.x86.operands.memoryaccess
 
-import assembler.x86.operands.Operand
 import assembler.x86.operands.FixedSizeParameter
+import assembler.x86.operands.Operand
 
 class FarPointer(val segment: List[Byte], val offset: List[Byte]) extends Operand with FixedSizeParameter {
   assume(segment.size == 2)

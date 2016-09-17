@@ -1,12 +1,12 @@
 package assembler.arm.opcodes
 
-import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
 import assembler.arm.instructions.ConditionalARMInstruction
-import assembler.arm.operands.Condition._
+import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.memory.MemoryPage
 
 class DataProcessingInstruction(mnemonic: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister)
     extends ConditionalARMInstruction(condition) {

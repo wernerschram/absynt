@@ -3,9 +3,9 @@ package assembler.x86.instructions.stack
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
+import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage
-import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.ImmediateValue._

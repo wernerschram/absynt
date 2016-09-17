@@ -1,11 +1,11 @@
 package assembler.arm.opcodes
 
-import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
 import assembler.arm.instructions.ConditionalARMInstruction
-import assembler.arm.operands.Condition._
+import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.memory.MemoryPage
 
 class MultiplyInstruction(val code: Byte, mnemonic: String, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode)
     extends ConditionalARMInstruction(condition) {

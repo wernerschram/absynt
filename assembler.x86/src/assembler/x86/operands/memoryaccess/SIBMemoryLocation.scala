@@ -2,11 +2,9 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.registers.SIBBaseRegister
-import assembler.x86.operands.registers.SIBIndexRegister
-import assembler.x86.operands.registers.SegmentRegister
-import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.registers._
 
 sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister, displacement: List[Byte], val scale: Int, segment: SegmentRegister)
     extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize, segment) with ModRMEncodableOperand {

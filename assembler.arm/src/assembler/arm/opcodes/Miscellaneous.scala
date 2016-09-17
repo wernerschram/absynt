@@ -1,14 +1,10 @@
 package assembler.arm.opcodes
 
-import assembler.ListExtensions._
-import assembler.arm.operands.Operand
-import assembler.arm.operands.registers.GeneralRegister
+import assembler.arm.instructions.ARMInstruction
+import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition._
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
 import assembler.memory.MemoryPage
-import assembler.arm.operands.Shifter
-import assembler.arm.instructions.ConditionalARMInstruction
 
 class Miscellaneous(val code: Byte)(implicit mnemonic: String)
     extends Opcode(mnemonic) {

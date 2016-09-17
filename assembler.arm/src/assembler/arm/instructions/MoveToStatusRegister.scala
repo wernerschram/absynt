@@ -1,13 +1,11 @@
 package assembler.arm.instructions.dataprocessing
 
-import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.Condition._
-import assembler.arm.operands.Shifter
+import assembler.arm.opcodes.Fields
 import assembler.arm.opcodes.{ MoveFromStatusRegister => MoveFromStatusRegisterOpcode }
 import assembler.arm.opcodes.{ MoveToStatusRegister => MoveToStatusRegisterOpcode }
-import assembler.arm.operands.registers.StatusRegister
-import assembler.arm.opcodes.Fields
+import assembler.arm.operands.Condition._
+import assembler.arm.operands.registers._
 
 object MoveFromStatusRegister {
   implicit val opcode = "mrs"

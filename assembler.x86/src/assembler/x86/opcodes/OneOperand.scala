@@ -1,18 +1,14 @@
 package assembler.x86.opcodes
 
+import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.MemoryLocation
+import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.ImmediateValue
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
-import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.x86.X86ContextOneOperand
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryLocation
-import assembler.memory.MemoryPage
-import assembler.Label
 
 abstract class OneOperand[OperandType <: Operand](val parameterPosition: ParameterPosition, val mnemonic: String) {
   val includeRexW: Boolean = true

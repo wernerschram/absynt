@@ -1,9 +1,9 @@
 package assembler.reference
 
 import assembler.Encodable
-import assembler.memory.MemoryPage
 import assembler.Label
 import assembler.LabeledEncodable
+import assembler.memory.MemoryPage
 
 trait ReferencingInstruction[T <: ReferencingInstructionOnPage]
     extends Encodable {

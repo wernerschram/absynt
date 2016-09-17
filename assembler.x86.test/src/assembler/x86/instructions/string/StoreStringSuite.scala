@@ -4,8 +4,8 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
-import assembler.memory.MemoryPage
 import assembler.Hex
+import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper

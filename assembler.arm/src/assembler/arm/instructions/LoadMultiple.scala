@@ -1,14 +1,12 @@
 package assembler.arm.instructions
 
-import assembler.arm.opcodes.{LoadStoreMultiple => LoadStoreMultipleOpcode }
-import assembler.arm.opcodes.UpdateMode
-import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.opcodes.LoadStoreMultipleOperation
-import assembler.arm.operands.Condition._
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes.{ReturnFromException => ReturnFromExceptionOpcode }
-import assembler.arm.opcodes.{LoadStoreMultiple => LoadStoreMultipleOpcode}
-import assembler.arm.opcodes.{ReturnFromException => ReturnFromExceptionOpcode}
+import assembler.arm.opcodes.{ LoadStoreMultiple => LoadStoreMultipleOpcode }
+import assembler.arm.opcodes.LoadStoreMultipleOperation
+import assembler.arm.opcodes.{ ReturnFromException => ReturnFromExceptionOpcode }
+import assembler.arm.opcodes.UpdateMode
+import assembler.arm.operands.Condition._
+import assembler.arm.operands.registers.GeneralRegister
 
 object LoadMultiple {
   //val code: Byte = 0x08

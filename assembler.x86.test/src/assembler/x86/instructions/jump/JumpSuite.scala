@@ -3,13 +3,11 @@ package assembler.x86.instructions.jump
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
-import assembler.memory.MemoryPage
-import assembler.ListExtensions._
 import assembler.Hex
-import assembler.x86.ListExtensions._
+import assembler.ListExtensions._
+import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.x86.instructions.jump._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.registers.Register._
 

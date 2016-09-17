@@ -2,13 +2,13 @@ package assembler.arm.opcodes
 
 import scala.language.implicitConversions
 
-import assembler.memory.MemoryPage
 import assembler.arm.instructions.ARMInstruction
 import assembler.arm.instructions.ConditionalARMInstruction
-import assembler.arm.operands.Condition._
+import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.ImmediateShiftValue
 import assembler.arm.operands.ShiftRegisterWithShift
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.memory.MemoryPage
 
 abstract sealed class LoadStoreAddressingType(pBit: Boolean, wBit: Boolean, val opcodeExtension: String) {
   protected def formatParameters(baseRegister: GeneralRegister, offset: String): String

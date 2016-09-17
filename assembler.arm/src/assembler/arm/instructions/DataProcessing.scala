@@ -1,12 +1,11 @@
 package assembler.arm.instructions
 
-import assembler.arm.opcodes.{ DataProcessing => DataProcessingOpcode }
-import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.ProcessorMode
+import assembler.arm.opcodes.{ DataProcessing => DataProcessingOpcode }
 import assembler.arm.operands.Condition._
-import assembler.arm.operands.Shifter
-import assembler.arm.opcodes.{DataProcessing => DataProcessingOpcode}
 import assembler.arm.operands.RightRotateImmediate
+import assembler.arm.operands.Shifter
+import assembler.arm.operands.registers.GeneralRegister
 
 class DataProcessing(val code: Byte, val opcode: String) {
     private val RegAndShifterToReg = new DataProcessingOpcode(code)(opcode)

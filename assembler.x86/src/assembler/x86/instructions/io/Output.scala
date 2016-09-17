@@ -3,9 +3,7 @@ package assembler.x86.instructions.io
 import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.ImmediateValue
-import assembler.x86.operands.registers.AccumulatorRegister
-import assembler.x86.operands.registers.DataRegister
-import assembler.x86.operands.registers.Register
+import assembler.x86.operands.registers._
 
 object Output {
   implicit val opcode = "out"

@@ -1,18 +1,19 @@
 package assembler.arm.instructions
 
 import org.scalamock.scalatest.MockFactory
-
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
+
+import assembler.Condition.apply
+import assembler.Encodable
 import assembler.Hex
-import assembler.memory.MemoryPage
+import assembler.LabeledEncodable
+import assembler.StringLabel
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.RelativePointer.apply
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.Encodable
-import assembler.LabeledEncodable
-import assembler.StringLabel
+import assembler.memory.MemoryPage
 
 class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 

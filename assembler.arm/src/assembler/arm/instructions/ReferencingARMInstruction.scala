@@ -1,13 +1,13 @@
 package assembler.arm.instructions
 
 import scala.collection.concurrent.TrieMap
+
 import assembler.LabelCondition
+import assembler.arm.ProcessorMode
+import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
-import assembler.arm.ProcessorMode
-import assembler.Encodable
-import assembler.arm.operands.RelativePointer
 
 trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
   def encodeWord: Int

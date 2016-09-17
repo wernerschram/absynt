@@ -1,14 +1,13 @@
 package assembler.x86.opcodes
 
+import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.MemoryLocation
+import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.Operand
+import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.registers.SegmentRegister
-import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.memory.MemoryPage
-import assembler.Label
 
 abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
     val parameter1Position: ParameterPosition,

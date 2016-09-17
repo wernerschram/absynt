@@ -1,18 +1,11 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.ModRMStatic
-import assembler.x86.opcodes.ModRRMStatic
-import assembler.x86.opcodes.ModSegmentRMStatic
-import assembler.x86.opcodes.RegisterEncoded
-import assembler.x86.opcodes.RegisterStatic
+import assembler.x86.opcodes._
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryAddress
-import assembler.x86.operands.registers.ByteRegister
-import assembler.x86.operands.registers.Register
-import assembler.x86.operands.registers.SegmentRegister
-import assembler.x86.operands.registers.WideRegister
+import assembler.x86.operands.registers._
 
 
 object Move {

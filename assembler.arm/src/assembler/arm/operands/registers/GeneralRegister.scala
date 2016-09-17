@@ -1,9 +1,6 @@
 package assembler.arm.operands.registers
 
-import assembler.arm.operands.Operand
-import assembler.arm.operands.LeftShiftValue
-import assembler.arm.operands.RightShiftValue
-import assembler.arm.operands.RotateValue
+import assembler.arm.operands._
 
 abstract class Register(mnemonic: String) extends Operand {
     override val toString = mnemonic

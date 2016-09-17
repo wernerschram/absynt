@@ -1,9 +1,9 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes.ProcessorState
-import assembler.arm.opcodes.ExecutionMode
 import assembler.arm.opcodes.Effect
+import assembler.arm.opcodes.ExecutionMode
+import assembler.arm.opcodes.ProcessorState
 
 object ChangeProcessorState {
   val code: Byte = 0x10

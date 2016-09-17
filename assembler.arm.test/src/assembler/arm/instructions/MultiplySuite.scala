@@ -4,13 +4,13 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
 import assembler.Hex
-import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.dataprocessing.Multiply
 import assembler.arm.instructions.dataprocessing.MultiplyAccumulate
 import assembler.arm.operands.Condition
 import assembler.arm.operands.Shifter.apply
 import assembler.arm.operands.registers.GeneralRegister._
+import assembler.memory.MemoryPage
 
 class MultiplySuite extends WordSpec with ShouldMatchers {
 

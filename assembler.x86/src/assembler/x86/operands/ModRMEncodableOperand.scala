@@ -1,8 +1,6 @@
 package assembler.x86.operands
 
-import assembler.x86.operands.registers.Register
-import assembler.x86.operands.registers.EncodableRegister
-import assembler.x86.operands.registers.SegmentRegister
+import assembler.x86.operands.registers._
 
 trait EncodableOperand extends Operand {
   def getExtendedBytes(rValue: Byte): List[Byte] 

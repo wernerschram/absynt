@@ -1,13 +1,13 @@
 package assembler.arm.opcodes
 
-import assembler.memory.MemoryPage
+import scala.language.implicitConversions
+
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
 import assembler.arm.instructions.ConditionalARMInstruction
-import assembler.arm.operands.Condition._
-import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operands.registers.StatusRegister
-import scala.language.implicitConversions
+import assembler.arm.operands.Condition.Condition
+import assembler.arm.operands.registers._
+import assembler.memory.MemoryPage
 
 class MoveFromStatusRegister()(implicit mnemonic: String)
     extends Opcode(mnemonic) {

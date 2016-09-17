@@ -1,19 +1,10 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes.LoadStore
-import assembler.arm.opcodes.LoadStoreAddressingTypeNormal
-import assembler.arm.opcodes.LoadStoreAddressingTypeUser
-import assembler.arm.opcodes.LoadStoreMiscelaneous
-import assembler.arm.opcodes.LoadStoreMiscelaneousOffset
-import assembler.arm.opcodes.LoadStoreMiscelaneousOperation
-import assembler.arm.opcodes.LoadStoreOffset
-import assembler.arm.opcodes.LoadStoreOperation
-import assembler.arm.operands.Condition.Always
-import assembler.arm.operands.Condition.Condition
-import assembler.arm.operands.registers.GeneralRegister
+import assembler.arm.opcodes._
 import assembler.arm.opcodes.LoadStoreOperation.LoadStoreOperation
-import assembler.arm.opcodes.LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation
+import assembler.arm.operands.Condition._
+import assembler.arm.operands.registers.GeneralRegister
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemnonic: String) {

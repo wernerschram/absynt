@@ -1,7 +1,7 @@
 package assembler.x86.operands.memoryaccess
 
-import assembler.x86.operands.Operand
 import assembler.x86.operands.FixedSizeParameter
+import assembler.x86.operands.Operand
 
 class NearPointer private(val displacement: List[Byte]) extends Operand with FixedSizeParameter {
   assume(List(1, 2, 4).contains(displacement.length))

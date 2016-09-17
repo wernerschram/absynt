@@ -4,14 +4,12 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
+import assembler.Hex
 import assembler.ListExtensions._
 import assembler.memory.MemoryPage
-import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
-import assembler.x86.operands.memoryaccess.MemoryAddress
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
-import assembler.x86.operands.memoryaccess.SIBMemoryLocation
+import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.registers.Register._
 
 class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {

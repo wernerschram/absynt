@@ -3,12 +3,13 @@ package assembler.x86.instructions.arithmetic
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
+import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage
-import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.x86.operands.memoryaccess._
+import assembler.x86.operands.memoryaccess.MemoryAddress
+import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.operands.registers.Register._
 
 class NotSuite extends WordSpec with ShouldMatchers {

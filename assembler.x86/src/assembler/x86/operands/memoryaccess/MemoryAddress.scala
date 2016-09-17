@@ -1,11 +1,10 @@
 package assembler.x86.operands.memoryaccess
 
+import assembler.x86.ParameterPosition
+import assembler.x86.operands.FixedSizeModRMEncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.registers.Register
 import assembler.x86.operands.registers.SegmentRegister
-import assembler.x86.ParameterPosition
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.FixedSizeParameter
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
     extends MemoryLocation(address, segment, address.size) with ModRMEncodableOperand {

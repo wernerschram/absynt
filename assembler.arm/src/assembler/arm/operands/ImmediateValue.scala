@@ -1,8 +1,6 @@
 package assembler.arm.operands
 
-import assembler.ListExtensions._
 import scala.language.implicitConversions
-import java.nio.ByteBuffer
 
 final class ImmediateValue(val value: Byte) extends Operand {
   

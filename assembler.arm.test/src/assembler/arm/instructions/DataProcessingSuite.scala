@@ -2,14 +2,15 @@ package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-import assembler.memory.MemoryPage
+
 import assembler.Hex
 import assembler.arm.ProcessorMode
+import assembler.arm.operands.Condition
+import assembler.arm.operands.Shifter
+import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.Condition._
-import assembler.arm.operands._
-import assembler.arm.instructions._
-import assembler.arm.operands.Shifter.apply
+import assembler.memory.MemoryPage
+
 class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])

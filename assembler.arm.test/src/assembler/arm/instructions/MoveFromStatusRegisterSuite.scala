@@ -2,24 +2,17 @@ package assembler.arm.instructions.branch
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
+
 import assembler.Hex
-import assembler.ListExtensions._
-import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
+import assembler.arm.instructions.dataprocessing.MoveFromStatusRegister
+import assembler.arm.instructions.dataprocessing.MoveToStatusRegister
+import assembler.arm.opcodes.Fields
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.instructions.LoadRegister
-import assembler.arm.opcodes.UpdateDirection
-import assembler.arm.opcodes.LoadStoreOffset
-import assembler.arm.opcodes.LoadStoreAddressingTypeNormal
-import assembler.arm.operands.Shifter
-import assembler.arm.opcodes.LoadStoreAddressingTypeUser
-import assembler.arm.opcodes.LoadStoreMiscelaneousOffset
-import assembler.arm.instructions.dataprocessing.MoveFromStatusRegister
 import assembler.arm.operands.registers.StatusRegister._
-import assembler.arm.opcodes.Fields
-import assembler.arm.instructions.dataprocessing.MoveToStatusRegister
+import assembler.memory.MemoryPage
 
 class MoveFromStatusRegisterSuite extends WordSpec with ShouldMatchers {
 

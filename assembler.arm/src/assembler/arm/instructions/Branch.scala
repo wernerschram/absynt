@@ -1,14 +1,14 @@
 package assembler.arm.instructions
 
+import assembler.LabelCondition
 import assembler.arm.ProcessorMode
 import assembler.arm.opcodes.BranchImmediate
 import assembler.arm.opcodes.BranchRegister
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.reference.BranchInstructionOnPage
 import assembler.memory.MemoryPage
-import assembler.LabelCondition
+import assembler.reference.BranchInstructionOnPage
 
 class Branch(code: Byte, val opcode: String) {
   private val Immediate = new BranchImmediate(code)(opcode)

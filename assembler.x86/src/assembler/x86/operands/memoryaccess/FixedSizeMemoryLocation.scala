@@ -2,8 +2,7 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.FixedSizeEncodableOperand
-import assembler.x86.operands.registers.Register
-import assembler.x86.operands.registers.SegmentRegister
+import assembler.x86.operands.registers._
 
 final class FixedSizeMemoryLocation private (location: MemoryLocation, val operandByteSize: Int, segment: SegmentRegister = Register.DS) 
     extends MemoryLocation(location.displacement, segment, location.addressSize) with FixedSizeEncodableOperand {

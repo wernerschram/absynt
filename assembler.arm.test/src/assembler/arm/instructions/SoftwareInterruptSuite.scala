@@ -2,15 +2,12 @@ package assembler.arm.instructions.dataprocessing
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-import assembler.memory.MemoryPage
+
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.instructions.ARMInstruction
-import assembler.arm.operands.Condition._
-import assembler.arm.operands.Shifter
-import assembler.arm.operands.Condition
 import assembler.arm.instructions.SoftwareInterrupt
+import assembler.memory.MemoryPage
 
 class SoftwareInterruptSuite extends WordSpec with ShouldMatchers {
 

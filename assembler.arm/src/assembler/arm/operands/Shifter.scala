@@ -1,8 +1,7 @@
 package assembler.arm.operands
 
-import assembler.ListExtensions._
 import scala.language.implicitConversions
-import java.nio.ByteBuffer
+
 import assembler.arm.operands.registers.GeneralRegister
 
 trait ShiftValue {
@@ -131,9 +130,6 @@ object Shifter {
   }                               
   
   implicit def apply(immediate: Int) = CreateShifters(immediate, 0)
-  
-//  implicit def apply(immediate: Int) = ForImmediate(immediate)
-  
 }
 
 

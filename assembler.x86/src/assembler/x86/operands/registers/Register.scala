@@ -3,11 +3,10 @@ package assembler.x86.operands.registers
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
-import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeEncodableOperand
-import assembler.x86.operands.Operand
-import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.Operand
 
 /**
  * @author werners
