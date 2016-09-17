@@ -8,9 +8,18 @@ import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.arm.ProcessorMode
 import assembler.Encodable
+import assembler.arm.operands.RelativePointer
 
 trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
   def encodeWord: Int
+  
+  def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
+      if (forward) {
+        RelativePointer(distance - 4)
+      } else {
+        RelativePointer(-distance - 8)
+      }
+    }
 }
 
 class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
