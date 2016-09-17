@@ -11,7 +11,7 @@ import assembler.x86.X86ContextOneOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryLocation
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Label
 
 abstract class OneOperand[OperandType <: Operand](val parameterPosition: ParameterPosition, val mnemonic: String) {

@@ -3,7 +3,7 @@ package assembler.x86.instructions.jump
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.ListExtensions._
 import assembler.Hex
 import assembler.x86.ListExtensions._

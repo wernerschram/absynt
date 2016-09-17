@@ -1,8 +1,8 @@
 package assembler.reference
 
 import assembler.Encodable
-import assembler.MemoryPage
-import assembler.PageLocation
+import assembler.memory.MemoryPage
+import assembler.memory.PageLocation
 
 abstract class BranchInstructionOnPage(
   private val thisLocation: PageLocation,

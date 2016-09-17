@@ -8,7 +8,7 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.FarPointer
 import assembler.x86.operands.memoryaccess.NearPointer
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Label
 import assembler.x86.operands.registers.Register
 

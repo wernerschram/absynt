@@ -1,6 +1,6 @@
 package assembler.reference
 
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 
 trait ReferencingInstructionOnPage {
  

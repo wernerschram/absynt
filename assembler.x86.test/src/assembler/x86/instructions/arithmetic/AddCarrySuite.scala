@@ -7,7 +7,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue.byteToImmediate
 import assembler.x86.operands.registers.Register._
 import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 
 class AddCarrySuite extends WordSpec with ShouldMatchers {
 

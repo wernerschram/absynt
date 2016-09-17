@@ -4,7 +4,7 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
 import assembler.Hex
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 
 class MiscellaneousSuite extends WordSpec with ShouldMatchers {

@@ -7,7 +7,7 @@ import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.Operand
 import assembler.x86.operands.registers.SegmentRegister
 import assembler.x86.instructions.FixedSizeX86Instruction
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Label
 
 abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](

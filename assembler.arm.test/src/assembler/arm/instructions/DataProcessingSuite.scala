@@ -2,7 +2,7 @@ package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._

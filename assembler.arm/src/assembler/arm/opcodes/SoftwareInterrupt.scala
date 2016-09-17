@@ -6,7 +6,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.Condition._
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.arm.operands.Shifter
 import assembler.arm.instructions.ConditionalARMInstruction
 

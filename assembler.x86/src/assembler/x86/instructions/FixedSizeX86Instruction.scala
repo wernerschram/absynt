@@ -2,7 +2,7 @@ package assembler.x86.instructions
 
 import assembler.Label
 import assembler.LabeledEncodable
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 
 abstract class FixedSizeX86Instruction() extends X86Instruction() {
   def size()(implicit page: MemoryPage) = encodeByte().length

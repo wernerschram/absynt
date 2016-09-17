@@ -3,7 +3,7 @@ import assembler.ListExtensions._
 import assembler.Encodable
 import assembler.LabeledEncodable
 import assembler.Label
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.arm.operands.Condition._
 
 trait ARMInstruction extends Encodable() {

@@ -2,8 +2,8 @@ package assembler.arm.instructions
 
 import scala.collection.concurrent.TrieMap
 import assembler.LabelCondition
-import assembler.MemoryPage
-import assembler.PageLocation
+import assembler.memory.PageLocation
+import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.arm.ProcessorMode

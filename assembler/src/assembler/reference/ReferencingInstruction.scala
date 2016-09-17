@@ -1,7 +1,7 @@
 package assembler.reference
 
 import assembler.Encodable
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Label
 import assembler.LabeledEncodable
 

@@ -2,7 +2,7 @@ package assembler.arm.opcodes
 
 import assembler.arm.operands.Operand
 import assembler.arm.instructions.ARMInstruction
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister

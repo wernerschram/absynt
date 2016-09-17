@@ -2,8 +2,8 @@ package assembler.x86.instructions.jump
 
 import assembler.LabelCondition
 import assembler.ListExtensions._
-import assembler.MemoryPage
-import assembler.PageLocation
+import assembler.memory.PageLocation
+import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.ReferencingX86Instruction

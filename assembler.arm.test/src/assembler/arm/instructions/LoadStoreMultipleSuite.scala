@@ -4,7 +4,7 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
 import assembler.Hex
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.opcodes.UpdateMode
 import assembler.arm.operands.registers.GeneralRegister._

@@ -5,7 +5,7 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
 import assembler.ListExtensions._
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._

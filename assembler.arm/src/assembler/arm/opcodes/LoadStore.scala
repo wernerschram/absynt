@@ -2,7 +2,7 @@ package assembler.arm.opcodes
 
 import scala.language.implicitConversions
 
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.arm.instructions.ARMInstruction
 import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition._

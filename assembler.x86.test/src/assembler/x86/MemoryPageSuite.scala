@@ -6,7 +6,7 @@ import org.scalatest.WordSpec
 
 import assembler.Encodable
 import assembler.LabeledEncodable
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Hex
 import assembler.x86.instructions.jump.Jump
 

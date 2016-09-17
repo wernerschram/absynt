@@ -3,7 +3,7 @@ package assembler.x86.instructions.arithmetic
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
-import assembler.MemoryPage
+import assembler.memory.MemoryPage
 import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction

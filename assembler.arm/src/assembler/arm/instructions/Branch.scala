@@ -7,8 +7,8 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.reference.BranchInstructionOnPage
-import assembler.PageLocation
-import assembler.MemoryPage
+import assembler.memory.PageLocation
+import assembler.memory.MemoryPage
 import assembler.LabelCondition
 
 class Branch(code: Byte, val opcode: String) {
@@ -86,7 +86,6 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
       (thisLocation, targetLocation, memoryPage, processorMode) =>  
         new ARMBranchInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
         opcode, labelCondition)  
-
 }
 
 object Branch extends Branch(0xA0.toByte, "b")

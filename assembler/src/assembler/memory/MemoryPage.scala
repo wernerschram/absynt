@@ -1,6 +1,7 @@
-package assembler
+package assembler.memory
 
-import scala.collection.immutable.HashMap
+import assembler.Condition
+import assembler.Encodable
 
 class MemoryPage(val content: List[Encodable]) {
   def encodableLocation(encodable: Encodable) = new PageLocation(content.indexOf(encodable))
