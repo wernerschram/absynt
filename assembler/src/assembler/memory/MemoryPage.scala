@@ -3,11 +3,11 @@ package assembler.memory
 import assembler.Condition
 import assembler.Encodable
 
-class MemoryPage(val content: List[Encodable]) {
+class MemoryPage(val content: Seq[Encodable]) {
   def encodableLocation(encodable: Encodable) = new PageLocation(content.indexOf(encodable))
 
   def getInstructionByCondition(condition: Condition) =
-    condition.filterList(content).head
+    condition.filter(content).head
   
   def slice(from: PageLocation, to: PageLocation) = 
     if (from < to) {
