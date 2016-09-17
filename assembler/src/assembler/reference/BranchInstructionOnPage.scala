@@ -2,11 +2,10 @@ package assembler.reference
 
 import assembler.Encodable
 import assembler.memory.MemoryPage
-import assembler.memory.PageLocation
 
 abstract class BranchInstructionOnPage(
-  private val thisLocation: PageLocation,
-  private val destinationLocation: PageLocation)(implicit page: MemoryPage)
+  private val thisLocation: Int,
+  private val destinationLocation: Int)(implicit page: MemoryPage)
     extends ReferencingInstructionOnPage() {
 
   def minimumSize: Int

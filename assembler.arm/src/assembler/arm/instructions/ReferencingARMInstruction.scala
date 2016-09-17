@@ -2,7 +2,6 @@ package assembler.arm.instructions
 
 import scala.collection.concurrent.TrieMap
 import assembler.LabelCondition
-import assembler.memory.PageLocation
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
@@ -23,7 +22,7 @@ trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
 }
 
 class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
-  factory: (PageLocation, PageLocation, MemoryPage, ProcessorMode) => T,
+  factory: (Int, Int, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)
     extends ARMInstruction with ReferencingInstruction[T] {

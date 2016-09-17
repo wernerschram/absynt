@@ -2,7 +2,6 @@ package assembler.x86.instructions.jump
 
 import assembler.LabelCondition
 import assembler.ListExtensions._
-import assembler.memory.PageLocation
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
@@ -19,7 +18,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
     Rel8(nearPointer)
   }
 
-  class ShortJumpInstructionOnPage(thisLocation: PageLocation, destinationLocation: PageLocation)(implicit page: MemoryPage, processorMode: ProcessorMode)
+  class ShortJumpInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends BranchInstructionOnPage(thisLocation, destinationLocation) {
     
     val shortJumpSize = shortOpcode.length + 1
