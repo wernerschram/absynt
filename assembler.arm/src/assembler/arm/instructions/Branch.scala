@@ -32,7 +32,7 @@ class Branch(code: Byte, val opcode: String) {
       if (forward) {
         apply(RelativePointer(distance - 4), condition)
       } else {
-        apply(RelativePointer(-distance - branchSize - 8), condition)
+        apply(RelativePointer(-distance - branchSize - 4), condition)
       }
     }
     

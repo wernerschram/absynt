@@ -50,7 +50,7 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         Branch(-0x08, Condition.SignedLessThan).encodeByte should be(Hex.MSB("bafffffe"))
       }
       
-      "correctly encode a branch to a labeled instruction" in {
+      "correctly encode a forward branch to a labeled instruction" in {
         val p = new MemoryPage(
           Branch("Label") ::
           filler(4) ::
@@ -60,7 +60,17 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         p.encodeByte() should be(Hex.MSB("EA000000 00000000 00000000"))
       }
       
-      "correctly encode a branch over another branch to a labeled instruction" in {
+       "correctly encode a backward branch to a labeled instruction" in {
+        val p = new MemoryPage(
+          labeledFiller(4, "Label") ::
+          filler(4) ::
+          Branch("Label") ::
+          Nil)
+
+        p.encodeByte() should be(Hex.MSB("00000000 00000000 EAFFFFFC"))
+      }
+       
+      "correctly encode a forward branch over another branch to a labeled instruction" in {
         val p = new MemoryPage(
           Branch("Label") ::
           filler(4) ::
@@ -70,6 +80,19 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
           Nil)
 
         p.encodeByte() should be(Hex.MSB("EA000002 00000000 EA000000 00000000 00000000"))
+      }
+      
+      
+      "correctly encode a backward branch over another branch to a labeled instruction" in {
+        val p = new MemoryPage(
+          labeledFiller(4, "Label") ::
+          filler(4) ::
+          Branch("Label") ::
+          filler(4) ::
+          Branch("Label") ::
+          Nil)
+
+        p.encodeByte() should be(Hex.MSB("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
     }
   }
