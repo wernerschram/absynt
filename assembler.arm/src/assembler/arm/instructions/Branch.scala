@@ -22,7 +22,7 @@ class Branch(code: Byte, val opcode: String) {
   class ARMBranchInstructionOnPage private[Branch](thisLocation: PageLocation, destinationLocation: PageLocation, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage {
     
-    val branchSize = 1
+    val branchSize = 4
     override val minimumSize = branchSize
     override val maximumSize = branchSize
 

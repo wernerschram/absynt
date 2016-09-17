@@ -1,5 +1,7 @@
 package assembler.arm.instructions
 
+import org.scalamock.scalatest.MockFactory
+
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 import assembler.Hex
@@ -8,7 +10,6 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.RelativePointer.apply
 import assembler.arm.operands.registers.GeneralRegister._
-import org.scalamock.scalatest.proxy.MockFactory
 import assembler.Encodable
 import assembler.LabeledEncodable
 import assembler.StringLabel
@@ -49,9 +50,26 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         Branch(-0x08, Condition.SignedLessThan).encodeByte should be(Hex.MSB("bafffffe"))
       }
       
-      "correctly encode a jump to a labeled instruction" when {
-        
-        
+      "correctly encode a branch to a labeled instruction" in {
+        val p = new MemoryPage(
+          Branch("Label") ::
+          filler(4) ::
+          labeledFiller(4, "Label") ::
+          Nil)
+
+        p.encodeByte() should be(Hex.MSB("EA000000 00000000 00000000"))
+      }
+      
+      "correctly encode a branch over another branch to a labeled instruction" in {
+        val p = new MemoryPage(
+          Branch("Label") ::
+          filler(4) ::
+          Branch("Label") ::
+          filler(4) ::
+          labeledFiller(4, "Label") ::
+          Nil)
+
+        p.encodeByte() should be(Hex.MSB("EA000002 00000000 EA000000 00000000 00000000"))
       }
     }
   }
