@@ -11,7 +11,6 @@ import assembler.LabeledEncodable
 import assembler.StringLabel
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
-import assembler.arm.operands.RelativePointer.apply
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
 

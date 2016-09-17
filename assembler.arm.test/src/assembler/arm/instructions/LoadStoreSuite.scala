@@ -10,9 +10,7 @@ import assembler.arm.instructions.LoadRegister
 import assembler.arm.instructions.StoreRegister
 import assembler.arm.opcodes.LoadStoreAddressingTypeNormal
 import assembler.arm.opcodes.LoadStoreMiscelaneousOffset
-import assembler.arm.opcodes.LoadStoreMiscelaneousOffset.apply
 import assembler.arm.opcodes.LoadStoreOffset
-import assembler.arm.opcodes.LoadStoreOffset.apply
 import assembler.arm.opcodes.UpdateDirection
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister._
