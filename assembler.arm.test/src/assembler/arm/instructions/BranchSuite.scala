@@ -2,16 +2,34 @@ package assembler.arm.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-
 import assembler.Hex
 import assembler.MemoryPage
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.RelativePointer.apply
 import assembler.arm.operands.registers.GeneralRegister._
+import org.scalamock.scalatest.proxy.MockFactory
+import assembler.Encodable
+import assembler.LabeledEncodable
+import assembler.StringLabel
 
-class BranchSuite extends WordSpec with ShouldMatchers {
+class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
+  def filler(size: Int) = { 
+    val filler = stub[Encodable]
+    (filler.size()(_: MemoryPage)).when(*).returns(size)
+    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
+    filler
+  }
+
+  def labeledFiller(size: Int, label: String) = {
+    val filler = stub[LabeledEncodable]
+    (filler.size()(_: MemoryPage)).when(*).returns(size)
+    (filler.label _).when.returns(StringLabel(label))
+    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
+    filler
+  }
+  
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
 
   "an Branch instruction" when {
@@ -29,6 +47,11 @@ class BranchSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode blt PC-0x08" in {
         Branch(-0x08, Condition.SignedLessThan).encodeByte should be(Hex.MSB("bafffffe"))
+      }
+      
+      "correctly encode a jump to a labeled instruction" when {
+        
+        
       }
     }
   }

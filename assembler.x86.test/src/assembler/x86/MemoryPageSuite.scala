@@ -7,8 +7,6 @@ import org.scalatest.WordSpec
 import assembler.Encodable
 import assembler.LabeledEncodable
 import assembler.MemoryPage
-import assembler.StringLabel
-import assembler.StringLabelCondition
 import assembler.Hex
 import assembler.x86.instructions.jump.Jump
 
@@ -24,7 +22,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
   def labeledFiller(size: Int, label: String) = {
     val filler = stub[LabeledEncodable]
     (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.label _).when.returns(new StringLabel(label))
+    (filler.label _).when.returns(label)
     (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
     filler
   }
@@ -35,7 +33,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "Encode a simple program with an indirect forward short jump instruction" in {
         val p = new MemoryPage(
-          Jump(StringLabelCondition("Label")) ::
+          Jump("Label") ::
             filler(1) ::
             labeledFiller(1, "Label") ::
             Nil)
@@ -47,7 +45,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(1) ::
-            Jump(StringLabelCondition("Label")) ::
+            Jump("Label") ::
             Nil)
 
         p.encodeByte() should be(Hex.LSB("00 00 EB FC"))
@@ -55,7 +53,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "Encode a simple program with an indirect forward near jump instruction" in {
         val p = new MemoryPage(
-          Jump(StringLabelCondition("Label")) ::
+          Jump("Label") ::
             filler(256) ::
             labeledFiller(1, "Label") ::
             Nil)
@@ -67,7 +65,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(256) ::
-            Jump(StringLabelCondition("Label")) ::
+            Jump("Label") ::
             Nil)
 
         p.encodeByte() should be(Hex.LSB("00 " * 257 + "E9 FC FE"))
@@ -76,10 +74,10 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
       "Encode a program with two indirect short jump instructions of which one jumps across the other" in {
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump(StringLabelCondition("Label2")) ::
+            Jump("Label2") ::
             filler(1) ::
             labeledFiller(1, "Label2") ::
-            Jump(StringLabelCondition("Label1")) ::
+            Jump("Label1") ::
             Nil)
 
         p.encodeByte() should be(Hex.LSB("00 EB 01 " + "00 " * 2 + "EB F9"))
@@ -95,10 +93,10 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump(StringLabelCondition("Label2")) ::
+            Jump("Label2") ::
             filler(122) ::
             labeledFiller(1, "Label2") ::
-            Jump(StringLabelCondition("Label1")) ::
+            Jump("Label1") ::
             Nil)
 
         p.encodeByte() should be(Hex.LSB("00 EB 7A " + "00 " * 123 + "EB 80"))
@@ -114,9 +112,9 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump(StringLabelCondition("Label2")) ::
+            Jump("Label2") ::
             filler(123) ::
-            Jump(StringLabelCondition("Label1")) ::
+            Jump("Label1") ::
             filler(2) ::
             labeledFiller(1, "Label2") ::
             Nil)
@@ -134,9 +132,9 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump(StringLabelCondition("Label2")) ::
+            Jump("Label2") ::
             filler(123) ::
-            Jump(StringLabelCondition("Label1")) ::
+            Jump("Label1") ::
             filler(3) ::
             labeledFiller(1, "Label2") ::
             Nil)
@@ -157,11 +155,11 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump(StringLabelCondition("Label2")) ::
+            Jump("Label2") ::
             filler(60) ::
-            Jump(StringLabelCondition("Label3")) ::
+            Jump("Label3") ::
             filler(61) ::
-            Jump(StringLabelCondition("Label1")) ::
+            Jump("Label1") ::
             filler(2) ::
             labeledFiller(1, "Label2") ::
             filler(61) ::
@@ -184,11 +182,11 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump(StringLabelCondition("Label2")) ::
+            Jump("Label2") ::
             filler(60) ::
-            Jump(StringLabelCondition("Label3")) ::
+            Jump("Label3") ::
             filler(61) ::
-            Jump(StringLabelCondition("Label1")) ::
+            Jump("Label1") ::
             filler(2) ::
             labeledFiller(1, "Label2") ::
             filler(62) ::
@@ -206,7 +204,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(1) ::
-            Jump(StringLabelCondition("Label")) ::
+            Jump("Label") ::
             Nil)
 
         p.encodeByte() should be(Hex.LSB("00 00 EB FC"))
@@ -214,7 +212,7 @@ class MemoryPageSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "Encode a simple program with an indirect forward near jump instruction" in {
         val p = new MemoryPage(
-          Jump(StringLabelCondition("Label")) ::
+          Jump("Label") ::
             filler(256) ::
             labeledFiller(1, "Label") ::
             Nil)
