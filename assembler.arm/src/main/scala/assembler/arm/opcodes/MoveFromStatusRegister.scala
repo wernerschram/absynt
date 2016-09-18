@@ -24,7 +24,7 @@ class MoveFromStatusRegister()(implicit mnemonic: String)
 
 object Fields extends Enumeration {
   type Fields = Value
-  
+
   val control = Value(16, "c")
   val extension = Value(17, "x")
   val status = Value(18, "s")
@@ -51,7 +51,7 @@ class MoveToStatusRegister()(implicit mnemonic: String)
     assume(rotate >=0 && rotate <= 30 && (rotate % 2 == 0))
     new ConditionalARMInstruction(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | 0x0320f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (rotate << 7) | (source.toByte & 0xff)))
+        (super.encodeWord() | 0x0320f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (rotate << 7) | (source & 0xff)))
 
       override val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, #${source.toString}, ${rotate}"
     }
