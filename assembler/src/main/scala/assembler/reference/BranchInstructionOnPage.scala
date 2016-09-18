@@ -32,15 +32,11 @@ abstract class BranchInstructionOnPage(
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum
 
-  private def minimumDistance = independentDistance + dependentIntermediates.map(instruction => instruction.isEstimated match {
-    case true => instruction.size
-    case false => minimumSize
-  }).sum
+  private def minimumDistance = independentDistance + dependentIntermediates.map(instruction =>
+    if (instruction.isEstimated) instruction.size else minimumSize).sum
 
-  private def maximumDistance = independentDistance + dependentIntermediates.map(instruction => instruction.isEstimated match {
-    case true => instruction.size
-    case false => maximumSize
-  }).sum
+  private def maximumDistance = independentDistance + dependentIntermediates.map(instruction =>
+    if (instruction.isEstimated) instruction.size else maximumSize).sum
 
   lazy val actualDistance = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
@@ -51,10 +47,10 @@ abstract class BranchInstructionOnPage(
   override def isEstimated: Boolean = _isEstimated
 
   private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = independentDistance +
-    dependentIntermediates.map(instruction => sizeAssumptions.contains(instruction.getOrElseCreateInstruction()) match {
-      case false => instruction.estimatedSize(sizeAssumptions)
-      case true => sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get
-    }).sum
+    dependentIntermediates.map(instruction =>
+      if (sizeAssumptions.contains(instruction.getOrElseCreateInstruction()))
+        instruction.estimatedSize(sizeAssumptions)
+      else sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get).sum
 
   override def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int = {
     var assumption: Option[Int] = None
