@@ -43,7 +43,7 @@ object ListExtensions {
   implicit class ListToImmediate(value: List[Byte]) {
     def decimalString(): String = decimal.toString()
 
-    def hexString() : String = value.reverse.map("%02X" format _).mkString
+    def hexString() : String = value.reverseMap("%02X" format _).mkString
 
     def decimal(): Long =
       ByteBuffer.wrap(value.padTo(java.lang.Long.BYTES, 0.toByte).take(java.lang.Long.BYTES).reverse.toArray).getLong
