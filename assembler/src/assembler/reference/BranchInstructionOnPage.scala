@@ -32,12 +32,12 @@ abstract class BranchInstructionOnPage(
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum
 
-  private def minimumDistance = independentDistance + dependentIntermediates.map(instruction => instruction.sizeIsKnown match {
+  private def minimumDistance = independentDistance + dependentIntermediates.map(instruction => instruction.isEstimated match {
     case true => instruction.size
     case false => minimumSize
   }).sum
 
-  private def maximumDistance = independentDistance + dependentIntermediates.map(instruction => instruction.sizeIsKnown match {
+  private def maximumDistance = independentDistance + dependentIntermediates.map(instruction => instruction.isEstimated match {
     case true => instruction.size
     case false => maximumSize
   }).sum
@@ -47,10 +47,8 @@ abstract class BranchInstructionOnPage(
   override def minimumEstimatedSize: Int = getSizeForDistance(forward, minimumDistance)
   override def maximumEstimatedSize: Int = getSizeForDistance(forward, maximumDistance)
 
-  // TODO: combine these two
-  private var isEstimated = false
-
-  override def sizeIsKnown: Boolean = isEstimated
+  private var _isEstimated = false
+  override def isEstimated: Boolean = _isEstimated
 
   private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = independentDistance +
     dependentIntermediates.map(instruction => sizeAssumptions.contains(instruction.getOrElseCreateInstruction()) match {
@@ -58,7 +56,7 @@ abstract class BranchInstructionOnPage(
       case true => sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get
     }).sum
 
-  override def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = {
+  override def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
     while (assumption.exists { value => value < newAssumption }) {
@@ -74,7 +72,7 @@ abstract class BranchInstructionOnPage(
     minimumEstimatedSize
   } else {
     val estimation = estimatedSize(collection.immutable.HashMap())
-    isEstimated = true
+    _isEstimated = true
     estimation
   }
 

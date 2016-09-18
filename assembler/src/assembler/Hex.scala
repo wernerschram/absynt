@@ -1,9 +1,15 @@
 package assembler
 
 object Hex {
-//  def apply(string: String): List[Byte] = LSB(string)
+  val hexRadix = 16
 
-  def LSB(string: String): List[Byte] = string.split(" ").flatMap { x => x.grouped(2) }.toList.map { x => Integer.parseUnsignedInt(x, 16).toByte }
+  def lsb(string: String): List[Byte] =
+    string.split(" ")
+    .flatMap { x => x.grouped(2) }
+  .toList.map { x => Integer.parseUnsignedInt(x, hexRadix).toByte }
 
-  def MSB(string: String): List[Byte] = string.split(" ").flatMap { x => x.grouped(2).toList.reverse }.toList.map { x => Integer.parseUnsignedInt(x, 16).toByte }
+  def msb(string: String): List[Byte] =
+    string.split(" ")
+    .flatMap { x => x.grouped(2).toList.reverse }
+  .toList.map { x => Integer.parseUnsignedInt(x, hexRadix).toByte }
 }

@@ -21,40 +21,40 @@ class StoreStringSuite extends WordSpec with ShouldMatchers with MockFactory {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode stos [di], al" in {
-        StoreString(AL, DI).encodeByte should be (Hex.LSB("AA"))
+        StoreString(AL, DI).encodeByte should be (Hex.lsb("AA"))
       }
 
       "correctly encode REP stos [di], al" in {
-        StoreString.Repeat(AL, DI).encodeByte should be (Hex.LSB("F3 AA"))
+        StoreString.Repeat(AL, DI).encodeByte should be (Hex.lsb("F3 AA"))
       }
 
       "correctly encode stos [di], ax" in {
-        StoreString(AX, DI).encodeByte should be (Hex.LSB("AB"))
+        StoreString(AX, DI).encodeByte should be (Hex.lsb("AB"))
       }
 
       "correctly encode stos [edi], ax" in {
-        StoreString(AX, EDI).encodeByte should be (Hex.LSB("67 AB"))
+        StoreString(AX, EDI).encodeByte should be (Hex.lsb("67 AB"))
       }
     }
-  
+
     "in protected mode" should {
 
       implicit val processorMode = ProcessorMode.Protected
 
       "correctly encode stos [edi], al" in {
-        StoreString(AL, EDI).encodeByte should be (Hex.LSB("AA"))
+        StoreString(AL, EDI).encodeByte should be (Hex.lsb("AA"))
       }
 
       "correctly encode stos [di], al" in {
-        StoreString(AL, DI).encodeByte should be (Hex.LSB("67 AA"))
+        StoreString(AL, DI).encodeByte should be (Hex.lsb("67 AA"))
       }
 
       "correctly encode stos [di], ax" in {
-        StoreString(AX, DI).encodeByte should be (Hex.LSB("67 66 AB"))
+        StoreString(AX, DI).encodeByte should be (Hex.lsb("67 66 AB"))
       }
 
     }
-  
+
     "in long mode" should {
 
       implicit val processorMode = ProcessorMode.Long

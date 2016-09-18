@@ -21,8 +21,8 @@ class ClearInterruptFlagSuite extends WordSpec with ShouldMatchers with MockFact
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode cli" in {
-        ClearInterruptFlag().encodeByte should be (Hex.LSB("FA"))
-      }     
+        ClearInterruptFlag().encodeByte should be (Hex.lsb("FA"))
+      }
     }
 
     "in long mode" should {
@@ -30,8 +30,8 @@ class ClearInterruptFlagSuite extends WordSpec with ShouldMatchers with MockFact
       implicit val processorMode = ProcessorMode.Long
 
       "correctly encode cli" in {
-        ClearInterruptFlag().encodeByte should be (Hex.LSB("FA"))
-      }     
+        ClearInterruptFlag().encodeByte should be (Hex.lsb("FA"))
+      }
     }
-  } 
+  }
 }

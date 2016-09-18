@@ -9,17 +9,18 @@ trait ReferencingInstruction[T <: ReferencingInstructionOnPage]
     extends Encodable {
   def getOrElseCreateInstruction()(implicit page: MemoryPage): T
 
-  def minimumEstimatedSize()(implicit page: MemoryPage) = getOrElseCreateInstruction.minimumEstimatedSize
-  def maximumEstimatedSize()(implicit page: MemoryPage) = getOrElseCreateInstruction.maximumEstimatedSize
+  def minimumEstimatedSize()(implicit page: MemoryPage): Int = getOrElseCreateInstruction.minimumEstimatedSize
+  def maximumEstimatedSize()(implicit page: MemoryPage): Int = getOrElseCreateInstruction.maximumEstimatedSize
 
-  def sizeIsKnown()(implicit page: MemoryPage) = getOrElseCreateInstruction.sizeIsKnown
+  def isEstimated()(implicit page: MemoryPage): Boolean = getOrElseCreateInstruction.isEstimated
 
-  def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: MemoryPage) = getOrElseCreateInstruction.estimatedSize(sizeAssumptions)
+  def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: MemoryPage): Int =
+    getOrElseCreateInstruction.estimatedSize(sizeAssumptions)
 
 //  def size()(implicit page: MemoryPage) = getOrElseCreateInstruction.size
-  override def encodeByte()(implicit page: MemoryPage) = getOrElseCreateInstruction.encodeByte
-  
-  override def withLabel(label: Label) = new LabeledReferencingInstruction[T](this, label)
+  override def encodeByte()(implicit page: MemoryPage): List[Byte] = getOrElseCreateInstruction.encodeByte
+
+  override def withLabel(label: Label): LabeledEncodable = new LabeledReferencingInstruction[T](this, label)
 }
 
 
@@ -28,8 +29,8 @@ class LabeledReferencingInstruction[T <: ReferencingInstructionOnPage](
     val label: Label) extends ReferencingInstruction[T] with LabeledEncodable {
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = instruction.getOrElseCreateInstruction()
 
-  override def size()(implicit page: MemoryPage) = instruction.size()
+  override def size()(implicit page: MemoryPage): Int = instruction.size()
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
-  
-  override def withLabel(label: Label) = new LabeledReferencingInstruction[T](this, label)
+
+  override def withLabel(label: Label): LabeledEncodable = new LabeledReferencingInstruction[T](this, label)
 }

@@ -7,15 +7,16 @@ abstract class Condition {
 }
 
 object Condition {
-  implicit def apply(text: String) = new LabelCondition(x => x.label match { case label: StringLabel => label.value == text }) {
-    override def toString() = text
-  }
+  implicit def apply(text: String): LabelCondition =
+    new LabelCondition(x => x.label match { case label: StringLabel => label.value == text }) {
+      override def toString() = text
+    }
 }
 
 class LabelCondition(labelMatcher: LabeledEncodable => Boolean) extends Condition {
-  override def filter[T](list: Seq[T]) =
+  override def filter[T](list: Seq[T]): Seq[T] =
     list.filter {
-      case x: LabeledEncodable => labelMatcher(x);
-      case default => false
+      case encodable: LabeledEncodable => labelMatcher(encodable);
+      case _ => false
     }
 }

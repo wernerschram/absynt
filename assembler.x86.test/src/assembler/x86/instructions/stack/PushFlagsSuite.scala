@@ -17,9 +17,9 @@ class PushFlagsSuite extends WordSpec with ShouldMatchers with MockFactory {
     "in long mode" should {
 
       implicit val processorMode = ProcessorMode.Long
-      
+
       "correctly encode pushf" in {
-        PushFlags().encodeByte should be (Hex.LSB("9C"))
+        PushFlags().encodeByte should be (Hex.lsb("9C"))
       }
     }
   }

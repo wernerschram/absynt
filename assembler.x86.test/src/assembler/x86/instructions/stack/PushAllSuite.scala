@@ -20,7 +20,7 @@ class PushAllSuite extends WordSpec with ShouldMatchers with MockFactory {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode pusha" in {
-        PushAll().encodeByte should be (Hex.LSB("60"))
+        PushAll().encodeByte should be (Hex.lsb("60"))
       }
     }
 
