@@ -36,7 +36,7 @@ abstract class NoOperand(val mnemonic: String) {
         NoOperand.this.getCode()
     }
 
-  def asTwoOperandOpcode[Operand1Type <: Operand, Operand2Type <: Operand](validateExtension: PartialFunction[(Operand1Type, Operand2Type, ProcessorMode), Boolean], includeRexW: Boolean = true): TwoOperand[Operand1Type, Operand2Type] =
+  def asTwoOperandOpcode[Operand1Type <: Operand, Operand2Type <: Operand](validateExtension: PartialFunction[(Operand1Type, Operand2Type, ProcessorMode), Boolean]): TwoOperand[Operand1Type, Operand2Type] =
     new TwoOperand[Operand1Type, Operand2Type](ParameterPosition.None, ParameterPosition.None, mnemonic) {
 
       override def validate(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
@@ -46,7 +46,7 @@ abstract class NoOperand(val mnemonic: String) {
         NoOperand.this.getCode()
     }
 
-  def withImmediate(validateExtension: PartialFunction[(ImmediateValue, ProcessorMode), Boolean] = OneOperand.valid, includeRexW: Boolean = true): OneOperand[ImmediateValue] =
+  def withImmediate(validateExtension: PartialFunction[(ImmediateValue, ProcessorMode), Boolean] = OneOperand.valid): OneOperand[ImmediateValue] =
     new OneOperand[ImmediateValue](ParameterPosition.None, mnemonic) {
 
       override def validate(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Boolean =
@@ -56,7 +56,7 @@ abstract class NoOperand(val mnemonic: String) {
         NoOperand.this.getCode ::: immediate.value
     }
 
-  def withNearPointer(validateExtension: PartialFunction[(NearPointer, ProcessorMode), Boolean] = OneOperand.valid, includeRexW: Boolean = true): OneOperand[NearPointer] =
+  def withNearPointer(validateExtension: PartialFunction[(NearPointer, ProcessorMode), Boolean] = OneOperand.valid): OneOperand[NearPointer] =
     new OneOperand[NearPointer](ParameterPosition.None, mnemonic) {
 
       override def validate(pointer: NearPointer)(implicit processorMode: ProcessorMode): Boolean =
@@ -66,7 +66,7 @@ abstract class NoOperand(val mnemonic: String) {
         NoOperand.this.getCode ::: pointer.displacement
     }
 
-  def withFarPointer(includeRexW: Boolean = true): OneOperand[FarPointer] =
+  def withFarPointer(): OneOperand[FarPointer] =
     new OneOperand[FarPointer](ParameterPosition.None, mnemonic) {
 
       override def getCode(pointer: FarPointer): List[Byte] =
@@ -84,11 +84,11 @@ abstract class NoOperand(val mnemonic: String) {
       override def getCode(): List[Byte] = NoOperand.this.getCode
       override def toString() = s"${NoOperand.this.toString()} ${register.toString()}"
   }
-  
+
   def withImplicitRegisters(register1: Register, register2: Register) =
     new NoOperand(mnemonic) {
       override def getCode(): List[Byte] = NoOperand.this.getCode
       override def toString() = s"${NoOperand.this.toString()} ${register1.toString()}, ${register2.toString()}"
   }
-  
+
 }

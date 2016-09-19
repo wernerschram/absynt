@@ -10,6 +10,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper
 import assembler.x86.operands.registers.Register._
+import assembler.x86.operands.memoryaccess.RegisterMemoryLocation._
 
 class StoreStringSuite extends WordSpec with ShouldMatchers with MockFactory {
 

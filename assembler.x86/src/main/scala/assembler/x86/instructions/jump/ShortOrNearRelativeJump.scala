@@ -61,7 +61,7 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
           if (processorMode == ProcessorMode.Real) {
             apply(NearPointer(distance.toShort.encodeLittleEndian)).encodeByte
           } else {
-            apply(NearPointer(distance.toInt.encodeLittleEndian)).encodeByte
+            apply(NearPointer(distance.encodeLittleEndian)).encodeByte
           }
         }
       } else {
@@ -71,16 +71,16 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
           if (processorMode == ProcessorMode.Real) {
             apply(NearPointer((-distance - nearJumpSize).toShort.encodeLittleEndian)).encodeByte
           } else {
-            apply(NearPointer((-distance - nearJumpSize).toInt.encodeLittleEndian)).encodeByte
+            apply(NearPointer((-distance - nearJumpSize).encodeLittleEndian)).encodeByte
           }
         }
       }
     }
   }
-  
+
   override def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
     new ReferencingX86Instruction[BranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>  
-        new ShortOrNearJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
+      (thisLocation, targetLocation, memoryPage, processorMode) =>
+        new ShortOrNearJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode),
         mnemonic, condition)
 }

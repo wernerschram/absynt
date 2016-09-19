@@ -18,7 +18,7 @@ sealed class RegisterMemoryLocation private (val index: IndexRegister, displacem
     case Nil => s"[${index}]"
     case default => s"[${index}+${displacement.decimalString()}]"
   }
-  
+
   override val defaultSegment: SegmentRegister = index.defaultSegment
 
   override def getExtendedBytes(rValue: Byte): List[Byte] = getModRM(rValue) :: displacement
@@ -35,9 +35,9 @@ sealed class RegisterMemoryLocation private (val index: IndexRegister, displacem
 
 object RegisterMemoryLocation {
   final class DIref private[RegisterMemoryLocation]() extends RegisterMemoryLocation(Register.DI, List.empty[Byte], Register.DI.defaultSegment)
-  
+
   val DIref = new DIref()
-  
+
   final class FixedSizeRegisterMemoryLocation private (
     index: IndexRegister, displacement: List[Byte], override val operandByteSize: Int, segment: SegmentRegister)
       extends RegisterMemoryLocation(index, displacement, segment) with FixedSizeModRMEncodableOperand
@@ -60,9 +60,9 @@ object RegisterMemoryLocation {
     new RegisterMemoryLocation(index, displacement, index.defaultSegment)
 
   implicit def indexWrapper(index: IndexRegister) = RegisterMemoryLocation(index)
-  
+
   implicit def indexWrapper(index: DestinationIndex) = DIref
-  
+
   object withSegmentOverride {
     def apply(index: IndexRegister, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
       new RegisterMemoryLocation(index, displacement, segment)
@@ -102,7 +102,7 @@ object RegisterMemoryLocation {
   def quadWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, 8, index.defaultSegment)
 
-    
+
   def segmentWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte]) =
     FarPointerRegisterMemoryLocation(index, displacement, 2, index.defaultSegment)
 

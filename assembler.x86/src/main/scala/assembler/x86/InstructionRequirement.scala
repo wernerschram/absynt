@@ -1,8 +1,6 @@
 package assembler.x86
 
-sealed protected class RexExtendedRequirement(val position: ParameterPosition) {
-  def isCompatibleWith(requirement: RexExtendedRequirement): Boolean = true
-}
+sealed protected class RexExtendedRequirement(val position: ParameterPosition)
 
 class ParameterPosition
 
@@ -23,7 +21,7 @@ object RexExtendedRequirement {
     case ParameterPosition.OperandR => instanceOperandR
     case ParameterPosition.OperandRM => instanceOperandRM
   }
-  
+
   val instanceIndex = new RexExtendedRequirement(ParameterPosition.Index)
   val instanceBase = new RexExtendedRequirement(ParameterPosition.Base)
   val instanceOpcodeReg = new RexExtendedRequirement(ParameterPosition.OpcodeReg)
