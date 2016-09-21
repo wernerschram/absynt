@@ -17,8 +17,7 @@ abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
 
   def validate(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
     operand1.isValidForMode(processorMode) &&
-      operand2.isValidForMode(processorMode) &&
-      operand1.canInteractWith(operand2)
+      operand2.isValidForMode(processorMode)
 
   def getCode(operand1: Operand1Type, operand2: Operand2Type): List[Byte]
 
@@ -38,9 +37,9 @@ abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
 
     }
   }
-  
-  def repeated() = new TwoOperand[Operand1Type, Operand2Type](parameter1Position, parameter2Position, s"REP ${mnemonic}") { 
-    override def getCode(operand1: Operand1Type, operand2: Operand2Type): List[Byte] = 
+
+  def repeated() = new TwoOperand[Operand1Type, Operand2Type](parameter1Position, parameter2Position, s"REP ${mnemonic}") {
+    override def getCode(operand1: Operand1Type, operand2: Operand2Type): List[Byte] =
       Opcode.RepeatPrefix :: TwoOperand.this.getCode(operand1, operand2)
   }
 }

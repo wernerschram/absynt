@@ -6,6 +6,5 @@ import assembler.x86.RexExtendedRequirement
 
 trait Operand {
   def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement]
-  def canInteractWith(register: Operand): Boolean = true
   def isValidForMode(processorMode: ProcessorMode): Boolean = true
 }

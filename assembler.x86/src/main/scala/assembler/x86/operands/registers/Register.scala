@@ -39,17 +39,17 @@ sealed abstract class ByteRegister(registerCode: Byte) extends GeneralRegister(r
 }
 
 sealed abstract class HighByteRegister(registerCode: Byte) extends ByteRegister(registerCode) {
-  override def canInteractWith(parameter: Operand): Boolean = parameter match {
-    case reg: RexByteRegister => false
-    case _ => true
-  }
+//  override def canInteractWith(parameter: Operand): Boolean = parameter match {
+//    case reg: RexByteRegister => false
+//    case _ => true
+//  }
 }
 
 sealed abstract class RexByteRegister(registerCode: Byte) extends ByteRegister(registerCode) {
-  override def canInteractWith(parameter: Operand): Boolean = parameter match {
-    case reg: HighByteRegister => false
-    case _ => true
-  }
+//  override def canInteractWith(parameter: Operand): Boolean = parameter match {
+//    case reg: HighByteRegister => false
+//    case _ => true
+//  }
 
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
     RexExtendedRequirement.instance(position) :: Nil
