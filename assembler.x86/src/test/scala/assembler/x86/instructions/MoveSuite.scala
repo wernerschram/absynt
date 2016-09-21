@@ -144,7 +144,7 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
         Move(AL, MemoryAddress(0xDEAF.toShort.encodeLittleEndian)).encodeByte should be (Hex.lsb("A2 AF DE"))
       }
 
-      "correctly encode mov [0x2D], ax" in { // TODO
+      "correctly encode mov [0x2D], ax" in {
         Move(AX, MemoryAddress(0x2D.toByte.encodeLittleEndian)).encodeByte should be (Hex.lsb("A3 2D"))
       }
       "correctly encode mov dl, 0x12" in {
@@ -177,7 +177,6 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
       implicit val processorMode = ProcessorMode.Protected
 
       "correctly encode mov [0xDEADBEEF], eax" in {
-      // TODO: can this be valid in real mode?
         Move(EAX, MemoryAddress(0xDEADBEEF.encodeLittleEndian)).encodeByte should be (Hex.lsb("A3 EF BE AD DE"))
       }
 

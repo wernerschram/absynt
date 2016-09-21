@@ -24,7 +24,7 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       }
 
       "throw an Exception for out 0x0010, al" in {
-        an [Exception] should be thrownBy {
+        an [AssertionError] should be thrownBy {
           Output(AL, 0x0010.toShort)
         }
       }
@@ -94,7 +94,7 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       }
 
       "throw an Exception for out dx, rax" in {
-        an [Exception] should be thrownBy {
+        an [AssertionError] should be thrownBy {
           Output(RAX, DX)
         }
       }

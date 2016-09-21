@@ -24,7 +24,7 @@ class InputSuite extends WordSpec with ShouldMatchers {
       }
 
       "throw an Exception for in al, 0x0010" in {
-        an [Exception] should be thrownBy {
+        an [AssertionError] should be thrownBy {
           Input(0x0010.toShort, AL)
         }
       }
@@ -94,7 +94,7 @@ class InputSuite extends WordSpec with ShouldMatchers {
       }
 
       "throw an Exception for in rax, dx" in {
-        an [Exception] should be thrownBy {
+        an [AssertionError] should be thrownBy {
           Input(DX, RAX)
         }
       }
