@@ -15,7 +15,7 @@ final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSize
     Nil
 
   val isPositive = (value.last & 0x80.toByte) == 0
-  
+
   override def toString() = value.decimalString()
 }
 

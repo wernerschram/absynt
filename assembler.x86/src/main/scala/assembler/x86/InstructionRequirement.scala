@@ -1,6 +1,6 @@
 package assembler.x86
 
-sealed protected class RexExtendedRequirement(val position: ParameterPosition)
+import assembler.x86.opcodes.Opcode
 
 class ParameterPosition
 
@@ -13,6 +13,8 @@ object ParameterPosition {
   case object None extends ParameterPosition
 }
 
+sealed protected class RexExtendedRequirement(val position: ParameterPosition, val rexBitmask: Byte)
+
 object RexExtendedRequirement {
   def instance(position: ParameterPosition) = position match {
     case ParameterPosition.Base => instanceBase
@@ -22,9 +24,9 @@ object RexExtendedRequirement {
     case ParameterPosition.OperandRM => instanceOperandRM
   }
 
-  val instanceIndex = new RexExtendedRequirement(ParameterPosition.Index)
-  val instanceBase = new RexExtendedRequirement(ParameterPosition.Base)
-  val instanceOpcodeReg = new RexExtendedRequirement(ParameterPosition.OpcodeReg)
-  val instanceOperandR = new RexExtendedRequirement(ParameterPosition.OperandR)
-  val instanceOperandRM = new RexExtendedRequirement(ParameterPosition.OperandRM)
+  val instanceIndex = new RexExtendedRequirement(ParameterPosition.Index, 0x02)
+  val instanceBase = new RexExtendedRequirement(ParameterPosition.Base, 0x01)
+  val instanceOpcodeReg = new RexExtendedRequirement(ParameterPosition.OpcodeReg, 0x01)
+  val instanceOperandR = new RexExtendedRequirement(ParameterPosition.OperandR, 0x04)
+  val instanceOperandRM = new RexExtendedRequirement(ParameterPosition.OperandRM, 0x01)
 }
