@@ -70,65 +70,65 @@ object Shifter {
     override val toString = s"${register.registerCode}"
   }
 
-  private def LogicalLeftShiftOperand[T <: LeftShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) = 
+  private def LogicalLeftShiftOperand[T <: LeftShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) =
     new ShiftRegisterWithShift(shifterCode, "lsl", register, shift)
 
-  def LogicalLeftShift(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[LeftImmediateShiftValue] = 
+  def LogicalLeftShift(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[LeftImmediateShiftValue] =
     LogicalLeftShiftOperand(0x00, register, LeftImmediateShiftValue(shiftImmediate))
-  def LogicalLeftShift(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[LeftShiftValue] = 
+  def LogicalLeftShift(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[LeftShiftValue] =
     LogicalLeftShiftOperand(0x10, register, shiftRegister)
-  
-  private def LogicalRightShiftOperand[T <: RightShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) = 
+
+  private def LogicalRightShiftOperand[T <: RightShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) =
     new ShiftRegisterWithShift(shifterCode, "lsr", register, shift)
 
-  def LogicalRightShift(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[RightImmediateShiftValue] = 
+  def LogicalRightShift(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[RightImmediateShiftValue] =
     LogicalRightShiftOperand(0x20, register, RightImmediateShiftValue(shiftImmediate))
-  def LogicalRightShift(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[RightShiftValue] = 
+  def LogicalRightShift(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[RightShiftValue] =
     LogicalRightShiftOperand(0x30, register, shiftRegister)
 
-  private def ArithmeticRightShiftOperand[T <: RightShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) = 
+  private def ArithmeticRightShiftOperand[T <: RightShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) =
     new ShiftRegisterWithShift(shifterCode, "asr", register, shift)
 
-  def ArithmeticRightShift(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[RightImmediateShiftValue] = 
+  def ArithmeticRightShift(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[RightImmediateShiftValue] =
     ArithmeticRightShiftOperand(0x40, register, RightImmediateShiftValue(shiftImmediate))
-  def ArithmeticRightShift(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[RightShiftValue] = 
+  def ArithmeticRightShift(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[RightShiftValue] =
     ArithmeticRightShiftOperand(0x50, register, shiftRegister)
 
-  private def RightRotateOperand[T <: RotateValue](shifterCode: Int, register: GeneralRegister, shift: T) = 
+  private def RightRotateOperand[T <: RotateValue](shifterCode: Int, register: GeneralRegister, shift: T) =
     new ShiftRegisterWithShift(shifterCode, "ror", register, shift)
 
-  def RightRotate(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[ImmediateRotateValue] = 
+  def RightRotate(register: GeneralRegister, shiftImmediate: Byte): ShiftRegisterWithShift[ImmediateRotateValue] =
     RightRotateOperand(0x60, register, ImmediateRotateValue(shiftImmediate))
-  def RightRotate(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[RotateValue] = 
+  def RightRotate(register: GeneralRegister, shiftRegister: GeneralRegister): ShiftRegisterWithShift[RotateValue] =
     RightRotateOperand(0x70, register, shiftRegister)
 
-  def RightRotateExtend(register: GeneralRegister) = 
-    new ShiftRegister(0x60, "rrx", register) 
+  def RightRotateExtend(register: GeneralRegister) =
+    new ShiftRegister(0x60, "rrx", register)
 
-  def RightRotateImmediate(immediate: Byte, rotateValue: Byte) = 
+  def RightRotateImmediate(immediate: Byte, rotateValue: Byte) =
     new RightRotateImmediate(immediate: Byte, rotateValue: Byte)
 
-  def ForImmediate(immediate: Int) = { 
+  def ForImmediate(immediate: Int) = {
     val rotateValue = (0 to 30 by 2).find { x => ((Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x)) }
     assume(rotateValue.isDefined)
-    
+
     val rotate = rotateValue.get.toByte
     new RightRotateImmediate(Integer.rotateLeft(immediate, rotate).toByte, rotate)
   }
 
   def CreateShifters(value: Int, minRotate: Int): List[RightRotateImmediate] = {
     if (value == 0) return Shifter.RightRotateImmediate(0, 0) :: Nil
-    
+
 	  val rotateValue = (minRotate to 30 by 2).find { x => ((Integer.rotateLeft(value, x) & 0xC0) != 0) }
 	  val rotate = rotateValue.get.toByte
-	  
+
     val intermediateValue = Integer.rotateLeft(value, rotate)
     if ((intermediateValue & 0xFF) == (intermediateValue))
     	return Shifter.RightRotateImmediate(intermediateValue.toByte, rotate) :: Nil
     else
     	return Shifter.RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) :: CreateShifters(value & Integer.rotateRight(0xFFFFFF00, rotate), rotate)
-  }                               
-  
+  }
+
   implicit def apply(immediate: Int) = CreateShifters(immediate, 0)
 }
 
