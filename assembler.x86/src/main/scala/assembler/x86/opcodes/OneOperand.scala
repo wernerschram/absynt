@@ -43,7 +43,7 @@ abstract class OneOperand[OperandType <: Operand](val parameterPosition: Paramet
   }
 
   def asTwoOperandOpcode[Operand2Type <: Operand](validateExtension: PartialFunction[(OperandType, Operand2Type, ProcessorMode), Boolean]): TwoOperand[OperandType, Operand2Type] =
-    new TwoOperand[OperandType, Operand2Type](OneOperand.this.parameterPosition, ParameterPosition.None, mnemonic) {
+    new TwoOperand[OperandType, Operand2Type](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) {
 
       override def validate(operand1: OperandType, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(operand1, operand2) && validateExtension(operand1, operand2, processorMode)
@@ -53,14 +53,14 @@ abstract class OneOperand[OperandType <: Operand](val parameterPosition: Paramet
     }
 
   def withOffset(): TwoOperand[OperandType, MemoryLocation] =
-    new TwoOperand[OperandType, MemoryLocation](OneOperand.this.parameterPosition, ParameterPosition.None, mnemonic) {
+    new TwoOperand[OperandType, MemoryLocation](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) {
 
       override def getCode(operand: OperandType, memoryLocation: MemoryLocation): List[Byte] =
         OneOperand.this.getCode(operand) ::: memoryLocation.displacement
     }
 
   def withImmediate(validateExtension: PartialFunction[(OperandType, ImmediateValue, ProcessorMode), Boolean] = TwoOperand.valid): TwoOperand[OperandType, ImmediateValue] =
-    new TwoOperand[OperandType, ImmediateValue](OneOperand.this.parameterPosition, ParameterPosition.None, mnemonic) {
+    new TwoOperand[OperandType, ImmediateValue](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) {
 
       override def validate(operand: OperandType, immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(operand, immediate) && validateExtension(operand, immediate, processorMode)

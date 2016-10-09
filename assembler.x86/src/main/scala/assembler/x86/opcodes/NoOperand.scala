@@ -27,7 +27,7 @@ abstract class NoOperand(val mnemonic: String) {
   override def toString() = mnemonic
 
   def asOneOperandOpcode[OperandType <: Operand](validateExtension: PartialFunction[(OperandType, ProcessorMode), Boolean]): OneOperand[OperandType] =
-    new OneOperand[OperandType](ParameterPosition.None, mnemonic) {
+    new OneOperand[OperandType](ParameterPosition.NotEncoded, mnemonic) {
 
       override def validate(operand: OperandType)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(operand) && validateExtension(operand, processorMode)
@@ -37,7 +37,7 @@ abstract class NoOperand(val mnemonic: String) {
     }
 
   def asTwoOperandOpcode[Operand1Type <: Operand, Operand2Type <: Operand](validateExtension: PartialFunction[(Operand1Type, Operand2Type, ProcessorMode), Boolean]): TwoOperand[Operand1Type, Operand2Type] =
-    new TwoOperand[Operand1Type, Operand2Type](ParameterPosition.None, ParameterPosition.None, mnemonic) {
+    new TwoOperand[Operand1Type, Operand2Type](ParameterPosition.NotEncoded, ParameterPosition.NotEncoded, mnemonic) {
 
       override def validate(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(operand1, operand2) && validateExtension(operand1, operand2, processorMode)
@@ -47,7 +47,7 @@ abstract class NoOperand(val mnemonic: String) {
     }
 
   def withImmediate(validateExtension: PartialFunction[(ImmediateValue, ProcessorMode), Boolean] = OneOperand.valid): OneOperand[ImmediateValue] =
-    new OneOperand[ImmediateValue](ParameterPosition.None, mnemonic) {
+    new OneOperand[ImmediateValue](ParameterPosition.NotEncoded, mnemonic) {
 
       override def validate(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(immediate) && validateExtension(immediate, processorMode)
@@ -57,7 +57,7 @@ abstract class NoOperand(val mnemonic: String) {
     }
 
   def withNearPointer(validateExtension: PartialFunction[(NearPointer, ProcessorMode), Boolean] = OneOperand.valid): OneOperand[NearPointer] =
-    new OneOperand[NearPointer](ParameterPosition.None, mnemonic) {
+    new OneOperand[NearPointer](ParameterPosition.NotEncoded, mnemonic) {
 
       override def validate(pointer: NearPointer)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(pointer) && validateExtension(pointer, processorMode)
@@ -67,7 +67,7 @@ abstract class NoOperand(val mnemonic: String) {
     }
 
   def withFarPointer(): OneOperand[FarPointer] =
-    new OneOperand[FarPointer](ParameterPosition.None, mnemonic) {
+    new OneOperand[FarPointer](ParameterPosition.NotEncoded, mnemonic) {
 
       override def getCode(pointer: FarPointer): List[Byte] =
         NoOperand.this.getCode ::: pointer.offset ::: pointer.segment

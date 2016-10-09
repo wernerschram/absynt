@@ -4,7 +4,7 @@ import assembler.x86.ParameterPosition
 import assembler.x86.operands.registers.Register
 
 class RegisterStatic[RegisterType <: Register](code: List[Byte], includeRexW: Boolean = true)(implicit mnemonic: String)
-  extends OneOperand[RegisterType](ParameterPosition.None, mnemonic) {
+  extends OneOperand[RegisterType](ParameterPosition.NotEncoded, mnemonic) {
 
   def getCode(register: RegisterType) = code
 }

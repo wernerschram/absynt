@@ -42,7 +42,7 @@ sealed abstract class HighByteRegister(registerCode: Byte) extends ByteRegister(
 
 sealed abstract class RexByteRegister(registerCode: Byte) extends ByteRegister(registerCode) {
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
-    RexExtendedRequirement.instance(position) :: Nil
+    position.rexRequirement.toList
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
 
@@ -56,7 +56,7 @@ sealed abstract class WordRegister(registerCode: Byte) extends WideRegister(regi
 
 sealed abstract class RexWordRegister(registerCode: Byte) extends WordRegister(registerCode) {
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
-    RexExtendedRequirement.instance(position) :: Nil
+    position.rexRequirement.toList
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
 
@@ -68,7 +68,7 @@ sealed abstract class DoubleWordRegister(registerCode: Byte)
 
 sealed abstract class RexDoubleWordRegister(registerCode: Byte) extends DoubleWordRegister(registerCode) {
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
-    RexExtendedRequirement.instance(position) :: Nil
+    position.rexRequirement.toList
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
 
@@ -81,7 +81,7 @@ sealed abstract class QuadWordRegister(registerCode: Byte)
 
 sealed abstract class RexQuadWordRegister(registerCode: Byte) extends QuadWordRegister(registerCode) {
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
-    RexExtendedRequirement.instance(position) :: Nil
+    position.rexRequirement.toList
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
 
