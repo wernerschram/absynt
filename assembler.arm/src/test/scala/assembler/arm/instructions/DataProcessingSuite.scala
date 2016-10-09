@@ -54,8 +54,8 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         AddCarry(R7, Shifter.LogicalRightShift(R10, R11), R5).encodeByte should be(Hex.msb("e0a75b3a"))
       }
 
-      "correctly encode adc r15, r11, r13, asr #13" in {
-        AddCarry(R11, Shifter.ArithmeticRightShift(R13, 13.toByte), R15).encodeByte should be(Hex.msb("e0abf6cd"))
+      "correctly encode adc r15, r11, sp, asr #13" in {
+        AddCarry(R11, Shifter.ArithmeticRightShift(SP, 13.toByte), R15).encodeByte should be(Hex.msb("e0abf6cd"))
       }
 
       "correctly encode adc r15, r11, r13, asr r13" in {
@@ -161,6 +161,13 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode mov r2, r1" in {
         Move(R1, R2).encodeByte should be(Hex.msb("e1a02001"))
+      }
+
+      "correctly encode mov r4, 0x20200000 (word 0x20200000 cannot be encoded in one instruction)" in {
+        // Because a dataprocessing instruction cannot encode 0x202000000, this instruction will be split up into two instructions as below:
+        //          40:   e3a04580        mov     r4, #128, 10            ; 0x20000000
+        //          44:   e3844980        orr     r4, r4, #128, 18        ; 0x200000
+        Move.forShifters(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04580 e3844980"))
       }
     }
   }
