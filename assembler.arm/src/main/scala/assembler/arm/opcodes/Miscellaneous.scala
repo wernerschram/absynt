@@ -65,11 +65,6 @@ object InterruptDisableFlags extends Enumeration {
 
 class ProcessorState(val code: Byte)(implicit mnemonic: String) {
 
-  def iflags(impreciseDataAbort: Boolean, normalInterrupt: Boolean, fastInterrupt: Boolean): String =
-    ((if (impreciseDataAbort) "a" else "") +
-      (if (normalInterrupt) "i" else "") +
-      (if (fastInterrupt) "f" else ""))
-
   private def apply(condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Byte, stringValue: String)(implicit processorMode: ProcessorMode): ARMInstruction =
     new ConditionalARMInstruction(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
