@@ -169,6 +169,13 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //          44:   e3844980        orr     r4, r4, #128, 18        ; 0x200000
         Move.forShifters(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04580 e3844980"))
       }
+
+      "correctly encode mov r4, 0x0" in {
+        // Because a dataprocessing instruction cannot encode 0x202000000, this instruction will be split up into two instructions as below:
+        //          40:   e3a04580        mov     r4, #128, 10            ; 0x20000000
+        //          44:   e3844980        orr     r4, r4, #128, 18        ; 0x200000
+        Move.forShifters(0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04000"))
+      }
     }
   }
 

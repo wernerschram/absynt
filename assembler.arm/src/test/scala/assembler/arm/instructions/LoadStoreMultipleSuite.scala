@@ -33,6 +33,10 @@ class LoadStoreMultipleSuite extends WordSpec with ShouldMatchers {
         LoadMultiple.withUserModeRegistersAndUpdateBase(R15 :: R14 :: Nil, R1, UpdateMode.IncrementAfter).encodeByte should be(Hex.msb("e8f1c000"))
       }
 
+       "correctly encode push lr" in {
+        Push(LR :: Nil).encodeByte should be(Hex.msb("e83d4000"))
+      }
+
       "throw an AssertionError for ldm r1!, {r14}^" in {
         an[AssertionError] should be thrownBy {
           LoadMultiple.withUserModeRegistersAndUpdateBase(R14 :: Nil, R1, UpdateMode.IncrementAfter)
@@ -55,6 +59,10 @@ class LoadStoreMultipleSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode stm r1, {r14}^" in {
         StoreMultiple.withUserModeRegisters(R14 :: Nil, R1, UpdateMode.DecrementBefore).encodeByte should be(Hex.msb("e9414000"))
+      }
+
+      "correctly encode pop r1, sp, pc" in {
+        Pop(R1 :: SP :: PC :: Nil).encodeByte should be(Hex.msb("e9ada002"))
       }
     }
   }
