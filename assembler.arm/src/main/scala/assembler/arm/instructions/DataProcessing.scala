@@ -26,9 +26,6 @@ class DataProcessingNoDestination(val code: Byte, val opcode: String) {
     def apply(register1: GeneralRegister, source2: Shifter, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
       RegAndShifter(register1, source2, condition)
 
-    def setFlags(register1: GeneralRegister, source2: Shifter, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
-      RegAndShifter.setFlags(register1, source2, condition)
-   
 }
 
 class DataProcessingNoRegister(val code: Byte, val opcode: String) {

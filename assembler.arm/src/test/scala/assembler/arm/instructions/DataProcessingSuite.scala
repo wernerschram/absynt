@@ -46,8 +46,8 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         }
       }
 
-      "correctly encode adc r3, r1, r14, lsl r5" in {
-        AddCarry(R1, Shifter.LogicalLeftShift(R14, R5), R3).encodeByte should be(Hex.msb("e0a1351e"))
+      "correctly encode adcs r3, r1, r14, lsl r5" in {
+        AddCarry.setFlags(R1, Shifter.LogicalLeftShift(R14, R5), R3).encodeByte should be(Hex.msb("e0b1351e"))
       }
 
       "correctly encode adc r9, r8, r6, lsl #4" in {

@@ -51,13 +51,6 @@ class DataProcessing(val code: Byte)(implicit mnemonic: String)
     new DataProcessingNoDestinationInstruction(mnemonic, code, condition, register1, operand2)
   }
 
-  def setFlags(register1: GeneralRegister, operand2: Shifter, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
-    new DataProcessingNoDestinationInstruction(mnemonic, code, condition, register1, operand2) {
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | ARMInstruction.sBit)
-    }
-  }
-
   def apply(operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
     new DataProcessingNoRegisterInstruction(mnemonic, code, condition, operand2, destination)
   }
