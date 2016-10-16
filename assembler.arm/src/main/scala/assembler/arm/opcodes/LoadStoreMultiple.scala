@@ -34,7 +34,7 @@ class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic
           (baseRegister.registerCode << 16) |
           toRegisterBits(registers))
 
-      override def toString() = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}, {${registers.map { x => x.toString }.mkString(", ")}}${if (userModeRegisters) "^" else ""}" // ${value.toString()}}"
+      override lazy val toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}, {${registers.map { x => x.toString }.mkString(", ")}}${if (userModeRegisters) "^" else ""}" // ${value.toString()}}"
     }
   }
 }
@@ -50,10 +50,10 @@ class ReturnFromException()(implicit mnemonic: String)
       override def encodeWord()(implicit page: MemoryPage) =
         (0xf8100a00 |
           (if (updateBase) 0x00200000 else 0) |
-          addressingMode.bitMask | 
+          addressingMode.bitMask |
           (baseRegister.registerCode << 16))
 
-      override def toString() = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}"
+      override lazy val toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}"
     }
   }
 }

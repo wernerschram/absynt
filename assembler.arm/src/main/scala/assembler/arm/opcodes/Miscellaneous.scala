@@ -34,7 +34,7 @@ object Effect {
 }
 
 sealed abstract class ExecutionMode(val mode: Byte) {
-  override val toString = mode.toString()
+  override lazy val toString = mode.toString()
 }
 
 object ExecutionMode {

@@ -17,7 +17,7 @@ class MoveFromStatusRegister()(implicit mnemonic: String)
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12))
 
-      override val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}"
+      override lazy val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}"
     }
 }
 
@@ -43,7 +43,7 @@ class MoveToStatusRegister()(implicit mnemonic: String)
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (source.registerCode)))
 
-      override val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
+      override lazy val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
     }
 
   // Immediate and shift
@@ -53,7 +53,7 @@ class MoveToStatusRegister()(implicit mnemonic: String)
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x0320f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (rotate << 7) | (source & 0xff)))
 
-      override val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, #${source.toString}, ${rotate}"
+      override lazy val toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, #${source.toString}, ${rotate}"
     }
   }
 }

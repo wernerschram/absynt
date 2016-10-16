@@ -53,26 +53,26 @@ abstract sealed class LoadStoreOffset private (val updateDirection: UpdateDirect
 object LoadStoreOffset {
   implicit def apply(offset: Short, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreOffset(updateDirection) {
     override val encode = 0x04000000 | offset | updateDirection.bitMask
-    override val toString: String = s"#${updateDirection.sign}${offset}"
+    override lazy val toString: String = s"#${updateDirection.sign}${offset}"
   }
 
   implicit def apply(offset: Short): LoadStoreOffset = {
     if (offset >= 0)
       apply(offset, UpdateDirection.Increment)
-    else 
+    else
       apply((-offset).toShort, UpdateDirection.Decrement)
   }
 
   implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreOffset(updateDirection) {
     override val encode = 0x06000000 | offsetRegister.registerCode | updateDirection.bitMask
-    override val toString: String = s"${updateDirection.sign}${offsetRegister}"
+    override lazy val toString: String = s"${updateDirection.sign}${offsetRegister}"
   }
 
   implicit def apply(offsetRegister: GeneralRegister): LoadStoreOffset = apply(offsetRegister, UpdateDirection.Increment)
 
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreOffset(updateDirection) {
     override val encode = 0x06000000 | offset.encode | updateDirection.bitMask
-    override val toString: String = s"#${updateDirection.sign}${offset}"
+    override lazy val toString: String = s"#${updateDirection.sign}${offset}"
   }
 
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue]): LoadStoreOffset = apply(offset, UpdateDirection.Increment)
@@ -85,14 +85,14 @@ abstract sealed class LoadStoreMiscelaneousOffset private (val updateDirection: 
 object LoadStoreMiscelaneousOffset {
   implicit def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreMiscelaneousOffset(updateDirection) {
     override val encode = 0x00400090 | updateDirection.bitMask | ((offset & 0xf0) << 4) | (offset & 0x0f)
-    override val toString: String = s"#${updateDirection.sign}${offset}"
+    override lazy val toString: String = s"#${updateDirection.sign}${offset}"
   }
 
   implicit def apply(offset: Byte): LoadStoreMiscelaneousOffset = apply(offset, UpdateDirection.Increment)
 
   implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreMiscelaneousOffset(updateDirection) {
     override val encode = 0x00000090 | offsetRegister.registerCode | updateDirection.bitMask
-    override val toString: String = s"${updateDirection.sign}${offsetRegister}"
+    override lazy val toString: String = s"${updateDirection.sign}${offsetRegister}"
   }
 
   implicit def apply(offsetRegister: GeneralRegister): LoadStoreMiscelaneousOffset = apply(offsetRegister, UpdateDirection.Increment)
@@ -110,7 +110,7 @@ object UpdateDirection {
 
 object LoadStoreOperation {
   abstract sealed class LoadStoreOperation(val bitMask: Int, val opcodeExtension: String)
-  
+
   object StoreWord extends LoadStoreOperation(0x00000000, "")
   object LoadWord extends LoadStoreOperation(0x00100000, "")
   object StoreByte extends LoadStoreOperation(0x00400000, "b")
@@ -119,7 +119,7 @@ object LoadStoreOperation {
 
 object LoadStoreMiscelaneousOperation {
   class LoadStoreMiscelaneousOperation(val bitMask: Int, val opcodeExtension: String)
-  
+
   object StoreHalfWord extends LoadStoreMiscelaneousOperation(0x00000020, "h")
   object LoadDoubleWord extends LoadStoreMiscelaneousOperation(0x00000040, "d")
   object StoreDoubleWord extends LoadStoreMiscelaneousOperation(0x00000060, "d")
@@ -141,7 +141,7 @@ class LoadStore(operation: LoadStoreOperation.LoadStoreOperation)(implicit mnemo
           operation.bitMask | addressingType.bitMask |
           (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
 
-      override val toString =
+      override lazy val toString =
         s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatParameters(baseRegister, offset)}"
 
     }
@@ -161,7 +161,7 @@ class LoadStoreMiscelaneous(operation: LoadStoreMiscelaneousOperation.LoadStoreM
           operation.bitMask | addressingType.bitMask |
           (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
 
-      override val toString =
+      override lazy val toString =
         s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatMiscelaneousParameters(baseRegister, offset)}"
     }
   }
