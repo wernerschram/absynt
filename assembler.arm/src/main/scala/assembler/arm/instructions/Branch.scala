@@ -1,6 +1,7 @@
 package assembler.arm.instructions
 
 import assembler.LabelCondition
+import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.opcodes.BranchImmediate
 import assembler.arm.opcodes.BranchRegister
@@ -9,7 +10,6 @@ import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
-
 
 class ARMBranchInstructionOnPage(branch:BranchImmediate, thisLocation: Int, destinationLocation: Int, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
     extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage {
@@ -26,7 +26,7 @@ class ARMBranchInstructionOnPage(branch:BranchImmediate, thisLocation: Int, dest
   override lazy val encodeWord = encodeWordForDistance(forward, actualDistance)
 
   override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
-    branch.apply(getPointerForDistance(forward, distance), condition).encodeByte()
+    encodeWordForDistance(forward, distance).encodeLittleEndian
 }
 
 class Branch(code: Byte, val opcode: String) {
