@@ -24,7 +24,7 @@ class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic
 
     new ConditionalARMInstruction(condition) {
       def toRegisterBits(registers: List[GeneralRegister]): Int =
-        registers.aggregate(0)((result, instance) => result | (1 << instance.registerCode), (result1, result2) => result1 | result2)
+        registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
 
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x08000000 |
