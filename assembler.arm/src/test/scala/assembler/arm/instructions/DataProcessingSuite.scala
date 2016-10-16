@@ -36,6 +36,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         AddCarry(R0, Shifter.LogicalLeftShift(R1, 2.toByte), R2).encodeByte should be(Hex.msb("e0a02101"))
       }
 
+      "correctly represent adc r2, r0, r1, lsl #2 as a string" in {
+        AddCarry(R0, Shifter.LogicalLeftShift(R1, 2.toByte), R2).toString should be("adc r2, r0, r1, lsl #2")
+      }
+
       "throw an AssertionError for adc r2, r0, r1, lsl #33" in {
         an[AssertionError] should be thrownBy {
           AddCarry(R0, Shifter.LogicalLeftShift(R1, 33.toByte), R2)
@@ -78,7 +82,7 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,2.toByte), R1).encodeByte should be(Hex.msb("e2a21101"))
       }
 
-      info("Not that there are different ways of encoding adc r1, r2, #1073741824. This test could result in false negatives")
+      info("Note that there are different ways of encoding adc r1, r2, #1073741824. This test could result in false negatives")
       "correctly encode adc r1, r2, #1073741824" in {
         AddCarry(R2, Shifter.ForImmediate(1073741824), R1).encodeByte should be(Hex.msb("e2a21101"))
       }
@@ -137,9 +141,14 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode cmn r2, r0, r1" in {
+      "correctly encode cmn r0, r1" in {
         CompareNegative(R0, R1).encodeByte should be(Hex.msb("e1600001"))
       }
+
+      "correctly represent r0, r1 as a string" in {
+        CompareNegative(R0, R1).toString should be("cmn r0, r1")
+      }
+
     }
   }
 
@@ -197,6 +206,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode mvn r2, r1" in {
         MoveNot(R1, R2).encodeByte should be(Hex.msb("e1e02001"))
+      }
+
+      "correctly represent mvn r2, r1 as a string" in {
+        MoveNot(R1, R2).toString should be("mvn r2, r1")
       }
     }
   }
