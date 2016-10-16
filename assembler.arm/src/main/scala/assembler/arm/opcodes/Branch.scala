@@ -16,7 +16,7 @@ class BranchImmediate(val code: Byte)(implicit mnemonic: String)
     override def encodeWord()(implicit page: MemoryPage) =
       // TODO: apply lBit
       (super.encodeWord() | ((code & 0xF0) << 20) | (destination.encode))
-    override lazy val toString = s"${BranchImmediate.this.mnemonic}${condition.mnemonicExtension} ${destination.toString}"
+    override def toString = s"${BranchImmediate.this.mnemonic}${condition.mnemonicExtension} ${destination.toString}"
   }
 }
 
@@ -27,7 +27,7 @@ class BranchRegister(val code: Byte)(implicit mnemonic: String)
     override def encodeWord()(implicit page: MemoryPage) =
       // TODO: apply lBit
       (super.encodeWord() | 0x012FFF00 | ((code & 0x0F) << 4) | (destination.registerCode))
-    override lazy val toString = s"${BranchRegister.this.mnemonic}${condition.mnemonicExtension} ${destination.toString}"
+    override def toString = s"${BranchRegister.this.mnemonic}${condition.mnemonicExtension} ${destination.toString}"
 
   }
 

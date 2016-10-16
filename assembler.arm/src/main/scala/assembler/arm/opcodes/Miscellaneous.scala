@@ -21,7 +21,7 @@ class Miscellaneous(val code: Byte)(implicit mnemonic: String)
         result
       }
 
-      override def toString() = s"${Miscellaneous.this.mnemonic}" // ${value.toString()}}"
+      override def toString = s"${Miscellaneous.this.mnemonic}" // ${value.toString()}}"
     }
   }
 }
@@ -34,7 +34,7 @@ object Effect {
 }
 
 sealed abstract class ExecutionMode(val mode: Byte) {
-  override lazy val toString = mode.toString()
+  override def toString = mode.toString()
 }
 
 object ExecutionMode {
@@ -70,7 +70,7 @@ class ProcessorState(val code: Byte)(implicit mnemonic: String) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
 
-      override def toString() = stringValue
+      override def toString = stringValue
     }
 
   def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMInstruction =

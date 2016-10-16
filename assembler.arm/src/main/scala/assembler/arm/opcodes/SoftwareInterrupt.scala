@@ -11,8 +11,8 @@ class SoftwareInterrupt()(implicit mnemonic: String)
   def apply(interrupt: Int, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
     new ARMInstruction() {
       override def encodeWord()(implicit page: MemoryPage) = ((condition.value << 28) | 0x0f000000 | (interrupt) )
-      
-      override def toString() = s"${mnemonic} ${interrupt.toString()}"
+
+      override def toString = s"${mnemonic} ${interrupt.toString()}"
     }
   }
 }

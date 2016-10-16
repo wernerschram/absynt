@@ -12,16 +12,16 @@ class MultiplyInstruction(val code: Byte, mnemonic: String, destination: General
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | 0x00000090 | (code << 21) | (destination.registerCode << 16) | (source.registerCode << 8) | multiplyValue.registerCode)
 
-  override def toString() = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}, ${multiplyValue.toString}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}, ${multiplyValue.toString}"
 }
 
-class MultiplyWithRegisterInstruction(code: Byte, mnemonic: String, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode) 
+class MultiplyWithRegisterInstruction(code: Byte, mnemonic: String, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode)
   extends MultiplyInstruction(code, mnemonic, destination, source, multiplyValue, condition) {
-  
+
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (addValue.registerCode << 12))
 
-  override def toString() = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}, ${multiplyValue.toString}, ${addValue.toString}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}, ${multiplyValue.toString}, ${addValue.toString}"
 }
 
 class Multiply(val code: Byte)(implicit mnemonic: String)
@@ -35,7 +35,7 @@ class Multiply(val code: Byte)(implicit mnemonic: String)
       override def encodeWord()(implicit page: MemoryPage) = super.encodeWord() | ARMInstruction.sBit
     }
   }
-  
+
   def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction =
     new MultiplyWithRegisterInstruction(code, mnemonic, destination, source, multiplyValue, addValue, condition)
 

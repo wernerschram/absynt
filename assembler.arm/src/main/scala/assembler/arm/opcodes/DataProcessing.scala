@@ -14,7 +14,7 @@ class DataProcessingInstruction(mnemonic: String, code: Byte, condition: Conditi
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 21) | (register1.registerCode << 16) | (destination.registerCode << 12) | operand2.encode)
 
-  override def toString() = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${operand2.toString()}, ${register1.toString}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${operand2.toString()}, ${register1.toString}"
 }
 
 class DataProcessingNoDestinationInstruction(mnemonic: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter)
@@ -23,7 +23,7 @@ class DataProcessingNoDestinationInstruction(mnemonic: String, code: Byte, condi
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 21) | (register1.registerCode << 16) | operand2.encode)
 
-  override def toString() = s"${mnemonic}${condition.mnemonicExtension} ${operand2.toString()}, ${register1.toString}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${operand2.toString()}, ${register1.toString}"
 }
 
 class DataProcessingNoRegisterInstruction(mnemonic: String, code: Byte, condition: Condition, operand2: Shifter, destination: GeneralRegister)
@@ -31,7 +31,7 @@ class DataProcessingNoRegisterInstruction(mnemonic: String, code: Byte, conditio
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 21) | (destination.registerCode << 12) | operand2.encode)
 
-  override def toString() = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${operand2.toString()}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${operand2.toString()}"
 }
 
 class DataProcessing(val code: Byte)(implicit mnemonic: String)

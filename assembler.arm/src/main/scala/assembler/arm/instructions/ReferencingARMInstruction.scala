@@ -35,5 +35,5 @@ class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
   override def encodeWord()(implicit page: MemoryPage) = getOrElseCreateInstruction().encodeWord
 
-  override def toString() = s"${mnemonic} ${condition} ()"
+  override def toString = s"${mnemonic} ${condition} ()"
 }
