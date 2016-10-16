@@ -10,41 +10,42 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 
+
+class ARMBranchInstructionOnPage(branch:BranchImmediate, thisLocation: Int, destinationLocation: Int, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
+    extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage {
+
+  val branchSize = 4
+  override val minimumSize = branchSize
+  override val maximumSize = branchSize
+
+  override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
+
+  def encodeWordForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
+    branch.apply(getPointerForDistance(forward, distance), condition).encodeWord()
+
+  override lazy val encodeWord = encodeWordForDistance(forward, actualDistance)
+
+  override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
+    branch.apply(getPointerForDistance(forward, distance), condition).encodeByte()
+}
+
 class Branch(code: Byte, val opcode: String) {
   private val Immediate = new BranchImmediate(code)(opcode)
 
   def apply(destination: RelativePointer, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     Immediate(destination, condition)
-  
-  class ARMBranchInstructionOnPage private[Branch](thisLocation: Int, destinationLocation: Int, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
-      extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage {
-    
-    val branchSize = 4
-    override val minimumSize = branchSize
-    override val maximumSize = branchSize
 
-    override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
-    
-    def encodeWordForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = 
-      apply(getPointerForDistance(forward, distance), condition).encodeWord()
-
-    override lazy val encodeWord = encodeWordForDistance(forward, actualDistance)
-
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = 
-      apply(getPointerForDistance(forward, distance), condition).encodeByte()
-  }
-   
   def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
     new ReferencingARMInstruction[ARMBranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>  
-        new ARMBranchInstructionOnPage(thisLocation, targetLocation, Always)(memoryPage, processorMode), 
-        opcode, labelCondition)  
+      (thisLocation, targetLocation, memoryPage, processorMode) =>
+        new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, Always)(memoryPage, processorMode),
+        opcode, labelCondition)
 
   def apply(labelCondition: LabelCondition, condition: Condition)(implicit processorMode: ProcessorMode) =
     new ReferencingARMInstruction[ARMBranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>  
-        new ARMBranchInstructionOnPage(thisLocation, targetLocation, condition)(memoryPage, processorMode), 
-        opcode, labelCondition)  
+      (thisLocation, targetLocation, memoryPage, processorMode) =>
+        new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, condition)(memoryPage, processorMode),
+        opcode, labelCondition)
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
@@ -61,30 +62,12 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(destination: RelativePointer)(implicit processorMode: ProcessorMode) =
     Immediate(destination, Unpredictable)
-    
-  class ARMBranchInstructionOnPage private[BranchLinkExchange](thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
-      extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage  {
-    
-    val branchSize = 1
-    override val minimumSize = branchSize
-    override val maximumSize = branchSize
 
-    override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
-
-    def encodeWordForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = 
-      apply(getPointerForDistance(forward, distance)).encodeWord()
-
-    override lazy val encodeWord = encodeWordForDistance(forward, actualDistance)
-
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = 
-      apply(getPointerForDistance(forward, distance)).encodeByte()
-  }    
-  
   def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
     new ReferencingARMInstruction[ARMBranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>  
-        new ARMBranchInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
-        opcode, labelCondition)  
+      (thisLocation, targetLocation, memoryPage, processorMode) =>
+        new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, Unpredictable)(memoryPage, processorMode),
+        opcode, labelCondition)
 }
 
 object Branch extends Branch(0xA0.toByte, "b")
