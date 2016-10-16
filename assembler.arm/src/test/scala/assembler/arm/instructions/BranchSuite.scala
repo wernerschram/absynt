@@ -64,10 +64,10 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         val p = new MemoryPage(
           labeledFiller(4, "Label") ::
             filler(4) ::
-            Branch("Label") ::
+            Branch("Label", Condition.LowerOrSame) ::
             Nil)
 
-        p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFC"))
+        p.encodeByte() should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
