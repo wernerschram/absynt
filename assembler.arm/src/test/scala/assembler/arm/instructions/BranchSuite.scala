@@ -38,16 +38,20 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode b PC+0x3e8" in {
+      "correctly encode b +0x3e8" in {
         Branch(0x3e8).encodeByte should be(Hex.msb("ea0000fa"))
       }
 
-      "correctly encode beq PC+0x1111110" in {
+      "correctly encode beq +0x1111110" in {
         Branch(0x1111110, Condition.Equal).encodeByte should be(Hex.msb("0a444444"))
       }
 
-      "correctly encode blt PC-0x08" in {
+      "correctly encode blt -0x08" in {
         Branch(-0x08, Condition.SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
+      }
+
+      "correctly represent blt -0x08 as a string" in {
+        Branch(-0x08, Condition.SignedLessThan).toString should be("blt -8")
       }
 
       "correctly encode a forward branch to a labeled instruction" in {
@@ -105,6 +109,10 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         BranchLink(0x1111110, Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
       }
 
+      "correctly represent bleq 0x1111118 as a string" in {
+        BranchLink(0x1111110, Condition.Equal).toString should be("bleq 17895696")
+      }
+
       "correctly encode a forward branch-link to a labeled instruction" in {
         val p = new MemoryPage(
           BranchLink("Label") ::
@@ -126,8 +134,23 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         BranchLinkExchange(0x1234).encodeByte should be(Hex.msb("fa00048d"))
       }
 
+      "correctly represent blx 0x123e as a string" in {
+        BranchLinkExchange(0x1234).toString should be("blx 4660")
+      }
+
       "correctly encode blx r12" in {
         BranchLinkExchange(R12).encodeByte should be(Hex.msb("e12fff3c"))
+      }
+
+
+      "correctly encode a forward branch-link-exchange to a labeled instruction" in {
+        val p = new MemoryPage(
+          BranchLinkExchange("Label") ::
+            filler(4) ::
+            labeledFiller(4, "Label") ::
+            Nil)
+
+        p.encodeByte() should be(Hex.msb("FA000000 00000000 00000000"))
       }
     }
   }
@@ -140,6 +163,11 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
       "correctly encode bx r1" in {
         BranchExchange(R1).encodeByte should be(Hex.msb("e12fff11"))
       }
+
+      "correctly represent bx r1 as a string" in {
+        BranchExchange(R1).toString should be("bx r1")
+      }
+
     }
   }
 
@@ -150,6 +178,11 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "correctly encode bxj r2" in {
         BranchExchangeJazelle(R2).encodeByte should be(Hex.msb("e12fff22"))
+      }
+
+
+      "correctly represent bxj r2 as a string" in {
+        BranchExchangeJazelle(R2).toString should be("bxj r2")
       }
     }
   }
