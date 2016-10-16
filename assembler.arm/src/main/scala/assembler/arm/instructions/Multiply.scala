@@ -1,4 +1,4 @@
-package assembler.arm.instructions.dataprocessing
+package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
 import assembler.arm.opcodes.{ Multiply => MultiplyOpcode }

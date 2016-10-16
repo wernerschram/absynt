@@ -6,8 +6,8 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.dataprocessing.MoveFromStatusRegister
-import assembler.arm.instructions.dataprocessing.MoveToStatusRegister
+import assembler.arm.instructions.MoveFromStatusRegister
+import assembler.arm.instructions.MoveToStatusRegister
 import assembler.arm.opcodes.Fields
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._

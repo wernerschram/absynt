@@ -5,8 +5,6 @@ import org.scalatest.WordSpec
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.dataprocessing.Multiply
-import assembler.arm.instructions.dataprocessing.MultiplyAccumulate
 import assembler.arm.operands.Condition
 import assembler.arm.operands.Shifter.apply
 import assembler.arm.operands.registers.GeneralRegister._
@@ -20,10 +18,6 @@ class MultiplySuite extends WordSpec with ShouldMatchers {
     "in a32 mode" should {
 
       implicit val processorMode = ProcessorMode.A32
-
-      "correctly encode mla r2, r0, r1" in {
-        AddCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0a02001"))
-      }
 
       "correctly encode mlagt r1, r3, r2, r4" in {
         MultiplyAccumulate(R1, R2, R3, R4, Condition.SignedGreaterThan).encodeByte should be(Hex.msb("c0214293"))
