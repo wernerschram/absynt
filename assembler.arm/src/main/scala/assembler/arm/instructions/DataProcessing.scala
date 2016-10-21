@@ -35,8 +35,14 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
     ShifterToReg.setFlags(source2, destination, condition)
 }
 
-object AddCarry extends DataProcessing(0x05.toByte, "adc")
-object Add extends DataProcessing(0x04.toByte, "add")
+object AddCarry extends DataProcessing(0x05.toByte, "adc") {
+  def forShifters(source1: GeneralRegister, source2: List[RightRotateImmediate], destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
+    apply(source1, source2.head, destination, condition) :: source2.tail.map(value => Add(destination, value, destination, condition))
+}
+object Add extends DataProcessing(0x04.toByte, "add") {
+  def forShifters(source1: GeneralRegister, source2: List[RightRotateImmediate], destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
+    apply(source1, source2.head, destination, condition) :: source2.tail.map(value => Add(destination, value, destination, condition))
+}
 object And extends DataProcessing(0x00.toByte, "and")
 object BitClear extends DataProcessing(0x0E.toByte, "bic")
 object CompareNegative extends DataProcessingNoDestination(0x0B.toByte, "cmn")

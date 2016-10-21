@@ -98,6 +98,16 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
           AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,32.toByte), R1)
         }
       }
+
+      "correctly encode adc r4, r5, 0xffffffff" in {
+        // Because a dataprocessing instruction cannot encode 0x1234, this instruction will be split up into two instructions as below:
+        //        e2a540ff        adc     r4, r5, #255    ; 0xff
+        //        e2844cff        add     r4, r4, #65280  ; 0xff00
+        //        e28448ff        add     r4, r4, #16711680       ; 0xff0000
+        //        e28444ff        add     r4, r4, #-16777216      ; 0xff000000
+        AddCarry.forShifters(R5, 0xffffffff, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2a540ff e2844cff e28448ff e28444ff"))
+      }
+
     }
   }
 
@@ -111,6 +121,15 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode add r2, r0, rr" in {
         Add(R0, R1, R2).encodeByte should be(Hex.msb("e0802001"))
       }
+
+      "correctly encode add r4, r5, 0x10011001" in {
+        // Because a dataprocessing instruction cannot encode 0x1234, this instruction will be split up into two instructions as below:
+        //        e2854001        add     r4, r5, #1
+        //        e2844a11        add     r4, r4, #69632  ; 0x11000
+        //        e2844201        add     r4, r4, #268435456      ; 0x10000000
+        Add.forShifters(R5, 0x10011001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2854001 e2844a11 e2844201"))
+      }
+
     }
   }
 

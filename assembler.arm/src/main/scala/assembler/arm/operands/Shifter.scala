@@ -119,10 +119,10 @@ object Shifter {
   private def CreateShifters(value: Int, minRotate: Int): List[RightRotateImmediate] = {
     if (value == 0) return Shifter.RightRotateImmediate(0, 0) :: Nil
 
-	  val shiftValue = (minRotate to 30 by 2).find { x => (((value >> x) & 0x03) != 0) }
+	  val shiftValue = (minRotate to 30 by 2).find { x => (((value >>> x) & 0x03) != 0) }
 	  val shift = shiftValue.get.toByte
 
-    val intermediateValue = value >> shift
+    val intermediateValue = value >>> shift
 
     val rotate: Byte = if (shift == 0) 0 else (32 - shift).toByte
     if ((intermediateValue & 0xFF) == (intermediateValue))
@@ -133,5 +133,3 @@ object Shifter {
 
   implicit def apply(immediate: Int) = CreateShifters(immediate, 0)
 }
-
-
