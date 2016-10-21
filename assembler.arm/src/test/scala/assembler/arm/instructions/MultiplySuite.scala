@@ -26,7 +26,6 @@ class MultiplySuite extends WordSpec with ShouldMatchers {
       "correctly encode mlasvs r1, r3, r2, r4" in {
         MultiplyAccumulate.setFlags(R1, R2, R3, R4, Condition.Overflow).encodeByte should be(Hex.msb("60314293"))
       }
-
     }
   }
 
