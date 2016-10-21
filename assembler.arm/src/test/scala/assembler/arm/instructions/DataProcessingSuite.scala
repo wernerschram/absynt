@@ -174,9 +174,9 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode mov r4, 0x20200000 (word 0x20200000 cannot be encoded in one instruction)" in {
         // Because a dataprocessing instruction cannot encode 0x202000000, this instruction will be split up into two instructions as below:
-        //          e3a04580        mov     r4, #128, 10            ; 0x20000000
-        //          e3844980        orr     r4, r4, #128, 18        ; 0x200000
-        Move.forShifters(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04580 e3844980"))
+        //        e3a04602        mov     r4, #2097152    ; 0x200000
+        //        e3844202        orr     r4, r4, #536870912      ; 0x20000000
+        Move.forShifters(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04602 e3844202"))
       }
 
       "correctly encode mov r4, 0x0 (using the forShifters syntax)" in {
@@ -222,11 +222,11 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode orr r4, r5, 0x12345678" in {
         // Because a dataprocessing instruction cannot encode 0x1234, this instruction will be split up into two instructions as below:
-        //        e3854078        orr     r4, r5, #120    ; 0x78
-        //        e3844548        orr     r4, r4, #72, 10 ; 0x12000000
-        //        e38449d1        orr     r4, r4, #3424256        ; 0x344000
-        //        e3844d58        orr     r4, r4, #88, 26 ; 0x1600
-        Or.forShifters(R5, 0x12345678, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3854078 e3844548 e38449d1 e3844d58"))
+        //    e3854f9e        orr     r4, r5, #632    ; 0x278
+        //    e3844b15        orr     r4, r4, #21504  ; 0x5400
+        //    e384478d        orr     r4, r4, #36962304       ; 0x2340000
+        //    e3844201        orr     r4, r4, #268435456      ; 0x10000000
+        Or.forShifters(R5, 0x12345678, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3854f9e e3844b15 e384478d e3844201"))
       }
 
     }
