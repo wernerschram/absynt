@@ -39,6 +39,13 @@ class MiscellaneousSuite extends WordSpec with ShouldMatchers {
         ChangeProcessorState(Effect.InterruptDisable, InterruptDisableFlags.impreciseDataAbort + InterruptDisableFlags.normalInterrupt, ExecutionMode.User).encodeByte should be(Hex.msb("f10e0190"))
       }
 
+      "correctly encode cpsie f" in {
+        ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.fastInterrupt).encodeByte should be(Hex.msb("f10a0040"))
+      }
+
+      "correctly encode cps #19" in {
+        ChangeProcessorState(ExecutionMode.Supervisor).encodeByte should be(Hex.msb("f1020013"))
+      }
     }
   }
 }

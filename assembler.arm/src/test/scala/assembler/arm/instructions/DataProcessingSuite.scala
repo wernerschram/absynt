@@ -174,15 +174,12 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode mov r4, 0x20200000 (word 0x20200000 cannot be encoded in one instruction)" in {
         // Because a dataprocessing instruction cannot encode 0x202000000, this instruction will be split up into two instructions as below:
-        //          40:   e3a04580        mov     r4, #128, 10            ; 0x20000000
-        //          44:   e3844980        orr     r4, r4, #128, 18        ; 0x200000
+        //          e3a04580        mov     r4, #128, 10            ; 0x20000000
+        //          e3844980        orr     r4, r4, #128, 18        ; 0x200000
         Move.forShifters(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04580 e3844980"))
       }
 
-      "correctly encode mov r4, 0x0" in {
-        // Because a dataprocessing instruction cannot encode 0x202000000, this instruction will be split up into two instructions as below:
-        //          40:   e3a04580        mov     r4, #128, 10            ; 0x20000000
-        //          44:   e3844980        orr     r4, r4, #128, 18        ; 0x200000
+      "correctly encode mov r4, 0x0 (using the forShifters syntax)" in {
         Move.forShifters(0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04000"))
       }
     }
@@ -222,6 +219,16 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode orr r2, r0, r1" in {
         Or(R0, R1, R2).encodeByte should be(Hex.msb("e1802001"))
       }
+
+      "correctly encode orr r4, r5, 0x12345678" in {
+        // Because a dataprocessing instruction cannot encode 0x1234, this instruction will be split up into two instructions as below:
+        //        e3854078        orr     r4, r5, #120    ; 0x78
+        //        e3844548        orr     r4, r4, #72, 10 ; 0x12000000
+        //        e38449d1        orr     r4, r4, #3424256        ; 0x344000
+        //        e3844d58        orr     r4, r4, #88, 26 ; 0x1600
+        Or.forShifters(R5, 0x12345678, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3854078 e3844548 e38449d1 e3844d58"))
+      }
+
     }
   }
 

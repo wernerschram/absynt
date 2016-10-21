@@ -13,9 +13,6 @@ class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     RegAndShifterToReg(source1, source2, destination, condition)
 
-  def forShifters(source1: GeneralRegister, source2: List[RightRotateImmediate], destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
-    source2.map(value => RegAndShifterToReg(source1, value, destination, condition))
-
   def setFlags(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     RegAndShifterToReg.setFlags(source1, source2, destination, condition)
 }
@@ -50,7 +47,10 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
     apply(source2.head, destination, condition) :: source2.tail.map(value => Or(destination, value, destination, condition))
 }
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
-object Or extends DataProcessing(0x0C.toByte, "orr")
+object Or extends DataProcessing(0x0C.toByte, "orr") {
+  def forShifters(source1: GeneralRegister, source2: List[RightRotateImmediate], destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
+    apply(source1, source2.head, destination, condition) :: source2.tail.map(value => Or(destination, value, destination, condition))
+}
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb")
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc")
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc")
