@@ -100,8 +100,25 @@ object Or extends DataProcessing(0x0C.toByte, "orr") {
       shifters.tail.map(value => Or(destination, value, destination, condition))
   }
 }
-object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb")
-object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc")
+object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
+    if (source2 == 0)
+      return ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
+    ReverseSubtract(source1, shifters.head, destination, condition) ::
+      shifters.tail.map(value => Add(destination, value, destination, condition))
+  }
+}
+object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
+    if (source2 == 0)
+      return ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
+    ReverseSubtractCarry(source1, shifters.head, destination, condition) ::
+      shifters.tail.map(value => Add(destination, value, destination, condition))
+  }
+}
+
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
     if (source2 == 0)
