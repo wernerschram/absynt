@@ -244,6 +244,12 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode eor r4, r5, r9 lsl #2" in {
         ExclusiveOr(R5, Shifter.LogicalLeftShift(R9, 2.toByte), R4).encodeByte should be(Hex.msb("e0254109"))
       }
+
+      "correctly encode eor r4, r5, 0x10000001" in {
+        //        e2254001        eor     r4, r5, #1
+        //        e2244201        eor     r4, r4, #268435456      ; 0x10000000
+        ExclusiveOr.forConstant(R5, 0x10000001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2254001 e2244201"))
+      }
     }
   }
 
