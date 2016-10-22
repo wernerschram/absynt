@@ -177,6 +177,13 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode and r2, r0, r1" in {
         BitClear(R0, R1, R2).encodeByte should be(Hex.msb("e1c02001"))
       }
+
+      "correctly encode bic r4, r5, 0x00005555" in {
+        //        e3c54055        bic     r4, r5, #85     ; 0x55
+        //        e3c44c55        bic     r4, r4, #21760  ; 0x5500
+        BitClear.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c54055 e3c44c55"))
+      }
+
     }
   }
 

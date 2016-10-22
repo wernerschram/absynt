@@ -62,7 +62,15 @@ object And extends DataProcessing(0x00.toByte, "and") {
       shifters.tail.map(value => BitClear(destination, value, destination, condition))
   }
 }
-object BitClear extends DataProcessing(0x0E.toByte, "bic")
+object BitClear extends DataProcessing(0x0E.toByte, "bic") {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
+    if (source2 == 0)
+      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
+    BitClear(source1, shifters.head, destination, condition) ::
+      shifters.tail.map(value => BitClear(destination, value, destination, condition))
+  }
+}
 object CompareNegative extends DataProcessingNoDestination(0x0B.toByte, "cmn")
 object Compare extends DataProcessingNoDestination(0x0A.toByte, "cmp")
 object ExclusiveOr extends DataProcessing(0x01.toByte, "eor")
