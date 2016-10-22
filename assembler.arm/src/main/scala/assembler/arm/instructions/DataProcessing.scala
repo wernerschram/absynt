@@ -103,6 +103,14 @@ object Or extends DataProcessing(0x0C.toByte, "orr") {
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb")
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc")
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc")
-object Subtract extends DataProcessing(0x02.toByte, "sub")
+object Subtract extends DataProcessing(0x02.toByte, "sub") {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
+    if (source2 == 0)
+      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
+    Subtract(source1, shifters.head, destination, condition) ::
+      shifters.tail.map(value => Subtract(destination, value, destination, condition))
+  }
+}
 object TestEquivalence extends DataProcessingNoDestination(0x09.toByte, "teq")
 object Test extends DataProcessingNoDestination(0x08.toByte, "tst")

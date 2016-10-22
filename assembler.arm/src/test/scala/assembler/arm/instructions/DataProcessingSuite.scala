@@ -330,6 +330,15 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode sub r2, r0, r1" in {
         Subtract(R0, R1, R2).encodeByte should be(Hex.msb("e0402001"))
       }
+
+      "correctly encode sub r4, r5, 0x88888888" in {
+        //        e2454f22        sub     r4, r5, #34, 30 ; 0x88
+        //        e2444b22        sub     r4, r4, #34816  ; 0x8800
+        //        e2444722        sub     r4, r4, #8912896        ; 0x880000
+        //        e2444322        sub     r4, r4, #-2013265920    ; 0x88000000
+        Subtract.forConstant(R5, 0x88888888, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2454f22 e2444b22 e2444722 e2444322"))
+      }
+
     }
   }
 
