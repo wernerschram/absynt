@@ -47,7 +47,7 @@ object AddCarry extends DataProcessing(0x05.toByte, "adc") {
 object Add extends DataProcessing(0x04.toByte, "add") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
     apply(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Add(destination, value, destination, condition))
@@ -65,7 +65,7 @@ object And extends DataProcessing(0x00.toByte, "and") {
 object BitClear extends DataProcessing(0x0E.toByte, "bic") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
     BitClear(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => BitClear(destination, value, destination, condition))
@@ -76,7 +76,7 @@ object Compare extends DataProcessingNoDestination(0x0A.toByte, "cmp")
 object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
     ExclusiveOr(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => ExclusiveOr(destination, value, destination, condition))
@@ -94,7 +94,7 @@ object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
 object Or extends DataProcessing(0x0C.toByte, "orr") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
     apply(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Or(destination, value, destination, condition))
@@ -102,11 +102,19 @@ object Or extends DataProcessing(0x0C.toByte, "orr") {
 }
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb")
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc")
-object SubtractCarry extends DataProcessing(0x06.toByte, "sbc")
-object Subtract extends DataProcessing(0x02.toByte, "sub") {
+object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
     if (source2 == 0)
       return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
+    SubtractCarry(source1, shifters.head, destination, condition) ::
+      shifters.tail.map(value => Subtract(destination, value, destination, condition))
+  }
+}
+object Subtract extends DataProcessing(0x02.toByte, "sub") {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): List[ARMInstruction] = {
+    if (source2 == 0)
+      return Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
     Subtract(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Subtract(destination, value, destination, condition))
