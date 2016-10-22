@@ -60,6 +60,9 @@ class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: In
 
 class RightRotateImmediate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
   assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
+
+  def transformImmediate(transformation: (Byte) => Byte): RightRotateImmediate = new RightRotateImmediate(transformation(immediate), rotateValue)
+
   override val encode = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
   override val toString = s"${immediate}, ${rotateValue}"
 }
@@ -117,7 +120,8 @@ object Shifter {
   }
 
   private def CreateShifters(value: Int, minRotate: Int): List[RightRotateImmediate] = {
-    if (value == 0) return Shifter.RightRotateImmediate(0, 0) :: Nil
+    if (value == 0)
+      return Nil
 
 	  val shiftValue = (minRotate to 30 by 2).find { x => (((value >>> x) & 0x03) != 0) }
 	  val shift = shiftValue.get.toByte
@@ -125,10 +129,7 @@ object Shifter {
     val intermediateValue = value >>> shift
 
     val rotate: Byte = if (shift == 0) 0 else (32 - shift).toByte
-    if ((intermediateValue & 0xFF) == (intermediateValue))
-    	return Shifter.RightRotateImmediate(intermediateValue.toByte, rotate) :: Nil
-    else
-    	return Shifter.RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) :: CreateShifters(value & (0xFFFFFF00 << shift), shift)
+  	return Shifter.RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) :: CreateShifters(value & (0xFFFFFF00 << shift), shift)
   }
 
   implicit def apply(immediate: Int) = CreateShifters(immediate, 0)

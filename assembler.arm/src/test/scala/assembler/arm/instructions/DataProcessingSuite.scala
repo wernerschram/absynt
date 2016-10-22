@@ -105,7 +105,7 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //        e2844cff        add     r4, r4, #65280  ; 0xff00
         //        e28448ff        add     r4, r4, #16711680       ; 0xff0000
         //        e28444ff        add     r4, r4, #-16777216      ; 0xff000000
-        AddCarry.forShifters(R5, 0xffffffff, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2a540ff e2844cff e28448ff e28444ff"))
+        AddCarry.forConstant(R5, 0xffffffff, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2a540ff e2844cff e28448ff e28444ff"))
       }
 
     }
@@ -127,7 +127,7 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //        e2854001        add     r4, r5, #1
         //        e2844a11        add     r4, r4, #69632  ; 0x11000
         //        e2844201        add     r4, r4, #268435456      ; 0x10000000
-        Add.forShifters(R5, 0x10011001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2854001 e2844a11 e2844201"))
+        Add.forConstant(R5, 0x10011001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2854001 e2844a11 e2844201"))
       }
 
     }
@@ -140,6 +140,31 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode and r2, r0, r1" in {
         And(R0, R1, R2).encodeByte should be(Hex.msb("e0002001"))
+      }
+
+      "correctly encode and r4, r5, 0x55555555" in {
+        // Because a dataprocessing instruction cannot encode 0x55555555, this instruction will be split up into two instructions as below:
+        //        e3c540aa        bic     r4, r5, #170    ; 0xaa
+        //        e3c44caa        bic     r4, r4, #43520  ; 0xaa00
+        //        e3c448aa        bic     r4, r4, #11141120       ; 0xaa0000
+        //        e3c444aa        bic     r4, r4, #-1442840576    ; 0xaa000000
+        And.forConstant(R5, 0x55555555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448aa e3c444aa"))
+      }
+
+      "correctly encode and r4, r5, 0xFFFF5555" in {
+        // Because a dataprocessing instruction cannot encode 0x55555555, this instruction will be split up into two instructions as below:
+        //        e3c540aa        bic     r4, r5, #170    ; 0xaa
+        //        e3c44caa        bic     r4, r4, #43520  ; 0xaa00
+        // Two superflous instructions are generated
+        And.forConstant(R5, 0xFFFF5555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa"))
+      }
+
+      "correctly encode and r4, r5, 0x00005555" in {
+        //        e3c540aa        bic     r4, r5, #170    ; 0xaa
+        //        e3c44caa        bic     r4, r4, #43520  ; 0xaa00
+        //        e3c448ff        bic     r4, r4, #16711680       ; 0xff0000
+        //        e3c444ff        bic     r4, r4, #-16777216      ; 0xff000000
+        And.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448ff e3c444ff"))
       }
     }
   }
@@ -195,11 +220,11 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         // Because a dataprocessing instruction cannot encode 0x202000000, this instruction will be split up into two instructions as below:
         //        e3a04602        mov     r4, #2097152    ; 0x200000
         //        e3844202        orr     r4, r4, #536870912      ; 0x20000000
-        Move.forShifters(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04602 e3844202"))
+        Move.forConstant(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04602 e3844202"))
       }
 
       "correctly encode mov r4, 0x0 (using the forShifters syntax)" in {
-        Move.forShifters(0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04000"))
+        Move.forConstant(0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04000"))
       }
     }
   }
@@ -245,7 +270,7 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //    e3844b15        orr     r4, r4, #21504  ; 0x5400
         //    e384478d        orr     r4, r4, #36962304       ; 0x2340000
         //    e3844201        orr     r4, r4, #268435456      ; 0x10000000
-        Or.forShifters(R5, 0x12345678, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3854f9e e3844b15 e384478d e3844201"))
+        Or.forConstant(R5, 0x12345678, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3854f9e e3844b15 e384478d e3844201"))
       }
 
     }
