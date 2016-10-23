@@ -21,7 +21,7 @@ class Miscellaneous(val code: Byte)(implicit mnemonic: String)
         result
       }
 
-      override def toString = s"${Miscellaneous.this.mnemonic}" // ${value.toString()}}"
+      override def toString = s"${mnemonic} ${value}"
     }
   }
 }

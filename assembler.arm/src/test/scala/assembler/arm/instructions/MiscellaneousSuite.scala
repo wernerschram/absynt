@@ -23,6 +23,9 @@ class MiscellaneousSuite extends WordSpec with ShouldMatchers {
         Breakpoint(0xf15.toShort).encodeByte should be(Hex.msb("e120f175"))
       }
 
+      "correctly represent bkpt 3861 as a string" in {
+        Breakpoint(0xf15.toShort).toString should be("bkpt 3861")
+      }
     }
   }
 
@@ -31,16 +34,24 @@ class MiscellaneousSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode cpsie,#31" in {
+      "correctly encode cpsie , #31" in {
         ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.none, ExecutionMode.System).encodeByte should be(Hex.msb("f10a001f"))
       }
 
-      "correctly encode cpsid ai,#16" in {
+      "correctly represent cpsie , #31 as a string" in {
+        ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.none, ExecutionMode.System).toString should be("cpsie , #31")
+      }
+
+      "correctly encode cpsid ai, #16" in {
         ChangeProcessorState(Effect.InterruptDisable, InterruptDisableFlags.impreciseDataAbort + InterruptDisableFlags.normalInterrupt, ExecutionMode.User).encodeByte should be(Hex.msb("f10e0190"))
       }
 
       "correctly encode cpsie f" in {
         ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.fastInterrupt).encodeByte should be(Hex.msb("f10a0040"))
+      }
+
+      "correctly represent cpsie f as a string" in {
+        ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.fastInterrupt).toString should be("cpsie f")
       }
 
       "correctly encode cps #19" in {
