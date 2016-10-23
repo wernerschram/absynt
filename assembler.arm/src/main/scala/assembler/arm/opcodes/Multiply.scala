@@ -12,7 +12,7 @@ class MultiplyInstruction(val code: Byte, mnemonic: String, destination: General
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | 0x00000090 | (code << 21) | (destination.registerCode << 16) | (source.registerCode << 8) | multiplyValue.registerCode)
 
-  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}, ${multiplyValue.toString}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${multiplyValue.toString}, ${source.toString}"
 }
 
 class MultiplyWithRegisterInstruction(code: Byte, mnemonic: String, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode)
@@ -21,7 +21,7 @@ class MultiplyWithRegisterInstruction(code: Byte, mnemonic: String, destination:
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (addValue.registerCode << 12))
 
-  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${source.toString}, ${multiplyValue.toString}, ${addValue.toString}"
+  override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${multiplyValue.toString}, ${source.toString}, ${addValue.toString}"
 }
 
 class Multiply(val code: Byte)(implicit mnemonic: String)
