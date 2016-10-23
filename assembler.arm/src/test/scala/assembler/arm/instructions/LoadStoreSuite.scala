@@ -29,8 +29,16 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
         LoadRegister(R1, R2, 10.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e592100a"))
       }
 
-      "correctly encode ldr r1, [r2, #-20]" in {
-        LoadRegister(R1, R2, LoadStoreOffset(20.toShort, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e5121014"))
+      "correctly represent ldr r1, [r2, #10] as a string" in {
+        LoadRegister(R1, R2, 10.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).toString should be("ldr r1, [r2, #10]")
+      }
+
+      "correctly encode ldr r1, [r2], #-20" in {
+        LoadRegister(R1, R2, -20.toShort, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e4121014"))
+      }
+
+      "correctly represent ldr r1, [r2], #-20 as a string" in {
+        LoadRegister(R1, R2, -20.toShort, LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], #-20")
       }
 
       "correctly encode ldr r1, [r2] #30" in {
@@ -45,12 +53,20 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
         LoadRegister(R1, R2, 50.toShort, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e5b21032"))
       }
 
+      "correctly represent ldr r1, [r2, #50]! as a string" in {
+        LoadRegister(R1, R2, 50.toShort, LoadStoreAddressingTypeNormal.PreIndexedNormal).toString should be("ldr r1, [r2, #50]!")
+      }
+
       "correctly encode ldr r1, [r2, #-60]!" in {
         LoadRegister(R1, R2, LoadStoreOffset(60.toShort, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e532103c"))
       }
 
       "correctly encode ldr r1, [r2, r3]" in {
         LoadRegister(R1, R2, R3, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e7921003"))
+      }
+
+      "correctly represent ldr r1, [r2, r3] as a string" in {
+        LoadRegister(R1, R2, R3, LoadStoreAddressingTypeNormal.OffsetNormal).toString should be("ldr r1, [r2, r3]")
       }
 
       "correctly encode ldr r1, [r2, -r8]!" in {
@@ -65,8 +81,12 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
         LoadRegister(R1, R2, LoadStoreOffset(Shifter.LogicalRightShift(R9, 20.toByte), UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e7121a29"))
       }
 
-      "correctly encode ldr r1, [r2], sl, asr #30" in {
+      "correctly encode ldr r1, [r2], r10, asr #30" in {
         LoadRegister(R1, R2, Shifter.ArithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e6921f4a"))
+      }
+
+      "correctly represent ldr r1, [r2], r10, asr #30 as a string" in {
+        LoadRegister(R1, R2, Shifter.ArithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], r10, asr #30")
       }
     }
   }
@@ -133,6 +153,10 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode ldrt r1, [r2], #130" in {
         LoadRegister.UserMode(R1, R2, 130.toShort).encodeByte should be(Hex.msb("e4b21082"))
+      }
+
+      "correctly represent ldrt r1, [r2], #130 as a string" in {
+        LoadRegister.UserMode(R1, R2, 130.toShort).toString should be("ldrt r1, [r2], #130")
       }
 
       "correctly encode ldrt r1, [r2], #-140" in {

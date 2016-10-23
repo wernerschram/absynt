@@ -72,7 +72,7 @@ object LoadStoreOffset {
 
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreOffset(updateDirection) {
     override val encode = 0x06000000 | offset.encode | updateDirection.bitMask
-    override def toString: String = s"#${updateDirection.sign}${offset}"
+    override def toString: String = s"${updateDirection.sign}${offset}"
   }
 
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue]): LoadStoreOffset = apply(offset, UpdateDirection.Increment)
