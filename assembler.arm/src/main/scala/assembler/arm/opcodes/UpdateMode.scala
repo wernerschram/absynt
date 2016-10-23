@@ -10,11 +10,11 @@ class UpdateModeBefore(increment: Boolean, mnemonicExtension: String) extends Up
 }
 
 class UpdateModeAfter(increment: Boolean, mnemonicExtension: String) extends UpdateMode(increment, mnemonicExtension) {
-  val bitMask = incrementBitMask 
+  val bitMask = incrementBitMask
 }
 
 object UpdateMode {
-  object IncrementAfter extends UpdateModeAfter(true, "ia")
+  object IncrementAfter extends UpdateModeAfter(true, "")
   object IncrementBefore extends UpdateModeBefore(true, "ib")
   object DecrementAfter extends UpdateModeAfter(false, "da")
   object DecrementBefore extends UpdateModeBefore(false, "db")
