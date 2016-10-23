@@ -6,6 +6,8 @@ import assembler.arm.opcodes.{ MoveFromStatusRegister => MoveFromStatusRegisterO
 import assembler.arm.opcodes.{ MoveToStatusRegister => MoveToStatusRegisterOpcode }
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers._
+import assembler.arm.operands.RightRotateImmediate
+import assembler.arm.operands.Shifter
 
 object MoveFromStatusRegister {
   implicit val opcode = "mrs"
@@ -27,15 +29,9 @@ object MoveToStatusRegister {
   def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode) =
     StatusToReg(source, destination, fields, condition)
 
-  def apply(source: Byte, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, 0, destination, fields, Always)
+  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode) =
+    StatusToReg(source, destination, fields, Always)
 
-  def apply(source: Byte, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, 0, destination, fields, condition)
-
-  def apply(source: Byte, rotate: Byte, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, rotate, destination, fields, Always)
-
-  def apply(source: Byte, rotate: Byte, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, rotate, destination, fields, condition)
+  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode) =
+    StatusToReg(source, destination, fields, condition)
 }

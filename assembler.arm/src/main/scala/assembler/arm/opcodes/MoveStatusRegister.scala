@@ -8,6 +8,7 @@ import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers._
 import assembler.memory.MemoryPage
+import assembler.arm.operands.RightRotateImmediate
 
 class MoveFromStatusRegister()(implicit mnemonic: String)
     extends Opcode(mnemonic) {
@@ -21,7 +22,6 @@ class MoveFromStatusRegister()(implicit mnemonic: String)
     }
 }
 
-
 object Fields extends Enumeration {
   type Fields = Value
 
@@ -30,8 +30,8 @@ object Fields extends Enumeration {
   val status = Value(18, "s")
   val flags = Value(19, "f")
 
-  implicit def fieldsToString(set: ValueSet) : String = {
-    set.foldRight("")((a,b) => a + b).reverse
+  implicit def fieldsToString(set: ValueSet): String = {
+    set.foldRight("")((a, b) => a + b).reverse
   }
 }
 
@@ -46,14 +46,12 @@ class MoveToStatusRegister()(implicit mnemonic: String)
       override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
     }
 
-  // Immediate and shift
-  def apply(source: Byte, rotate: Byte, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
-    assume(rotate >=0 && rotate <= 30 && (rotate % 2 == 0))
+  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
     new ConditionalARMInstruction(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | 0x0320f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (rotate << 7) | (source & 0xff)))
+        (super.encodeWord() | 0x0120f000 | (destination.registerCode << 22) | ((fields.toBitMask)(0).toInt) | source.encode)
 
-      override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, #${source.toString}, ${rotate}"
+      override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
     }
   }
 }

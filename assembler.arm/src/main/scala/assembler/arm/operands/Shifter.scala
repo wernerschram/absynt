@@ -61,7 +61,7 @@ class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: In
 class RightRotateImmediate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
   assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
   override val encode = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
-  override val toString = s"${immediate}, ${rotateValue}"
+  override val toString = s"#${immediate}, ${rotateValue}"
 }
 
 object Shifter {
@@ -107,6 +107,9 @@ object Shifter {
 
   def RightRotateImmediate(immediate: Byte, rotateValue: Byte) =
     new RightRotateImmediate(immediate: Byte, rotateValue: Byte)
+
+  implicit def RightRotateImmediate(immediate: Byte) =
+    new RightRotateImmediate(immediate: Byte, 0)
 
   def ForImmediate(immediate: Int) = {
     val rotateValue = (0 to 30 by 2).find { x => ((Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x)) }
