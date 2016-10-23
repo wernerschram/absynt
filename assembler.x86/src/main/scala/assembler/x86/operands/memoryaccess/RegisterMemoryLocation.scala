@@ -14,7 +14,7 @@ sealed class RegisterMemoryLocation private (val index: IndexRegister, displacem
     extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
 
-  override lazy val toString: String = displacement match {
+  override def toString(): String = displacement match {
     case Nil => s"[${index}]"
     case default => s"[${index}+${displacement.decimalString()}]"
   }
