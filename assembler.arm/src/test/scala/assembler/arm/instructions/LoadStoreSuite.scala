@@ -96,8 +96,12 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode ldrb r1, [r2, #70]!" in {
+      "correctly encode ldrb r1, [r2, #70]" in {
         LoadRegister.byte(R1, R2, 70.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e5d21046"))
+      }
+
+      "correctly represent ldrb r1, [r2, #70] as a string" in {
+        LoadRegister.byte(R1, R2, 70.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).toString should be("ldrb r1, [r2, #70]")
       }
     }
   }
@@ -110,6 +114,10 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
       "correctly encode ldrd r1, [r2], #-40" in {
         LoadRegister.doubleWord(R1, R2, LoadStoreMiscelaneousOffset(40.toByte, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e04212d8"))
       }
+
+      "correctly represent ldrd r1, [r2], #-40 as a string" in {
+        LoadRegister.doubleWord(R1, R2, LoadStoreMiscelaneousOffset(40.toByte, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldrd r1, [r2], #-40")
+      }
     }
   }
 
@@ -120,6 +128,10 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode ldrsb r1, [r2, #50]!" in {
         LoadRegister.signedByte(R1, R2, 50.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e1f213d2"))
+      }
+
+      "correctly represent ldrsb r1, [r2, #50]! as a string" in {
+        LoadRegister.signedByte(R1, R2, 50.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).toString should be("ldrsb r1, [r2, #50]!")
       }
     }
   }
@@ -132,6 +144,10 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
       "correctly encode ldrh r1, [r2, #-60]!" in {
         LoadRegister.unsignedHalfWord(R1, R2, LoadStoreMiscelaneousOffset(60.toByte, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e17213bc"))
       }
+
+      "correctly represent ldrh r1, [r2, #-60]! as a string" in {
+        LoadRegister.unsignedHalfWord(R1, R2, LoadStoreMiscelaneousOffset(60.toByte, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.PreIndexedNormal).toString should be("ldrh r1, [r2, #-60]!")
+      }
     }
   }
 
@@ -142,6 +158,10 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode ldrsh r1, [r2, r3]" in {
         LoadRegister.signedHalfWord(R1, R2, R3, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e19210f3"))
+      }
+
+      "correctly represent ldrsh r1, [r2, r3] as a string" in {
+        LoadRegister.signedHalfWord(R1, R2, R3, LoadStoreAddressingTypeNormal.OffsetNormal).toString should be("ldrsh r1, [r2, r3]")
       }
     }
   }
