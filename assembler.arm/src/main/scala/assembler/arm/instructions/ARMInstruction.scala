@@ -33,6 +33,6 @@ class LabeledARMInstruction(instruction: ARMInstruction, override val label: Lab
 
   override def encodeWord()(implicit page: MemoryPage): Int = instruction.encodeWord()
 
-  override def toString = s"${label.toString}: ${instruction.toString()}"
+  override def toString = s"$label: $instruction"
 
 }

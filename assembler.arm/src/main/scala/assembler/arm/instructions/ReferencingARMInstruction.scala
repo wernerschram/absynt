@@ -3,6 +3,7 @@ package assembler.arm.instructions
 import scala.collection.concurrent.TrieMap
 
 import assembler.LabelCondition
+import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
@@ -13,12 +14,12 @@ trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
   def encodeWord: Int
 
   def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
-      if (forward) {
-        RelativePointer(distance - 4)
-      } else {
-        RelativePointer(-distance - 8)
-      }
+    if (forward) {
+      RelativePointer(distance - 4)
+    } else {
+      RelativePointer(-distance - 8)
     }
+  }
 }
 
 class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
@@ -33,7 +34,8 @@ class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
     pageMap.getOrElseUpdate(page, { factory(page.encodableLocation(this), target, page, processorMode) })
   }
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
+
   override def encodeWord()(implicit page: MemoryPage) = getOrElseCreateInstruction().encodeWord
 
-  override def toString = s"${mnemonic} ${condition} ()"
+  override def toString = s"$mnemonic $condition"
 }

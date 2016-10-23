@@ -11,7 +11,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 
-class ARMBranchInstructionOnPage(branch:BranchImmediate, thisLocation: Int, destinationLocation: Int, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
+class ARMBranchInstructionOnPage(branch: BranchImmediate, thisLocation: Int, destinationLocation: Int, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
     extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage {
 
   val branchSize = 4
@@ -39,13 +39,13 @@ class Branch(code: Byte, val opcode: String) {
     new ReferencingARMInstruction[ARMBranchInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>
         new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, Always)(memoryPage, processorMode),
-        opcode, labelCondition)
+      opcode, labelCondition)
 
   def apply(labelCondition: LabelCondition, condition: Condition)(implicit processorMode: ProcessorMode) =
     new ReferencingARMInstruction[ARMBranchInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>
         new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, condition)(memoryPage, processorMode),
-        opcode, labelCondition)
+      opcode, labelCondition)
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
@@ -67,7 +67,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
     new ReferencingARMInstruction[ARMBranchInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>
         new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, Unpredictable)(memoryPage, processorMode),
-        opcode, labelCondition)
+      opcode, labelCondition)
 }
 
 object Branch extends Branch(0xA0.toByte, "b")

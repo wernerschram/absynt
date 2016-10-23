@@ -97,6 +97,10 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
+
+      "correctly represent b Label as a string" in {
+        Branch("Label").toString should be("b Label")
+      }
     }
   }
 
