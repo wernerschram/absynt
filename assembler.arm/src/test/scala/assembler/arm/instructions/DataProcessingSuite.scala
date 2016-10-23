@@ -40,6 +40,14 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         AddCarry(R0, Shifter.LogicalLeftShift(R1, 2.toByte), R2).toString should be("adc r2, r0, r1, lsl #2")
       }
 
+      "correctly encode adc r2, r0, r1, rrx" in {
+        AddCarry(R0, Shifter.RightRotateExtend(R1), R2).encodeByte should be(Hex.msb("e0a02061"))
+      }
+
+      "correctly represent adc r2, r0, r1, rrx as a string" in {
+        AddCarry(R0, Shifter.RightRotateExtend(R1), R2).toString should be("adc r2, r0, r1, rrx")
+      }
+
       "throw an AssertionError for adc r2, r0, r1, lsl #33" in {
         an[AssertionError] should be thrownBy {
           AddCarry(R0, Shifter.LogicalLeftShift(R1, 33.toByte), R2)

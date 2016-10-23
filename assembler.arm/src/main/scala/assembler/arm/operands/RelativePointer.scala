@@ -6,8 +6,8 @@ class RelativePointer private(val displacement: Int) extends Operand {
   assume((displacement > -8388608) && (displacement < 8388607))
 
   def encode = displacement & 0xFFFFFF
-  
-  override val toString = s"${(displacement * 4).toString()}"
+
+  override def toString() = s"${(displacement * 4).toString()}"
 }
 
 object RelativePointer {

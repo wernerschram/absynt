@@ -50,24 +50,24 @@ abstract class Shifter {
 
 class ShiftRegister private[operands](shifterCode: Int, mnemonic: String, register: GeneralRegister) extends Shifter {
   override val encode = shifterCode | register.registerCode
-  override val toString = s"${register}, ${mnemonic}"
+  override def toString() = s"${register}, ${mnemonic}"
 }
 
 class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: Int, mnemonic: String, register: GeneralRegister, shiftValue: T) extends ShiftRegister(shifterCode, mnemonic, register) {
   override val encode = shifterCode | shiftValue.encodeShiftValue | register.registerCode
-  override val toString = s"${register}, ${mnemonic} ${shiftValue}"
+  override def toString() = s"${register}, ${mnemonic} ${shiftValue}"
 }
 
 class RightRotateImmediate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
   assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
   override val encode = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
-  override val toString = s"#${immediate}, ${rotateValue}"
+  override def toString() = s"#${immediate}, ${rotateValue}"
 }
 
 object Shifter {
   implicit def apply(register: GeneralRegister) = new Shifter() {
     override val encode = register.registerCode.toInt
-    override val toString = s"${register}"
+    override def toString() = s"${register}"
   }
 
   private def LogicalLeftShiftOperand[T <: LeftShiftValue](shifterCode: Int, register: GeneralRegister, shift: T) =

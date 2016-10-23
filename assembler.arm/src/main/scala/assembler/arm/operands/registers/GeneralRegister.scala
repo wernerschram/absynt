@@ -3,7 +3,7 @@ package assembler.arm.operands.registers
 import assembler.arm.operands._
 
 abstract class Register(mnemonic: String) extends Operand {
-    override val toString = mnemonic
+    override def toString() = mnemonic
 }
 
 sealed abstract class GeneralRegister(val registerCode: Byte) extends Register(s"r${registerCode}") with LeftShiftValue with RightShiftValue with RotateValue {
@@ -11,7 +11,7 @@ sealed abstract class GeneralRegister(val registerCode: Byte) extends Register(s
   override def encodeShiftValue = registerCode << 8
 }
 
-object GeneralRegister {  
+object GeneralRegister {
     case object R0   extends GeneralRegister(0x00)
     case object R1   extends GeneralRegister(0x01)
     case object R2   extends GeneralRegister(0x02)
@@ -37,7 +37,7 @@ sealed abstract class StatusRegister(val registerCode: Byte, mnemonic: String) e
   val shifter = registerCode.toShort
 }
 
-object StatusRegister {  
+object StatusRegister {
     case object CPSR extends StatusRegister(0x00, "CPSR")
     case object SPSR extends StatusRegister(0x01, "SPSR")
 }
