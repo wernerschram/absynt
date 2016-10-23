@@ -56,7 +56,7 @@ class DataProcessing(val code: Byte)(implicit mnemonic: String)
   }
 
   def setFlags(operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
-    new DataProcessingNoRegisterInstruction(mnemonic, code, condition, operand2, destination) {
+    new DataProcessingNoRegisterInstruction(mnemonic + "s", code, condition, operand2, destination) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | ARMInstruction.sBit)
     }

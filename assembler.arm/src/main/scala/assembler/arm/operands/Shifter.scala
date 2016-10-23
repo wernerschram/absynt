@@ -60,9 +60,6 @@ class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: In
 
 class RightRotateImmediate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
   assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
-
-  def transformImmediate(transformation: (Byte) => Byte): RightRotateImmediate = new RightRotateImmediate(transformation(immediate), rotateValue)
-
   override val encode = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
   override val toString = s"${immediate}, ${rotateValue}"
 }

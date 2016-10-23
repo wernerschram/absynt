@@ -82,7 +82,6 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,2.toByte), R1).encodeByte should be(Hex.msb("e2a21101"))
       }
 
-      info("Note that there are different ways of encoding adc r1, r2, #1073741824. This test could result in false negatives")
       "correctly encode adc r1, r2, #1073741824" in {
         AddCarry(R2, Shifter.ForImmediate(1073741824), R1).encodeByte should be(Hex.msb("e2a21101"))
       }
@@ -137,6 +136,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         Add.forConstant(R5, 0x10011001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2854001 e2844a11 e2844201"))
       }
 
+      "correctly represent add r9, r10, r10, lsr #2 as a string" in {
+        Add(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("add r9, r10, r10, lsr #2")
+      }
+
     }
   }
 
@@ -175,6 +178,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //        e3c444ff        bic     r4, r4, #-16777216      ; 0xff000000
         And.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448ff e3c444ff"))
       }
+
+      "correctly represent and r9, r10, r10, lsr #2 as a string" in {
+        And(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("and r9, r10, r10, lsr #2")
+      }
     }
   }
 
@@ -197,6 +204,9 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         BitClear.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c54055 e3c44c55"))
       }
 
+      "correctly represent bic r9, r10, r10, lsr #2 as a string" in {
+        BitClear(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("bic r9, r10, r10, lsr #2")
+      }
     }
   }
 
@@ -209,10 +219,9 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         CompareNegative(R0, R1).encodeByte should be(Hex.msb("e1600001"))
       }
 
-      "correctly represent r0, r1 as a string" in {
+      "correctly represent cmn r0, r1 as a string" in {
         CompareNegative(R0, R1).toString should be("cmn r0, r1")
       }
-
     }
   }
 
@@ -223,6 +232,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode cmp r2, r0, r1" in {
         Compare(R0, R1).encodeByte should be(Hex.msb("e1400001"))
+      }
+
+      "correctly represent cmp r0, r1 as a string" in {
+        Compare(R0, R1).toString should be("cmp r0, r1")
       }
     }
   }
@@ -236,6 +249,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         Move(R1, R2).encodeByte should be(Hex.msb("e1a02001"))
       }
 
+      "correctly encode movscs r2, r1" in {
+        Move.setFlags(R1, R2, Condition.CarrySet).encodeByte should be(Hex.msb("21b02001"))
+      }
+
       "correctly encode mov r4, 0x20200000" in {
         //        e3a04602        mov     r4, #2097152    ; 0x200000
         //        e3844202        orr     r4, r4, #536870912      ; 0x20000000
@@ -244,6 +261,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode mov r4, 0x0" in {
         Move.forConstant(0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04000"))
+      }
+
+      "correctly represent movscs r2, r1 as a string" in {
+        Move.setFlags(R1, R2, Condition.CarrySet).toString should be("movscs r2, r1")
       }
     }
   }
@@ -266,6 +287,11 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode eor r4, r5, 0x0" in {
         ExclusiveOr.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
+
+      "correctly represent eor r9, r10, r10, lsr #2 as a string" in {
+        ExclusiveOr(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("eor r9, r10, r10, lsr #2")
+      }
+
     }
   }
 
@@ -305,6 +331,9 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         Or.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
 
+      "correctly represent orr r9, r10, r10, lsr #2 as a string" in {
+        Or(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("orr r9, r10, r10, lsr #2")
+      }
     }
   }
 
@@ -329,7 +358,9 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         ReverseSubtract.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2654000"))
       }
 
-
+      "correctly represent rsb r9, r10, r10, lsr #2 as a string" in {
+        ReverseSubtract(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("rsb r9, r10, r10, lsr #2")
+      }
     }
   }
 
@@ -341,6 +372,24 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
       "correctly encode rsc r2, r0, r1" in {
         ReverseSubtractCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0e02001"))
       }
+
+      "correctly encode rsc r4, r5, 0xF0F0F0F0" in {
+        //          e2e54e0f        rsc     r4, r5, #15, 28 ; 0xf0
+        //          e2844a0f        add     r4, r4, #61440  ; 0xf000
+        //          e284420f        add     r4, r4, #-268435456     ; 0xf0000000
+        ReverseSubtractCarry.forConstant(R5, 0xF000F0F0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2e54e0f e2844a0f e284420f"))
+      }
+
+      "correctly encode rsc r4, r5, 0x0" in {
+        //        e2e54000        rsc     r4, r5, #0
+        ReverseSubtractCarry.forConstant(R5, 0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2e54000"))
+      }
+
+
+      "correctly represent rsc r9, r10, r10, lsr #2 as a string" in {
+        ReverseSubtractCarry(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("rsc r9, r10, r10, lsr #2")
+      }
+
     }
   }
 
@@ -364,6 +413,11 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //        e2c54000        sbc     r4, r5, #0
         SubtractCarry.forConstant(R5, 0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2c54000"))
       }
+
+      "correctly represent sbc r9, r10, r10, lsr #2 as a string" in {
+        SubtractCarry(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("sbc r9, r10, r10, lsr #2")
+      }
+
     }
   }
 
@@ -387,6 +441,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
         //        e2444322        sub     r4, r4, #-2013265920    ; 0x88000000
         Subtract.forConstant(R5, 0x88888888, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2454f22 e2444b22 e2444722 e2444322"))
       }
+
+      "correctly represent sub r9, r10, r10, lsr #2 as a string" in {
+        Subtract(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("sub r9, r10, r10, lsr #2")
+      }
     }
   }
 
@@ -395,9 +453,14 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode teq r2, r0, r1" in {
+      "correctly encode teq r0, r1" in {
         TestEquivalence(R0, R1).encodeByte should be(Hex.msb("e1200001"))
       }
+
+      "correctly represent teq r10, r10, lsr #2 as a string" in {
+        TestEquivalence(R10, Shifter.LogicalRightShift(R10, 2.toByte)).toString should be("teq r10, r10, lsr #2")
+      }
+
     }
   }
 
@@ -408,6 +471,10 @@ class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode tst r2, r0, r1" in {
         Test(R0, R1).encodeByte should be(Hex.msb("e1000001"))
+      }
+
+      "correctly represent tst r10, r10, lsr #2 as a string" in {
+        Test(R10, Shifter.LogicalRightShift(R10, 2.toByte)).toString should be("tst r10, r10, lsr #2")
       }
     }
   }
