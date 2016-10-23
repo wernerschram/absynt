@@ -57,6 +57,10 @@ class MoveFromStatusRegisterSuite extends WordSpec with ShouldMatchers {
         MoveToStatusRegister(R9, CPSR, Fields.extension + Fields.control + Fields.status + Fields.flags).encodeByte should be(Hex.msb("e12ff009"))
       }
 
+      "correctly represent msr CPSR_fsxc, r9 as a string" in {
+        MoveToStatusRegister(R9, CPSR, Fields.extension + Fields.control + Fields.status + Fields.flags).toString should be("msr CPSR_fsxc, r9")
+      }
+
       "correctly encode msr CPSR_fx, #240" in {
         MoveToStatusRegister(Shifter.RightRotateImmediate(0xf0.toByte), CPSR, Fields.extension + Fields.flags).encodeByte should be(Hex.msb("e32af0f0"))
       }
