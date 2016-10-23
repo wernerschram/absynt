@@ -28,9 +28,15 @@ class MoveFromStatusRegisterSuite extends WordSpec with ShouldMatchers {
         MoveFromStatusRegister(CPSR, R1).encodeByte should be(Hex.msb("e10f1000"))
       }
 
-      "correctly encode mrscc r1, SPSR" in {
+      "correctly encode mrslo r1, SPSR" in {
         MoveFromStatusRegister(SPSR, R1, Condition.UnsignedLower).encodeByte should be(Hex.msb("314f1000"))
       }
+
+      "correctly represent mrslo r1, SPSR as a string" in {
+        MoveFromStatusRegister(SPSR, R1, Condition.UnsignedLower).toString should be("mrslo r1, SPSR")
+      }
+
+
     }
   }
 
@@ -59,8 +65,12 @@ class MoveFromStatusRegisterSuite extends WordSpec with ShouldMatchers {
         MoveToStatusRegister(Shifter.RightRotateImmediate(0xf0.toByte, 4.toByte), CPSR, Fields.extension + Fields.flags).encodeByte should be(Hex.msb("e32af2f0"))
       }
 
-      "correctly encode msr CPSR_fsxc, #16777216" in {
+      "correctly encode msr CPSR_fsxc, #1, 8" in {
         MoveToStatusRegister(Shifter.RightRotateImmediate(1.toByte, 8.toByte), CPSR, Fields.extension + Fields.control + Fields.status + Fields.flags).encodeByte should be(Hex.msb("e32ff401"))
+      }
+
+      "correctly represent msr CPSR_fsxc, #1, 8 as a string" in {
+        MoveToStatusRegister(Shifter.RightRotateImmediate(1.toByte, 8.toByte), CPSR, Fields.extension + Fields.control + Fields.status + Fields.flags).toString should be("msr CPSR_fsxc, #1, 8")
       }
 
       "correctly encode msrls CPSR_fsxc, #256" in {
