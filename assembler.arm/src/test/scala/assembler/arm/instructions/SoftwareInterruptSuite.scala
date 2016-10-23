@@ -18,10 +18,13 @@ class SoftwareInterruptSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode swi 0x0000000a" in {
+      "correctly encode swi 10" in {
         SoftwareInterrupt(10).encodeByte should be(Hex.msb("ef00000a"))
       }
 
+      "correctly represent swi 10 as a string" in {
+        SoftwareInterrupt(10).toString should be("swi 10")
+      }
     }
   }
 }
