@@ -29,6 +29,10 @@ class StoreStringSuite extends WordSpec with ShouldMatchers with MockFactory {
         StoreString.Repeat(AL, DI).encodeByte should be (Hex.lsb("F3 AA"))
       }
 
+      "correctly encode REP stos [di], ax" in {
+        StoreString.Repeat(AX, DI).encodeByte should be (Hex.lsb("F3 AB"))
+      }
+
       "correctly encode stos [di], ax" in {
         StoreString(AX, DI).encodeByte should be (Hex.lsb("AB"))
       }
