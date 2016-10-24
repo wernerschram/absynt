@@ -23,8 +23,6 @@ class ARMBranchInstructionOnPage(branch: BranchImmediate, thisLocation: Int, des
   def encodeWordForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
     branch.apply(getPointerForDistance(forward, distance), condition).encodeWord()
 
-  override lazy val encodeWord = encodeWordForDistance(forward, actualDistance)
-
   override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
     encodeWordForDistance(forward, distance).encodeLittleEndian
 }

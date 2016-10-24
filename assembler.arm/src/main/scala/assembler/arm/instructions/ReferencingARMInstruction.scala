@@ -9,9 +9,9 @@ import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
+import assembler.Encodable
 
 trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
-  def encodeWord: Int
 
   def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
     if (forward) {
@@ -26,7 +26,7 @@ class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
   factory: (Int, Int, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)
-    extends ARMInstruction with ReferencingInstruction[T] {
+    extends Encodable with ReferencingInstruction[T] {
   val pageMap = new TrieMap[MemoryPage, T]
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = {
@@ -34,8 +34,6 @@ class ReferencingARMInstruction[T <: ReferencingARMInstructionOnPage](
     pageMap.getOrElseUpdate(page, { factory(page.encodableLocation(this), target, page, processorMode) })
   }
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
-
-  override def encodeWord()(implicit page: MemoryPage) = getOrElseCreateInstruction().encodeWord
 
   override def toString = s"$mnemonic $condition"
 }
