@@ -25,7 +25,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
     ((scaleCode << 6) | (indexCode << 3) | baseCode).toByte
   }
 
-  override def getExtendedBytes(rValue: Byte): List[Byte] = getModRM(rValue) :: getSIB :: displacement
+  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: getSIB :: displacement
 
   override def getRexRequirements(position: ParameterPosition) =
     base.getRexRequirements(ParameterPosition.Base) :::

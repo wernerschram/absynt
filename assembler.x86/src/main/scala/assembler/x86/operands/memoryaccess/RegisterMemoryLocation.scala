@@ -21,7 +21,7 @@ sealed class RegisterMemoryLocation private (val index: IndexRegister, displacem
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
 
-  override def getExtendedBytes(rValue: Byte): List[Byte] = getModRM(rValue) :: displacement
+  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: displacement
 
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
     index.getRexRequirements(ParameterPosition.OperandRM)

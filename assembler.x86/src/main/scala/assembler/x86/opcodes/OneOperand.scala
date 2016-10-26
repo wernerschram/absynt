@@ -73,12 +73,4 @@ abstract class OneOperand[OperandType <: Operand](val parameterPosition: Paramet
 
 object OneOperand {
   def valid[OperandType <: Operand]: PartialFunction[(OperandType, ProcessorMode), Boolean] = { case _ => true }
-
-  def getModRM(rValue: Byte, operandRM: ModRMEncodableOperand): List[Byte] = operandRM match {
-    case location: MemoryLocation => getModRMByte(rValue, operandRM) :: location.displacement
-    case _ => getModRMByte(rValue, operandRM) :: Nil
-  }
-
-  def getModRMByte(rValue: Byte, operandRM: ModRMEncodableOperand) =
-    (((operandRM.modValue & 3) << 6) | ((rValue & 7) << 3) | (operandRM.registerOrMemoryModeCode & 7)).toByte
 }

@@ -76,7 +76,7 @@ abstract class NoOperand(val mnemonic: String) {
   def withModRM(rValue: Byte) =
     new OneOperand[ModRMEncodableOperand](ParameterPosition.OperandRM, mnemonic) {
       override def getCode(operandRM: ModRMEncodableOperand): List[Byte] =
-        NoOperand.this.getCode ::: OneOperand.getModRM(rValue, operandRM)
+        NoOperand.this.getCode ::: operandRM.getExtendedBytes(rValue)
     }
 
   def withImplicitRegister(register: Register) =
