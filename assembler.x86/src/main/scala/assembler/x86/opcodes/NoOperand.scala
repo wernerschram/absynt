@@ -79,16 +79,9 @@ abstract class NoOperand(val mnemonic: String) {
         NoOperand.this.getCode ::: operandRM.getExtendedBytes(rValue)
     }
 
-  def withImplicitRegister(register: Register) =
-    new NoOperand(mnemonic) {
-      override def getCode(): List[Byte] = NoOperand.this.getCode
-      override def toString() = s"${NoOperand.this.toString()} ${register.toString()}"
-  }
-
   def withImplicitRegisters(register1: Register, register2: Register) =
     new NoOperand(mnemonic) {
       override def getCode(): List[Byte] = NoOperand.this.getCode
       override def toString() = s"${NoOperand.this.toString()} ${register1.toString()}, ${register2.toString()}"
   }
-
 }

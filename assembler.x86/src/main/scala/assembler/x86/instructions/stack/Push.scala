@@ -19,11 +19,6 @@ final object Push {
     case _ => true
   }
 
-  private val lengthValidation: PartialFunction[Int, Boolean] = {
-    case 8 => false
-    case _ => true
-  }
-
   private val R16 = new RegisterEncoded[WideRegister](0x50.toByte :: Nil, includeRexW = false) {
     override def validate(register: WideRegister)(implicit processorMode: ProcessorMode): Boolean =
       super.validate(register) && lengthModeValidation(processorMode, register)
@@ -47,8 +42,8 @@ final object Push {
 //  def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
 //    R16(register)
 
-  def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) = operand match { 
-    case register: WideRegister => 
+  def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) = operand match {
+    case register: WideRegister =>
       R16(register)
     case _ =>
       RM16(operand)
@@ -59,7 +54,7 @@ final object Push {
       case immediate: ImmediateValue if (immediate.operandByteSize > 1) => Imm16(immediate)
   }
 
-  
+
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode) = segment match {
     case Register.CS => StaticCS()
     case Register.SS => StaticSS()

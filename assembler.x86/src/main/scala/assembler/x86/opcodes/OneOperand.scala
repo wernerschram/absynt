@@ -42,16 +42,6 @@ abstract class OneOperand[OperandType <: Operand](val parameterPosition: Paramet
     }
   }
 
-  def asTwoOperandOpcode[Operand2Type <: Operand](validateExtension: PartialFunction[(OperandType, Operand2Type, ProcessorMode), Boolean]): TwoOperand[OperandType, Operand2Type] =
-    new TwoOperand[OperandType, Operand2Type](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) {
-
-      override def validate(operand1: OperandType, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
-        super.validate(operand1, operand2) && validateExtension(operand1, operand2, processorMode)
-
-      override def getCode(operand1: OperandType, operand2: Operand2Type) =
-        OneOperand.this.getCode(operand1)
-    }
-
   def withOffset(): TwoOperand[OperandType, MemoryLocation] =
     new TwoOperand[OperandType, MemoryLocation](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) {
 
