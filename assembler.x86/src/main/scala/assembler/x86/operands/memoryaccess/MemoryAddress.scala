@@ -1,5 +1,7 @@
 package assembler.x86.operands.memoryaccess
 
+import assembler.ListExtensions._
+
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
@@ -18,6 +20,8 @@ sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegiste
   override val defaultSegment: SegmentRegister = Register.DS
 
   override def getRexRequirements(position: ParameterPosition) = Nil
+
+  override def toString = s"${segment.getSegmentPrefix(defaultSegment)}[${address.decimalString()}]"
 }
 
 object MemoryAddress {

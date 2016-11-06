@@ -13,11 +13,15 @@ import assembler.x86.operands._
 sealed class RegisterMemoryLocation private (val index: IndexRegister, displacement: List[Byte], segment: SegmentRegister)
     extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
+//
+//  override def toString(): String = displacement match {
+//    case Nil => s"[${index}]"
+//    case default => s"[${index}+${displacement.decimalString()}]"
+//  }
 
-  override def toString(): String = displacement match {
-    case Nil => s"[${index}]"
-    case default => s"[${index}+${displacement.decimalString()}]"
-  }
+  override def toString(): String = s"${segment.getSegmentPrefix(defaultSegment)}[${index}${displacementString}]"
+
+  private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString()}"
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
 

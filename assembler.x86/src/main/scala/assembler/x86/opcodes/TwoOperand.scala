@@ -12,7 +12,8 @@ import assembler.x86.operands.SegmentRegister
 abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
     val parameter1Position: ParameterPosition,
     val parameter2Position: ParameterPosition,
-    val mnemonic: String) {
+    val mnemonic: String,
+    reverse: Boolean = false) {
   val includeRexW: Boolean = true
 
   def validate(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
@@ -33,15 +34,23 @@ abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
           Opcode.optionalRexPrefix(TwoOperand.getOperandSize(operand1, operand2), rexRequirements, includeRexW) :::
           getCode(operand1, operand2)
       }
-      override def toString() = s"${TwoOperand.this.mnemonic} ${operand2.toString()}, ${operand1.toString()}"
 
+      override def toString() = TwoOperand.this.toString(operand1, operand2)
     }
   }
+
+  def toString(operand1: Operand1Type, operand2: Operand2Type) =
+    s"${mnemonic} ${operand2}, ${operand1}"
 
   def repeated() = new TwoOperand[Operand1Type, Operand2Type](parameter1Position, parameter2Position, s"REP ${mnemonic}") {
     override def getCode(operand1: Operand1Type, operand2: Operand2Type): List[Byte] =
       Opcode.RepeatPrefix :: TwoOperand.this.getCode(operand1, operand2)
   }
+}
+
+trait reversedOperands[Operand1Type <: Operand, Operand2Type <: Operand] extends TwoOperand[Operand1Type, Operand2Type] {
+  override def toString(operand1: Operand1Type, operand2: Operand2Type) =
+    s"${mnemonic} ${operand1}, ${operand2}"
 }
 
 object TwoOperand {

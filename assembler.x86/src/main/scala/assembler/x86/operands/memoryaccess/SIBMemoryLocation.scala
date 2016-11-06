@@ -1,5 +1,7 @@
 package assembler.x86.operands.memoryaccess
 
+import assembler.ListExtensions._
+
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
@@ -32,6 +34,12 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
       index.getRexRequirements(ParameterPosition.Index)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
+
+  override def toString() = s"${segment.getSegmentPrefix(defaultSegment)}[${base}+${index}${scaleString}${displacementString}]"
+
+  private def scaleString = if (scale == 1) "" else s"*${scale}"
+
+  private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString()}"
 }
 
 object SIBMemoryLocation {

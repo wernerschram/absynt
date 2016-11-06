@@ -15,14 +15,14 @@ object Move {
   private val R8ToRM8 = new ModRRMStatic[ByteRegister](0x88.toByte :: Nil)
   private val R16ToRM16 = new ModRRMStatic[WideRegister](0x89.toByte :: Nil)
 
-  private val RM8ToR8 = new ModRRMStatic[ByteRegister](0x8A.toByte :: Nil)
-  private val RM16ToR16 = new ModRRMStatic[WideRegister](0x8B.toByte :: Nil)
+  private val RM8ToR8 = new ModRRMStatic[ByteRegister](0x8A.toByte :: Nil) with reversedOperands[ByteRegister, ModRMEncodableOperand]
+  private val RM16ToR16 = new ModRRMStatic[WideRegister](0x8B.toByte :: Nil) with reversedOperands[WideRegister, ModRMEncodableOperand]
 
   private val SRegToRM16 = new ModSegmentRMStatic(0x8C.toByte :: Nil)
-  private val RM16ToSReg = new ModSegmentRMStatic(0x8E.toByte :: Nil)
+  private val RM16ToSReg = new ModSegmentRMStatic(0x8E.toByte :: Nil) with reversedOperands[SegmentRegister, ModRMEncodableOperand]
 
-  private val MOffs8ToAL = (new RegisterStatic[ByteRegister](0xA0.toByte :: Nil)).withOffset()
-  private val MOffs16ToAX = (new RegisterStatic[WideRegister](0xA1.toByte :: Nil)).withOffset()
+  private val MOffs8ToAL = (new RegisterStatic[ByteRegister](0xA0.toByte :: Nil)).withOffset(true)
+  private val MOffs16ToAX = (new RegisterStatic[WideRegister](0xA1.toByte :: Nil)).withOffset(true)
 
   private val ALToMOffs8 = (new RegisterStatic[ByteRegister](0xA2.toByte :: Nil)).withOffset()
   private val AXToMOffs16 = (new RegisterStatic[WideRegister](0xA3.toByte :: Nil)).withOffset()
