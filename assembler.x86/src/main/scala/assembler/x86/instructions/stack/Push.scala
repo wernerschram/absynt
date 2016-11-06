@@ -7,7 +7,7 @@ import assembler.x86.opcodes.Static
 import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 final object Push {
   implicit val opcode = "push"

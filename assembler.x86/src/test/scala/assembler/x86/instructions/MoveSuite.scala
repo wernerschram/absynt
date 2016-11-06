@@ -10,7 +10,7 @@ import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.memoryaccess._
-import assembler.x86.operands.registers.Register._
+import assembler.x86.operands.Register._
 
 class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
 
@@ -23,6 +23,10 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "correctly encode mov bh, al" in {
         Move(AL, BH).encodeByte should be (Hex.lsb("88 C7"))
+      }
+
+      "correctly represent mov bh, al as a string" in {
+        Move(AL, BH).toString should be("mov bh, al")
       }
 
       "correctly encode mov [si], ch" in {

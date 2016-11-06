@@ -3,7 +3,7 @@ package assembler.x86.instructions.string
 import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 final object StoreString {
   implicit val mnemonic = "stos"

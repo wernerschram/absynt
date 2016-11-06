@@ -10,7 +10,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.memoryaccess.MemoryAddress
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
-import assembler.x86.operands.registers.Register._
+import assembler.x86.operands.Register._
 
 class NotSuite extends WordSpec with ShouldMatchers {
 

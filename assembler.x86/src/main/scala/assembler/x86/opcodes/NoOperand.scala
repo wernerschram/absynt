@@ -9,7 +9,7 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.FarPointer
 import assembler.x86.operands.memoryaccess.NearPointer
-import assembler.x86.operands.registers.Register
+import assembler.x86.operands.Register
 
 abstract class NoOperand(val mnemonic: String) {
   def validate()(implicit processorMode: ProcessorMode): Boolean = true

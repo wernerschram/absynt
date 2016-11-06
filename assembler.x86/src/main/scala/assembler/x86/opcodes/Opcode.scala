@@ -4,8 +4,8 @@ import scala.collection.immutable.Map
 
 import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
-import assembler.x86.operands.registers.Register
-import assembler.x86.operands.registers.SegmentRegister
+import assembler.x86.operands.Register
+import assembler.x86.operands.SegmentRegister
 
 object Opcode {
   private val OperandSizeCode = 0x66.toByte

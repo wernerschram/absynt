@@ -7,7 +7,7 @@ import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.MemoryLocation
-import assembler.x86.operands.registers.SegmentRegister
+import assembler.x86.operands.SegmentRegister
 
 abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
     val parameter1Position: ParameterPosition,

@@ -8,7 +8,7 @@ import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 

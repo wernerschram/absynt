@@ -3,7 +3,7 @@ package assembler.x86.instructions.io
 import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.ImmediateValue
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 object Input {
   implicit val opcode = "in"
@@ -20,6 +20,7 @@ object Input {
     (destination) match {
       case (Register.AL) => Imm8ToAL(immediate)
       case (Register.AX) => Imm8ToAX(immediate)
+      case default => throw new AssertionError
     }
   }
 
@@ -29,6 +30,7 @@ object Input {
     (destination) match {
       case (Register.AL) => DXToAL(destination, port)
       case (Register.AX | Register.EAX) => DXToAX(destination, port)
+      case default => throw new AssertionError
     }
   }
 }

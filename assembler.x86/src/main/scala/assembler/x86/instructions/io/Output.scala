@@ -3,7 +3,7 @@ package assembler.x86.instructions.io
 import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.ImmediateValue
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 object Output {
   implicit val opcode = "out"
@@ -20,6 +20,7 @@ object Output {
     (destination) match {
       case (Register.AL) => ALToImm8(immediate)
       case (Register.AX) => AXToImm8(immediate)
+      case default => throw new AssertionError
     }
   }
   def apply(destination: AccumulatorRegister, port: DataRegister)(implicit processorMode: ProcessorMode) = {
@@ -28,6 +29,7 @@ object Output {
     (destination) match {
       case (Register.AL) => ALToDX()
       case (Register.AX | Register.EAX) => AXToDX()
+      case default => throw new AssertionError
     }
   }
 }

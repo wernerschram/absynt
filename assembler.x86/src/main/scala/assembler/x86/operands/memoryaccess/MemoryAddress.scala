@@ -3,8 +3,8 @@ package assembler.x86.operands.memoryaccess
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.registers.Register
-import assembler.x86.operands.registers.SegmentRegister
+import assembler.x86.operands.Register
+import assembler.x86.operands.SegmentRegister
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
     extends MemoryLocation(address, segment, address.size) with ModRMEncodableOperand {
@@ -24,14 +24,14 @@ object MemoryAddress {
   final class FixedSizeMemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS, val operandByteSize: Int)
       extends MemoryAddress(address, segment) with FixedSizeModRMEncodableOperand {
   }
-  def apply(address: List[Byte], segment: SegmentRegister = Register.DS) = 
+  def apply(address: List[Byte], segment: SegmentRegister = Register.DS) =
     new MemoryAddress(address, segment)
 
   private object FixedSizeMemoryAddress {
-    def apply(address: List[Byte], segment: SegmentRegister = Register.DS, operandByteSize: Int) = 
+    def apply(address: List[Byte], segment: SegmentRegister = Register.DS, operandByteSize: Int) =
       new FixedSizeMemoryAddress(address, segment, operandByteSize)
   }
-  
+
   def byteSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
     FixedSizeMemoryAddress(address, segment, 1)
 

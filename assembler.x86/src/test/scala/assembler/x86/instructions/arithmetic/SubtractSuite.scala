@@ -8,7 +8,7 @@ import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Instruction
 import assembler.x86.operands.ImmediateValue.byteToImmediate
-import assembler.x86.operands.registers.Register._
+import assembler.x86.operands.Register._
 
 class SubtractSuite extends WordSpec with ShouldMatchers {
 

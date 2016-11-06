@@ -8,7 +8,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 sealed class RegisterMemoryLocation private (val index: IndexRegister, displacement: List[Byte], segment: SegmentRegister)
     extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)

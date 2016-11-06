@@ -1,6 +1,6 @@
 package assembler.x86.operands.memoryaccess
 
-import assembler.x86.operands.registers.SegmentRegister
+import assembler.x86.operands.SegmentRegister
 
 abstract class IndirectMemoryLocation(
   val registerOrMemoryModeCode: Byte, displacement: List[Byte] = List.empty[Byte], addressSize: Int, segment: SegmentRegister)

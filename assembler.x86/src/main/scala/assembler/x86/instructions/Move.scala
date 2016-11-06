@@ -5,7 +5,7 @@ import assembler.x86.opcodes._
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryAddress
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 
 object Move {
@@ -40,8 +40,8 @@ object Move {
     SRegToRM16(source, destination)
 
   def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
-    assume(!(source.isInstanceOf[RexByteRegister] && destination.isInstanceOf[HighByteRegister]))
-    assume(!(source.isInstanceOf[HighByteRegister] && destination.isInstanceOf[RexByteRegister]))
+    assume(!(source.isInstanceOf[GeneralPurposeRexRegister] && destination.isInstanceOf[HighByteRegister]))
+    assume(!(source.isInstanceOf[HighByteRegister] && destination.isInstanceOf[GeneralPurposeRexRegister]))
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
   }
 

@@ -4,7 +4,7 @@ import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.registers._
+import assembler.x86.operands._
 
 sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister, displacement: List[Byte], val scale: Int, segment: SegmentRegister)
     extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize, segment) with ModRMEncodableOperand {
