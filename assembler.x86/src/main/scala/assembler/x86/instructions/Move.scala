@@ -6,6 +6,7 @@ import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryAddress
 import assembler.x86.operands._
+import assembler.x86.operands.memoryaccess.MemoryLocation
 
 
 object Move {
@@ -21,11 +22,11 @@ object Move {
   private val SRegToRM16 = new ModSegmentRMStatic(0x8C.toByte :: Nil)
   private val RM16ToSReg = new ModSegmentRMStatic(0x8E.toByte :: Nil) with reversedOperands[SegmentRegister, ModRMEncodableOperand]
 
-  private val MOffs8ToAL = (new RegisterStatic[ByteRegister](0xA0.toByte :: Nil)).withOffset(true)
-  private val MOffs16ToAX = (new RegisterStatic[WideRegister](0xA1.toByte :: Nil)).withOffset(true)
+  private val MOffs8ToAL = new RegisterStaticWithOffset[ByteRegister](0xA0.toByte :: Nil) with reversedOperands[ByteRegister, MemoryLocation]
+  private val MOffs16ToAX = new RegisterStaticWithOffset[WideRegister](0xA1.toByte :: Nil) with reversedOperands[WideRegister, MemoryLocation]
 
-  private val ALToMOffs8 = (new RegisterStatic[ByteRegister](0xA2.toByte :: Nil)).withOffset()
-  private val AXToMOffs16 = (new RegisterStatic[WideRegister](0xA3.toByte :: Nil)).withOffset()
+  private val ALToMOffs8 = new RegisterStaticWithOffset[ByteRegister](0xA2.toByte :: Nil)
+  private val AXToMOffs16 = new RegisterStaticWithOffset[WideRegister](0xA3.toByte :: Nil)
 
   private val Imm8ToR8 = (new RegisterEncoded[ByteRegister](0xB0.toByte :: Nil)).withImmediate()
   private val Imm16ToR16 = (new RegisterEncoded[WideRegister](0xB8.toByte :: Nil)).withImmediate()

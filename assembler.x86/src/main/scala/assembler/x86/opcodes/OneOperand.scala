@@ -46,26 +46,6 @@ abstract trait OneOperand[OperandType <: Operand] {
     }
   }
 
-  def withOffset(reversed: Boolean = false): TwoOperand[OperandType, MemoryLocation] =
-    if (!reversed)
-      new TwoOperand[OperandType, MemoryLocation] {
-        val parameter1Position = OneOperand.this.parameterPosition
-        val parameter2Position = ParameterPosition.NotEncoded
-        val mnemonic = OneOperand.this.mnemonic
-
-        override def getCode(operand: OperandType, memoryLocation: MemoryLocation): List[Byte] =
-          OneOperand.this.getCode(operand) ::: memoryLocation.displacement
-      }
-    else
-      new TwoOperand[OperandType, MemoryLocation] with reversedOperands[OperandType, MemoryLocation] {
-        val parameter1Position = OneOperand.this.parameterPosition
-        val parameter2Position = ParameterPosition.NotEncoded
-        val mnemonic = OneOperand.this.mnemonic
-
-        override def getCode(operand: OperandType, memoryLocation: MemoryLocation): List[Byte] =
-          OneOperand.this.getCode(operand) ::: memoryLocation.displacement
-      }
-
   def withImmediate(validateExtension: PartialFunction[(OperandType, ImmediateValue, ProcessorMode), Boolean] = TwoOperand.valid): TwoOperand[OperandType, ImmediateValue] =
     new TwoOperand[OperandType, ImmediateValue] with reversedOperands[OperandType, ImmediateValue] {
         val parameter1Position = OneOperand.this.parameterPosition
