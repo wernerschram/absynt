@@ -9,11 +9,12 @@ import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.SegmentRegister
 
-abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
-    val parameter1Position: ParameterPosition,
-    val parameter2Position: ParameterPosition,
-    val mnemonic: String,
-    reverse: Boolean = false) {
+abstract trait TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand] {
+
+  val parameter1Position: ParameterPosition
+  val parameter2Position: ParameterPosition
+  val mnemonic: String
+
   val includeRexW: Boolean = true
 
   def validate(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean =
@@ -42,7 +43,12 @@ abstract class TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand](
   def toString(operand1: Operand1Type, operand2: Operand2Type) =
     s"${mnemonic} ${operand2}, ${operand1}"
 
-  def repeated() = new TwoOperand[Operand1Type, Operand2Type](parameter1Position, parameter2Position, s"REP ${mnemonic}") {
+  def repeated() = new TwoOperand[Operand1Type, Operand2Type] {
+
+    val parameter1Position = TwoOperand.this.parameter1Position
+    val parameter2Position = TwoOperand.this.parameter2Position
+    val mnemonic = s"REP ${TwoOperand.this.mnemonic}"
+
     override def getCode(operand1: Operand1Type, operand2: Operand2Type): List[Byte] =
       Opcode.RepeatPrefix :: TwoOperand.this.getCode(operand1, operand2)
   }

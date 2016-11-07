@@ -3,8 +3,10 @@ package assembler.x86.opcodes
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.EncodableRegister
 
-class RegisterEncoded[RegisterType <: EncodableRegister](code: List[Byte], override val includeRexW: Boolean = true)(implicit mnemonic: String)
-  extends OneOperand[RegisterType](ParameterPosition.OpcodeReg, mnemonic) {
+class RegisterEncoded[RegisterType <: EncodableRegister](code: List[Byte], override val includeRexW: Boolean = true)(implicit val mnemonic: String)
+  extends OneOperand[RegisterType] {
+
+  val parameterPosition = ParameterPosition.OpcodeReg
 
   override def getCode(operand: RegisterType): List[Byte] =
     code.take(code.length - 1) ::: (code.last | operand.registerOrMemoryModeCode).toByte :: Nil

@@ -10,7 +10,11 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.MemoryLocation
 
-abstract class OneOperand[OperandType <: Operand](val parameterPosition: ParameterPosition, val mnemonic: String) {
+abstract trait OneOperand[OperandType <: Operand] {
+
+  val parameterPosition: ParameterPosition
+  val mnemonic: String
+
   val includeRexW: Boolean = true
 
   def validate(operand: OperandType)(implicit processorMode: ProcessorMode): Boolean =
@@ -44,20 +48,29 @@ abstract class OneOperand[OperandType <: Operand](val parameterPosition: Paramet
 
   def withOffset(reversed: Boolean = false): TwoOperand[OperandType, MemoryLocation] =
     if (!reversed)
-      new TwoOperand[OperandType, MemoryLocation](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) {
+      new TwoOperand[OperandType, MemoryLocation] {
+        val parameter1Position = OneOperand.this.parameterPosition
+        val parameter2Position = ParameterPosition.NotEncoded
+        val mnemonic = OneOperand.this.mnemonic
 
         override def getCode(operand: OperandType, memoryLocation: MemoryLocation): List[Byte] =
           OneOperand.this.getCode(operand) ::: memoryLocation.displacement
       }
     else
-      new TwoOperand[OperandType, MemoryLocation](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) with reversedOperands[OperandType, MemoryLocation] {
+      new TwoOperand[OperandType, MemoryLocation] with reversedOperands[OperandType, MemoryLocation] {
+        val parameter1Position = OneOperand.this.parameterPosition
+        val parameter2Position = ParameterPosition.NotEncoded
+        val mnemonic = OneOperand.this.mnemonic
 
         override def getCode(operand: OperandType, memoryLocation: MemoryLocation): List[Byte] =
           OneOperand.this.getCode(operand) ::: memoryLocation.displacement
       }
 
   def withImmediate(validateExtension: PartialFunction[(OperandType, ImmediateValue, ProcessorMode), Boolean] = TwoOperand.valid): TwoOperand[OperandType, ImmediateValue] =
-    new TwoOperand[OperandType, ImmediateValue](OneOperand.this.parameterPosition, ParameterPosition.NotEncoded, mnemonic) with reversedOperands[OperandType, ImmediateValue] {
+    new TwoOperand[OperandType, ImmediateValue] with reversedOperands[OperandType, ImmediateValue] {
+        val parameter1Position = OneOperand.this.parameterPosition
+        val parameter2Position = ParameterPosition.NotEncoded
+        val mnemonic = OneOperand.this.mnemonic
 
       override def validate(operand: OperandType, immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Boolean =
         super.validate(operand, immediate) && validateExtension(operand, immediate, processorMode)

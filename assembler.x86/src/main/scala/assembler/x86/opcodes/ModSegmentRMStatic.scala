@@ -6,8 +6,11 @@ import assembler.x86.operands.FixedSizeEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.SegmentRegister
 
-class ModSegmentRMStatic(code: List[Byte], includeRexW: Boolean = true)(implicit mnemonic: String)
-  extends TwoOperand[SegmentRegister, ModRMEncodableOperand](ParameterPosition.OperandR, ParameterPosition.OperandRM, mnemonic) {
+class ModSegmentRMStatic(code: List[Byte], includeRexW: Boolean = true)(implicit val mnemonic: String)
+  extends TwoOperand[SegmentRegister, ModRMEncodableOperand] {
+
+  val parameter1Position = ParameterPosition.OperandR
+  val parameter2Position = ParameterPosition.OperandRM
 
   override def validate(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): Boolean = operand2 match {
     case fixed: FixedSizeEncodableOperand => super.validate(operand1, operand2) && (fixed.operandByteSize != 1)
