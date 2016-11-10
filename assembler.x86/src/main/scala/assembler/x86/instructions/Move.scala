@@ -28,11 +28,11 @@ object Move {
   private val ALToMOffs8 = new RegisterStaticWithOffset[ByteRegister](0xA2.toByte :: Nil)
   private val AXToMOffs16 = new RegisterStaticWithOffset[WideRegister](0xA3.toByte :: Nil)
 
-  private val Imm8ToR8 = (new RegisterEncoded[ByteRegister](0xB0.toByte :: Nil)).withImmediate()
-  private val Imm16ToR16 = (new RegisterEncoded[WideRegister](0xB8.toByte :: Nil)).withImmediate()
+  private val Imm8ToR8 = new RegisterEncodedWithImmediate[ByteRegister](0xB0.toByte :: Nil) with reversedOperands[ByteRegister, ImmediateValue]
+  private val Imm16ToR16 = new RegisterEncodedWithImmediate[WideRegister](0xB8.toByte :: Nil) with reversedOperands[WideRegister, ImmediateValue]
 
-  private val Imm8ToRM8 = (new ModRMStatic(0xC6.toByte :: Nil)).withImmediate()
-  private val Imm16ToRM16 = (new ModRMStatic(0xC7.toByte :: Nil)).withImmediate()
+  private val Imm8ToRM8 = new ModRMStaticWithImmediate(0xC6.toByte :: Nil) with reversedOperands[EncodableOperand, ImmediateValue]
+  private val Imm16ToRM16 = new ModRMStaticWithImmediate(0xC7.toByte :: Nil) with reversedOperands[EncodableOperand, ImmediateValue]
 
   def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit processorMode: ProcessorMode) =
     RM16ToSReg(destination, source)

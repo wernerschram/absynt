@@ -45,20 +45,6 @@ abstract trait OneOperand[OperandType <: Operand] {
       override def toString() = s"${OneOperand.this.mnemonic} ${operand.toString()}"
     }
   }
-
-  def withImmediate(validateExtension: PartialFunction[(OperandType, ImmediateValue, ProcessorMode), Boolean] = TwoOperand.valid): TwoOperand[OperandType, ImmediateValue] =
-    new TwoOperand[OperandType, ImmediateValue] with reversedOperands[OperandType, ImmediateValue] {
-        val parameter1Position = OneOperand.this.parameterPosition
-        val parameter2Position = ParameterPosition.NotEncoded
-        val mnemonic = OneOperand.this.mnemonic
-
-      override def validate(operand: OperandType, immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Boolean =
-        super.validate(operand, immediate) && validateExtension(operand, immediate, processorMode)
-
-      override def getCode(operand: OperandType, immediate: ImmediateValue): List[Byte] =
-        OneOperand.this.getCode(operand) ::: immediate.value
-    }
-
 }
 
 object OneOperand {

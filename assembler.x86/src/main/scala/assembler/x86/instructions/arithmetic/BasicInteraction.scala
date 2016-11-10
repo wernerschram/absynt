@@ -9,6 +9,8 @@ import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands._
+import assembler.x86.opcodes.RegisterStaticWithImmediate
+import assembler.x86.opcodes.ModRMStaticWithImmediate
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
@@ -18,13 +20,13 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private val RM8ToR8 = new ModRRMStatic[ByteRegister]((OpcodeBase+0x02).toByte :: Nil)
   private val RM16ToR16 = new ModRRMStatic[WideRegister]((OpcodeBase+0x03).toByte :: Nil)
 
-  private val Imm8ToAL = (new RegisterStatic[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)).withImmediate()
-  private val Imm16ToAX = (new RegisterStatic[WideRegister]((OpcodeBase+0x05).toByte :: Nil)).withImmediate({case (_, value, _) => value.operandByteSize < 8 })
+  private val Imm8ToAL = new RegisterStaticWithImmediate[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)
+  private val Imm16ToAX = new RegisterStaticWithImmediate[WideRegister]((OpcodeBase+0x05).toByte :: Nil, {case (_, value, _) => value.operandByteSize < 8 })
 
-  private val Imm8ToRM8 = (new ModRMStatic(0x80.toByte :: Nil, extensionCode)).withImmediate()
-  private val Imm16ToRM16 = (new ModRMStatic(0x81.toByte :: Nil, extensionCode)).withImmediate({ case (_, value, _) => value.operandByteSize < 8 })
+  private val Imm8ToRM8 = new ModRMStaticWithImmediate(0x80.toByte :: Nil, extensionCode)
+  private val Imm16ToRM16 = new ModRMStaticWithImmediate(0x81.toByte :: Nil, extensionCode)//, {case (_, value, _) => value.operandByteSize < 8 })
 
-  private val Imm8ToRM16 = (new ModRMStatic(0x83.toByte :: Nil, extensionCode)).withImmediate()
+  private val Imm8ToRM16 = new ModRMStaticWithImmediate(0x83.toByte :: Nil, extensionCode)
 
   def apply(immediate: ImmediateValue, destination: EncodableOperand)(implicit processorMode: ProcessorMode) = (destination, immediate) match {
     case (Register.AL, source: ImmediateValue) =>
