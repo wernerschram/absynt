@@ -4,12 +4,12 @@ import assembler.Label
 import assembler.LabeledEncodable
 import assembler.memory.MemoryPage
 
-abstract class FixedSizeX86Instruction() extends X86Instruction() {
+trait FixedSizeX86Operation extends X86Operation {
   def size()(implicit page: MemoryPage) = encodeByte().length
   def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
 }
 
-class LabeledX86Instruction(instruction: X86Instruction, override val label: Label) extends FixedSizeX86Instruction with LabeledEncodable {
+class LabeledX86Instruction(instruction: X86Operation, override val label: Label) extends FixedSizeX86Operation with LabeledEncodable {
   override def size()(implicit page: MemoryPage) = instruction.size()
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
 

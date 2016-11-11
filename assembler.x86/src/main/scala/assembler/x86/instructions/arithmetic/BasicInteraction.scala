@@ -1,7 +1,6 @@
 package assembler.x86.instructions.arithmetic
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.ModRMStatic
 import assembler.x86.opcodes.ModRRMStatic
 import assembler.x86.opcodes.RegisterStatic
 import assembler.x86.operands.EncodableOperand

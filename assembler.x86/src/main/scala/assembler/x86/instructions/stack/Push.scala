@@ -1,13 +1,13 @@
 package assembler.x86.instructions.stack
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.ModRMStatic
 import assembler.x86.opcodes.RegisterEncoded
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands._
+import assembler.x86.operations.ModRMStaticOperation
 
 final object Push {
   implicit val opcode = "push"
@@ -24,10 +24,11 @@ final object Push {
       super.validate(register) && lengthModeValidation(processorMode, register)
   }
 
-  private val RM16 = new ModRMStatic(0xFF.toByte :: Nil, 0x06.toByte) {
-    override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
-      super.validate(operand) && lengthModeValidation(processorMode, operand)
-  }
+  private def RM16(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
+      override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
+        super.validate(operand) && lengthModeValidation(processorMode, operand)
+    }
 
   private val Imm8 = new Static(0x6A.toByte :: Nil).withImmediate()
   private val Imm16 = new Static(0x68.toByte :: Nil).withImmediate({ case (value, mode) => value.operandByteSize != 8; case _ => true })
@@ -39,8 +40,8 @@ final object Push {
   private val StaticFS = new Static(0x0F.toByte :: 0xA0.toByte :: Nil)
   private val StaticGS = new Static(0x0F.toByte :: 0xA8.toByte :: Nil)
 
-//  def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
-//    R16(register)
+  //  def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
+  //    R16(register)
 
   def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) = operand match {
     case register: WideRegister =>
@@ -50,10 +51,9 @@ final object Push {
   }
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate match {
-      case immediate: ImmediateValue if (immediate.operandByteSize == 1) => Imm8(immediate)
-      case immediate: ImmediateValue if (immediate.operandByteSize > 1) => Imm16(immediate)
+    case immediate: ImmediateValue if (immediate.operandByteSize == 1) => Imm8(immediate)
+    case immediate: ImmediateValue if (immediate.operandByteSize > 1) => Imm16(immediate)
   }
-
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode) = segment match {
     case Register.CS => StaticCS()

@@ -3,7 +3,7 @@ package assembler.x86.opcodes
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.MemoryLocation
@@ -23,8 +23,8 @@ abstract trait TwoOperand[Operand1Type <: Operand, Operand2Type <: Operand] {
 
   def getCode(operand1: Operand1Type, operand2: Operand2Type): List[Byte]
 
-  def apply(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
-    new FixedSizeX86Instruction() {
+  def apply(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): FixedSizeX86Operation = {
+    new FixedSizeX86Operation() {
       assume(validate(operand1, operand2))
       override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
         val rexRequirements = operand1.getRexRequirements(parameter1Position) ::: operand2.getRexRequirements(parameter2Position)

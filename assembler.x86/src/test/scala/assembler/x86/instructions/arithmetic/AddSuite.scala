@@ -6,13 +6,13 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.ImmediateValue.byteToImmediate
 import assembler.x86.operands.Register._
 
 class AddSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Instruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
 
   // Add inherits from BasicInteraction, which is covered by the Xor instruction.
   // This suite covers two basic cases.

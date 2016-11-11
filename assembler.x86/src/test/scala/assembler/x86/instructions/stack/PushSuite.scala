@@ -7,14 +7,14 @@ import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
 
 class PushSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Instruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
 
   "an Push instruction" when {
     "in real mode" should {

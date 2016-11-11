@@ -3,7 +3,7 @@ package assembler.x86.opcodes
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
@@ -19,8 +19,8 @@ abstract trait NoOperand {
 
   def getCode(): List[Byte]
 
-  def apply()(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
-    new FixedSizeX86Instruction() {
+  def apply()(implicit processorMode: ProcessorMode): FixedSizeX86Operation = {
+    new FixedSizeX86Operation() {
       assume(validate())
       override def encodeByte()(implicit page: MemoryPage): List[Byte] = getCode()
       override def toString() = NoOperand.this.toString()

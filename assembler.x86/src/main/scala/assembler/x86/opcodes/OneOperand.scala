@@ -3,14 +3,14 @@ package assembler.x86.opcodes
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.MemoryLocation
 
-abstract trait OneOperand[OperandType <: Operand] {
+trait OneOperand[OperandType <: Operand] {
 
   val parameterPosition: ParameterPosition
   val mnemonic: String
@@ -32,8 +32,8 @@ abstract trait OneOperand[OperandType <: Operand] {
     case _ => return None
   }
 
-  def apply(operand: OperandType)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
-    new FixedSizeX86Instruction() {
+  def apply(operand: OperandType)(implicit processorMode: ProcessorMode): FixedSizeX86Operation= {
+    new FixedSizeX86Operation() {
       assume(validate(operand))
       override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
         val operandSize = getOperandSize(operand)
@@ -46,6 +46,7 @@ abstract trait OneOperand[OperandType <: Operand] {
     }
   }
 }
+
 
 object OneOperand {
   def valid[OperandType <: Operand]: PartialFunction[(OperandType, ProcessorMode), Boolean] = { case _ => true }

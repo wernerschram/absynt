@@ -1,33 +1,35 @@
 package assembler.x86.instructions.jump
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.ModRMStatic
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.FarPointer
+import assembler.x86.operations.ModRMStaticOperation
 
 final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
-  
-  private val RM16 = new ModRMStatic(0xFF.toByte :: Nil, 4, includeRexW = false) {
-    override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
-      super.validate(operand) && ((operand, processorMode) match {
-        case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Long) if (fixed.operandByteSize != 8) => false
-        case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == 8) => false
-        case _ => true
-      })
-  }
+
+  private def RM16(operand: EncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
+      override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
+        super.validate(operand) && ((operand, processorMode) match {
+          case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Long) if (fixed.operandByteSize != 8) => false
+          case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == 8) => false
+          case _ => true
+        })
+    }
 
   private val Ptr1616 = new Static(0xEA.toByte :: Nil).withFarPointer()
 
-  private val M1616 = new ModRMStatic(0xFF.toByte :: Nil, 5) {
-    override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
+  private def M1616(operand: EncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 5, mnemonic) {
+      override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
       super.validate(operand) && ((operand, processorMode) match {
         case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == 8) => false
         case _ => true
       })
-  }
+    }
 
   def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     RM16(operand)

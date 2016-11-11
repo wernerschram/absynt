@@ -12,7 +12,7 @@ class ReferencingX86Instruction[T <: ReferencingInstructionOnPage](
   factory: (Int, Int, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)
-    extends X86Instruction() with ReferencingInstruction[T] {
+    extends X86Operation() with ReferencingInstruction[T] {
   val pageMap = new TrieMap[MemoryPage, T]
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = {

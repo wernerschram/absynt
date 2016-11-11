@@ -4,6 +4,6 @@ import assembler.Encodable
 import assembler.Label
 import assembler.LabeledEncodable
 
-abstract class X86Instruction() extends Encodable() {
+trait X86Operation extends Encodable {
   def withLabel(label: Label): LabeledEncodable
 }

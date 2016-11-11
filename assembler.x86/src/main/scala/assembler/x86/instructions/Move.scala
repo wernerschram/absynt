@@ -40,13 +40,13 @@ object Move {
   def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     SRegToRM16(source, destination)
 
-  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction = {
+  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation = {
     assume(!(source.isInstanceOf[GeneralPurposeRexRegister] && destination.isInstanceOf[HighByteRegister]))
     assume(!(source.isInstanceOf[HighByteRegister] && destination.isInstanceOf[GeneralPurposeRexRegister]))
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
   }
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Instruction =
+  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation =
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
 
   def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode) = (source, destination) match {

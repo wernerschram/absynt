@@ -7,11 +7,11 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Instruction
+import assembler.x86.instructions.FixedSizeX86Operation
 
 class PushAllSuite extends WordSpec with ShouldMatchers with MockFactory {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Instruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
 
   "a PushAll instruction" when {
 
