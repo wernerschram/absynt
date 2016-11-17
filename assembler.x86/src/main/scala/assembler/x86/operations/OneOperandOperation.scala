@@ -25,22 +25,22 @@ trait OneOperandOperation[OperandType <: Operand] extends FixedSizeX86Operation2
   val parameter1Position: ParameterPosition
   val mnemonic: String
 
-  override val operandSize: Option[Int] = operand1 match {
+  override lazy val operandSize: Option[Int] = operand1 match {
     case fixed: FixedSizeParameter => Some(fixed.operandByteSize)
     case _ => None
   }
 
-  override val addressSize: Option[Int] = operand1 match {
+  override lazy val addressSize: Option[Int] = operand1 match {
     case address: MemoryLocation => Some(address.addressSize)
     case _ => None
   }
 
-  override val segmentOverride: Option[SegmentRegister] = operand1 match {
+  override lazy val segmentOverride: Option[SegmentRegister] = operand1 match {
     case location: MemoryLocation => location.getSegmentOverride
     case _ => None
   }
 
-  override val rexRequirements = operand1.getRexRequirements(parameter1Position)
+  override lazy val rexRequirements = operand1.getRexRequirements(parameter1Position)
 
   override def toString() = s"${mnemonic} ${operand1.toString()}"
 

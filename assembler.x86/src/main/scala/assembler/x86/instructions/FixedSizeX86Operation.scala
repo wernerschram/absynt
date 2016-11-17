@@ -21,10 +21,10 @@ trait FixedSizeX86Operation2 extends X86Operation {
   val includeRexW: Boolean = true
   val code: List[Byte]
 
-  val operandSize: Option[Int]
-  val addressSize: Option[Int]
-  val segmentOverride: Option[SegmentRegister]
-  val rexRequirements: List[RexExtendedRequirement]
+  def operandSize: Option[Int]
+  def addressSize: Option[Int]
+  def segmentOverride: Option[SegmentRegister]
+  def rexRequirements: List[RexExtendedRequirement]
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
 

@@ -27,25 +27,25 @@ trait SecondOperand[Operand1Type <: Operand, Operand2Type <: Operand] extends Fi
   val parameter2Position: ParameterPosition
   val mnemonic: String
 
-  override val operandSize: Option[Int] = (operand1, operand2) match {
+  override lazy val operandSize: Option[Int] = (operand1, operand2) match {
     case (fixed: FixedSizeParameter, _) => Some(fixed.operandByteSize)
     case (_, fixed: FixedSizeParameter) => Some(fixed.operandByteSize)
     case _ => None
   }
 
-  override val addressSize: Option[Int] = (operand1, operand2) match {
+  override lazy val addressSize: Option[Int] = (operand1, operand2) match {
     case (address: MemoryLocation, _) => Some(address.addressSize)
     case (_, address: MemoryLocation) => Some(address.addressSize)
     case _ => None
   }
 
-  override val segmentOverride: Option[SegmentRegister] = (operand1, operand2) match {
+  override lazy val segmentOverride: Option[SegmentRegister] = (operand1, operand2) match {
     case (location: MemoryLocation, _) => location.getSegmentOverride
     case (_, location: MemoryLocation) => location.getSegmentOverride
     case _ => None
   }
 
-  override val rexRequirements = operand1.getRexRequirements(parameter1Position) ::: operand2.getRexRequirements(parameter2Position)
+  override lazy val rexRequirements = operand1.getRexRequirements(parameter1Position) ::: operand2.getRexRequirements(parameter2Position)
 
   override def toString =
     s"${mnemonic} ${operand2}, ${operand1}"

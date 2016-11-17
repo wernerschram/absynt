@@ -5,10 +5,11 @@ import assembler.x86.ParameterPosition
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
+import assembler.x86.operands.Operand
 
-trait Immediate extends SecondOperand[EncodableOperand, ImmediateValue] {
+trait Immediate[T <: Operand] extends SecondOperand[T, ImmediateValue] {
 
-  self: OneOperandOperation[EncodableOperand] =>
+  self: OneOperandOperation[T] =>
   override val parameter1Position = ParameterPosition.OperandRM
   override val parameter2Position = ParameterPosition.NotEncoded
 
