@@ -93,7 +93,7 @@ class JumpSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX.combinedIndex(SI), segment = FS)).encodeByte should be(Hex.lsb("66 FF 20"))
+        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX.combinedIndex(SI), segment = FS)).encodeByte should be(Hex.lsb("64 66 FF 20"))
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -203,7 +203,7 @@ class JumpSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX.combinedIndex(SI), segment = FS)).encodeByte should be(Hex.lsb("67 FF 20"))
+        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX.combinedIndex(SI), segment = FS)).encodeByte should be(Hex.lsb("64 67 FF 20"))
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
