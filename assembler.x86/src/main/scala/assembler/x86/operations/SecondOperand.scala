@@ -9,19 +9,21 @@ import assembler.x86.operands.Operand
 import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.instructions.FixedSizeX86Operation
+import assembler.x86.instructions.FixedSizeX86Operation2
 
-trait SecondOperand[Operand1Type <: Operand, Operand2Type <: Operand] extends FixedSizeX86Operation {
-//  assume(validate(operand1, operand2))
-
-//  def validate(operand1: Operand1Type, operand2: Operand2Type)(implicit processorMode: ProcessorMode): Boolean = true
-//    operand1.isValidForMode(processorMode) &&
-//      operand2.isValidForMode(processorMode)
+trait SecondOperand[Operand1Type <: Operand, Operand2Type <: Operand] extends FixedSizeX86Operation2 {
 
   self: OneOperandOperation[Operand1Type] =>
 
   val code: List[Byte]
 
   val operand2: Operand2Type
+
+  abstract override def validate = {
+    super.validate
+    assume(operand2.isValidForMode(processorMode))
+  }
+
   implicit val processorMode: ProcessorMode
 
   val parameter2Position: ParameterPosition

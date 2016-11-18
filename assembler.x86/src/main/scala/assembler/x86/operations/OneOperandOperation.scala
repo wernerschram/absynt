@@ -12,14 +12,16 @@ import assembler.x86.RexExtendedRequirement
 import assembler.x86.instructions.FixedSizeX86Operation2
 
 trait OneOperandOperation[OperandType <: Operand] extends FixedSizeX86Operation2 {
-  assume(validate(operand1))
-
-  def validate(operand: OperandType)(implicit processorMode: ProcessorMode): Boolean =
-    operand.isValidForMode(processorMode)
+  assume(operand1.isValidForMode(processorMode))
 
   val code: List[Byte]
 
   val operand1: OperandType
+
+  def validate = {
+    assume(operand1.isValidForMode(processorMode))
+  }
+
   implicit val processorMode: ProcessorMode
 
   val parameter1Position: ParameterPosition

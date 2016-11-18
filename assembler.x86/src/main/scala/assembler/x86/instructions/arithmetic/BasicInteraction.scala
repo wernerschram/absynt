@@ -1,7 +1,6 @@
 package assembler.x86.instructions.arithmetic
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.ModRRMStatic
 import assembler.x86.opcodes.RegisterStatic
 import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
@@ -11,14 +10,21 @@ import assembler.x86.operands._
 import assembler.x86.opcodes.RegisterStaticWithImmediate
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.ModRRMStaticOperation
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
-  private val R8ToRM8 = new ModRRMStatic[ByteRegister]((OpcodeBase+0x00).toByte :: Nil)
-  private val R16ToRM16 = new ModRRMStatic[WideRegister]((OpcodeBase+0x01).toByte :: Nil)
+  private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase+0x00).toByte :: Nil, mnemonic)
 
-  private val RM8ToR8 = new ModRRMStatic[ByteRegister]((OpcodeBase+0x02).toByte :: Nil)
-  private val RM16ToR16 = new ModRRMStatic[WideRegister]((OpcodeBase+0x03).toByte :: Nil)
+  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase+0x01).toByte :: Nil, mnemonic)
+
+  private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase+0x02).toByte :: Nil, mnemonic)
+
+  private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase+0x03).toByte :: Nil, mnemonic)
 
   private val Imm8ToAL = new RegisterStaticWithImmediate[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)
   private val Imm16ToAX = new RegisterStaticWithImmediate[WideRegister]((OpcodeBase+0x05).toByte :: Nil, {case (_, value, _) => value.operandByteSize < 8 })

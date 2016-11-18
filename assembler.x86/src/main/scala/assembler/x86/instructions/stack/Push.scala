@@ -26,8 +26,7 @@ final object Push {
 
   private def RM16(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
-      override def validate(operand: EncodableOperand)(implicit processorMode: ProcessorMode): Boolean =
-        super.validate(operand) && lengthModeValidation(processorMode, operand)
+      assume(lengthModeValidation(processorMode, operand))
     }
 
   private val Imm8 = new Static(0x6A.toByte :: Nil).withImmediate()

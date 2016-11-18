@@ -13,7 +13,7 @@ class ModRMStaticOperation(
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
     extends OneOperandOperation[EncodableOperand] {
-  assume(validate(operand1))
+//  assume(validate)
 
   override val parameter1Position = ParameterPosition.OperandRM
 

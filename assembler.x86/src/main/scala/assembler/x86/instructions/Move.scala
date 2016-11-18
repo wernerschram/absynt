@@ -11,16 +11,23 @@ import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
 import assembler.x86.operations.ReversedOperands
 import assembler.x86.operations.ReversedOperands
+import assembler.x86.operations.ModRRMStaticOperation
 
 object Move {
 
   implicit val mnemonic = "mov"
 
-  private val R8ToRM8 = new ModRRMStatic[ByteRegister](0x88.toByte :: Nil)
-  private val R16ToRM16 = new ModRRMStatic[WideRegister](0x89.toByte :: Nil)
+  private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[ByteRegister](operand1, operand2, 0x88.toByte :: Nil, mnemonic)
 
-  private val RM8ToR8 = new ModRRMStatic[ByteRegister](0x8A.toByte :: Nil) with reversedOperands[ByteRegister, ModRMEncodableOperand]
-  private val RM16ToR16 = new ModRRMStatic[WideRegister](0x8B.toByte :: Nil) with reversedOperands[WideRegister, ModRMEncodableOperand]
+  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[WideRegister](operand1, operand2, 0x89.toByte :: Nil, mnemonic)
+
+  private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[ByteRegister](operand1, operand2, 0x8A.toByte :: Nil, mnemonic) with ReversedOperands[ByteRegister, ModRMEncodableOperand]
+
+  private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStaticOperation[WideRegister](operand1, operand2, 0x8B.toByte :: Nil, mnemonic) with ReversedOperands[WideRegister, ModRMEncodableOperand]
 
   private val SRegToRM16 = new ModSegmentRMStatic(0x8C.toByte :: Nil)
   private val RM16ToSReg = new ModSegmentRMStatic(0x8E.toByte :: Nil) with reversedOperands[SegmentRegister, ModRMEncodableOperand]

@@ -405,7 +405,7 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "throw an exception for mov r13l, [bp+si]" in {
         an [AssertionError] should be thrownBy {
-          Move(RegisterMemoryLocation(BP.combinedIndex(SI)), R13L)
+          Move(RegisterMemoryLocation(BP.combinedIndex(SI)), R13L).encodeByte
         }
       }
 

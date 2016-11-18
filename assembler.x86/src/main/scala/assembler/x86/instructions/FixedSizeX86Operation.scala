@@ -13,7 +13,9 @@ trait FixedSizeX86Operation extends X86Operation {
   override def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
 }
 
-trait FixedSizeX86Operation2 extends X86Operation {
+trait FixedSizeX86Operation2 extends FixedSizeX86Operation {
+  def validate: Unit
+
   override def size()(implicit page: MemoryPage) = encodeByte().length
   override def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
 
@@ -27,6 +29,7 @@ trait FixedSizeX86Operation2 extends X86Operation {
   def rexRequirements: List[RexExtendedRequirement]
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
+    validate
 
     Operation.optionalSegmentOverridePrefix(segmentOverride) :::
       Operation.optionalAddressSizePrefix(addressSize) :::
