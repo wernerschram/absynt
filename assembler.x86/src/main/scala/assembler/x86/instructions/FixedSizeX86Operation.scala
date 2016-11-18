@@ -29,8 +29,8 @@ trait FixedSizeX86Operation2 extends X86Operation {
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
 
     Operation.optionalSegmentOverridePrefix(segmentOverride) :::
-      Operation.optionalOperandSizePrefix(operandSize) :::
       Operation.optionalAddressSizePrefix(addressSize) :::
+      Operation.optionalOperandSizePrefix(operandSize) :::
       Operation.optionalRexPrefix(operandSize, rexRequirements, includeRexW) :::
       code
   }

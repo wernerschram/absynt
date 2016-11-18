@@ -7,7 +7,10 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryAddress
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.MemoryLocation
-
+import assembler.x86.operations.Immediate
+import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.ReversedOperands
+import assembler.x86.operations.ReversedOperands
 
 object Move {
 
@@ -31,8 +34,18 @@ object Move {
   private val Imm8ToR8 = new RegisterEncodedWithImmediate[ByteRegister](0xB0.toByte :: Nil) with reversedOperands[ByteRegister, ImmediateValue]
   private val Imm16ToR16 = new RegisterEncodedWithImmediate[WideRegister](0xB8.toByte :: Nil) with reversedOperands[WideRegister, ImmediateValue]
 
-  private val Imm8ToRM8 = new ModRMStaticWithImmediate(0xC6.toByte :: Nil) with reversedOperands[EncodableOperand, ImmediateValue]
-  private val Imm16ToRM16 = new ModRMStaticWithImmediate(0xC7.toByte :: Nil) with reversedOperands[EncodableOperand, ImmediateValue]
+//  private val Imm8ToRM8 = new ModRMStaticWithImmediate(0xC6.toByte :: Nil) with reversedOperands[EncodableOperand, ImmediateValue]
+//  private val Imm16ToRM16 = new ModRMStaticWithImmediate(0xC7.toByte :: Nil) with reversedOperands[EncodableOperand, ImmediateValue]
+
+  private def Imm8ToRM8(operand: EncodableOperand, immediate: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate[EncodableOperand] with ReversedOperands[EncodableOperand, ImmediateValue] {
+      override val operand2 = immediate
+    }
+
+  private def Imm16ToRM16(operand: EncodableOperand, immediate: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate[EncodableOperand] with ReversedOperands[EncodableOperand, ImmediateValue] {
+      override val operand2 = immediate
+    }
 
   def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit processorMode: ProcessorMode) =
     RM16ToSReg(destination, source)

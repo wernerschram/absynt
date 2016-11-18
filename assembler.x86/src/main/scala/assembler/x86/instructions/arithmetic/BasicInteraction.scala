@@ -9,7 +9,6 @@ import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands._
 import assembler.x86.opcodes.RegisterStaticWithImmediate
-import assembler.x86.opcodes.ModRMStaticWithImmediate
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
 
@@ -28,7 +27,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     new ModRMStaticOperation(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate[EncodableOperand] {
     override val operand2 = immediate
   }
-//  private val Imm16ToRM16 = new ModRMStaticWithImmediate(0x81.toByte :: Nil, extensionCode)//, {case (_, value, _) => value.operandByteSize < 8 })
+
   private def Imm16ToRM16(operand: EncodableOperand, immediate: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate[EncodableOperand] {
     override val operand2 = immediate

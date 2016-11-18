@@ -215,7 +215,7 @@ class JumpSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.segmentWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("66 67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.segmentWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
@@ -325,7 +325,7 @@ class JumpSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.segmentWordSize(EDX)).encodeByte should be(Hex.lsb("66 67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.segmentWordSize(EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [edx]" in {
