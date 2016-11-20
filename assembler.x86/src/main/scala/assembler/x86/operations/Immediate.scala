@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.EncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode

@@ -1,18 +1,18 @@
 package assembler.x86.operations
 
 import assembler.x86.ParameterPosition
-import assembler.x86.operands.EncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
 import assembler.x86.operands.Operand
 import assembler.x86.instructions.FixedSizeX86Operation2
-import assembler.x86.operands.FixedSizeParameter
+import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.SegmentRegister
 
 class ModRMStaticOperation(
-  val operand1: EncodableOperand,
+  val operand1: ModRMEncodableOperand,
   override val code: List[Byte],
   val rValue: Byte,
   override val mnemonic: String,
@@ -26,7 +26,7 @@ class ModRMStaticOperation(
   }
 
   override def operandSize: Option[Int] = operand1 match {
-    case fixed: FixedSizeParameter => Some(fixed.operandByteSize)
+    case fixed: FixedSizeOperand => Some(fixed.operandByteSize)
     case _ => None
   }
 

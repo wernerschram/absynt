@@ -2,10 +2,8 @@ package assembler.x86.instructions.arithmetic
 
 import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.RegisterStatic
-import assembler.x86.operands.EncodableOperand
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
-import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands._
 import assembler.x86.opcodes.RegisterStaticWithImmediate
 import assembler.x86.operations.Immediate
@@ -29,22 +27,22 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private val Imm8ToAL = new RegisterStaticWithImmediate[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)
   private val Imm16ToAX = new RegisterStaticWithImmediate[WideRegister]((OpcodeBase+0x05).toByte :: Nil, {case (_, value, _) => value.operandByteSize < 8 })
 
-  private def Imm8ToRM8(operand: EncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
     override val immediate = immediateValue
   }
 
-  private def Imm16ToRM16(operand: EncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
     override val immediate = immediateValue
   }
 
-  private def Imm8ToRM16(operand: EncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
     override val immediate = immediateValue
   }
 
-  def apply(immediate: ImmediateValue, destination: EncodableOperand)(implicit processorMode: ProcessorMode) = (destination, immediate) match {
+  def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) = (destination, immediate) match {
     case (Register.AL, source: ImmediateValue) =>
       Imm8ToAL(Register.AL, source)
     case (destination: WideRegister, source: ImmediateValue) if (destination.isInstanceOf[AccumulatorRegister]) =>

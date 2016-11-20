@@ -1,14 +1,13 @@
 package assembler.x86.operations
 
 import assembler.x86.ParameterPosition
-import assembler.x86.operands.EncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
 import assembler.x86.operands.EncodableRegister
-import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
-import assembler.x86.operands.FixedSizeParameter
+import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.instructions.FixedSizeX86Operation2
@@ -30,7 +29,7 @@ class ModRRMStaticOperation[RegisterType <: EncodableRegister](
 
   override def operandSize: Option[Int] = (super.operandSize, register) match {
     case (size: Some[Int], _) => size
-    case (_, fixed: FixedSizeParameter) => Some(fixed.operandByteSize)
+    case (_, fixed: FixedSizeOperand) => Some(fixed.operandByteSize)
     case _ => None
   }
 

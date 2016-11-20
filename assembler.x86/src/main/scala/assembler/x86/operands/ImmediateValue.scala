@@ -6,7 +6,7 @@ import assembler.ListExtensions._
 import assembler.x86.ParameterPosition
 import assembler.x86.RexExtendedRequirement
 
-final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeParameter {
+final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeOperand {
   assume(List(1, 2, 4, 8).contains(value.length))
 
   override val operandByteSize: Int = value.length

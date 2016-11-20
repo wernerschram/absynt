@@ -3,7 +3,7 @@ package assembler.x86.instructions.stack
 import assembler.x86.ProcessorMode
 import assembler.x86.opcodes.RegisterEncoded
 import assembler.x86.opcodes.Static
-import assembler.x86.operands.EncodableOperand
+import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands._
@@ -12,7 +12,7 @@ import assembler.x86.operations.ModRMStaticOperation
 final object Push {
   implicit val opcode = "push"
 
-  private val lengthModeValidation: PartialFunction[(ProcessorMode, EncodableOperand), Boolean] = {
+  private val lengthModeValidation: PartialFunction[(ProcessorMode, ModRMEncodableOperand), Boolean] = {
     case (ProcessorMode.Protected, operand: FixedSizeModRMEncodableOperand) if (operand.operandByteSize == 8) => false
     case (ProcessorMode.Long, operand: FixedSizeModRMEncodableOperand) if (operand.operandByteSize == 4) => false
     case (_, operand: FixedSizeModRMEncodableOperand) if (operand.operandByteSize == 1) => false

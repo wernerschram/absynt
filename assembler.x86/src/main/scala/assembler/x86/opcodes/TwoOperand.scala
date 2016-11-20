@@ -4,7 +4,7 @@ import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Operation
-import assembler.x86.operands.FixedSizeParameter
+import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.SegmentRegister
@@ -63,8 +63,8 @@ object TwoOperand {
   def valid[OperandType, Operand2Type]: PartialFunction[(OperandType, Operand2Type, ProcessorMode), Boolean] = { case _ => true }
 
   def getOperandSize(operand1: Operand, operand2: Operand): Option[Int] = (operand1, operand2) match {
-    case (fixed: FixedSizeParameter, _) => Some(fixed.operandByteSize)
-    case (_, fixed: FixedSizeParameter) => Some(fixed.operandByteSize)
+    case (fixed: FixedSizeOperand, _) => Some(fixed.operandByteSize)
+    case (_, fixed: FixedSizeOperand) => Some(fixed.operandByteSize)
     case _ => return None
   }
 

@@ -46,12 +46,12 @@ object Move {
   private val Imm8ToR8 = new RegisterEncodedWithImmediate[ByteRegister](0xB0.toByte :: Nil) with reversedOperands[ByteRegister, ImmediateValue]
   private val Imm16ToR16 = new RegisterEncodedWithImmediate[WideRegister](0xB8.toByte :: Nil) with reversedOperands[WideRegister, ImmediateValue]
 
-  private def Imm8ToRM8(operand: EncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate with ReversedOperands {
       override val immediate = immediateValue
     }
 
-  private def Imm16ToRM16(operand: EncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate with ReversedOperands {
       override val immediate = immediateValue
     }

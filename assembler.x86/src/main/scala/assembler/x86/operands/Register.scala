@@ -54,7 +54,7 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
 
 }
 
-sealed abstract trait IndexRegister extends FixedSizeEncodableOperand with ModRMEncodableOperand {
+sealed abstract trait IndexRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte = registerOrMemoryModeCode
   val displaceOnly: Boolean = false
@@ -64,7 +64,7 @@ sealed trait RealModeIndexRegister extends IndexRegister
 
 sealed trait ProtectedModeIndexRegister extends IndexRegister
 
-sealed trait EncodedBaseRegister extends FixedSizeEncodableOperand {
+sealed trait EncodedBaseRegister extends FixedSizeModRMEncodableOperand {
   def getBaseCode(index: RealModeIndexRegister): Byte
 
   def combinedIndex(index: RealModeIndexRegister): IndexRegister = new IndexRegister {
@@ -83,12 +83,12 @@ sealed trait EncodedBaseRegister extends FixedSizeEncodableOperand {
   }
 }
 
-sealed trait SIBIndexRegister extends FixedSizeEncodableOperand with ModRMEncodableOperand {
+sealed trait SIBIndexRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
   val defaultSIBSegment: SegmentRegister = Register.DS
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait SIBBaseRegister extends FixedSizeEncodableOperand with ModRMEncodableOperand {
+sealed trait SIBBaseRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
   val SIBBaseCode: Byte = registerOrMemoryModeCode
   val scaleOnly: Boolean = false
 }

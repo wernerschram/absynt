@@ -4,7 +4,7 @@ import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Operation
-import assembler.x86.operands.FixedSizeParameter
+import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
@@ -23,7 +23,7 @@ trait OneOperand[OperandType <: Operand] {
   def getCode(operand: OperandType): List[Byte]
 
   def getOperandSize(operand: Operand): Option[Int] = operand match {
-    case fixed: FixedSizeParameter => Some(fixed.operandByteSize)
+    case fixed: FixedSizeOperand => Some(fixed.operandByteSize)
     case _ => None
   }
 

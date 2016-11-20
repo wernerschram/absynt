@@ -1,10 +1,9 @@
 package assembler.x86.operands.memoryaccess
 
-import assembler.ListExtensions._
-
+import assembler.ListExtensions.ListToImmediate
 import assembler.x86.ParameterPosition
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
 
