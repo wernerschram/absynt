@@ -298,7 +298,7 @@ class JumpSuite extends WordSpec with ShouldMatchers {
 
       "throw an AssertionError for jmp [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump(RegisterMemoryLocation(BP.combinedIndex(SI)))
+          Jump(RegisterMemoryLocation(BP.combinedIndex(SI))).encodeByte
         }
       }
 

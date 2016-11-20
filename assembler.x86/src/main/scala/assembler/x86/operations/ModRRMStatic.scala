@@ -11,44 +11,40 @@ import assembler.x86.operands.Operand
 import assembler.x86.operands.FixedSizeParameter
 import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.instructions.FixedSizeX86Operation2
 
 class ModRRMStaticOperation[RegisterType <: EncodableRegister](
-  override val operand1: RegisterType,
+  val operand1: RegisterType,
   val operand2: ModRMEncodableOperand,
   override val code: List[Byte],
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends OneOperandOperation[RegisterType] {
-//with SecondOperand[RegisterType, ModRMEncodableOperand]
+    extends FixedSizeX86Operation2 {
 
   override def operands: List[Operand] = operand1 :: operand2 :: Nil
 
-  override val parameter1Position = ParameterPosition.OperandR
-
   override def validate = {
-    super.validate
+    assume(operand1.isValidForMode(processorMode))
     assume(operand2.isValidForMode(processorMode))
   }
 
-  override def operandSize: Option[Int] = (super.operandSize, operand2) match {
-    case (size: Some[Int], _) => size
-    case (None, fixed: FixedSizeParameter) => Some(fixed.operandByteSize)
+  override def operandSize: Option[Int] = (operand1, operand2) match {
+    case (fixed: FixedSizeParameter, _) => Some(fixed.operandByteSize)
+    case (_, fixed: FixedSizeParameter) => Some(fixed.operandByteSize)
     case _ => None
   }
 
-  override def addressSize: Option[Int] = (super.addressSize, operand2) match {
-    case (size: Some[Int], _) => size
-    case (None, address: MemoryLocation) => Some(address.addressSize)
+  override def addressSize: Option[Int] = operand2 match {
+    case address: MemoryLocation => Some(address.addressSize)
     case _ => None
   }
 
-  override def segmentOverride: Option[SegmentRegister] = (super.segmentOverride, operand2) match {
-    case (segment: Some[SegmentRegister], _) => segment
-    case (None, location: MemoryLocation) => location.getSegmentOverride
+  override def segmentOverride: Option[SegmentRegister] = operand2 match {
+    case location: MemoryLocation => location.getSegmentOverride
     case _ => None
   }
 
-  override def rexRequirements = super.rexRequirements ::: operand2.getRexRequirements(ParameterPosition.OperandRM)
+  override def rexRequirements = operand1.getRexRequirements(ParameterPosition.OperandR) ::: operand2.getRexRequirements(ParameterPosition.OperandRM)
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
     super.encodeByte() ::: operand2.getExtendedBytes(operand1)
