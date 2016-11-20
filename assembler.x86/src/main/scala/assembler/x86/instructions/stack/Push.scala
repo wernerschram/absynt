@@ -1,13 +1,13 @@
 package assembler.x86.instructions.stack
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.RegisterEncoded
 import assembler.x86.opcodes.Static
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands._
 import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.RegisterEncoded
 
 final object Push {
   implicit val opcode = "push"
@@ -19,9 +19,12 @@ final object Push {
     case _ => true
   }
 
-  private val R16 = new RegisterEncoded[WideRegister](0x50.toByte :: Nil, includeRexW = false) {
-    override def validate(register: WideRegister)(implicit processorMode: ProcessorMode): Boolean =
-      super.validate(register) && lengthModeValidation(processorMode, register)
+  private def R16(register: WideRegister)(implicit processorMode: ProcessorMode)  =
+    new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false) {
+    override def validate = {
+      super.validate
+      assume(lengthModeValidation(processorMode, register))
+    }
   }
 
   private def RM16(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =

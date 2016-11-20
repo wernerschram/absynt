@@ -14,6 +14,7 @@ import assembler.x86.operations.ReversedOperands
 import assembler.x86.operations.ModRRMStaticOperation
 import assembler.x86.operations.ModSegmentRMStaticOperation
 import assembler.x86.ParameterPosition
+import assembler.x86.operations.RegisterEncoded
 
 object Move {
 
@@ -43,17 +44,24 @@ object Move {
   private val ALToMOffs8 = new RegisterStaticWithOffset[ByteRegister](0xA2.toByte :: Nil)
   private val AXToMOffs16 = new RegisterStaticWithOffset[WideRegister](0xA3.toByte :: Nil)
 
-  private val Imm8ToR8 = new RegisterEncodedWithImmediate[ByteRegister](0xB0.toByte :: Nil) with reversedOperands[ByteRegister, ImmediateValue]
-  private val Imm16ToR16 = new RegisterEncodedWithImmediate[WideRegister](0xB8.toByte :: Nil) with reversedOperands[WideRegister, ImmediateValue]
+  private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode)  =
+    new RegisterEncoded[ByteRegister](register, 0xB0.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
+      override def immediate = immediateValue
+    }
+
+  private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode)  =
+    new RegisterEncoded[WideRegister](register, 0xB8.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
+      override def immediate = immediateValue
+    }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate with ReversedOperands {
-      override val immediate = immediateValue
+      override def immediate = immediateValue
     }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate with ReversedOperands {
-      override val immediate = immediateValue
+      override def immediate = immediateValue
     }
 
   def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit processorMode: ProcessorMode) =

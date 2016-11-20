@@ -15,7 +15,7 @@ trait FixedSizeX86Operation extends X86Operation {
 }
 
 trait FixedSizeX86Operation2 extends FixedSizeX86Operation {
-  def validate: Unit
+  def validate: Unit = Unit
 
   def operands: List[Operand]
 
@@ -24,13 +24,13 @@ trait FixedSizeX86Operation2 extends FixedSizeX86Operation {
 
   implicit val processorMode: ProcessorMode
   val includeRexW: Boolean = true
-  val code: List[Byte]
+  def code: List[Byte]
   val mnemonic: String
 
-  def operandSize: Option[Int]
-  def addressSize: Option[Int]
-  def segmentOverride: Option[SegmentRegister]
-  def rexRequirements: List[RexExtendedRequirement]
+  def operandSize: Option[Int] = None
+  def addressSize: Option[Int] = None
+  def segmentOverride: Option[SegmentRegister] = None
+  def rexRequirements: List[RexExtendedRequirement] = Nil
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
     validate

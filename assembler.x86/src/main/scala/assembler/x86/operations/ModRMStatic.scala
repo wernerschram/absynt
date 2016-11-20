@@ -21,7 +21,8 @@ class ModRMStaticOperation(
 
   override def operands: List[Operand] = operand1 :: Nil
 
-  def validate = {
+  override def validate = {
+    super.validate
     assume(operand1.isValidForMode(processorMode))
   }
 

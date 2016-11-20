@@ -11,11 +11,4 @@ class Static(override val code: List[Byte], implicit val mnemonic: String)(overr
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = code
 
   def operands: List[assembler.x86.operands.Operand] = Nil
-  def validate: Unit = Unit
-
-  def operandSize: Option[Int] = None
-  def addressSize: Option[Int] = None
-  def segmentOverride: Option[SegmentRegister] = None
-  def rexRequirements: List[RexExtendedRequirement] = Nil
-
 }
