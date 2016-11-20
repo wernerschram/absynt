@@ -2,13 +2,6 @@ package assembler.x86.operands
 
 trait EncodableOperand extends Operand {
   def getExtendedBytes(rValue: Byte): List[Byte]
-
-  def getExtendedBytes(register: EncodableRegister): List[Byte] =
-    getExtendedBytes(register.registerOrMemoryModeCode)
-
-  def getExtendedBytes(segment: SegmentRegister): List[Byte] =
-    getExtendedBytes(segment.registerCode)
-
 }
 
 trait ModRMEncodableOperand extends EncodableOperand {
