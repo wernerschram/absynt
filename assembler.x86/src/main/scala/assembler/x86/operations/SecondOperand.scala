@@ -49,6 +49,4 @@ trait SecondOperand[Operand1Type <: Operand, Operand2Type <: Operand] extends Fi
 
   override lazy val rexRequirements = operand1.getRexRequirements(parameter1Position) ::: operand2.getRexRequirements(parameter2Position)
 
-  override def toString =
-    s"${mnemonic} ${operand2}, ${operand1}"
 }

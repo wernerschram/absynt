@@ -6,19 +6,23 @@ import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
 import assembler.x86.operands.Operand
+import assembler.x86.instructions.FixedSizeX86Operation
+import assembler.x86.instructions.FixedSizeX86Operation2
 
-trait Immediate[T <: Operand] extends SecondOperand[T, ImmediateValue] {
+trait Immediate extends FixedSizeX86Operation2 {
 
-  self: OneOperandOperation[T] =>
-  override val parameter1Position = ParameterPosition.OperandRM
-  override val parameter2Position = ParameterPosition.NotEncoded
+  self: FixedSizeX86Operation2 =>
+  def immediate: ImmediateValue
 
-//  override def validate(operand: EncodableOperand, immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Boolean =
-//    super.validate(operand, immediate) && validateExtension(operand, immediate, processorMode)
+  abstract override def operands = super.operands ::: immediate :: Nil
 
+  abstract override def operandSize: Option[Int] = super.operandSize match {
+    case size: Some[Int] => size
+    case None => Some(immediate.operandByteSize)
+  }
 
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
-    super.encodeByte() ::: operand2.value
+    super.encodeByte() ::: immediate.value
   }
 
 }

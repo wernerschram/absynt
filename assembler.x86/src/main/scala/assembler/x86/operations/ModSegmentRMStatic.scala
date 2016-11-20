@@ -6,6 +6,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.FixedSizeEncodableOperand
+import assembler.x86.operands.Operand
 
 class ModSegmentRMStaticOperation(
   override val operand1: SegmentRegister,
@@ -17,6 +18,8 @@ class ModSegmentRMStaticOperation(
 
   override val parameter1Position = ParameterPosition.OperandR
   override val parameter2Position = ParameterPosition.OperandRM
+
+  override def operands: List[Operand] = operand1 :: operand2 :: Nil
 
 //  override def validate =
 //    operand2 match {

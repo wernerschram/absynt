@@ -5,6 +5,7 @@ import assembler.x86.operands.EncodableOperand
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
+import assembler.x86.operands.Operand
 
 class ModRMStaticOperation(
   override val operand1: EncodableOperand,
@@ -13,9 +14,10 @@ class ModRMStaticOperation(
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
     extends OneOperandOperation[EncodableOperand] {
-//  assume(validate)
 
   override val parameter1Position = ParameterPosition.OperandRM
+
+  override def operands: List[Operand] = operand1 :: Nil
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
     super.encodeByte() ::: operand1.getExtendedBytes(rValue)

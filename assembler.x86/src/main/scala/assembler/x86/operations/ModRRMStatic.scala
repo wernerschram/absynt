@@ -7,6 +7,7 @@ import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
 import assembler.x86.operands.EncodableRegister
 import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.Operand
 
 class ModRRMStaticOperation[RegisterType <: EncodableRegister](
   override val operand1: RegisterType,
@@ -15,6 +16,8 @@ class ModRRMStaticOperation[RegisterType <: EncodableRegister](
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
     extends OneOperandOperation[RegisterType] with SecondOperand[RegisterType, ModRMEncodableOperand] {
+
+  override def operands: List[Operand] = operand1 :: operand2 :: Nil
 
   override val parameter1Position = ParameterPosition.OperandR
   override val parameter2Position = ParameterPosition.OperandRM
