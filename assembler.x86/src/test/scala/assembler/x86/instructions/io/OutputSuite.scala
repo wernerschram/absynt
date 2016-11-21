@@ -42,7 +42,7 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode out dx, eax" in {
-        Output(EAX, DX).encodeByte should be (Hex.lsb("EF"))
+        Output(EAX, DX).encodeByte should be (Hex.lsb("66 EF"))
       }
     }
     "in protected mode" should {
@@ -61,7 +61,7 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode out dx, ax" in {
-        Output(AX, DX).encodeByte should be (Hex.lsb("EF"))
+        Output(AX, DX).encodeByte should be (Hex.lsb("66 EF"))
       }
 
       "correctly encode out dx, eax" in {
@@ -86,7 +86,7 @@ class OutputSuite extends WordSpec with ShouldMatchers {
       }
 
       "correctly encode out dx, ax" in {
-        Output(AX, DX).encodeByte should be (Hex.lsb("EF"))
+        Output(AX, DX).encodeByte should be (Hex.lsb("66 EF"))
       }
 
       "correctly encode out dx, eax" in {
