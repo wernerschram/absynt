@@ -12,7 +12,7 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
-      assume((operand, processorMode) match {
+      assume((operandRM, processorMode) match {
           case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Long) if (fixed.operandByteSize != 8) => false
           case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == 8) => false
           case _ => true
@@ -25,7 +25,7 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
 
   private def M1616(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 5, mnemonic) {
-      assume((operand, processorMode) match {
+      assume((operandRM, processorMode) match {
         case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == 8) => false
         case _ => true
       })

@@ -14,11 +14,11 @@ import assembler.x86.instructions.FixedSizeX86Operation2
 
 class ModRRMStaticOperation[RegisterType <: EncodableRegister](
   val register: RegisterType,
-  operand1: ModRMEncodableOperand,
+  operandRM: ModRMEncodableOperand,
   override val code: List[Byte],
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends ModRMStaticOperation(operand1, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
+    extends ModRMStaticOperation(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
   override def operands: List[Operand] = register :: super.operands
 
