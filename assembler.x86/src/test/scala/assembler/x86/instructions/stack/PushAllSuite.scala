@@ -30,7 +30,7 @@ class PushAllSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "throw an AssertionError for pusha" in {
         an[AssertionError] should be thrownBy {
-          PushAll()
+          PushAll().encodeByte()
         }
       }
     }
