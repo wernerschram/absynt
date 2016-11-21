@@ -23,7 +23,7 @@ class PushSuite extends WordSpec with ShouldMatchers {
 
       "throw an AssertionError for push BYTE PTR [bp]" in {
         an [AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.byteSize(BP))
+          Push(RegisterMemoryLocation.byteSize(BP)).encodeByte
         }
       }
 
@@ -37,7 +37,7 @@ class PushSuite extends WordSpec with ShouldMatchers {
 
       "throw an AssertionError for push cl" in {
         an [AssertionError] should be thrownBy {
-          Push(CL)
+          Push(CL).encodeByte
         }
       }
 
@@ -102,7 +102,7 @@ class PushSuite extends WordSpec with ShouldMatchers {
 
       "throw an AssertionError for push DWORD PTR [rax]" in {
         an [AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.doubleWordSize(RAX))
+          Push(RegisterMemoryLocation.doubleWordSize(RAX)).encodeByte
         }
       }
 

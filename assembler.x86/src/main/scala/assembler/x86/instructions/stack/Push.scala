@@ -1,14 +1,11 @@
 package assembler.x86.instructions.stack
 
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
-import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands._
-import assembler.x86.operations.ModRMStaticOperation
 import assembler.x86.operations.RegisterEncoded
 import assembler.x86.operations.Static
 import assembler.x86.operations.Immediate
+import assembler.x86.operations.ModRMStaticOperation
 
 final object Push {
   implicit val opcode = "push"
@@ -21,16 +18,19 @@ final object Push {
   }
 
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false) {
-      override def validate = {
-        super.validate
-        assume(lengthModeValidation(processorMode, register))
-      }
-    }
+    new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false)
 
   private def RM16(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
-      assume(lengthModeValidation(processorMode, operandRM))
+      override def validate = {
+        super.validate
+        processorMode match {
+          case ProcessorMode.Protected => assume(operand.operandByteSize != 8)
+          case ProcessorMode.Long => assume(operand.operandByteSize != 4)
+          case _ => assume(operand.operandByteSize != 1)
+        }
+      }
+//      assume(lengthModeValidation(processorMode, operandRM))
     }
 
   private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0x6A.toByte :: Nil, opcode) with Immediate {
