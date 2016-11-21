@@ -1,11 +1,12 @@
 package assembler.x86.instructions.jump
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.Static
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.FarPointer
 import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.Static
+import assembler.x86.operations.{FarPointer => FarPointerOperation}
 
 final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
@@ -18,7 +19,9 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
         })
     }
 
-  private val Ptr1616 = new Static(0xEA.toByte :: Nil).withFarPointer()
+  private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) = new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
+    override def pointer = farPointer
+  }
 
   private def M1616(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 5, mnemonic) {
