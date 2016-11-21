@@ -8,7 +8,5 @@ import assembler.x86.instructions.FixedSizeX86Operation2
 import assembler.x86.ProcessorMode
 
 class Static(override val code: List[Byte], implicit val mnemonic: String)(override implicit val processorMode: ProcessorMode) extends FixedSizeX86Operation2 {
-  override def encodeByte()(implicit page: MemoryPage): List[Byte] = code
-
   def operands: List[assembler.x86.operands.Operand] = Nil
 }

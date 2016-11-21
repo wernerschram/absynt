@@ -1,18 +1,42 @@
 package assembler.x86.instructions.io
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes.Static
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands._
+import assembler.x86.operations.Static
+import assembler.x86.operations.Immediate
+import assembler.memory.MemoryPage
 
 object Input {
   implicit val opcode = "in"
 
-  private val Imm8ToAL = new Static(0xE4.toByte :: Nil).withImmediate({ case (value, _) => value.operandByteSize == 1 })
-  private val Imm8ToAX = new Static(0xE5.toByte :: Nil).withImmediate({ case (value, _) => value.operandByteSize == 1 })
+  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0xE4.toByte :: Nil, opcode) with Immediate {
+    override val immediate = immediateValue
+    override def validate = {
+      super.validate
+      assume(immediate.operandByteSize == 1)
+    }
+  }
+  private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0xE5.toByte :: Nil, opcode) with Immediate {
+    override val immediate = immediateValue
+    override def validate = {
+      super.validate
+      assume(immediate.operandByteSize == 1)
+    }
+  }
 
-  private val DXToAL = (new Static(0xEC.toByte :: Nil)).asTwoOperandOpcode[AccumulatorRegister, DataRegister]({ case (Register.AL, Register.DX, _) => true; case _ => false })
-  private val DXToAX = (new Static(0xED.toByte :: Nil)).asTwoOperandOpcode[AccumulatorRegister, DataRegister]({ case (Register.AX | Register.EAX, Register.DX, _) => true; case _ => false })
+  private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) {
+    override def operands = Register.DX :: Register.AL :: Nil
+    override def operandSize = Some(Register.AL.operandByteSize)
+  }
+  private def DXToAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
+    override def operands = Register.DX :: Register.AX :: Nil
+    override def operandSize = Some(Register.AX.operandByteSize)
+  }
+  private def DXToEAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
+    override def operands = Register.DX :: Register.EAX :: Nil
+    override def operandSize = Some(Register.EAX.operandByteSize)
+  }
 
   def apply(immediate: ImmediateValue, destination: AccumulatorRegister)(implicit processorMode: ProcessorMode) = {
     assume(destination == Register.AL || destination == Register.AX)
@@ -28,8 +52,9 @@ object Input {
     assume(destination == Register.AL || destination == Register.AX || destination == Register.EAX)
     assume(port == Register.DX)
     (destination) match {
-      case (Register.AL) => DXToAL(destination, port)
-      case (Register.AX | Register.EAX) => DXToAX(destination, port)
+      case (Register.AL) => DXToAL
+      case (Register.AX) => DXToAX
+      case (Register.EAX) => DXToEAX
       case default => throw new AssertionError
     }
   }
