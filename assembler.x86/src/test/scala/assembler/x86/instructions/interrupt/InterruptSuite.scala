@@ -35,7 +35,7 @@ class InterruptSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "throw an AssertionError for INT 0x0001" in {
         an [AssertionError] should be thrownBy {
-          Interrupt(0x01.toShort)
+          Interrupt(0x01.toShort).encodeByte()
         }
       }
     }
