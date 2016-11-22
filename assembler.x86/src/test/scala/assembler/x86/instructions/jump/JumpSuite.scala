@@ -70,7 +70,7 @@ class JumpSuite extends WordSpec with ShouldMatchers {
       "correctly encode jcx [next]+0x10" in { JumpIfCountZero(NearPointer(0x10.toByte.encodeLittleEndian)).encodeByte should be(Hex.lsb("E3 10")) }
       "throw an AssertionError for jcx [next]+0x2030" in { an[AssertionError] should be thrownBy { JumpIfCountZero(NearPointer(0x2030.encodeLittleEndian)) } }
 
-      "throw an AssertionError for jmp [next]+0x10203040" in { an[AssertionError] should be thrownBy { Jump(NearPointer(0x10203040.encodeLittleEndian)) } }
+      "throw an AssertionError for jmp [next]+0x10203040" in { an[AssertionError] should be thrownBy { Jump(NearPointer(0x10203040.encodeLittleEndian)).encodeByte } }
 
       "correctly encode jmp ax" in {
         Jump(AX).encodeByte should be(Hex.lsb("FF E0"))
@@ -148,13 +148,13 @@ class JumpSuite extends WordSpec with ShouldMatchers {
 
       "throw an AssertionError for jmp [next]+0x1020" in {
         an[AssertionError] should be thrownBy {
-          Jump(NearPointer(0x1020.toShort.encodeLittleEndian))
+          Jump(NearPointer(0x1020.toShort.encodeLittleEndian)).encodeByte
         }
       }
 
       "throw an AssertionError for ja [next]+0x1020" in {
         an[AssertionError] should be thrownBy {
-          JumpIfAbove(NearPointer(0x1020.toShort.encodeLittleEndian))
+          JumpIfAbove(NearPointer(0x1020.toShort.encodeLittleEndian)).encodeByte
         }
       }
 
@@ -258,13 +258,13 @@ class JumpSuite extends WordSpec with ShouldMatchers {
 
       "throw an AssertionError for jmp [next]+0x1020" in {
         an[AssertionError] should be thrownBy {
-          Jump(NearPointer(0x1020.toShort.encodeLittleEndian))
+          Jump(NearPointer(0x1020.toShort.encodeLittleEndian)).encodeByte
         }
       }
 
       "throw an AssertionError for ja [next]+0x1020" in {
         an[AssertionError] should be thrownBy {
-          JumpIfAbove(NearPointer(0x1020.toShort.encodeLittleEndian))
+          JumpIfAbove(NearPointer(0x1020.toShort.encodeLittleEndian)).encodeByte
         }
       }
 

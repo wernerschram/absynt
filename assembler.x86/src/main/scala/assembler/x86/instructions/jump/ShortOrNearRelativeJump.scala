@@ -6,18 +6,24 @@ import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.ReferencingX86Instruction
-import assembler.x86.opcodes.Static
 import assembler.x86.operands.memoryaccess.NearPointer
+import assembler.x86.operations.{ NearPointer => NearPointerOperation }
+import assembler.x86.operations.Static
 
 abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: List[Byte], mnemonic: String) extends ShortRelativeJump(shortOpcode, mnemonic) {
-  val validate: PartialFunction[(NearPointer, ProcessorMode), Boolean] = {
-    case (pointer, ProcessorMode.Long) if (pointer.operandByteSize == 2) => false
-    case (pointer, ProcessorMode.Protected) if (pointer.operandByteSize == 2) => false
-    case (pointer, ProcessorMode.Real) if (pointer.operandByteSize != 2) => false
-    case _ => true
-  }
 
-  private val Rel16 = new Static(nearOpcode)(mnemonic).withNearPointer(validate)
+  private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = new Static(nearOpcode, mnemonic) with NearPointerOperation {
+    override val pointer = nearPointer: NearPointer
+
+    override def validate = {
+      super.validate
+      processorMode match {
+        case ProcessorMode.Long => assume(pointer.operandByteSize != 2)
+        case ProcessorMode.Protected => assume(pointer.operandByteSize != 2)
+        case ProcessorMode.Real => assume(pointer.operandByteSize == 2)
+      }
+    }
+  }
 
   override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = nearPointer.operandByteSize match {
     case 1 =>
