@@ -6,12 +6,15 @@ import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.ReferencingX86Instruction
-import assembler.x86.opcodes.Static
 import assembler.x86.operands.memoryaccess.NearPointer
+import assembler.x86.operations.Static
+import assembler.x86.operations.{NearPointer => NearPointerOperation}
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
-  private val Rel8 = new Static(shortOpcode).withNearPointer()
+  private def Rel8(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = new Static(shortOpcode, mnemonic) with NearPointerOperation {
+    override val pointer = nearPointer
+  }
 
   def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
     assume(nearPointer.operandByteSize == 1)
@@ -20,7 +23,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
 
   class ShortJumpInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends BranchInstructionOnPage(thisLocation, destinationLocation) {
-    
+
     val shortJumpSize = shortOpcode.length + 1
     override val minimumSize = shortJumpSize
     override val maximumSize = shortJumpSize
@@ -38,7 +41,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
 
   def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
     new ReferencingX86Instruction[BranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>  
-        new ShortJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode), 
+      (thisLocation, targetLocation, memoryPage, processorMode) =>
+        new ShortJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode),
         mnemonic, condition)
 }
