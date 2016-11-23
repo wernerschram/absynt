@@ -9,6 +9,7 @@ import assembler.x86.opcodes.RegisterStaticWithImmediate
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
 import assembler.x86.operations.ModRRMStaticOperation
+import assembler.x86.operations.Static
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
@@ -24,8 +25,27 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase+0x03).toByte :: Nil, mnemonic)
 
-  private val Imm8ToAL = new RegisterStaticWithImmediate[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)
-  private val Imm16ToAX = new RegisterStaticWithImmediate[WideRegister]((OpcodeBase+0x05).toByte :: Nil, {case (_, value, _) => value.operandByteSize < 8 })
+  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x04).toByte :: Nil, mnemonic) with Immediate {
+    override val immediate = immediateValue
+  }
+
+  private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x05).toByte :: Nil, mnemonic) with Immediate {
+    override val immediate = immediateValue
+    override def operandSize = Some(2)
+  }
+
+  private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x5).toByte :: Nil, mnemonic) with Immediate {
+    override val immediate = immediateValue
+    override def operandSize = Some(4)
+  }
+
+  private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x5).toByte :: Nil, mnemonic) with Immediate {
+    override val immediate = immediateValue
+    override def operandSize = Some(8)
+  }
+
+  //private val Imm8ToAL = new RegisterStaticWithImmediate[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)
+//  private val Imm16ToAX = new RegisterStaticWithImmediate[WideRegister]((OpcodeBase+0x05).toByte :: Nil, {case (_, value, _) => value.operandByteSize < 8 })
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
@@ -43,16 +63,21 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   }
 
   def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) = (destination, immediate) match {
-    case (Register.AL, source: ImmediateValue) =>
-      Imm8ToAL(Register.AL, source)
-    case (destination: WideRegister, source: ImmediateValue) if (destination.isInstanceOf[AccumulatorRegister]) =>
-      Imm16ToAX(destination, source)
+    case (Register.AL, source: ImmediateValue) if (source.operandByteSize == 1) =>
+      Imm8ToAL(source)
+    case (Register.AX, source: ImmediateValue) if (source.operandByteSize == 2) =>
+      Imm16ToAX(source)
+    case (Register.EAX, source: ImmediateValue) if (source.operandByteSize == 4) =>
+      Imm32ToEAX(source)
+    case (Register.RAX, source: ImmediateValue) if (source.operandByteSize == 4) =>
+      Imm32ToRAX(source)
     case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize == 1 && destination.operandByteSize == 1) =>
       Imm8ToRM8(destination, source)
-    case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize > 1) =>
+    case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize > 1 && source.operandByteSize < 8) =>
       Imm16ToRM16(destination, source)
     case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize == 1 && destination.operandByteSize > 1) =>
       Imm8ToRM16(destination, source)
+    case default => throw new AssertionError
   }
 
   def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
