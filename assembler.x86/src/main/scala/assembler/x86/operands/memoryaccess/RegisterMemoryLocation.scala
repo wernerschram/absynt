@@ -37,9 +37,7 @@ sealed class RegisterMemoryLocation private (val index: IndexRegister, displacem
 }
 
 object RegisterMemoryLocation {
-  final class DIref private[RegisterMemoryLocation]() extends RegisterMemoryLocation(Register.DI, List.empty[Byte], Register.DI.defaultSegment)
-
-  val DIref = new DIref()
+  final class DIref private[RegisterMemoryLocation](index: DestinationIndex) extends RegisterMemoryLocation(index, List.empty[Byte], Register.DI.defaultSegment)
 
   final class FixedSizeRegisterMemoryLocation private (
     index: IndexRegister, displacement: List[Byte], override val operandByteSize: Int, segment: SegmentRegister)
@@ -64,7 +62,7 @@ object RegisterMemoryLocation {
 
   implicit def indexWrapper(index: IndexRegister) = RegisterMemoryLocation(index)
 
-  implicit def indexWrapper(index: DestinationIndex) = DIref
+  implicit def indexWrapper(index: DestinationIndex) = new DIref(index)
 
   object withSegmentOverride {
     def apply(index: IndexRegister, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
