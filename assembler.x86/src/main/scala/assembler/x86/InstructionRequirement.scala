@@ -1,7 +1,5 @@
 package assembler.x86
 
-import assembler.x86.opcodes.Opcode
-
 class ParameterPosition(val rexRequirement: Option[RexExtendedRequirement])
 
 object ParameterPosition {

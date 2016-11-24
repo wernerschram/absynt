@@ -7,13 +7,13 @@ import assembler.Hex
 import assembler.ListExtensions._
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Operation
-import assembler.x86.operands.memoryaccess._
+import assembler.x86.instructions.FixedSizeX86Operation2
 import assembler.x86.operands.Register._
+import assembler.x86.operands.memoryaccess._
 
 class JumpSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation2])
 
   // NOTE: I used [next] to denote the location of the next instruction troughout this suite.
   // I can't find out an official way of denoting this. I keep myself recommended if someone knows an official notation :)

@@ -14,7 +14,7 @@ import assembler.x86.operands.Register._
 
 class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation2])
 
   "a Move instruction" when {
     "in real mode" should {

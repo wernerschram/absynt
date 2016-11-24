@@ -7,11 +7,11 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Operation
+import assembler.x86.instructions.FixedSizeX86Operation2
 
 class PushFlagsSuite extends WordSpec with ShouldMatchers with MockFactory {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation2])
 
   "an PushFlags instruction" when {
     "in long mode" should {

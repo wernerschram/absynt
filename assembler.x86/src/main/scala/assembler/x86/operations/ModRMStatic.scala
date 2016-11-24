@@ -1,15 +1,14 @@
 package assembler.x86.operations
 
-import assembler.x86.ParameterPosition
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.ImmediateValue
-import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
-import assembler.x86.operands.Operand
+import assembler.x86.ParameterPosition
+import assembler.x86.ProcessorMode
 import assembler.x86.instructions.FixedSizeX86Operation2
 import assembler.x86.operands.FixedSizeOperand
-import assembler.x86.operands.memoryaccess.MemoryLocation
+import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.Operand
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 
 class ModRMStaticOperation(
   val operandRM: ModRMEncodableOperand,
@@ -32,12 +31,12 @@ class ModRMStaticOperation(
   }
 
   override def addressSize: Option[Int] = operandRM match {
-    case address: MemoryLocation => Some(address.addressSize)
+    case address: MemoryLocationType => Some(address.addressSize)
     case _ => None
   }
 
   override def segmentOverride: Option[SegmentRegister] = operandRM match {
-    case location: MemoryLocation => location.getSegmentOverride
+    case location: MemoryLocationType => location.getSegmentOverride
     case _ => None
   }
 

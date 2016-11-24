@@ -1,14 +1,9 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.ParameterPosition
-import assembler.x86.operands.ImmediateValue
-import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
-import assembler.x86.operands.Operand
-import assembler.x86.instructions.FixedSizeX86Operation
+import assembler.x86.ParameterPosition
 import assembler.x86.instructions.FixedSizeX86Operation2
-import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
+import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerType }
 
 trait NearPointer extends FixedSizeX86Operation2 {
 

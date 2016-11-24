@@ -9,12 +9,12 @@ import assembler.x86.operations.Operation
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Operand
 
-trait FixedSizeX86Operation extends X86Operation {
-  override def size()(implicit page: MemoryPage) = encodeByte().length
-  override def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
-}
+//trait FixedSizeX86Operation extends X86Operation {
+//  override def size()(implicit page: MemoryPage) = encodeByte().length
+//  override def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
+//}
 
-trait FixedSizeX86Operation2 extends FixedSizeX86Operation {
+trait FixedSizeX86Operation2 extends X86Operation {
   def validate: Unit = Unit
 
   def operands: List[Operand]

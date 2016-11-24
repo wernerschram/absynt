@@ -1,7 +1,6 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
-import assembler.x86.opcodes._
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.memoryaccess.MemoryAddress
@@ -122,13 +121,13 @@ object Move {
   def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     SRegToRM16(source, destination)
 
-  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation = {
+  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation2 = {
     assume(!(source.isInstanceOf[GeneralPurposeRexRegister] && destination.isInstanceOf[HighByteRegister]))
     assume(!(source.isInstanceOf[HighByteRegister] && destination.isInstanceOf[GeneralPurposeRexRegister]))
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
   }
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation =
+  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation2 =
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
 
   def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode) = (source, destination) match {
