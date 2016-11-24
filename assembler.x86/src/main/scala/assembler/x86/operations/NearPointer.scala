@@ -2,12 +2,12 @@ package assembler.x86.operations
 
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
-import assembler.x86.instructions.FixedSizeX86Operation2
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerType }
 
-trait NearPointer extends FixedSizeX86Operation2 {
+trait NearPointer extends FixedSizeX86Operation {
 
-  self: FixedSizeX86Operation2 =>
+  self: FixedSizeX86Operation =>
   def pointer: NearPointerType
 
   abstract override def operands = super.operands ::: pointer :: Nil

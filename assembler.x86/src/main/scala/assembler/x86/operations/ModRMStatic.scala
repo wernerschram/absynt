@@ -3,7 +3,7 @@ package assembler.x86.operations
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Operation2
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
@@ -16,7 +16,7 @@ class ModRMStaticOperation(
   val rValue: Byte,
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends FixedSizeX86Operation2 {
+    extends FixedSizeX86Operation {
 
   override def operands: List[Operand] = operandRM :: Nil
 

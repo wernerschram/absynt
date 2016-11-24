@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
 import assembler.x86.operands.EncodableRegister
-import assembler.x86.instructions.FixedSizeX86Operation2
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.Operand
 import assembler.x86.ProcessorMode
 import assembler.x86.ParameterPosition
@@ -12,7 +12,7 @@ class RegisterEncoded[RegisterType <: EncodableRegister](
   rawCode: List[Byte],
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends FixedSizeX86Operation2 {
+    extends FixedSizeX86Operation {
 
   override def operands: List[Operand] = register :: Nil
 

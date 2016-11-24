@@ -6,12 +6,12 @@ import assembler.x86.operands.ImmediateValue
 import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
 import assembler.x86.operands.Operand
-import assembler.x86.instructions.FixedSizeX86Operation2
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType}
 
-trait FarPointer extends FixedSizeX86Operation2 {
+trait FarPointer extends FixedSizeX86Operation {
 
-  self: FixedSizeX86Operation2 =>
+  self: FixedSizeX86Operation =>
   def pointer: FarPointerType
 
   abstract override def operands = super.operands ::: pointer :: Nil

@@ -7,14 +7,14 @@ import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Operation2
+import assembler.x86.instructions.FixedSizeX86Operation
 import assembler.x86.operands.memoryaccess.MemoryAddress
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.operands.Register._
 
 class NotSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation2])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
 
   "an Not instruction" when {
     "in real mode" should {

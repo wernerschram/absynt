@@ -14,7 +14,7 @@ import assembler.x86.operands.Operand
 //  override def withLabel(label: Label): LabeledEncodable = new LabeledX86Instruction(this, label)
 //}
 
-trait FixedSizeX86Operation2 extends X86Operation {
+trait FixedSizeX86Operation extends X86Operation {
   def validate: Unit = Unit
 
   def operands: List[Operand]

@@ -8,11 +8,11 @@ import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.ClearInterruptFlag
-import assembler.x86.instructions.FixedSizeX86Operation2
+import assembler.x86.instructions.FixedSizeX86Operation
 
 class ClearInterruptFlagSuite extends WordSpec with ShouldMatchers with MockFactory {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation2])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
 
   "an ClearInterruptFlag instruction" when {
 
