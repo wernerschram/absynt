@@ -15,6 +15,8 @@ import assembler.x86.operations.ModRRMStaticOperation
 import assembler.x86.operations.ModSegmentRMStaticOperation
 import assembler.x86.ParameterPosition
 import assembler.x86.operations.RegisterEncoded
+import assembler.x86.operations.Static
+import assembler.x86.operations.{ MemoryLocation => MemoryLocationOperation }
 
 object Move {
 
@@ -38,18 +40,68 @@ object Move {
   private def RM16ToSReg(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModSegmentRMStaticOperation(operand1, operand2, 0x8E.toByte :: Nil, mnemonic) with ReversedOperands
 
-  private val MOffs8ToAL = new RegisterStaticWithOffset[ByteRegister](0xA0.toByte :: Nil) with reversedOperands[ByteRegister, MemoryLocation]
-  private val MOffs16ToAX = new RegisterStaticWithOffset[WideRegister](0xA1.toByte :: Nil) with reversedOperands[WideRegister, MemoryLocation]
+  private def MOffs8ToAL(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
+      override def operands = Register.AL :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(1)
+    }
 
-  private val ALToMOffs8 = new RegisterStaticWithOffset[ByteRegister](0xA2.toByte :: Nil)
-  private val AXToMOffs16 = new RegisterStaticWithOffset[WideRegister](0xA3.toByte :: Nil)
+  private def MOffs16ToAX(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
+      override def operands = Register.AX :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(2)
+    }
 
-  private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode)  =
+  private def MOffs32ToEAX(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
+      override def operands = Register.EAX :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(4)
+    }
+
+  private def MOffs64ToRAX(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
+      override def operands = Register.RAX :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(8)
+    }
+
+  private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation {
+      override def operands = Register.AL :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(1)
+    }
+
+  private def AXToMOffs16(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
+      override def operands = Register.AX :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(2)
+    }
+
+  private def EAXToMOffs32(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
+      override def operands = Register.EAX :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(4)
+    }
+
+  private def RAXToMOffs64(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
+      override def operands = Register.RAX :: super.operands
+      override val location = memoryLocation
+      override def operandSize = Some(8)
+    }
+
+  private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[ByteRegister](register, 0xB0.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
       override def immediate = immediateValue
     }
 
-  private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode)  =
+  private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](register, 0xB8.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
       override def immediate = immediateValue
     }
@@ -81,28 +133,36 @@ object Move {
 
   def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode) = (source, destination) match {
     case (source: MemoryAddress, Register.AL) =>
-      MOffs8ToAL(Register.AL, source)
+      MOffs8ToAL(source)
     case (source: ModRMEncodableOperand, destination: ByteRegister) =>
       RM8ToR8(destination, source)
   }
 
   def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode) = (source, destination) match {
-    case (source: MemoryAddress, Register.AX | Register.EAX | Register.RAX) =>
-      MOffs16ToAX(destination, source)
+    case (source: MemoryAddress, Register.AX) =>
+      MOffs16ToAX(source)
+    case (source: MemoryAddress, Register.EAX) =>
+      MOffs32ToEAX(source)
+    case (source: MemoryAddress, Register.RAX) =>
+      MOffs64ToRAX(source)
     case (source: ModRMEncodableOperand, destination: WideRegister) =>
       RM16ToR16(destination, source)
   }
 
   def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) = (source, destination) match {
     case (Register.AL, destination: MemoryAddress) =>
-      ALToMOffs8(Register.AL, destination)
+      ALToMOffs8(destination)
     case (source: ByteRegister, destination: ModRMEncodableOperand) =>
       R8ToRM8(source, destination)
   }
 
   def apply(source: WideRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) = (source, destination) match {
-    case (Register.AX | Register.EAX | Register.RAX, destination: MemoryAddress) =>
-      AXToMOffs16(source, destination)
+    case (Register.AX, destination: MemoryAddress) =>
+      AXToMOffs16(destination)
+    case (Register.EAX, destination: MemoryAddress) =>
+      EAXToMOffs32(destination)
+    case (Register.RAX, destination: MemoryAddress) =>
+      RAXToMOffs64(destination)
     case (source: WideRegister, destination: ModRMEncodableOperand) =>
       R16ToRM16(source, destination)
   }

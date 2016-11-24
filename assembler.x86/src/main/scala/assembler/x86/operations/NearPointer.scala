@@ -32,13 +32,3 @@ trait NearPointer extends FixedSizeX86Operation2 {
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
     super.encodeByte() ::: pointer.displacement
 }
-
-
-//  def withNearPointer(validateExtension: PartialFunction[(NearPointer, ProcessorMode), Boolean] = OneOperand.valid): OneOperand[NearPointer] =
-//    new OneOperand[NearPointer] {
-//
-//        super.validate(pointer) && validateExtension(pointer, processorMode)
-//
-//      override def getCode(pointer: NearPointer): List[Byte] =
-//        NoOperand.this.getCode ::: pointer.displacement
-//    }
