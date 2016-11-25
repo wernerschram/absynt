@@ -146,6 +146,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         p.encodeByte() should be(Hex.lsb("EB 01 00 00"))
       }
 
+      "Encode a simple program with an indirect forward conditional on count zero short jump instruction" in {
+        val p = new MemoryPage(
+          JumpIfCountZero("Label") ::
+            filler(1) ::
+            labeledFiller(1, "Label") ::
+            Nil)
+
+        p.encodeByte() should be(Hex.lsb("E3 01 00 00"))
+      }
+
       "Encode a simple program with an indirect backward short jump instruction" in {
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
@@ -156,6 +166,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         p.encodeByte() should be(Hex.lsb("00 00 EB FC"))
       }
 
+      "Encode a simple program with an indirect backward conditional on count zero short jump instruction" in {
+        val p = new MemoryPage(
+          labeledFiller(1, "Label") ::
+            filler(1) ::
+            JumpIfCountZero("Label") ::
+            Nil)
+
+        p.encodeByte() should be(Hex.lsb("00 00 E3 FC"))
+      }
+
       "Encode a simple program with an indirect forward near jump instruction" in {
         val p = new MemoryPage(
           Jump("Label") ::
@@ -164,6 +184,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
             Nil)
 
         p.encodeByte() should be(Hex.lsb("E9 00 01" + " 00" * 257))
+      }
+
+      "throw an AssertionError for a simple program with an indirect forward conditional on count zero near jump instruction" in {
+        val p = new MemoryPage(
+          JumpIfCountZero("Label") ::
+            filler(256) ::
+            labeledFiller(1, "Label") ::
+            Nil)
+
+        an[AssertionError] should be thrownBy { p.encodeByte() }
       }
 
       "Encode a simple program with an indirect backward near jump instruction" in {

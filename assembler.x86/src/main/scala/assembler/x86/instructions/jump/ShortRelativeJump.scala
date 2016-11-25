@@ -31,6 +31,8 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
     override def getSizeForDistance(forward: Boolean, distance: Int) = shortJumpSize
 
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
+      assume(distance > (Byte.MinValue + shortJumpSize))
+      assume(distance < Byte.MaxValue)
       if (forward) {
         apply(NearPointer(distance.toByte.encodeLittleEndian)).encodeByte
       } else {
