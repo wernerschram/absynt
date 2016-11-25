@@ -11,7 +11,16 @@ final object Push {
   implicit val opcode = "push"
 
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false)
+    new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false) {
+      override def validate = {
+        super.validate
+        processorMode match {
+          case ProcessorMode.Protected => assume(register.operandByteSize != 8)
+          case ProcessorMode.Long => assume(register.operandByteSize != 4)
+          case _ => assume(register.operandByteSize != 1)
+        }
+      }
+    }
 
   private def RM16(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {

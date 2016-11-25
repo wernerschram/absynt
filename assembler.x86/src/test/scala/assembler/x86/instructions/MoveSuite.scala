@@ -58,6 +58,18 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
         Move(BH, RegisterMemoryLocation(BP.combinedIndex(SI), 0x7D.toByte.encodeLittleEndian)).toString should be("mov [bp+si+125], bh")
       }
 
+      "throw an AssertionError for mov [bp+bx], bh" in {
+        an [AssertionError] should be thrownBy {
+          Move(BH, RegisterMemoryLocation(BP.combinedIndex(BX)))
+        }
+      }
+
+      "throw an AssertionError for mov [bx+bp], bh" in {
+        an [AssertionError] should be thrownBy {
+          Move(BH, RegisterMemoryLocation(BX.combinedIndex(BP)))
+        }
+      }
+
       "correctly encode mov [bp]+0x1234, cl" in {
         Move(CL, RegisterMemoryLocation(BP, 0x1234.toShort.encodeLittleEndian)).encodeByte should be (Hex.lsb("88 8E 34 12"))
       }
@@ -370,12 +382,12 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
         }
       }
 
-      "correctly encode mov bl, r8l" in {
-        Move(R8L, BL).encodeByte should be (Hex.lsb("44 88 C3"))
+      "correctly encode mov bl, r13l" in {
+        Move(R13L, BL).encodeByte should be (Hex.lsb("44 88 EB"))
       }
 
-      "correctly represent mov bl, r8l as a string" in {
-        Move(R8L, BL).toString should be("mov bl, r8l")
+      "correctly represent mov bl, r13l as a string" in {
+        Move(R13L, BL).toString should be("mov bl, r13l")
       }
 
       "correctly encode mov r15l, al" in {

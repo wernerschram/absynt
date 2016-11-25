@@ -150,7 +150,6 @@ object Register {
   case object BX extends BaseRegister with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
     override val indexCode = 0x07.toByte
     def getBaseCode(index: RealModeIndexRegister) = {
-//      assume(index == SI || index == DI)
       index match {
         case SI => 0x00
         case DI => 0x01
@@ -162,7 +161,6 @@ object Register {
   case object BP extends BasePointer with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
     override val indexCode = 0x06.toByte
     def getBaseCode(index: RealModeIndexRegister) = {
-//      assume(index == SI || index == DI)
       index match {
         case SI => 0x02
         case DI => 0x03
