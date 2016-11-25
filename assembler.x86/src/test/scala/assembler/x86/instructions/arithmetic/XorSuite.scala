@@ -89,6 +89,10 @@ class XorSuite extends WordSpec with ShouldMatchers {
 
       implicit val processorMode = ProcessorMode.Long
 
+      "correctly encode xor QWORD PTR [0x11111111], 0x44332211" in {
+        Xor(0x44332211, MemoryAddress.quadWordSize(0x11111111.encodeLittleEndian)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
+      }
+
       "correctly encode xor rax, 0x78776655" in {
         Xor(0x78776655, RAX).encodeByte should be(Hex.lsb("48 35 55 66 77 78"))
       }
@@ -114,6 +118,10 @@ class XorSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode xor DWORD PTR [rax+rbx*2], 0x44" in {
         Xor(0x44.toByte, SIBMemoryLocation.doubleWordSize(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("83 34 58 44"))
+      }
+
+      "correctly encode xor QWORD PTR [rax+rbx*2], 0x44" in {
+        Xor(0x44.toByte, SIBMemoryLocation.quadWordSize(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("48 83 34 58 44"))
       }
 
       "correctly encode xor [rbx], al" in {

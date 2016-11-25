@@ -16,8 +16,6 @@ trait FarPointer extends X86Operation {
     case None => Some(pointer.operandByteSize)
   }
 
-  abstract override def rexRequirements = pointer.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
-
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
     super.encodeByte() ::: pointer.offset ::: pointer.segment
 }

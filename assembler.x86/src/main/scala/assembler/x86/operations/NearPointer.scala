@@ -21,8 +21,6 @@ trait NearPointer extends X86Operation {
     assume(pointer.isValidForMode(processorMode))
   }
 
-  abstract override def rexRequirements = pointer.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
-
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
     super.encodeByte() ::: pointer.displacement
 }
