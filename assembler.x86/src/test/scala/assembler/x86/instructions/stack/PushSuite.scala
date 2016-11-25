@@ -90,6 +90,12 @@ class PushSuite extends WordSpec with ShouldMatchers {
       "correctly encode push gs" in {
         Push(GS).encodeByte should be (0x0F.toByte :: 0xA8.toByte :: Nil)
       }
+
+      "throw an AssertionError for push BYTE PTR [bp]" in {
+        an [AssertionError] should be thrownBy {
+          Push(RegisterMemoryLocation.quadWordSize(BP)).encodeByte
+        }
+      }
     }
 
     "in long mode" should {

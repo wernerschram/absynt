@@ -2,10 +2,10 @@ package assembler.x86.instructions.stack
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.operations.RegisterEncoded
-import assembler.x86.operations.Static
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.RegisterEncoded
+import assembler.x86.operations.Static
 
 final object Push {
   implicit val opcode = "push"
@@ -23,7 +23,6 @@ final object Push {
           case _ => assume(operand.operandByteSize != 1)
         }
       }
-//      assume(lengthModeValidation(processorMode, operandRM))
     }
 
   private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0x6A.toByte :: Nil, opcode) with Immediate {
@@ -47,12 +46,8 @@ final object Push {
   def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
     R16(register)
 
-  def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) = operand match {
-    case register: WideRegister =>
-      R16(register)
-    case _ =>
-      RM16(operand)
-  }
+  def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    RM16(operand)
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate.operandByteSize match {
     case 1 => Imm8(immediate)
