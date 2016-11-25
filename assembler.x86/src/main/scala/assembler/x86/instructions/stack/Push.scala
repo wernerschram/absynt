@@ -10,13 +10,6 @@ import assembler.x86.operations.ModRMStaticOperation
 final object Push {
   implicit val opcode = "push"
 
-  private val lengthModeValidation: PartialFunction[(ProcessorMode, ModRMEncodableOperand), Boolean] = {
-    case (ProcessorMode.Protected, operand: FixedSizeModRMEncodableOperand) if (operand.operandByteSize == 8) => false
-    case (ProcessorMode.Long, operand: FixedSizeModRMEncodableOperand) if (operand.operandByteSize == 4) => false
-    case (_, operand: FixedSizeModRMEncodableOperand) if (operand.operandByteSize == 1) => false
-    case _ => true
-  }
-
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false)
 
