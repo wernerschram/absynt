@@ -1,34 +1,35 @@
 package assembler.x86.instructions.io
 
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.AccumulatorRegister
+import assembler.x86.operands.DataRegister
 import assembler.x86.operands.ImmediateValue
-import assembler.x86.operands._
-import assembler.x86.operations.Static
+import assembler.x86.operands.Register
 import assembler.x86.operations.Immediate
-import assembler.memory.MemoryPage
 import assembler.x86.operations.ReversedOperands
+import assembler.x86.operations.Static
 
 object Input {
   implicit val opcode = "in"
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE4.toByte :: Nil, opcode) with Immediate with ReversedOperands {
-    override def operands = Register.AL :: super.operands
-    override val immediate = immediateValue
-    override def validate = {
-      super.validate
-      assume(immediate.operandByteSize == 1)
+      override def operands = Register.AL :: super.operands
+      override val immediate = immediateValue
+      override def validate = {
+        super.validate
+        assume(immediate.operandByteSize == 1)
+      }
     }
-  }
   private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE5.toByte :: Nil, opcode) with Immediate with ReversedOperands {
-    override def operands = Register.AX :: super.operands
-    override val immediate = immediateValue
-    override def validate = {
-      super.validate
-      assume(immediate.operandByteSize == 1)
+      override def operands = Register.AX :: super.operands
+      override val immediate = immediateValue
+      override def validate = {
+        super.validate
+        assume(immediate.operandByteSize == 1)
+      }
     }
-  }
 
   private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) {
     override def operands = Register.DX :: Register.AL :: Nil
