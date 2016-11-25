@@ -126,6 +126,14 @@ class PushSuite extends WordSpec with ShouldMatchers {
       "correctly encode push r13" in {
         Push(R13).encodeByte should be(0x41.toByte :: 0x55.toByte :: Nil)
       }
+
+      "correctly encode push rbp" in {
+        Push(RBP).encodeByte should be(0x55.toByte :: Nil)
+      }
+
+      "correctly encode push rsi" in {
+        Push(RSI).encodeByte should be(0x56.toByte :: Nil)
+      }
     }
   }
 }
