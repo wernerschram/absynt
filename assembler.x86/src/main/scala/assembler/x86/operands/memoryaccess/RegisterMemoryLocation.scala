@@ -32,7 +32,8 @@ sealed class RegisterMemoryLocation private (val index: IndexRegister, displacem
 }
 
 object RegisterMemoryLocation {
-  final class DIref private[RegisterMemoryLocation](index: DestinationIndex) extends RegisterMemoryLocation(index, List.empty[Byte], Register.DI.defaultSegment)
+  final class DIReference private[RegisterMemoryLocation] (index: DestinationIndex, displacement: List[Byte], segment: SegmentRegister)
+    extends RegisterMemoryLocation(index, displacement, segment)
 
   final class FixedSizeRegisterMemoryLocation private (
     index: IndexRegister, displacement: List[Byte], override val operandByteSize: Int, segment: SegmentRegister)
@@ -55,9 +56,18 @@ object RegisterMemoryLocation {
   def apply(index: IndexRegister, displacement: List[Byte] = List.empty[Byte]) =
     new RegisterMemoryLocation(index, displacement, index.defaultSegment)
 
+  def apply(index: DestinationIndex, displacement: List[Byte], segment: SegmentRegister) =
+    new DIReference(index, displacement, segment)
+
+  def apply(index: DestinationIndex) =
+    new DIReference(index, List.empty[Byte], index.defaultSegment)
+
+  //  def apply(index: DestinationIndex, displacement: List[Byte] = List.empty[Byte]) =
+  //    new DIref(index)
+
   implicit def indexWrapper(index: IndexRegister) = RegisterMemoryLocation(index)
 
-  implicit def indexWrapper(index: DestinationIndex) = new DIref(index)
+  implicit def indexWrapper(index: DestinationIndex) = apply(index)
 
   object withSegmentOverride {
     def apply(index: IndexRegister, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
@@ -75,7 +85,6 @@ object RegisterMemoryLocation {
     def quadWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
       FixedSizeRegisterMemoryLocation(index, displacement, 8, segment)
 
-
     def segmentWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
       FarPointerRegisterMemoryLocation(index, displacement, 2, segment)
 
@@ -84,7 +93,7 @@ object RegisterMemoryLocation {
 
     def segmentQuadWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
       FarPointerRegisterMemoryLocation(index, displacement, 8, segment)
-}
+  }
 
   def byteSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, 1, index.defaultSegment)
@@ -97,7 +106,6 @@ object RegisterMemoryLocation {
 
   def quadWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, 8, index.defaultSegment)
-
 
   def segmentWordSize(index: IndexRegister, displacement: List[Byte] = List.empty[Byte]) =
     FarPointerRegisterMemoryLocation(index, displacement, 2, index.defaultSegment)

@@ -10,4 +10,5 @@ trait Repeated extends X86Operation {
     0xF3.toByte :: super.encodeByte()
   }
 
+  abstract override def mnemonic = s"rep ${super.mnemonic}"
 }

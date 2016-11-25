@@ -20,7 +20,7 @@ trait X86Operation extends Encodable {
   implicit val processorMode: ProcessorMode
   val includeRexW: Boolean = true
   def code: List[Byte]
-  val mnemonic: String
+  def mnemonic: String
 
   def operandSize: Option[Int] = None
   def addressSize: Option[Int] = None
