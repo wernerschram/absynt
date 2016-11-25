@@ -22,9 +22,6 @@ trait MemoryLocation extends X86Operation {
     case None => location.getSegmentOverride
   }
 
-
-  abstract override def rexRequirements = location.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
-
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
     super.encodeByte() ::: location.displacement
 }

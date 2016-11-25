@@ -4,7 +4,8 @@ import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
 
-sealed abstract class Register extends Operand
+sealed abstract class Register extends Operand {
+}
 
 sealed abstract class EncodableRegister(val registerCode: Byte) extends Register with FixedSizeModRMEncodableOperand {
 
@@ -45,8 +46,6 @@ sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15")
 
 sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register {
   val operandByteSize: Int = 2
-  override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
-    Nil
 
   override def toString() = mnemonic
 
@@ -54,20 +53,29 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
 
 }
 
-sealed abstract trait IndexRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
+sealed trait BaseIndexPair extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
+
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte = registerOrMemoryModeCode
   val displaceOnly: Boolean = false
+
 }
 
-sealed trait RealModeIndexRegister extends IndexRegister
+sealed trait IndexRegister extends Register with BaseIndexPair
 
-sealed trait ProtectedModeIndexRegister extends IndexRegister
+sealed trait RealModeIndexRegister extends IndexRegister {
+}
+
+sealed trait ProtectedModeIndexRegister extends IndexRegister {
+}
 
 sealed trait EncodedBaseRegister extends FixedSizeModRMEncodableOperand {
+
+  self: Register =>
+
   def getBaseCode(index: RealModeIndexRegister): Byte
 
-  def combinedIndex(index: RealModeIndexRegister): IndexRegister = new IndexRegister {
+  def combinedIndex(index: RealModeIndexRegister): BaseIndexPair = new BaseIndexPair {
     override val defaultSegment = index.defaultSegment
     override val indexCode = getBaseCode(index)
 
