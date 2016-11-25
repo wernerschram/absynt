@@ -69,7 +69,9 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       Imm32ToRAX(source)
     case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize == 1 && destination.operandByteSize == 1) =>
       Imm8ToRM8(destination, source)
-    case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize > 1 && source.operandByteSize < 8) =>
+    case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize > 1 && source.operandByteSize < 8 && source.operandByteSize == destination.operandByteSize) =>
+      Imm16ToRM16(destination, source)
+    case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize == 4 && destination.operandByteSize == 8) =>
       Imm16ToRM16(destination, source)
     case (destination: FixedSizeModRMEncodableOperand, source: ImmediateValue) if (source.operandByteSize == 1 && destination.operandByteSize > 1) =>
       Imm8ToRM16(destination, source)
