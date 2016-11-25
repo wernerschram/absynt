@@ -1,7 +1,6 @@
-package assembler.x86.instructions
+package assembler.x86.operations
 
 import scala.collection.concurrent.TrieMap
-
 import assembler.Encodable
 import assembler.LabelCondition
 import assembler.memory.MemoryPage
@@ -9,7 +8,7 @@ import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.x86.ProcessorMode
 
-class ReferencingX86Instruction[T <: ReferencingInstructionOnPage](
+class ReferencingX86Operation[T <: ReferencingInstructionOnPage](
   factory: (Int, Int, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)

@@ -5,7 +5,7 @@ import assembler.ListExtensions._
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.ReferencingX86Instruction
+import assembler.x86.operations.ReferencingX86Operation
 import assembler.x86.operands.memoryaccess.NearPointer
 import assembler.x86.operations.{ NearPointer => NearPointerOperation }
 import assembler.x86.operations.Static
@@ -85,7 +85,7 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
   }
 
   override def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new ReferencingX86Instruction[BranchInstructionOnPage](
+    new ReferencingX86Operation[BranchInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>
         new ShortOrNearJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode),
         mnemonic, condition)
