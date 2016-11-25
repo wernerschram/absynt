@@ -6,18 +6,23 @@ import assembler.x86.operands._
 import assembler.x86.operations.Static
 import assembler.x86.operations.Immediate
 import assembler.memory.MemoryPage
+import assembler.x86.operations.ReversedOperands
 
 object Input {
   implicit val opcode = "in"
 
-  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0xE4.toByte :: Nil, opcode) with Immediate {
+  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static(0xE4.toByte :: Nil, opcode) with Immediate with ReversedOperands {
+    override def operands = Register.AL :: super.operands
     override val immediate = immediateValue
     override def validate = {
       super.validate
       assume(immediate.operandByteSize == 1)
     }
   }
-  private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0xE5.toByte :: Nil, opcode) with Immediate {
+  private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static(0xE5.toByte :: Nil, opcode) with Immediate with ReversedOperands {
+    override def operands = Register.AX :: super.operands
     override val immediate = immediateValue
     override def validate = {
       super.validate
@@ -39,7 +44,6 @@ object Input {
   }
 
   def apply(immediate: ImmediateValue, destination: AccumulatorRegister)(implicit processorMode: ProcessorMode) = {
-    assume(destination == Register.AL || destination == Register.AX)
     assume(immediate.operandByteSize == 1)
     (destination) match {
       case (Register.AL) => Imm8ToAL(immediate)
@@ -49,7 +53,6 @@ object Input {
   }
 
   def apply(port: DataRegister, destination: AccumulatorRegister)(implicit processorMode: ProcessorMode) = {
-    assume(destination == Register.AL || destination == Register.AX || destination == Register.EAX)
     assume(port == Register.DX)
     (destination) match {
       case (Register.AL) => DXToAL
