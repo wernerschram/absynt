@@ -364,6 +364,12 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
         }
       }
 
+      "throw an AssertionError for mov r8l, bh" in {
+        an [AssertionError] should be thrownBy {
+          Move(BH, R8L)
+        }
+      }
+
       "correctly encode mov bl, r8l" in {
         Move(R8L, BL).encodeByte should be (Hex.lsb("44 88 C3"))
       }
