@@ -6,14 +6,14 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.FixedSizeX86Operation
+import assembler.x86.operations.X86Operation
 import assembler.x86.operands.ImmediateValue.byteToImmediate
 import assembler.x86.operands.Register.AL
 import assembler.x86.operands.Register.BL
 
 class AddCarrySuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 
   // Add inherits from BasicInteraction, which is covered by the Xor instruction.
   // This suite covers two basic cases.

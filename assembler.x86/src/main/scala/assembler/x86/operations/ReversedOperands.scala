@@ -1,16 +1,6 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.Operand
-import assembler.x86.instructions.FixedSizeX86Operation
-
-//trait ReversedOperands[Operand1Type <: Operand, Operand2Type <: Operand]
-//    extends OneOperandOperation[Operand1Type]
-//    with SecondOperand[Operand1Type, Operand2Type] {
-//  override def toString =
-//    s"${mnemonic} ${operand1}, ${operand2}"
-//}
-
 trait ReversedOperands
-    extends FixedSizeX86Operation {
+    extends X86Operation {
   override def toString() = s"${mnemonic} ${operands.map { operand => operand.toString() }.mkString(", ")}"
 }

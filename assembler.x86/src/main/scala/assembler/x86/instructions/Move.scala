@@ -16,6 +16,7 @@ import assembler.x86.ParameterPosition
 import assembler.x86.operations.RegisterEncoded
 import assembler.x86.operations.Static
 import assembler.x86.operations.{ MemoryLocation => MemoryLocationOperation }
+import assembler.x86.operations.X86Operation
 
 object Move {
 
@@ -121,13 +122,13 @@ object Move {
   def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     SRegToRM16(source, destination)
 
-  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation = {
+  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation = {
     assume(!(source.isInstanceOf[GeneralPurposeRexRegister] && destination.isInstanceOf[HighByteRegister]))
     assume(!(source.isInstanceOf[HighByteRegister] && destination.isInstanceOf[GeneralPurposeRexRegister]))
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
   }
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): FixedSizeX86Operation =
+  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): X86Operation =
     apply(source, destination.asInstanceOf[ModRMEncodableOperand])
 
   def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode) = (source, destination) match {

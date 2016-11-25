@@ -1,18 +1,16 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.EncodableRegister
-import assembler.x86.instructions.FixedSizeX86Operation
-import assembler.x86.operands.Operand
-import assembler.x86.ProcessorMode
 import assembler.x86.ParameterPosition
-import assembler.memory.MemoryPage
+import assembler.x86.ProcessorMode
+import assembler.x86.operands.EncodableRegister
+import assembler.x86.operands.Operand
 
 class RegisterEncoded[RegisterType <: EncodableRegister](
   register: RegisterType,
   rawCode: List[Byte],
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends FixedSizeX86Operation {
+    extends X86Operation {
 
   override def operands: List[Operand] = register :: Nil
 

@@ -2,6 +2,7 @@ package assembler.x86.instructions
 
 import scala.collection.concurrent.TrieMap
 
+import assembler.Encodable
 import assembler.LabelCondition
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
@@ -12,7 +13,7 @@ class ReferencingX86Instruction[T <: ReferencingInstructionOnPage](
   factory: (Int, Int, MemoryPage, ProcessorMode) => T,
   mnemonic: String,
   condition: LabelCondition)(implicit processorMode: ProcessorMode)
-    extends X86Operation() with ReferencingInstruction[T] {
+    extends Encodable() with ReferencingInstruction[T] {
   val pageMap = new TrieMap[MemoryPage, T]
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): T = {
@@ -21,6 +22,6 @@ class ReferencingX86Instruction[T <: ReferencingInstructionOnPage](
   }
 
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
-  
+
   override def toString() = s"${mnemonic} ${condition}"
 }

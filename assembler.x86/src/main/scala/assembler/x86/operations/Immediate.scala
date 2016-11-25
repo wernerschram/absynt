@@ -1,16 +1,11 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.ParameterPosition
-import assembler.x86.operands.ImmediateValue
-import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
-import assembler.x86.operands.Operand
-import assembler.x86.instructions.FixedSizeX86Operation
+import assembler.x86.operands.ImmediateValue
 
-trait Immediate extends FixedSizeX86Operation {
+trait Immediate extends X86Operation {
 
-  self: FixedSizeX86Operation =>
+  self: X86Operation =>
   def immediate: ImmediateValue
 
   abstract override def operands = super.operands ::: immediate :: Nil

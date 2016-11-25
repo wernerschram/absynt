@@ -1,17 +1,12 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.ParameterPosition
-import assembler.x86.operands.ImmediateValue
-import assembler.x86.ProcessorMode
 import assembler.memory.MemoryPage
-import assembler.x86.operands.Operand
-import assembler.x86.instructions.FixedSizeX86Operation
-import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType}
+import assembler.x86.ParameterPosition
+import assembler.x86.operands.memoryaccess.{ FarPointer => FarPointerType }
 
-trait FarPointer extends FixedSizeX86Operation {
+trait FarPointer extends X86Operation {
 
-  self: FixedSizeX86Operation =>
+  self: X86Operation =>
   def pointer: FarPointerType
 
   abstract override def operands = super.operands ::: pointer :: Nil

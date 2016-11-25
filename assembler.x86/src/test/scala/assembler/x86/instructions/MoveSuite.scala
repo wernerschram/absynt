@@ -11,10 +11,11 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
+import assembler.x86.operations.X86Operation
 
 class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[FixedSizeX86Operation])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 
   "a Move instruction" when {
     "in real mode" should {
