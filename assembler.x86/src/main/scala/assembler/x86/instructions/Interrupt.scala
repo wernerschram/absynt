@@ -18,9 +18,6 @@ object Interrupt {
     }
   }
 
-  def apply()(implicit processorMode: ProcessorMode) =
-    Static()
-
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate.value.head match {
     case 3 => Static()
     case _ => Imm8(immediate)
