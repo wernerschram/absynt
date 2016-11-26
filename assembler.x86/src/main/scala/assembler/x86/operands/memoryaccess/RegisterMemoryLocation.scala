@@ -37,7 +37,17 @@ object RegisterMemoryLocation {
 
   final class FixedSizeRegisterMemoryLocation private (
     index: BaseIndexPair, displacement: List[Byte], override val operandByteSize: Int, segment: SegmentRegister)
-      extends RegisterMemoryLocation(index, displacement, segment) with FixedSizeModRMEncodableOperand
+      extends RegisterMemoryLocation(index, displacement, segment) with FixedSizeModRMEncodableOperand {
+    def sizeString = operandByteSize match {
+      case 1 => "BYTE"
+      case 2 => "WORD"
+      case 4 => "DWORD"
+      case 8 => "QWORD"
+      case default => throw new AssertionError
+    }
+
+    override def toString = s"${sizeString} PTR ${super.toString()}"
+  }
 
   private object FixedSizeRegisterMemoryLocation {
     def apply(index: BaseIndexPair, displacement: List[Byte], operandByteSize: Int, segment: SegmentRegister) =

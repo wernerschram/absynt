@@ -1,5 +1,6 @@
 package assembler.x86.operands.memoryaccess
 
+import assembler.ListExtensions._
 import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.Operand
 
@@ -8,4 +9,6 @@ class FarPointer(val segment: List[Byte], val offset: List[Byte]) extends Operan
   assume(List(2, 4).contains(offset.length))
 
   override val operandByteSize: Int = offset.length
+
+  override def toString() = s"FAR 0x${segment.bigEndianHexString()}:0x${offset.bigEndianHexString()}"
 }

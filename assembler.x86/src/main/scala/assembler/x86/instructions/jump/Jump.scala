@@ -84,7 +84,7 @@ final object JumpIfBelow extends JumpIfCarry("jb")
 final object JumpIfBelowOrEqual extends JumpIfCarryOrZero("jbe")
 final object JumpIfCarry extends JumpIfCarry("jc")
 final object JumpIfCountZero extends JumpIfCountZero
-final object JumpIfEqual extends JumpIfZero("jz")
+final object JumpIfEqual extends JumpIfZero("je")
 final object JumpIfGreater extends JumpIfNotZeroAndSignedEqualsOverflow("jg")
 final object JumpIfGreaterOrEqual extends JumpIfSignedEqualsOverflow("jge")
 final object JumpIfLess extends JumpIfSignedNotEqualsOverflow("jl")
