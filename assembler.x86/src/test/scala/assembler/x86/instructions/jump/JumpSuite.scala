@@ -123,16 +123,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.segmentWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("FF 2A"))
+        Jump.Far(RegisterMemoryLocation.wordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.segmentDoubleWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("66 FF 2A"))
       }
 
       "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation.segmentQuadWordSize(BP.combinedIndex(SI)))
+          Jump.Far(RegisterMemoryLocation.quadWordSize(BP.combinedIndex(SI)))
         }
       }
 
@@ -427,16 +427,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.segmentWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.wordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.segmentDoubleWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation.segmentQuadWordSize(BP.combinedIndex(SI)))
+          Jump.Far(RegisterMemoryLocation.quadWordSize(BP.combinedIndex(SI)))
         }
       }
 
@@ -567,15 +567,15 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.segmentWordSize(EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.wordSize(EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.segmentDoubleWordSize(EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "correctly encode jmp FAR QWORD PTR [rdx]" in {
-        Jump.Far(RegisterMemoryLocation.segmentQuadWordSize(RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.quadWordSize(RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
       }
     }
   }

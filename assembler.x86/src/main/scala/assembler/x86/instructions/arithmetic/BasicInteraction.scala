@@ -40,9 +40,6 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     override def operandSize = Some(8)
   }
 
-  //private val Imm8ToAL = new RegisterStaticWithImmediate[ByteRegister]((OpcodeBase+0x04).toByte :: Nil)
-//  private val Imm16ToAX = new RegisterStaticWithImmediate[WideRegister]((OpcodeBase+0x05).toByte :: Nil, {case (_, value, _) => value.operandByteSize < 8 })
-
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
     override val immediate = immediateValue
