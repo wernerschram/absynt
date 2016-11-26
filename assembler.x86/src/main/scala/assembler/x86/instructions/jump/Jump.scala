@@ -7,6 +7,8 @@ import assembler.x86.operands.memoryaccess.FarPointer
 import assembler.x86.operations.ModRMStaticOperation
 import assembler.x86.operations.Static
 import assembler.x86.operations.{FarPointer => FarPointerOperation}
+import assembler.x86.operations.{MemoryLocation => MemoryLocationOperation}
+import assembler.x86.operands.memoryaccess.MemoryLocation
 
 final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
@@ -23,8 +25,8 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
     override def pointer = farPointer
   }
 
-  private def M1616(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 5, mnemonic) {
+  private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 5, s"${mnemonic} FAR") {
       assume((operandRM, processorMode) match {
         case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == 8) => false
         case _ => true
@@ -38,7 +40,7 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
     def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
       Ptr1616(farPointer)
 
-    def apply(pointer: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    def apply(pointer: MemoryLocation)(implicit processorMode: ProcessorMode) =
       M1616(pointer)
   }
 }
