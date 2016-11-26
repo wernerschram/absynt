@@ -37,7 +37,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
   override def toString() = s"${segment.getSegmentPrefix(defaultSegment)}[${base}+${index}${scaleString}${displacementString}]"
 
-  private def scaleString = if (scale == 1) "" else s"*${scale}"
+  private def scaleString = s"*${scale}"
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString()}"
 }

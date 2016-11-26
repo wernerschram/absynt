@@ -114,8 +114,32 @@ class XorSuite extends WordSpec with ShouldMatchers {
         }
       }
 
+      "correctly encode xor BYTE PTR [rax+rbx*2], 0x11" in {
+        Xor(0x11.toByte, SIBMemoryLocation.byteSize(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("80 34 58 11"))
+      }
+
+      "correctly encode xor WORD PTR [rax+rbx*2], 0x2211" in {
+        Xor(0x2211.toShort, SIBMemoryLocation.wordSize(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("66 81 34 58 11 22"))
+      }
+
       "correctly encode xor DWORD PTR [rax+rbx*2], 0x44332211" in {
         Xor(0x44332211, SIBMemoryLocation.doubleWordSize(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("81 34 58 11 22 33 44"))
+      }
+
+      "correctly encode xor BYTE PTR gs:[rax+rbx*2], 0x11" in {
+        Xor(0x11.toByte, SIBMemoryLocation.withSegmentOverride.byteSize(RBX, RAX, List.empty[Byte], 2, GS)).encodeByte should be(Hex.lsb("65 80 34 58 11"))
+      }
+
+      "correctly encode xor WORD PTR es:[rax+rbx*2], 0x2211" in {
+        Xor(0x2211.toShort, SIBMemoryLocation.withSegmentOverride.wordSize(RBX, RAX, List.empty[Byte], 2, ES)).encodeByte should be(Hex.lsb("26 66 81 34 58 11 22"))
+      }
+
+      "correctly encode xor DWORD PTR fs:[rax+rbx*2], 0x44332211" in {
+        Xor(0x44332211, SIBMemoryLocation.withSegmentOverride.doubleWordSize(RBX, RAX, List.empty[Byte], 2, FS)).encodeByte should be(Hex.lsb("64 81 34 58 11 22 33 44"))
+      }
+
+      "correctly encode xor QWORD PTR ss:[rax+rbx*2], 0x44332211" in {
+        Xor(0x44332211, SIBMemoryLocation.withSegmentOverride.quadWordSize(RBX, RAX, List.empty[Byte], 2, SS)).encodeByte should be(Hex.lsb("36 48 81 34 58 11 22 33 44"))
       }
 
       "correctly encode xor QWORD PTR cs:[eax], 0x44332211" in {

@@ -102,6 +102,14 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
         Move(SI, RegisterMemoryLocation(SI)).toString should be("mov [si], si")
       }
 
+      "correctly encode mov [ecx+ebx*1], edx" in {
+        Move(EDX, SIBMemoryLocation(EBX, ECX, scale = 1)).encodeByte should be (Hex.lsb("67 66 89 14 19"))
+      }
+
+      "correctly represent mov [ecx+ebx*1], edx as a string" in {
+        Move(EDX, SIBMemoryLocation(EBX, ECX, scale = 1)).toString should   be("mov [ecx+ebx*1], edx")
+      }
+
       "correctly encode mov [ecx+ebx*4], edx" in {
         Move(EDX, SIBMemoryLocation(EBX, ECX, scale = 4)).encodeByte should be (Hex.lsb("67 66 89 14 99"))
       }
