@@ -3,6 +3,7 @@ package assembler.x86.operations
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.memoryaccess.{ FarPointer => FarPointerType }
+import assembler.x86.operands.OperandSize
 
 trait FarPointer extends X86Operation {
 
@@ -11,9 +12,9 @@ trait FarPointer extends X86Operation {
 
   abstract override def operands = super.operands ::: pointer :: Nil
 
-  abstract override def operandSize: Option[Int] = super.operandSize match {
-    case size: Some[Int] => size
-    case None => Some(pointer.operandByteSize)
+  abstract override def operandSize = super.operandSize match {
+    case OperandSize.Unknown => pointer.operandByteSize
+    case default => super.operandSize
   }
 
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =

@@ -8,6 +8,7 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.memoryaccess.{ MemoryLocation => MemoryLocationType }
+import assembler.x86.operands.OperandSize
 
 class ModRMStaticOperation(
   val operandRM: ModRMEncodableOperand,
@@ -24,9 +25,9 @@ class ModRMStaticOperation(
     assume(operandRM.isValidForMode(processorMode))
   }
 
-  override def operandSize: Option[Int] = operandRM match {
-    case fixed: FixedSizeOperand => Some(fixed.operandByteSize)
-    case _ => None
+  override def operandSize: OperandSize = (super.operandSize, operandRM) match {
+    case (OperandSize.Unknown, fixed: FixedSizeOperand) => fixed.operandByteSize
+    case _ => super.operandSize
   }
 
   override def addressSize: Option[Int] = operandRM match {

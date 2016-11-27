@@ -6,6 +6,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.operands.OperandSize
 
 object Operation {
   private val OperandSizeCode = 0x66.toByte
@@ -30,12 +31,8 @@ object Operation {
     (Register.FS, Operation.SegmentOverrideFS),
     (Register.GS, Operation.SegmentOverrideGS))
 
-  def optionalOperandSizePrefix(operandSize: Option[Int])(implicit processorMode: ProcessorMode): List[Byte] =
-    (operandSize, processorMode) match {
-      case (Some(4), ProcessorMode.Real) => Operation.OperandSizeCode :: Nil
-      case (Some(2), ProcessorMode.Protected | ProcessorMode.Long) => Operation.OperandSizeCode :: Nil
-      case _ => Nil
-    }
+  def optionalOperandSizePrefix(operandSize: OperandSize)(implicit processorMode: ProcessorMode): List[Byte] =
+    if (operandSize.requiresOperandSizePrefix(processorMode)) Operation.OperandSizeCode :: Nil else Nil
 
   def optionalAddressSizePrefix(addressSize: Option[Int])(implicit processorMode: ProcessorMode): List[Byte] = {
     (addressSize, processorMode) match {
@@ -51,8 +48,8 @@ object Operation {
     case _ => Nil
   }
 
-  def optionalRexPrefix(operandSize: Option[Int], rexRequirements: List[RexExtendedRequirement], includeRexW: Boolean)(implicit processorMode: ProcessorMode): List[Byte] = {
-    val rexW = (includeRexW && operandSize.isDefined && operandSize.get == 8)
+  def optionalRexPrefix(operandSize: OperandSize, rexRequirements: List[RexExtendedRequirement], includeRexW: Boolean)(implicit processorMode: ProcessorMode): List[Byte] = {
+    val rexW = (includeRexW && operandSize == OperandSize.QuadWord)
     if (rexRequirements.isEmpty && (!rexW)) {
       Nil
     } else {
@@ -65,8 +62,11 @@ object Operation {
       }
     }
   }
-}
 
+//  def optionalRexPrefix(rexRequirements: List[RexExtendedRequirement], includeRexW: Boolean)(implicit processorMode: ProcessorMode): List[Byte] = {
+//    rexRequirements.foldLeft[Byte](Operation.RexCode)((value, req) => (value | req.rexBitmask).toByte) :: Nil
+//  }
+}
 
 trait Prefix {
 }

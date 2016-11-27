@@ -13,26 +13,26 @@ final object StoreString {
   private def Static8(destination: RegisterMemoryLocation.DIReference)(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands = destination :: Register.AL :: Nil
-      override def operandSize = Some(Register.AL.operandByteSize)
+      override def operandSize = Register.AL.operandByteSize
       override def addressSize = Some(destination.addressSize)
     }
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)(implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands = destination :: register :: Nil
-      override def operandSize = Some(register.operandByteSize)
+      override def operandSize = register.operandByteSize
       override def addressSize = Some(destination.addressSize)
     }
 
   private def RepStatic8(destination: RegisterMemoryLocation.DIReference)(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands = destination :: Register.AL :: Nil
-      override def operandSize = Some(Register.AL.operandByteSize)
+      override def operandSize = Register.AL.operandByteSize
       override def addressSize = Some(destination.addressSize)
     }
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)(implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands = destination :: register :: Nil
-      override def operandSize = Some(register.operandByteSize)
+      override def operandSize = register.operandByteSize
       override def addressSize = Some(destination.addressSize)
     }
 

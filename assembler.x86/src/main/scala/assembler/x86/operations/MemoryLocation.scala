@@ -4,6 +4,7 @@ import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.memoryaccess.{ MemoryLocation => MemoryLocationType }
+import assembler.x86.operands.OperandSize
 
 trait MemoryLocation extends X86Operation {
 
@@ -12,9 +13,9 @@ trait MemoryLocation extends X86Operation {
 
   abstract override def operands = super.operands ::: location :: Nil
 
-  abstract override def addressSize: Option[Int] = super.operandSize match {
-    case size: Some[Int] => size
+  abstract override def addressSize: Option[Int] = super.addressSize match {
     case None => Some(location.addressSize)
+    case default => super.addressSize
   }
 
   override def segmentOverride = super.segmentOverride match {

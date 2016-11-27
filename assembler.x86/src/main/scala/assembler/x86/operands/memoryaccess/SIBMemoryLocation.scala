@@ -9,7 +9,7 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands._
 
 sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister, displacement: List[Byte], val scale: Int, segment: SegmentRegister)
-    extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize, segment) with ModRMEncodableOperand {
+    extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize.asInstanceOf[ValueSize].size, segment) with ModRMEncodableOperand {
   assume(index.operandByteSize == base.operandByteSize)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
@@ -31,7 +31,8 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
   override def getRexRequirements(position: ParameterPosition) =
     base.getRexRequirements(ParameterPosition.Base) :::
-      index.getRexRequirements(ParameterPosition.Index)
+      index.getRexRequirements(ParameterPosition.Index) :::
+      super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
 
@@ -43,11 +44,11 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 }
 
 object SIBMemoryLocation {
-  final class FixedSizeSIBMemoryLocation private (index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte], scale: Int, val operandByteSize: Int, segment: SegmentRegister)
+  final class FixedSizeSIBMemoryLocation private (index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte], scale: Int, val operandByteSize: OperandSize, segment: SegmentRegister)
     extends SIBMemoryLocation(index, base, displacement, scale, segment) with FixedSizeModRMEncodableOperand
 
   private object FixedSizeSIBMemoryLocation {
-    def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte], scale: Int, operandByteSize: Int, segment: SegmentRegister) =
+    def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte], scale: Int, operandByteSize: OperandSize, segment: SegmentRegister) =
       new FixedSizeSIBMemoryLocation(index, base, displacement, scale, operandByteSize, segment)
   }
 
@@ -55,32 +56,32 @@ object SIBMemoryLocation {
     new SIBMemoryLocation(index, base, displacement, scale, index.defaultSIBSegment)
 
   def byteSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, 1, index.defaultSIBSegment)
+    FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.Byte, index.defaultSIBSegment)
 
   def wordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, 2, index.defaultSIBSegment)
+    FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.Word, index.defaultSIBSegment)
 
   def doubleWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, 4, index.defaultSIBSegment)
+    FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.DoubleWord, index.defaultSIBSegment)
 
   def quadWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, 8, index.defaultSIBSegment)
+    FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.QuadWord, index.defaultSIBSegment)
 
   object withSegmentOverride {
     def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1, segment: SegmentRegister) =
       new SIBMemoryLocation(index, base, displacement, scale, segment)
 
     def byteSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1, segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, 1, segment)
+      FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.Byte, segment)
 
     def wordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1, segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, 2, segment)
+      FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.Word, segment)
 
     def doubleWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1, segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, 4, segment)
+      FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.DoubleWord, segment)
 
     def quadWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte] = List.empty[Byte], scale: Int = 1, segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, 8, segment)
+      FixedSizeSIBMemoryLocation(index, base, displacement, scale, OperandSize.QuadWord, segment)
 
   }
 }

@@ -15,9 +15,9 @@ final object Push {
       override def validate = {
         super.validate
         processorMode match {
-          case ProcessorMode.Protected => assume(register.operandByteSize != 8)
-          case ProcessorMode.Long => assume(register.operandByteSize != 4)
-          case _ => assume(register.operandByteSize != 1)
+          case ProcessorMode.Protected => assume(register.operandByteSize != OperandSize.QuadWord)
+          case ProcessorMode.Long => assume(register.operandByteSize != OperandSize.DoubleWord)
+          case _ => assume(register.operandByteSize != OperandSize.Byte)
         }
       }
     }
@@ -27,9 +27,9 @@ final object Push {
       override def validate = {
         super.validate
         processorMode match {
-          case ProcessorMode.Protected => assume(operand.operandByteSize != 8)
-          case ProcessorMode.Long => assume(operand.operandByteSize != 4)
-          case _ => assume(operand.operandByteSize != 1)
+          case ProcessorMode.Protected => assume(operand.operandByteSize != OperandSize.QuadWord)
+          case ProcessorMode.Long => assume(operand.operandByteSize != OperandSize.DoubleWord)
+          case _ => assume(operand.operandByteSize != OperandSize.Byte)
         }
       }
     }
@@ -41,7 +41,7 @@ final object Push {
     override def immediate = immediateValue
     override def validate = {
       super.validate
-      assume(immediate.operandByteSize != 8)
+      assume(immediate.operandByteSize != OperandSize.QuadWord)
     }
   }
 
@@ -59,9 +59,9 @@ final object Push {
     RM16(operand)
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate.operandByteSize match {
-    case 1 => Imm8(immediate)
-    case 2 | 4 => Imm16(immediate)
-    case 8 => throw new AssertionError
+    case OperandSize.Byte => Imm8(immediate)
+    case OperandSize.Word | OperandSize.DoubleWord => Imm16(immediate)
+    case default => throw new AssertionError
   }
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode) = segment match {

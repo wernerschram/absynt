@@ -10,7 +10,7 @@ import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands._
 
 sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacement: List[Byte], segment: SegmentRegister)
-    extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
+    extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize.asInstanceOf[ValueSize].size, segment)
     with ModRMEncodableOperand {
 
   override def toString(): String = s"${segment.getSegmentPrefix(defaultSegment)}[${index}${displacementString}]"
@@ -22,7 +22,7 @@ sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacem
   override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: displacement
 
   override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
-    index.getRexRequirements(ParameterPosition.OperandRM)
+    index.getRexRequirements(ParameterPosition.OperandRM) ::: super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = (index, processorMode) match {
     case (realIndex: BaseIndexPair, ProcessorMode.Real | ProcessorMode.Protected) => true
@@ -36,21 +36,14 @@ object RegisterMemoryLocation {
     extends RegisterMemoryLocation(index, displacement, segment)
 
   final class FixedSizeRegisterMemoryLocation private (
-    index: BaseIndexPair, displacement: List[Byte], override val operandByteSize: Int, segment: SegmentRegister)
+    index: BaseIndexPair, displacement: List[Byte], override val operandByteSize: OperandSize, segment: SegmentRegister)
       extends RegisterMemoryLocation(index, displacement, segment) with FixedSizeModRMEncodableOperand {
-    def sizeString = operandByteSize match {
-      case 1 => "BYTE"
-      case 2 => "WORD"
-      case 4 => "DWORD"
-      case 8 => "QWORD"
-      case default => throw new AssertionError
-    }
 
-    override def toString = s"${sizeString} PTR ${super.toString()}"
+    override def toString = s"${operandByteSize} PTR ${super.toString()}"
   }
 
   private object FixedSizeRegisterMemoryLocation {
-    def apply(index: BaseIndexPair, displacement: List[Byte], operandByteSize: Int, segment: SegmentRegister) =
+    def apply(index: BaseIndexPair, displacement: List[Byte], operandByteSize: OperandSize, segment: SegmentRegister) =
       new FixedSizeRegisterMemoryLocation(index, displacement, operandByteSize, segment)
   }
 
@@ -70,27 +63,27 @@ object RegisterMemoryLocation {
       new RegisterMemoryLocation(index, displacement, segment)
 
     def byteSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, 1, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Byte, segment)
 
     def wordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, 2, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Word, segment)
 
     def doubleWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, 4, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.DoubleWord, segment)
 
     def quadWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, 8, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.QuadWord, segment)
   }
 
   def byteSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, 1, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Byte, index.defaultSegment)
 
   def wordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, 2, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Word, index.defaultSegment)
 
   def doubleWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, 4, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.DoubleWord, index.defaultSegment)
 
   def quadWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, 8, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.QuadWord, index.defaultSegment)
 }

@@ -8,6 +8,7 @@ import assembler.x86.operands.Register
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.ReversedOperands
 import assembler.x86.operations.Static
+import assembler.x86.operands.OperandSize
 
 object Output {
   implicit val opcode = "out"
@@ -18,7 +19,7 @@ object Output {
       override val immediate = immediateValue
       override def validate = {
         super.validate
-        assume(immediate.operandByteSize == 1)
+        assume(immediate.operandByteSize == OperandSize.Byte)
       }
     }
   private def AXToImm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -27,30 +28,30 @@ object Output {
       override val immediate = immediateValue
       override def validate = {
         super.validate
-        assume(immediate.operandByteSize == 1)
+        assume(immediate.operandByteSize == OperandSize.Byte)
       }
     }
 
   private def ALToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEE.toByte :: Nil, opcode) with ReversedOperands {
       override def operands = Register.DX :: Register.AL :: Nil
-      override def operandSize = Some(Register.AL.operandByteSize)
+      override def operandSize = Register.AL.operandByteSize
     }
 
   private def AXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with ReversedOperands {
       override def operands = Register.DX :: Register.AX :: Nil
-      override def operandSize = Some(Register.AX.operandByteSize)
+      override def operandSize = Register.AX.operandByteSize
     }
 
   private def EAXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with ReversedOperands {
       override def operands = Register.DX :: Register.EAX :: Nil
-      override def operandSize = Some(Register.EAX.operandByteSize)
+      override def operandSize = Register.EAX.operandByteSize
     }
 
   def apply(destination: AccumulatorRegister, immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = {
-    assume(immediate.operandByteSize == 1)
+    assume(immediate.operandByteSize == OperandSize.Byte)
     (destination) match {
       case (Register.AL) => ALToImm8(immediate)
       case (Register.AX) => AXToImm8(immediate)

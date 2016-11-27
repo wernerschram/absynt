@@ -8,6 +8,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
 import assembler.x86.operands.Operand
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.operands.OperandSize
 
 trait X86Operation extends Encodable {
   def validate: Unit = Unit
@@ -22,7 +23,7 @@ trait X86Operation extends Encodable {
   def code: List[Byte]
   def mnemonic: String
 
-  def operandSize: Option[Int] = None
+  def operandSize: OperandSize = OperandSize.Unknown
   def addressSize: Option[Int] = None
   def segmentOverride: Option[SegmentRegister] = None
   def rexRequirements: List[RexExtendedRequirement] = Nil

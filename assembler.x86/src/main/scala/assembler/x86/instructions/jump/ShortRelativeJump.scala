@@ -9,6 +9,7 @@ import assembler.x86.operations.ReferencingX86Operation
 import assembler.x86.operands.memoryaccess.NearPointer
 import assembler.x86.operations.Static
 import assembler.x86.operations.{NearPointer => NearPointerOperation}
+import assembler.x86.operands.OperandSize
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
@@ -17,7 +18,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   }
 
   def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
-    assume(nearPointer.operandByteSize == 1)
+    assume(nearPointer.operandByteSize == OperandSize.Byte)
     Rel8(nearPointer)
   }
 

@@ -6,6 +6,8 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.operands.OperandSize
+import assembler.x86.RexExtendedRequirement
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
     extends MemoryLocation(address, segment, address.size) with ModRMEncodableOperand {
@@ -18,32 +20,30 @@ sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegiste
 
   override val defaultSegment: SegmentRegister = Register.DS
 
-  override def getRexRequirements(position: ParameterPosition) = Nil
-
   override def toString = s"${segment.getSegmentPrefix(defaultSegment)}[${address.decimalString()}]"
 }
 
 object MemoryAddress {
-  final class FixedSizeMemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS, val operandByteSize: Int)
+  final class FixedSizeMemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS, val operandByteSize: OperandSize)
       extends MemoryAddress(address, segment) with FixedSizeModRMEncodableOperand {
   }
   def apply(address: List[Byte], segment: SegmentRegister = Register.DS) =
     new MemoryAddress(address, segment)
 
   private object FixedSizeMemoryAddress {
-    def apply(address: List[Byte], segment: SegmentRegister = Register.DS, operandByteSize: Int) =
+    def apply(address: List[Byte], segment: SegmentRegister = Register.DS, operandByteSize: OperandSize) =
       new FixedSizeMemoryAddress(address, segment, operandByteSize)
   }
 
   def byteSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, 1)
+    FixedSizeMemoryAddress(address, segment, OperandSize.Byte)
 
   def wordSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, 2)
+    FixedSizeMemoryAddress(address, segment, OperandSize.Word)
 
   def doubleWordSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, 4)
+    FixedSizeMemoryAddress(address, segment, OperandSize.DoubleWord)
 
   def quadWordSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, 8)
+    FixedSizeMemoryAddress(address, segment, OperandSize.QuadWord)
 }

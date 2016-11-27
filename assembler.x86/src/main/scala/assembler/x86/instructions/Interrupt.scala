@@ -4,6 +4,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.Static
+import assembler.x86.operands.OperandSize
 
 object Interrupt {
   implicit val opcode = "int"
@@ -14,7 +15,7 @@ object Interrupt {
     override def immediate = immediateValue
     override def validate = {
       super.validate
-      assume(immediate.operandByteSize == 1)
+      assume(immediate.operandByteSize == OperandSize.Byte)
     }
   }
 

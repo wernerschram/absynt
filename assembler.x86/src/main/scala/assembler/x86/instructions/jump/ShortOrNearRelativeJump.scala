@@ -9,6 +9,7 @@ import assembler.x86.operations.ReferencingX86Operation
 import assembler.x86.operands.memoryaccess.NearPointer
 import assembler.x86.operations.{ NearPointer => NearPointerOperation }
 import assembler.x86.operations.Static
+import assembler.x86.operands.OperandSize
 
 abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: List[Byte], mnemonic: String) extends ShortRelativeJump(shortOpcode, mnemonic) {
 
@@ -18,15 +19,14 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
     override def validate = {
       super.validate
       processorMode match {
-        case ProcessorMode.Long => assume(pointer.operandByteSize != 2)
-        case ProcessorMode.Protected => assume(pointer.operandByteSize != 2)
-        case ProcessorMode.Real => assume(pointer.operandByteSize == 2)
+        case ProcessorMode.Long | ProcessorMode.Protected => assume(pointer.operandByteSize != OperandSize.Word)
+        case ProcessorMode.Real => assume(pointer.operandByteSize == OperandSize.Word)
       }
     }
   }
 
   override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = nearPointer.operandByteSize match {
-    case 1 =>
+    case OperandSize.Byte =>
       super.apply(nearPointer)
     case _ =>
       Rel16(nearPointer)
@@ -88,5 +88,5 @@ abstract class ShortOrNearRelativeJump(shortOpcode: List[Byte], val nearOpcode: 
     new ReferencingX86Operation[BranchInstructionOnPage](
       (thisLocation, targetLocation, memoryPage, processorMode) =>
         new ShortOrNearJumpInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode),
-        mnemonic, condition)
+      mnemonic, condition)
 }

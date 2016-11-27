@@ -3,6 +3,7 @@ package assembler.x86.operations
 import assembler.memory.MemoryPage
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerType }
+import assembler.x86.operands.OperandSize
 
 trait NearPointer extends X86Operation {
 
@@ -11,9 +12,9 @@ trait NearPointer extends X86Operation {
 
   abstract override def operands = super.operands ::: pointer :: Nil
 
-  abstract override def operandSize: Option[Int] = super.operandSize match {
-    case size: Some[Int] => size
-    case None => Some(pointer.operandByteSize)
+  abstract override def operandSize: OperandSize = super.operandSize match {
+    case OperandSize.Unknown => pointer.operandByteSize
+    case default => super.operandSize
   }
 
   override def validate = {

@@ -6,6 +6,7 @@ import assembler.x86.operands.EncodableRegister
 import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
+import assembler.x86.operands.OperandSize
 
 class ModRRMStaticOperation[RegisterType <: EncodableRegister](
   val register: RegisterType,
@@ -22,10 +23,9 @@ class ModRRMStaticOperation[RegisterType <: EncodableRegister](
     assume(register.isValidForMode(processorMode))
   }
 
-  override def operandSize: Option[Int] = (super.operandSize, register) match {
-    case (size: Some[Int], _) => size
-    case (_, fixed: FixedSizeOperand) => Some(fixed.operandByteSize)
-    case _ => None
+  override def operandSize: OperandSize = (super.operandSize, register) match {
+    case (OperandSize.Unknown, fixed: FixedSizeOperand) => fixed.operandByteSize
+    case _ => super.operandSize
   }
 
   override def rexRequirements = super.rexRequirements ::: register.getRexRequirements(ParameterPosition.OperandR)

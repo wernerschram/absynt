@@ -8,6 +8,7 @@ import assembler.x86.operands.Register
 import assembler.x86.operations.Immediate
 import assembler.x86.operations.ReversedOperands
 import assembler.x86.operations.Static
+import assembler.x86.operands.OperandSize
 
 object Input {
   implicit val opcode = "in"
@@ -18,7 +19,7 @@ object Input {
       override val immediate = immediateValue
       override def validate = {
         super.validate
-        assume(immediate.operandByteSize == 1)
+        assume(immediate.operandByteSize == OperandSize.Byte)
       }
     }
   private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -27,25 +28,25 @@ object Input {
       override val immediate = immediateValue
       override def validate = {
         super.validate
-        assume(immediate.operandByteSize == 1)
+        assume(immediate.operandByteSize == OperandSize.Byte)
       }
     }
 
   private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) {
     override def operands = Register.DX :: Register.AL :: Nil
-    override def operandSize = Some(Register.AL.operandByteSize)
+    override def operandSize = Register.AL.operandByteSize
   }
   private def DXToAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
     override def operands = Register.DX :: Register.AX :: Nil
-    override def operandSize = Some(Register.AX.operandByteSize)
+    override def operandSize = Register.AX.operandByteSize
   }
   private def DXToEAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
     override def operands = Register.DX :: Register.EAX :: Nil
-    override def operandSize = Some(Register.EAX.operandByteSize)
+    override def operandSize = Register.EAX.operandByteSize
   }
 
   def apply(immediate: ImmediateValue, destination: AccumulatorRegister)(implicit processorMode: ProcessorMode) = {
-    assume(immediate.operandByteSize == 1)
+    assume(immediate.operandByteSize == OperandSize.Byte)
     (destination) match {
       case (Register.AL) => Imm8ToAL(immediate)
       case (Register.AX) => Imm8ToAX(immediate)
