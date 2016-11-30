@@ -28,5 +28,7 @@ class ModRRMStaticOperation[RegisterType <: EncodableRegister](
     case _ => super.operandSize
   }
 
-  override def rexRequirements = super.rexRequirements ::: register.getRexRequirements(ParameterPosition.OperandR)
+  override def rexRequirements = super.rexRequirements :::
+    register.getRexRequirements(ParameterPosition.OperandR) :::
+    operandRM.getRexRequirements(ParameterPosition.OperandRM)
 }

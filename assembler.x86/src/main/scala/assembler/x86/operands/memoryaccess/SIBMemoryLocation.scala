@@ -30,9 +30,9 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
   override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: getSIB :: displacement
 
   override def getRexRequirements(position: ParameterPosition) =
-    base.getRexRequirements(ParameterPosition.Base) :::
-      index.getRexRequirements(ParameterPosition.Index) :::
-      super.getRexRequirements(position)
+    super.getRexRequirements(position) :::
+      base.getRexRequirements(ParameterPosition.Base) :::
+      index.getRexRequirements(ParameterPosition.Index)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
 

@@ -40,7 +40,8 @@ class ModRMStaticOperation(
     case _ => None
   }
 
-  override def rexRequirements = operandRM.getRexRequirements(ParameterPosition.OperandRM)
+  override def rexRequirements = super.rexRequirements :::
+    operandRM.getRexRequirements(ParameterPosition.OperandRM)
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
     super.encodeByte() ::: operandRM.getExtendedBytes(rValue)
