@@ -102,7 +102,7 @@ sealed trait SIBBaseRegister extends FixedSizeModRMEncodableOperand with ModRMEn
 }
 
 sealed trait ByteRegister extends GeneralPurposeRegister {
-  override val operandByteSize = OperandSize.Byte
+  override val operandByteSize = ValueSize.Byte
 }
 
 sealed trait LowByteRegister extends ByteRegister {
@@ -117,17 +117,17 @@ sealed trait HighByteRegister extends ByteRegister {
 sealed trait WideRegister extends GeneralPurposeRegister
 
 sealed trait WordRegister extends WideRegister {
-  override val operandByteSize = OperandSize.Word
+  override val operandByteSize = ValueSize.Word
   override def toString = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
 }
 
 sealed trait DoubleWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
-  override val operandByteSize = OperandSize.DoubleWord
+  override val operandByteSize = ValueSize.DoubleWord
   override def toString = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e${mnemonic}"
 }
 
 sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
-  override val operandByteSize = OperandSize.QuadWord
+  override val operandByteSize = ValueSize.QuadWord
   override def toString = if (mnemonic.startsWith("r")) mnemonic else s"r${mnemonic}"
 //  override def getRexRequirements(position: ParameterPosition) = position.rexRequirement.toList ::: super.getRexRequirements(position)
 }

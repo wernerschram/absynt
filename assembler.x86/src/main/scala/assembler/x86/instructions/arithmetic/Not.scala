@@ -3,7 +3,7 @@ package assembler.x86.instructions.arithmetic
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operations.ModRMStaticOperation
-import assembler.x86.operands.OperandSize
+import assembler.x86.operands.ValueSize
 
 object Not {
   implicit val opcode = "not"
@@ -14,7 +14,7 @@ object Not {
     new ModRMStaticOperation(operand, 0xF7.toByte :: Nil, 2, opcode)
 
   def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) = operand.operandByteSize match {
-    case OperandSize.Byte => RM8(operand)
+    case ValueSize.Byte => RM8(operand)
     case _ => RM16(operand)
   }
 }

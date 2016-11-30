@@ -1,15 +1,15 @@
 package assembler.x86.instructions.jump
 
 import assembler.LabelCondition
-import assembler.ListExtensions._
+import assembler.ListExtensions.ByteEncoder
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
-import assembler.x86.operations.ReferencingX86Operation
 import assembler.x86.operands.memoryaccess.NearPointer
+import assembler.x86.operations.{ NearPointer => NearPointerOperation }
+import assembler.x86.operations.ReferencingX86Operation
 import assembler.x86.operations.Static
-import assembler.x86.operations.{NearPointer => NearPointerOperation}
-import assembler.x86.operands.OperandSize
+import assembler.x86.operands.ValueSize
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
@@ -18,7 +18,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   }
 
   def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
-    assume(nearPointer.operandByteSize == OperandSize.Byte)
+    assume(nearPointer.operandByteSize == ValueSize.Byte)
     Rel8(nearPointer)
   }
 

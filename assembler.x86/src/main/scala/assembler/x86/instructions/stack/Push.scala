@@ -15,9 +15,9 @@ final object Push {
       override def validate = {
         super.validate
         processorMode match {
-          case ProcessorMode.Protected => assume(register.operandByteSize != OperandSize.QuadWord)
-          case ProcessorMode.Long => assume(register.operandByteSize != OperandSize.DoubleWord)
-          case _ => assume(register.operandByteSize != OperandSize.Byte)
+          case ProcessorMode.Protected => assume(register.operandByteSize != ValueSize.QuadWord)
+          case ProcessorMode.Long => assume(register.operandByteSize != ValueSize.DoubleWord)
+          case _ => assume(register.operandByteSize != ValueSize.Byte)
         }
       }
     }
@@ -27,9 +27,9 @@ final object Push {
       override def validate = {
         super.validate
         processorMode match {
-          case ProcessorMode.Protected => assume(operand.operandByteSize != OperandSize.QuadWord)
-          case ProcessorMode.Long => assume(operand.operandByteSize != OperandSize.DoubleWord)
-          case _ => assume(operand.operandByteSize != OperandSize.Byte)
+          case ProcessorMode.Protected => assume(operand.operandByteSize != ValueSize.QuadWord)
+          case ProcessorMode.Long => assume(operand.operandByteSize != ValueSize.DoubleWord)
+          case _ => assume(operand.operandByteSize != ValueSize.Byte)
         }
       }
     }
@@ -41,7 +41,7 @@ final object Push {
     override def immediate = immediateValue
     override def validate = {
       super.validate
-      assume(immediate.operandByteSize != OperandSize.QuadWord)
+      assume(immediate.operandByteSize != ValueSize.QuadWord)
     }
   }
 
@@ -59,8 +59,8 @@ final object Push {
     RM16(operand)
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate.operandByteSize match {
-    case OperandSize.Byte => Imm8(immediate)
-    case OperandSize.Word | OperandSize.DoubleWord => Imm16(immediate)
+    case ValueSize.Byte => Imm8(immediate)
+    case ValueSize.Word | ValueSize.DoubleWord => Imm16(immediate)
     case default => throw new AssertionError
   }
 

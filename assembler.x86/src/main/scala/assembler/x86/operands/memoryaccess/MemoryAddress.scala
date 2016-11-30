@@ -6,8 +6,9 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
-import assembler.x86.operands.OperandSize
+import assembler.x86.operands.ValueSize
 import assembler.x86.RexExtendedRequirement
+import assembler.x86.operands.OperandSize
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
     extends MemoryLocation(address, segment, address.size) with ModRMEncodableOperand {
@@ -36,14 +37,14 @@ object MemoryAddress {
   }
 
   def byteSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, OperandSize.Byte)
+    FixedSizeMemoryAddress(address, segment, ValueSize.Byte)
 
   def wordSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, OperandSize.Word)
+    FixedSizeMemoryAddress(address, segment, ValueSize.Word)
 
   def doubleWordSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, OperandSize.DoubleWord)
+    FixedSizeMemoryAddress(address, segment, ValueSize.DoubleWord)
 
   def quadWordSize(address: List[Byte], segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, OperandSize.QuadWord)
+    FixedSizeMemoryAddress(address, segment, ValueSize.QuadWord)
 }

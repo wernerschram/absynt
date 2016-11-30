@@ -9,6 +9,7 @@ import assembler.x86.operations.Immediate
 import assembler.x86.operations.ReversedOperands
 import assembler.x86.operations.Static
 import assembler.x86.operands.OperandSize
+import assembler.x86.operands.ValueSize
 
 object Input {
   implicit val opcode = "in"
@@ -19,7 +20,7 @@ object Input {
       override val immediate = immediateValue
       override def validate = {
         super.validate
-        assume(immediate.operandByteSize == OperandSize.Byte)
+        assume(immediate.operandByteSize == ValueSize.Byte)
       }
     }
   private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -28,7 +29,7 @@ object Input {
       override val immediate = immediateValue
       override def validate = {
         super.validate
-        assume(immediate.operandByteSize == OperandSize.Byte)
+        assume(immediate.operandByteSize == ValueSize.Byte)
       }
     }
 
@@ -46,7 +47,7 @@ object Input {
   }
 
   def apply(immediate: ImmediateValue, destination: AccumulatorRegister)(implicit processorMode: ProcessorMode) = {
-    assume(immediate.operandByteSize == OperandSize.Byte)
+    assume(immediate.operandByteSize == ValueSize.Byte)
     (destination) match {
       case (Register.AL) => Imm8ToAL(immediate)
       case (Register.AX) => Imm8ToAX(immediate)

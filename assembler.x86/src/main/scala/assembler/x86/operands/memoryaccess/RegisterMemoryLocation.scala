@@ -63,27 +63,27 @@ object RegisterMemoryLocation {
       new RegisterMemoryLocation(index, displacement, segment)
 
     def byteSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Byte, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Byte, segment)
 
     def wordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Word, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Word, segment)
 
     def doubleWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.DoubleWord, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.DoubleWord, segment)
 
     def quadWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.QuadWord, segment)
+      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.QuadWord, segment)
   }
 
   def byteSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Byte, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Byte, index.defaultSegment)
 
   def wordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.Word, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Word, index.defaultSegment)
 
   def doubleWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.DoubleWord, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.DoubleWord, index.defaultSegment)
 
   def quadWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
-    FixedSizeRegisterMemoryLocation(index, displacement, OperandSize.QuadWord, index.defaultSegment)
+    FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.QuadWord, index.defaultSegment)
 }

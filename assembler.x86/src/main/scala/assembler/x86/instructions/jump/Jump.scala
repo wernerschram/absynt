@@ -9,15 +9,15 @@ import assembler.x86.operations.Static
 import assembler.x86.operations.{FarPointer => FarPointerOperation}
 import assembler.x86.operations.{MemoryLocation => MemoryLocationOperation}
 import assembler.x86.operands.memoryaccess.MemoryLocation
-import assembler.x86.operands.OperandSize
+import assembler.x86.operands.ValueSize
 
 final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
       assume((operandRM, processorMode) match {
-          case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Long) if (fixed.operandByteSize != OperandSize.QuadWord) => false
-          case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == OperandSize.QuadWord) => false
+          case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Long) if (fixed.operandByteSize != ValueSize.QuadWord) => false
+          case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == ValueSize.QuadWord) => false
           case _ => true
         })
     }
@@ -29,7 +29,7 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
   private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 5, s"${mnemonic} FAR") {
       assume((operandRM, processorMode) match {
-        case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == OperandSize.QuadWord) => false
+        case (fixed: FixedSizeModRMEncodableOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == ValueSize.QuadWord) => false
         case _ => true
       })
     }

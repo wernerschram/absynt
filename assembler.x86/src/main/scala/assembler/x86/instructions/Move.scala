@@ -44,56 +44,56 @@ object Move {
     new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
       override def operands = Register.AL :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.Byte
+      override def operandSize = ValueSize.Byte
     }
 
   private def MOffs16ToAX(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
       override def operands = Register.AX :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.Word
+      override def operandSize = ValueSize.Word
     }
 
   private def MOffs32ToEAX(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
       override def operands = Register.EAX :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.DoubleWord
+      override def operandSize = ValueSize.DoubleWord
     }
 
   private def MOffs64ToRAX(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
       override def operands = Register.RAX :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.QuadWord
+      override def operandSize = ValueSize.QuadWord
     }
 
   private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation {
       override def operands = Register.AL :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.Byte
+      override def operandSize = ValueSize.Byte
     }
 
   private def AXToMOffs16(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
       override def operands = Register.AX :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.Word
+      override def operandSize = ValueSize.Word
     }
 
   private def EAXToMOffs32(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
       override def operands = Register.EAX :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.DoubleWord
+      override def operandSize = ValueSize.DoubleWord
     }
 
   private def RAXToMOffs64(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
       override def operands = Register.RAX :: super.operands
       override val location = memoryLocation
-      override def operandSize = OperandSize.QuadWord
+      override def operandSize = ValueSize.QuadWord
     }
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -173,7 +173,7 @@ object Move {
     Imm16ToR16(destination, source)
 
   def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) = source.operandByteSize match {
-    case OperandSize.Byte =>
+    case ValueSize.Byte =>
       Imm8ToRM8(destination, source)
     case _ =>
       Imm16ToRM16(destination, source)

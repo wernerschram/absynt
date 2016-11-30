@@ -12,68 +12,68 @@ import assembler.x86.ParameterPosition
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase+0x00).toByte :: Nil, mnemonic)
+    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic)
 
   private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase+0x01).toByte :: Nil, mnemonic)
+    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic)
 
   private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase+0x02).toByte :: Nil, mnemonic)
+    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic)
 
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase+0x03).toByte :: Nil, mnemonic)
+    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic)
 
-  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x04).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with Immediate {
     override val immediate = immediateValue
   }
 
-  private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x05).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with Immediate {
     override val immediate = immediateValue
-    override def operandSize = OperandSize.Word
+    override def operandSize = ValueSize.Word
   }
 
-  private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x5).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
     override val immediate = immediateValue
-    override def operandSize = OperandSize.DoubleWord
+    override def operandSize = ValueSize.DoubleWord
   }
 
-  private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase+0x5).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
     override val immediate = immediateValue
-    override def operandSize = OperandSize.QuadWord
+    override def operandSize = ValueSize.QuadWord
   }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
-    override val immediate = immediateValue
-  }
+      override val immediate = immediateValue
+    }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
-    override val immediate = immediateValue
-  }
+      override val immediate = immediateValue
+    }
 
   private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
-    override val immediate = immediateValue
-    override def rexRequirements = operand.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
-  }
+      override val immediate = immediateValue
+      override def rexRequirements = operand.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
+    }
 
   def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) = (destination, immediate.operandByteSize) match {
-    case (Register.AL, OperandSize.Byte) =>
+    case (Register.AL, ValueSize.Byte) =>
       Imm8ToAL(immediate)
-    case (Register.AX, OperandSize.Word) =>
+    case (Register.AX, ValueSize.Word) =>
       Imm16ToAX(immediate)
-    case (Register.EAX, OperandSize.DoubleWord) =>
+    case (Register.EAX, ValueSize.DoubleWord) =>
       Imm32ToEAX(immediate)
-    case (Register.RAX, OperandSize.DoubleWord) =>
+    case (Register.RAX, ValueSize.DoubleWord) =>
       Imm32ToRAX(immediate)
-    case (destination: FixedSizeModRMEncodableOperand, OperandSize.Byte) if (destination.operandByteSize == OperandSize.Byte) =>
+    case (destination: FixedSizeModRMEncodableOperand, ValueSize.Byte) if (destination.operandByteSize == ValueSize.Byte) =>
       Imm8ToRM8(destination, immediate)
-    case (destination: FixedSizeModRMEncodableOperand, OperandSize.Word|OperandSize.DoubleWord) if (immediate.operandByteSize == destination.operandByteSize) =>
+    case (destination: FixedSizeModRMEncodableOperand, ValueSize.Word | ValueSize.DoubleWord) if (immediate.operandByteSize == destination.operandByteSize) =>
       Imm16ToRM16(destination, immediate)
-    case (destination: FixedSizeModRMEncodableOperand, OperandSize.DoubleWord) if (destination.operandByteSize == OperandSize.QuadWord) =>
+    case (destination: FixedSizeModRMEncodableOperand, ValueSize.DoubleWord) if (destination.operandByteSize == ValueSize.QuadWord) =>
       Imm16ToRM16(destination, immediate)
-    case (destination: FixedSizeModRMEncodableOperand, OperandSize.Byte) if (destination.operandByteSize != OperandSize.Byte) =>
+    case (destination: FixedSizeModRMEncodableOperand, ValueSize.Byte) if (destination.operandByteSize != ValueSize.Byte) =>
       Imm8ToRM16(destination, immediate)
     case default => throw new AssertionError
   }

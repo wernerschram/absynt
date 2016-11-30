@@ -6,6 +6,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.operands.ValueSize
 import assembler.x86.operands.OperandSize
 
 object Operation {
@@ -49,7 +50,7 @@ object Operation {
   }
 
   def optionalRexPrefix(operandSize: OperandSize, rexRequirements: List[RexExtendedRequirement], includeRexW: Boolean)(implicit processorMode: ProcessorMode): List[Byte] = {
-    val rexW = (includeRexW && operandSize == OperandSize.QuadWord)
+    val rexW = (includeRexW && operandSize == ValueSize.QuadWord)
     if (rexRequirements.isEmpty && (!rexW)) {
       Nil
     } else {
@@ -62,20 +63,4 @@ object Operation {
       }
     }
   }
-
-//  def optionalRexPrefix(rexRequirements: List[RexExtendedRequirement], includeRexW: Boolean)(implicit processorMode: ProcessorMode): List[Byte] = {
-//    rexRequirements.foldLeft[Byte](Operation.RexCode)((value, req) => (value | req.rexBitmask).toByte) :: Nil
-//  }
-}
-
-trait Prefix {
-}
-
-trait AddressSizePrefix extends Prefix {
-}
-
-trait OperandSizePrefix extends Prefix {
-}
-
-trait RexPrefix extends Prefix {
 }
