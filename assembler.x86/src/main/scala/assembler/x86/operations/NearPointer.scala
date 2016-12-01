@@ -12,10 +12,7 @@ trait NearPointer extends X86Operation {
 
   abstract override def operands = super.operands ::: pointer :: Nil
 
-  abstract override def operandSize: OperandSize = super.operandSize match {
-    case OperandSize.Unknown => pointer.operandByteSize
-    case default => super.operandSize
-  }
+  abstract override def operandSize: OperandSize = pointer.operandByteSize
 
   override def validate = {
     super.validate

@@ -12,10 +12,7 @@ trait FarPointer extends X86Operation {
 
   abstract override def operands = super.operands ::: pointer :: Nil
 
-  abstract override def operandSize = super.operandSize match {
-    case OperandSize.Unknown => pointer.operandByteSize
-    case default => super.operandSize
-  }
+  abstract override def operandSize = pointer.operandByteSize
 
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
     super.encodeByte() ::: pointer.offset ::: pointer.segment
