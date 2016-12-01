@@ -12,6 +12,7 @@ import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
 import assembler.x86.operations.X86Operation
+import assembler.x86.operands.ImmediateValue
 
 class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
 
@@ -549,6 +550,11 @@ class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
         Move(EBP, SIBMemoryLocation(R9, R8, 0.encodeLittleEndian, 2)).toString should be("mov [r8+r9*2+0], ebp")
       }
 
+      "throw an exception for mov 0x001122, rax" in {
+        an [AssertionError] should be thrownBy {
+          Move(new ImmediateValue(0x00.toByte :: 0x11.toByte :: 0x22.toByte :: Nil), RAX).encodeByte
+        }
+      }
     }
   }
 }

@@ -7,8 +7,6 @@ import assembler.x86.ParameterPosition
 import assembler.x86.RexExtendedRequirement
 
 final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeOperand {
-  assume(List(1, 2, 4, 8).contains(value.length))
-
   override val operandByteSize: OperandSize = ValueSize.sizeOfValue(value.length)
 
   val isPositive = (value.last & 0x80.toByte) == 0

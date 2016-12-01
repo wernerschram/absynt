@@ -132,7 +132,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "throw an AssertionError for jmp 0x10203040" in { an[AssertionError] should be thrownBy { Jump(NearPointer(0x10203040.encodeLittleEndian)).encodeByte } }
 
-      "correctly encode jmp ax" in { Jump(AX).encodeByte should be(Hex.lsb("FF E0"))}
+      "correctly encode jmp ax" in { Jump(AX).encodeByte should be(Hex.lsb("FF E0")) }
       "correctly represent jmp ax as a string" in { Jump(AX).toString should be("jmp ax") }
 
       "correctly encode jmp [bp+si]" in { Jump(RegisterMemoryLocation(BP.combinedIndex(SI))).encodeByte should be(Hex.lsb("FF 22")) }
@@ -160,10 +160,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         Jump.Far(new FarPointer(0x1000.toShort.encodeLittleEndian, 0x2000.toShort.encodeLittleEndian)).toString should be("jmp FAR 0x1000:0x2000")
       }
 
-      "correctly encode jmp FAR 0x30:0x200010" in {
+      "throw an AssertionError for jmp 0x10:0x10" in {
+        an[AssertionError] should be thrownBy {
+          Jump.Far(new FarPointer(0x10.toByte.encodeLittleEndian, 0x10.toByte.encodeLittleEndian))
+        }
+      }
+
+      "correctly encode jmp FAR 0x0030:0x200010" in {
         Jump.Far(new FarPointer(0x30.toShort.encodeLittleEndian, 0x200010.encodeLittleEndian)).encodeByte should be(Hex.lsb("66 EA 10 00 20 00 30 00"))
       }
-      "correctly represent jmp FAR 0x30:0x200010 as a string" in {
+      "correctly represent jmp FAR 0x0030:0x200010 as a string" in {
         Jump.Far(new FarPointer(0x30.toShort.encodeLittleEndian, 0x200010.encodeLittleEndian)).toString should be("jmp FAR 0x0030:0x00200010")
       }
 
