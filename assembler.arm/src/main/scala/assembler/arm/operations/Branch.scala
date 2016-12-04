@@ -6,18 +6,6 @@ import assembler.arm.operands.Operand
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
 
-class BranchImmediateOperation(val code: Byte)(implicit mnemonic: String)
-    extends Operation(mnemonic) {
-
-  def apply(destination: RelativePointer, condition: Condition) = new ConditionalARMOperation(condition) {
-
-    override def encodeWord()(implicit page: MemoryPage) =
-      // TODO: apply lBit
-      (super.encodeWord() | ((code & 0xF0) << 20) | (destination.encode))
-    override def toString = s"${BranchImmediateOperation.this.mnemonic}${condition.mnemonicExtension} ${destination.toString}"
-  }
-}
-
 class BranchImmediate(destination: RelativePointer, condition: Condition, val code: Byte, val mnemonic: String)
 extends ConditionalARMOperation(condition) {
     override def encodeWord()(implicit page: MemoryPage) =
