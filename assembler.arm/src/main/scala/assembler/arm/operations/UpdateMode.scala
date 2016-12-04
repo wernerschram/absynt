@@ -1,6 +1,6 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
-abstract class UpdateMode private[opcodes](val increment: Boolean, val mnemonicExtension: String) {
+abstract class UpdateMode private[operations](val increment: Boolean, val mnemonicExtension: String) {
   val incrementBitMask = (if (increment) 0x00800000 else 0)
   def bitMask: Int
 }

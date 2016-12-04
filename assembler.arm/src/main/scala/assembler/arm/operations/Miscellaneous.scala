@@ -1,9 +1,7 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
 import scala.language.implicitConversions
 
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition._
 import assembler.arm.ProcessorMode
 import assembler.memory.MemoryPage
@@ -11,8 +9,8 @@ import assembler.memory.MemoryPage
 class Miscellaneous(val code: Byte)(implicit mnemonic: String)
     extends Opcode(mnemonic) {
 
-  def apply(value: Short, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
-    new ARMInstruction() {
+  def apply(value: Short, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
+    new ARMOperation() {
       override def encodeWord()(implicit page: MemoryPage) = {
         val valuePart1: Byte = (value & 0x0f).toByte
         val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
@@ -65,7 +63,7 @@ object InterruptDisableFlags extends Enumeration {
 
 class ProcessorState(val code: Byte)(implicit mnemonic: String) {
 
-  private def apply(condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Byte, stringValue: String)(implicit processorMode: ProcessorMode): ARMInstruction =
+  private def apply(condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Byte, stringValue: String)(implicit processorMode: ProcessorMode): ARMOperation =
     new ConditionalARMInstruction(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
@@ -73,18 +71,18 @@ class ProcessorState(val code: Byte)(implicit mnemonic: String) {
       override def toString = stringValue
     }
 
-  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMInstruction =
+  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMOperation =
     apply(Unpredictable, effect.iMod, 0x01.toByte,
         ((interruptDisableFlags.toBitMask)(0).toInt << 6), mode.mode,
       s"${ProcessorState.this.mnemonic}${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #${mode}")
 
-  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet)(implicit processorMode: ProcessorMode): ARMInstruction =
+  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet)(implicit processorMode: ProcessorMode): ARMOperation =
     apply(Unpredictable, effect.iMod, 0x01.toByte,
         ((interruptDisableFlags.toBitMask)(0).toInt << 6), 0x00,
       s"${ProcessorState.this.mnemonic}${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
 
 
-  def apply(mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMInstruction =
+  def apply(mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMOperation =
     apply(Unpredictable,
       0x00.toByte,
       0x01.toByte,

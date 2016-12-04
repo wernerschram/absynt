@@ -6,13 +6,14 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.memory.MemoryPage
-import assembler.arm.opcodes.ExecutionMode
-import assembler.arm.opcodes.Effect
-import assembler.arm.opcodes.InterruptDisableFlags
+import assembler.arm.operations.ExecutionMode
+import assembler.arm.operations.Effect
+import assembler.arm.operations.InterruptDisableFlags
+import assembler.arm.operations.ARMOperation
 
 class MiscellaneousSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "a Breakpoint instruction" when {
     "in a32 mode" should {

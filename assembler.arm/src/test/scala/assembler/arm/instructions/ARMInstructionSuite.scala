@@ -5,15 +5,17 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
+import assembler.arm.operations.LabeledARMInstruction
+import assembler.arm.operations.ARMOperation
 
 class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an ARM instruction" when {
     "in a32 mode" should {
 
-      class MyInstruction extends ARMInstruction {
+      class MyInstruction extends ARMOperation {
         override def encodeWord()(implicit page: MemoryPage) = 4
       }
 
@@ -37,7 +39,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
     "in a32 mode" should {
 
       "correctly return the size of the instruction" in {
-        val instruction = stub[ARMInstruction]
+        val instruction = stub[ARMOperation]
         (instruction.size()(_: MemoryPage)).when(*).returns(4)
 
         val labeledInstruction = new LabeledARMInstruction(instruction, "Label")
@@ -45,7 +47,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
       }
 
       "return the encoded instruction when encodeByte is called" in {
-        val instruction = stub[ARMInstruction]
+        val instruction = stub[ARMOperation]
         (instruction.encodeByte()(_: MemoryPage)).when(*).returns(0x01.toByte :: 0x02.toByte :: Nil)
 
         val labeledInstruction = new LabeledARMInstruction(instruction, "Label")
@@ -53,7 +55,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
       }
 
       "return the encoded instruction when encodeWord is called" in {
-        val instruction = stub[ARMInstruction]
+        val instruction = stub[ARMOperation]
         (instruction.encodeWord()(_: MemoryPage)).when(*).returns(0x12345678)
 
         val labeledInstruction = new LabeledARMInstruction(instruction, "Label")

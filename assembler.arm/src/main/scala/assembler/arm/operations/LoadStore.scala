@@ -1,9 +1,7 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
 import scala.language.implicitConversions
 
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.ImmediateShiftValue
 import assembler.arm.operands.ShiftRegisterWithShift
@@ -133,7 +131,7 @@ class LoadStore(operation: LoadStoreOperation.LoadStoreOperation)(implicit mnemo
 
   def apply(
     condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
-    addressingType: LoadStoreAddressingType): ARMInstruction = {
+    addressingType: LoadStoreAddressingType): ARMOperation = {
 
     new ConditionalARMInstruction(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
@@ -153,7 +151,7 @@ class LoadStoreMiscelaneous(operation: LoadStoreMiscelaneousOperation.LoadStoreM
 
   def apply(
     condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
-    addressingType: LoadStoreAddressingType): ARMInstruction = {
+    addressingType: LoadStoreAddressingType): ARMOperation = {
 
     new ConditionalARMInstruction(condition) {
       override def encodeWord()(implicit page: MemoryPage) =

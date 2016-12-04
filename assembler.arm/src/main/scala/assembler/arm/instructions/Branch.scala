@@ -3,11 +3,11 @@ package assembler.arm.instructions
 import assembler.LabelCondition
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes.BranchImmediate
-import assembler.arm.opcodes.BranchRegister
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.arm.operations.BranchImmediate
+import assembler.arm.operations.BranchRegister
 import assembler.memory.MemoryPage
 import assembler.reference.BranchInstructionOnPage
 

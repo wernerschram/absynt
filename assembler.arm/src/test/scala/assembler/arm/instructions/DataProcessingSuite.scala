@@ -10,10 +10,11 @@ import assembler.arm.operands.Shifter
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
+import assembler.arm.operations.ARMOperation
 
 class DataProcessingSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an AddCarry instruction" when {
     "in a32 mode" should {

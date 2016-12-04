@@ -2,14 +2,13 @@ package assembler.arm.instructions
 
 import scala.collection.concurrent.TrieMap
 
+import assembler.Encodable
 import assembler.LabelCondition
-import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
-import assembler.Encodable
 
 trait ReferencingARMInstructionOnPage extends ReferencingInstructionOnPage {
 

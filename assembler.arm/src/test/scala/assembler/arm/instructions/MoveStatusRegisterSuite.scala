@@ -5,10 +5,10 @@ import org.scalatest.WordSpec
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
+import assembler.arm.operations.ARMOperation
 import assembler.arm.instructions.MoveFromStatusRegister
 import assembler.arm.instructions.MoveToStatusRegister
-import assembler.arm.opcodes.Fields
+import assembler.arm.operations.Fields
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.registers.StatusRegister._
@@ -17,7 +17,7 @@ import assembler.arm.operands.Shifter
 
 class MoveFromStatusRegisterSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {

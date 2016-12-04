@@ -1,12 +1,10 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
 import assembler.memory.MemoryPage
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.Operand
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.ConditionalARMInstruction
 
 class BranchImmediate(val code: Byte)(implicit mnemonic: String)
     extends Opcode(mnemonic) {

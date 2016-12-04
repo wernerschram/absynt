@@ -1,8 +1,8 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes.Miscellaneous
 import assembler.arm.operands.Condition._
+import assembler.arm.operations.Miscellaneous
 
 object Breakpoint {
   val code: Byte = 0x09

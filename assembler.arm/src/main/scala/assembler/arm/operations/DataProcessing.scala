@@ -1,8 +1,6 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
@@ -37,28 +35,28 @@ class DataProcessingNoRegisterInstruction(mnemonic: String, code: Byte, conditio
 class DataProcessing(val code: Byte)(implicit mnemonic: String)
     extends Opcode(mnemonic) {
 
-  def apply(register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction =
+  def apply(register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
     new DataProcessingInstruction(mnemonic, code, condition, register1, operand2, destination)
 
-  def setFlags(register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def setFlags(register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new DataProcessingInstruction(mnemonic + "s", code, condition, register1, operand2, destination) {
       override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | ARMInstruction.sBit)
+        (super.encodeWord() | ARMOperation.sBit)
     }
   }
 
-  def apply(register1: GeneralRegister, operand2: Shifter, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def apply(register1: GeneralRegister, operand2: Shifter, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new DataProcessingNoDestinationInstruction(mnemonic, code, condition, register1, operand2)
   }
 
-  def apply(operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def apply(operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new DataProcessingNoRegisterInstruction(mnemonic, code, condition, operand2, destination)
   }
 
-  def setFlags(operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def setFlags(operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new DataProcessingNoRegisterInstruction(mnemonic + "s", code, condition, operand2, destination) {
       override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | ARMInstruction.sBit)
+        (super.encodeWord() | ARMOperation.sBit)
     }
   }
 }

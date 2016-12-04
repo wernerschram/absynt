@@ -1,4 +1,4 @@
-package assembler.arm.instructions
+package assembler.arm.operations
 
 import assembler.Encodable
 import assembler.Label
@@ -7,7 +7,7 @@ import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
 import assembler.memory.MemoryPage
 
-trait ARMInstruction extends Encodable() {
+trait ARMOperation extends Encodable() {
   def withLabel(label: Label): LabeledEncodable = new LabeledARMInstruction(this, label)
   override def size()(implicit page: MemoryPage) = 4
 
@@ -16,18 +16,18 @@ trait ARMInstruction extends Encodable() {
   def encodeByte()(implicit page: MemoryPage): List[Byte] = encodeWord.encodeLittleEndian
 }
 
-object ARMInstruction {
+object ARMOperation {
   val sBit = 0x00100000
 }
 
-abstract class ConditionalARMInstruction(val condition: Condition) extends ARMInstruction {
+abstract class ConditionalARMInstruction(val condition: Condition) extends ARMOperation {
 
   override def encodeWord()(implicit page: MemoryPage): Int =
     (condition.value << 28)
 }
 
 
-class LabeledARMInstruction(instruction: ARMInstruction, override val label: Label) extends ARMInstruction with LabeledEncodable {
+class LabeledARMInstruction(instruction: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
   override def size()(implicit page: MemoryPage) = instruction.size()
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
 

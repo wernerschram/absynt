@@ -1,9 +1,9 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes.{ Multiply => MultiplyOpcode }
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.arm.operations.{ Multiply => MultiplyOpcode }
 
 class MultiplyWithRegister(val code: Byte, val opcode: String) {
   private val RegRegAndRegToReg = new MultiplyOpcode(code)(opcode)

@@ -9,10 +9,11 @@ import assembler.arm.operands.Condition
 import assembler.arm.operands.Shifter.apply
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
+import assembler.arm.operations.ARMOperation
 
 class MultiplySuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an MultiplyAccumulate instruction" when {
     "in a32 mode" should {

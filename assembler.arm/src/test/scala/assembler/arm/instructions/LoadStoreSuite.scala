@@ -5,20 +5,20 @@ import org.scalatest.WordSpec
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
+import assembler.arm.operations.ARMOperation
 import assembler.arm.instructions.LoadRegister
 import assembler.arm.instructions.StoreRegister
-import assembler.arm.opcodes.LoadStoreAddressingTypeNormal
-import assembler.arm.opcodes.LoadStoreMiscelaneousOffset
-import assembler.arm.opcodes.LoadStoreOffset
-import assembler.arm.opcodes.UpdateDirection
+import assembler.arm.operations.LoadStoreAddressingTypeNormal
+import assembler.arm.operations.LoadStoreMiscelaneousOffset
+import assembler.arm.operations.LoadStoreOffset
+import assembler.arm.operations.UpdateDirection
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
 
 class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {

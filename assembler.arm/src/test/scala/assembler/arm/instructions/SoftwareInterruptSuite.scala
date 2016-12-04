@@ -5,13 +5,13 @@ import org.scalatest.WordSpec
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
+import assembler.arm.operations.ARMOperation
 import assembler.arm.instructions.SoftwareInterrupt
 import assembler.memory.MemoryPage
 
 class SoftwareInterruptSuite extends WordSpec with ShouldMatchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "a SoftwareInterrupt instruction" when {
     "in a32 mode" should {

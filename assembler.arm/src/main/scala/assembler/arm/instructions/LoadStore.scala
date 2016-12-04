@@ -1,10 +1,10 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.opcodes._
-import assembler.arm.opcodes.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.arm.operations._
+import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemnonic: String) {

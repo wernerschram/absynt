@@ -1,8 +1,6 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
@@ -27,21 +25,21 @@ class MultiplyWithRegisterInstruction(code: Byte, mnemonic: String, destination:
 class Multiply(val code: Byte)(implicit mnemonic: String)
     extends Opcode(mnemonic) {
 
-  def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction =
+  def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
     new MultiplyInstruction(code, mnemonic, destination, source, multiplyValue, condition)
 
-  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new MultiplyInstruction(code, mnemonic + "s", destination, source, multiplyValue, condition) {
-      override def encodeWord()(implicit page: MemoryPage) = super.encodeWord() | ARMInstruction.sBit
+      override def encodeWord()(implicit page: MemoryPage) = super.encodeWord() | ARMOperation.sBit
     }
   }
 
-  def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction =
+  def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
     new MultiplyWithRegisterInstruction(code, mnemonic, destination, source, multiplyValue, addValue, condition)
 
-  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new MultiplyWithRegisterInstruction(code, mnemonic + "s", destination, source, multiplyValue, addValue, condition) {
-      override def encodeWord()(implicit page: MemoryPage) = super.encodeWord() | ARMInstruction.sBit
+      override def encodeWord()(implicit page: MemoryPage) = super.encodeWord() | ARMOperation.sBit
     }
   }
 }

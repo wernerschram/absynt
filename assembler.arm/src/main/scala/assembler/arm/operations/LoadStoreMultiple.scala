@@ -1,8 +1,6 @@
-package assembler.arm.opcodes
+package assembler.arm.operations
 
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.ARMInstruction
-import assembler.arm.instructions.ConditionalARMInstruction
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
@@ -17,7 +15,7 @@ object LoadStoreMultipleOperation {
 class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic: String)
     extends Opcode(mnemonic) {
 
-  def apply(condition: Condition, registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, userModeRegisters: Boolean)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def apply(condition: Condition, registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, userModeRegisters: Boolean)(implicit processorMode: ProcessorMode): ARMOperation = {
     assume(!registers.isEmpty)
     assume(baseRegister != GeneralRegister.R15)
     assume(!(updateBase && userModeRegisters && !registers.contains(GeneralRegister.R15)))
@@ -42,10 +40,10 @@ class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic
 class ReturnFromException()(implicit mnemonic: String)
     extends Opcode(mnemonic) {
 
-  def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean)(implicit processorMode: ProcessorMode): ARMInstruction = {
+  def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean)(implicit processorMode: ProcessorMode): ARMOperation = {
     assume(baseRegister != GeneralRegister.R15)
 
-    new ARMInstruction() {
+    new ARMOperation() {
 
       override def encodeWord()(implicit page: MemoryPage) =
         (0xf8100a00 |

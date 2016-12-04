@@ -13,6 +13,7 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
+import assembler.arm.operations.ARMOperation
 
 class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
@@ -31,7 +32,7 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
     filler
   }
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMInstruction])
+  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an Branch instruction" when {
     "in a32 mode" should {
