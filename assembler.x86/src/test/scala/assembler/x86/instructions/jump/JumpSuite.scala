@@ -203,6 +203,11 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         p.encodeByte() should be(Hex.lsb("EB 01 00 00"))
       }
 
+
+      "correctly represent jmp Label as a string" in {
+        Jump("Label").toString should be("jmp Label")
+      }
+
       "Encode a simple program with an indirect forward conditional on count zero short jump instruction" in {
         val p = new MemoryPage(
           JumpIfCountZero("Label") ::

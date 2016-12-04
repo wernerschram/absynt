@@ -6,6 +6,7 @@ import org.scalatest.WordSpec
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.Interrupt
+import assembler.x86.operands.Register
 
 class X86OperationSuite extends WordSpec with ShouldMatchers with MockFactory {
 
@@ -55,6 +56,22 @@ class X86OperationSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val labeledInstruction = new LabeledX86Operation(instruction, "Label")
         labeledInstruction.encodeByte() should be(0x01.toByte :: 0x02.toByte :: Nil)
+      }
+
+      "return the code of the instruction when code is called" in {
+        val instruction = stub[X86Operation]
+        (instruction.code _).when().returns(0x01.toByte :: Nil)
+
+        val labeledInstruction = new LabeledX86Operation(instruction, "Label")
+        labeledInstruction.code should be(0x01.toByte :: Nil)
+      }
+
+      "return the operands of the instruction when operands is called" in {
+        val instruction = stub[X86Operation]
+        (instruction.operands _).when().returns(Register.AX :: Nil)
+
+        val labeledInstruction = new LabeledX86Operation(instruction, "Label")
+        labeledInstruction.operands should be(Register.AX :: Nil)
       }
 
       "correctly represent the instruction as a string" in {
