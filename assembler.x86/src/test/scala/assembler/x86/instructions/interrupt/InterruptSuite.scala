@@ -24,6 +24,10 @@ class InterruptSuite extends WordSpec with ShouldMatchers with MockFactory {
       "correctly encode int 0x03" in {
         Interrupt(0x03.toByte).encodeByte should be (Hex.lsb("CC"))
       }
+
+      "correctly represent int 0x03 as a string" in {
+        Interrupt(0x03.toByte).toString should be("int 3")
+      }
     }
     "in long mode" should {
 
@@ -31,6 +35,10 @@ class InterruptSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       "correctly encode int 0x01" in {
         Interrupt(0x01.toByte).encodeByte should be (Hex.lsb("CD 01"))
+      }
+
+      "correctly represent int 0x01 as a string" in {
+        Interrupt(0x01.toByte).toString should be("int 1")
       }
 
       "throw an AssertionError for INT 0x0001" in {

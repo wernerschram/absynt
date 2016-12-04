@@ -9,7 +9,9 @@ import assembler.x86.operations.Static
 object Interrupt {
   implicit val opcode = "int"
 
-  private def Static()(implicit processorMode: ProcessorMode) = new Static(0xCC.toByte :: Nil, opcode)
+  private def Static()(implicit processorMode: ProcessorMode) = new Static(0xCC.toByte :: Nil, opcode) {
+    override def operands = ImmediateValue.byteToImmediate(3.toByte) :: super.operands
+  }
   private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0xCD.toByte :: Nil, opcode) with Immediate {
     override def immediate = immediateValue
     override def validate = {
