@@ -218,6 +218,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
             labeledFiller(1, "Label") ::
             Nil)
 
+        jump.size()(p) should be(2);
+
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E3 01")) }
       }
 
