@@ -1,7 +1,6 @@
 package assembler.arm.instructions
 
 import assembler.LabelCondition
-import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativePointer
@@ -9,41 +8,25 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.BranchImmediate
 import assembler.arm.operations.BranchRegister
 import assembler.memory.MemoryPage
-import assembler.reference.BranchInstructionOnPage
-
-class ARMBranchInstructionOnPage(branch: BranchImmediate, thisLocation: Int, destinationLocation: Int, condition: Condition)(implicit page: MemoryPage, processorMode: ProcessorMode)
-    extends BranchInstructionOnPage(thisLocation, destinationLocation) with ReferencingARMInstructionOnPage {
-
-  val branchSize = 4
-  override val minimumSize = branchSize
-  override val maximumSize = branchSize
-
-  override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
-
-  def encodeWordForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
-    branch.apply(getPointerForDistance(forward, distance), condition).encodeWord()
-
-  override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
-    encodeWordForDistance(forward, distance).encodeLittleEndian
-}
 
 class Branch(code: Byte, val opcode: String) {
-  private val Immediate = new BranchImmediate(code)(opcode)
+  private def Immediate(destination: RelativePointer, condition: Condition = Always) =
+    new BranchImmediate(destination, condition, code, opcode)
 
-  def apply(destination: RelativePointer, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
+  def apply(destination: RelativePointer, condition: Condition = Always)(implicit processorMode: ProcessorMode): BranchImmediate =
     Immediate(destination, condition)
 
   def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[ARMBranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>
-        new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, Always)(memoryPage, processorMode),
-      opcode, labelCondition)
+    new ReferencingARMInstruction(opcode, labelCondition) {
+      override def encodeWordForDistance(destination: RelativePointer)(implicit page: MemoryPage): Int =
+        Immediate(destination, Always).encodeWord()
+    }
 
   def apply(labelCondition: LabelCondition, condition: Condition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[ARMBranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>
-        new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, condition)(memoryPage, processorMode),
-      opcode, labelCondition)
+    new ReferencingARMInstruction(opcode, labelCondition) {
+      override def encodeWordForDistance(destination: RelativePointer)(implicit page: MemoryPage): Int =
+        Immediate(destination, condition).encodeWord()
+    }
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
@@ -56,16 +39,18 @@ class BranchExchange(registerCode: Byte, val opcode: String) {
 
 class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String) extends BranchExchange(registerCode, opcode) {
   // TODO HBit
-  private val Immediate = new BranchImmediate(immediateCode)(opcode)
+  //  private val Immediate = new BranchImmediateOperation(immediateCode)(opcode)
+  private def Immediate(destination: RelativePointer, condition: Condition = Always) =
+    new BranchImmediate(destination, condition, immediateCode, opcode)
 
   def apply(destination: RelativePointer)(implicit processorMode: ProcessorMode) =
     Immediate(destination, Unpredictable)
 
   def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[ARMBranchInstructionOnPage](
-      (thisLocation, targetLocation, memoryPage, processorMode) =>
-        new ARMBranchInstructionOnPage(Immediate, thisLocation, targetLocation, Unpredictable)(memoryPage, processorMode),
-      opcode, labelCondition)
+    new ReferencingARMInstruction(opcode, labelCondition) {
+      override def encodeWordForDistance(destination: RelativePointer)(implicit page: MemoryPage): Int =
+        Immediate(destination, Unpredictable).encodeWord()
+    }
 }
 
 object Branch extends Branch(0xA0.toByte, "b")
