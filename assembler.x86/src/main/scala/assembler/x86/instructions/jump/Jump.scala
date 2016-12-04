@@ -11,7 +11,7 @@ import assembler.x86.operations.{MemoryLocation => MemoryLocationOperation}
 import assembler.x86.operands.memoryaccess.MemoryLocation
 import assembler.x86.operands.ValueSize
 
-final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
+final object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
@@ -47,37 +47,37 @@ final object Jump extends ShortOrNearRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
 }
 
 private[jump] class JumpIfOverflow(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x70.toByte :: Nil, 0x0F.toByte :: 0x80.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x70.toByte :: Nil, 0x0F.toByte :: 0x80.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNotOverflow(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x71.toByte :: Nil, 0x0F.toByte :: 0x81.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x71.toByte :: Nil, 0x0F.toByte :: 0x81.toByte :: Nil, mnemonic)
 private[jump] class JumpIfCarry(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x72.toByte :: Nil, 0x0F.toByte :: 0x82.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x72.toByte :: Nil, 0x0F.toByte :: 0x82.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNoCarry(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x73.toByte :: Nil, 0x0F.toByte :: 0x83.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x73.toByte :: Nil, 0x0F.toByte :: 0x83.toByte :: Nil, mnemonic)
 private[jump] class JumpIfZero(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x74.toByte :: Nil, 0x0F.toByte :: 0x84.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x74.toByte :: Nil, 0x0F.toByte :: 0x84.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNotZero(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x75.toByte :: Nil, 0x0F.toByte :: 0x85.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x75.toByte :: Nil, 0x0F.toByte :: 0x85.toByte :: Nil, mnemonic)
 private[jump] class JumpIfCarryOrZero(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x76.toByte :: Nil, 0x0F.toByte :: 0x86.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x76.toByte :: Nil, 0x0F.toByte :: 0x86.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNoCarryAndNoZero(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x77.toByte :: Nil, 0x0F.toByte :: 0x87.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x77.toByte :: Nil, 0x0F.toByte :: 0x87.toByte :: Nil, mnemonic)
 private[jump] class JumpIfSigned(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x78.toByte :: Nil, 0x0F.toByte :: 0x88.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x78.toByte :: Nil, 0x0F.toByte :: 0x88.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNotSigned(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x79.toByte :: Nil, 0x0F.toByte :: 0x8B.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x79.toByte :: Nil, 0x0F.toByte :: 0x8B.toByte :: Nil, mnemonic)
 private[jump] class JumpIfParity(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x7A.toByte :: Nil, 0x0F.toByte :: 0x8A.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x7A.toByte :: Nil, 0x0F.toByte :: 0x8A.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNotParity(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x7B.toByte :: Nil, 0x0F.toByte :: 0x8B.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x7B.toByte :: Nil, 0x0F.toByte :: 0x8B.toByte :: Nil, mnemonic)
 private[jump] class JumpIfSignedNotEqualsOverflow(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x7C.toByte :: Nil, 0x0F.toByte :: 0x8C.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x7C.toByte :: Nil, 0x0F.toByte :: 0x8C.toByte :: Nil, mnemonic)
 private[jump] class JumpIfSignedEqualsOverflow(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x7D.toByte :: Nil, 0x0F.toByte :: 0x8D.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x7D.toByte :: Nil, 0x0F.toByte :: 0x8D.toByte :: Nil, mnemonic)
 private[jump] class JumpIfZeroAndSignedNotEqualsOverflow(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x7E.toByte :: Nil, 0x0F.toByte :: 0x8E.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x7E.toByte :: Nil, 0x0F.toByte :: 0x8E.toByte :: Nil, mnemonic)
 private[jump] class JumpIfNotZeroAndSignedEqualsOverflow(mnemonic: String)
-  extends ShortOrNearRelativeJump(0x7F.toByte :: Nil, 0x0F.toByte :: 0x8F.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(0x7F.toByte :: Nil, 0x0F.toByte :: 0x8F.toByte :: Nil, mnemonic)
 private[jump] class JumpIfCountZero
   extends ShortRelativeJump(0xE3.toByte :: Nil, "jcx")
 

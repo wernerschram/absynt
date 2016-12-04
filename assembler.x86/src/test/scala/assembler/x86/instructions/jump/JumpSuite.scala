@@ -245,7 +245,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E3 FC")) }
       }
 
-      "Encode a simple program with an indirect forward near jump instruction" in {
+      "Encode a simple program with an indirect forward long jump instruction" in {
         val jump = Jump("Label")
 
         val p = new MemoryPage(
@@ -257,7 +257,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01")) }
       }
 
-      "throw an AssertionError for a simple program with an indirect forward conditional on count zero near jump instruction" in {
+      "throw an AssertionError for a simple program with an indirect forward conditional on count zero long jump instruction" in {
         val jump = JumpIfCountZero("Label")
 
         val p = new MemoryPage(
@@ -269,7 +269,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         an[AssertionError] should be thrownBy { p.encodeByte() }
       }
 
-      "Encode a simple program with an indirect backward near jump instruction" in {
+      "Encode a simple program with an indirect backward long jump instruction" in {
         val jump = Jump("Label")
 
         val p = new MemoryPage(
@@ -330,7 +330,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7F")) }
       }
 
-      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the second forces the first to be near" in {
+      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the second forces the first to be long" in {
         val jump1 = Jump("Label1")
         val jump2 = Jump("Label2")
 
@@ -347,7 +347,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
       }
 
-      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the first forces the second to be near" in {
+      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the first forces the second to be long" in {
         val jump1 = Jump("Label1")
         val jump2 = Jump("Label2")
 
@@ -573,7 +573,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB FC")) }
       }
 
-      "Encode a simple program with an indirect backward near jump instruction" in {
+      "Encode a simple program with an indirect backward long jump instruction" in {
         val jump = Jump("Label")
 
         val p = new MemoryPage(
@@ -585,7 +585,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 FA FE FF FF")) }
       }
 
-      "Encode a simple program with an indirect forward near jump instruction" in {
+      "Encode a simple program with an indirect forward long jump instruction" in {
         val jump = Jump("Label")
 
         val p = new MemoryPage(
