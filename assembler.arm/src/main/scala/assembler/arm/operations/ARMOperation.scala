@@ -8,7 +8,7 @@ import assembler.arm.operands.Condition.Condition
 import assembler.memory.MemoryPage
 
 trait ARMOperation extends Encodable() {
-  def withLabel(label: Label): LabeledEncodable = new LabeledARMInstruction(this, label)
+  def withLabel(label: Label): LabeledEncodable = new LabeledARMOperation(this, label)
   override def size()(implicit page: MemoryPage) = 4
 
   def encodeWord()(implicit page: MemoryPage): Int
@@ -20,14 +20,14 @@ object ARMOperation {
   val sBit = 0x00100000
 }
 
-abstract class ConditionalARMInstruction(val condition: Condition) extends ARMOperation {
+abstract class ConditionalARMOperation(val condition: Condition) extends ARMOperation {
 
   override def encodeWord()(implicit page: MemoryPage): Int =
     (condition.value << 28)
 }
 
 
-class LabeledARMInstruction(instruction: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
+class LabeledARMOperation(instruction: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
   override def size()(implicit page: MemoryPage) = instruction.size()
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
 

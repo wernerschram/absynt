@@ -7,9 +7,9 @@ import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
 
 class BranchImmediate(val code: Byte)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
-  def apply(destination: RelativePointer, condition: Condition) = new ConditionalARMInstruction(condition) {
+  def apply(destination: RelativePointer, condition: Condition) = new ConditionalARMOperation(condition) {
 
     override def encodeWord()(implicit page: MemoryPage) =
       // TODO: apply lBit
@@ -19,8 +19,8 @@ class BranchImmediate(val code: Byte)(implicit mnemonic: String)
 }
 
 class BranchRegister(val code: Byte)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
-  def apply(destination: GeneralRegister, condition: Condition) = new ConditionalARMInstruction(condition) {
+    extends Operation(mnemonic) {
+  def apply(destination: GeneralRegister, condition: Condition) = new ConditionalARMOperation(condition) {
 
     override def encodeWord()(implicit page: MemoryPage) =
       // TODO: apply lBit

@@ -13,14 +13,14 @@ object LoadStoreMultipleOperation {
 }
 
 class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(condition: Condition, registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, userModeRegisters: Boolean)(implicit processorMode: ProcessorMode): ARMOperation = {
     assume(!registers.isEmpty)
     assume(baseRegister != GeneralRegister.R15)
     assume(!(updateBase && userModeRegisters && !registers.contains(GeneralRegister.R15)))
 
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       def toRegisterBits(registers: List[GeneralRegister]): Int =
         registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
 
@@ -38,7 +38,7 @@ class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic
 }
 
 class ReturnFromException()(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean)(implicit processorMode: ProcessorMode): ARMOperation = {
     assume(baseRegister != GeneralRegister.R15)

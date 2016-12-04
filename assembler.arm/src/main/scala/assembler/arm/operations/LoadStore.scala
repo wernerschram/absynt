@@ -127,13 +127,13 @@ object LoadStoreMiscelaneousOperation {
 }
 
 class LoadStore(operation: LoadStoreOperation.LoadStoreOperation)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(
     condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
     addressingType: LoadStoreAddressingType): ARMOperation = {
 
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() |
           operation.bitMask | addressingType.bitMask |
@@ -147,13 +147,13 @@ class LoadStore(operation: LoadStoreOperation.LoadStoreOperation)(implicit mnemo
 }
 
 class LoadStoreMiscelaneous(operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(
     condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
     addressingType: LoadStoreAddressingType): ARMOperation = {
 
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() |
           operation.bitMask | addressingType.bitMask |

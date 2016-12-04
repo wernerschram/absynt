@@ -5,7 +5,7 @@ import assembler.arm.operands.Condition.Condition
 import assembler.memory.MemoryPage
 
 class SoftwareInterrupt()(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(interrupt: Int, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new ARMOperation() {

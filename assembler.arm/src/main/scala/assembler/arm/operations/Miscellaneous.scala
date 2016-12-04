@@ -7,7 +7,7 @@ import assembler.arm.ProcessorMode
 import assembler.memory.MemoryPage
 
 class Miscellaneous(val code: Byte)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(value: Short, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new ARMOperation() {
@@ -64,7 +64,7 @@ object InterruptDisableFlags extends Enumeration {
 class ProcessorState(val code: Byte)(implicit mnemonic: String) {
 
   private def apply(condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Byte, stringValue: String)(implicit processorMode: ProcessorMode): ARMOperation =
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
 

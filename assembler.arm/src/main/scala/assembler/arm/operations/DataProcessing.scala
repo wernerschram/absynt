@@ -6,8 +6,8 @@ import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
 
-class DataProcessingInstruction(mnemonic: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister)
-    extends ConditionalARMInstruction(condition) {
+class DataProcessingOperation(mnemonic: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister)
+    extends ConditionalARMOperation(condition) {
 
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 21) | (register1.registerCode << 16) | (destination.registerCode << 12) | operand2.encode)
@@ -16,7 +16,7 @@ class DataProcessingInstruction(mnemonic: String, code: Byte, condition: Conditi
 }
 
 class DataProcessingNoDestinationInstruction(mnemonic: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter)
-    extends ConditionalARMInstruction(condition) {
+    extends ConditionalARMOperation(condition) {
 
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 21) | (register1.registerCode << 16) | operand2.encode)
@@ -25,7 +25,7 @@ class DataProcessingNoDestinationInstruction(mnemonic: String, code: Byte, condi
 }
 
 class DataProcessingNoRegisterInstruction(mnemonic: String, code: Byte, condition: Condition, operand2: Shifter, destination: GeneralRegister)
-    extends ConditionalARMInstruction(condition) {
+    extends ConditionalARMOperation(condition) {
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 21) | (destination.registerCode << 12) | operand2.encode)
 
@@ -33,13 +33,13 @@ class DataProcessingNoRegisterInstruction(mnemonic: String, code: Byte, conditio
 }
 
 class DataProcessing(val code: Byte)(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new DataProcessingInstruction(mnemonic, code, condition, register1, operand2, destination)
+    new DataProcessingOperation(mnemonic, code, condition, register1, operand2, destination)
 
   def setFlags(register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
-    new DataProcessingInstruction(mnemonic + "s", code, condition, register1, operand2, destination) {
+    new DataProcessingOperation(mnemonic + "s", code, condition, register1, operand2, destination) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | ARMOperation.sBit)
     }

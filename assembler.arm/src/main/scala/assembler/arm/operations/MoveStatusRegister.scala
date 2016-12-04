@@ -9,10 +9,10 @@ import assembler.memory.MemoryPage
 import assembler.arm.operands.RightRotateImmediate
 
 class MoveFromStatusRegister()(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(source: StatusRegister, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12))
 
@@ -34,10 +34,10 @@ object Fields extends Enumeration {
 }
 
 class MoveToStatusRegister()(implicit mnemonic: String)
-    extends Opcode(mnemonic) {
+    extends Operation(mnemonic) {
 
   def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (source.registerCode)))
 
@@ -45,7 +45,7 @@ class MoveToStatusRegister()(implicit mnemonic: String)
     }
 
   def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
-    new ConditionalARMInstruction(condition) {
+    new ConditionalARMOperation(condition) {
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | 0x0120f000 | (destination.registerCode << 22) | ((fields.toBitMask)(0).toInt) | source.encode)
 

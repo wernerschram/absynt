@@ -5,7 +5,7 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.LabeledARMInstruction
+import assembler.arm.operations.LabeledARMOperation
 import assembler.arm.operations.ARMOperation
 
 class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory {
@@ -42,7 +42,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
         val instruction = stub[ARMOperation]
         (instruction.size()(_: MemoryPage)).when(*).returns(4)
 
-        val labeledInstruction = new LabeledARMInstruction(instruction, "Label")
+        val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.size() should be(4)
       }
 
@@ -50,7 +50,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
         val instruction = stub[ARMOperation]
         (instruction.encodeByte()(_: MemoryPage)).when(*).returns(0x01.toByte :: 0x02.toByte :: Nil)
 
-        val labeledInstruction = new LabeledARMInstruction(instruction, "Label")
+        val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.encodeByte() should be(0x01.toByte :: 0x02.toByte :: Nil)
       }
 
@@ -58,7 +58,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
         val instruction = stub[ARMOperation]
         (instruction.encodeWord()(_: MemoryPage)).when(*).returns(0x12345678)
 
-        val labeledInstruction = new LabeledARMInstruction(instruction, "Label")
+        val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.encodeWord() should be(0x12345678)
       }
 
@@ -67,7 +67,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
 
         val instruction = Breakpoint(4)
 
-        val labeledInstruction = new LabeledARMInstruction(instruction, "Label")
+        val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.toString() should be("Label: bkpt 4")
       }
 }
