@@ -43,33 +43,37 @@ abstract class BranchInstructionOnPage(
   override def minimumEstimatedSize: Int = getSizeForDistance(forward, minimumDistance)
   override def maximumEstimatedSize: Int = getSizeForDistance(forward, maximumDistance)
 
-  private var _isEstimated = false
-  override def isEstimated: Boolean = _isEstimated
+  private var _estimatedSize: Option[Int] = None
+  override def isEstimated: Boolean = _estimatedSize != None
 
   private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = independentDistance +
-    dependentIntermediates.map(instruction =>
+    dependentIntermediates.map { instruction =>
       if (sizeAssumptions.contains(instruction.getOrElseCreateInstruction()))
+        sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get
+      else
         instruction.estimatedSize(sizeAssumptions)
-      else sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get).sum
+    }
+    .sum
 
   override def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
-    while (assumption.exists { value => value < newAssumption }) {
-      {
-        assumption = Some(newAssumption)
-        newAssumption = getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
-      }
+    while (!assumption.isDefined || assumption.get < newAssumption) {
+      assumption = Some(newAssumption)
+      newAssumption = getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
     }
     newAssumption
   }
 
-  lazy val size: Int = if (minimumEstimatedSize == maximumEstimatedSize) {
-    minimumEstimatedSize
-  } else {
-    val estimation = estimatedSize(collection.immutable.HashMap())
-    _isEstimated = true
-    estimation
+  override def size: Int = {
+    if (_estimatedSize == None) {
+      if (minimumEstimatedSize == maximumEstimatedSize) {
+        _estimatedSize = Some(minimumEstimatedSize)
+      } else {
+        _estimatedSize = Some(estimatedSize(collection.immutable.HashMap()))
+      }
+    }
+    _estimatedSize.get
   }
 
   override lazy val encodeByte = encodeForDistance(forward, actualDistance)

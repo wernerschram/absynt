@@ -194,63 +194,74 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect forward short jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
-          Jump("Label") ::
+          jump ::
             filler(1) ::
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("EB 01 00 00"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB 01")) }
       }
-
 
       "correctly represent jmp Label as a string" in {
         Jump("Label").toString should be("jmp Label")
       }
 
       "Encode a simple program with an indirect forward conditional on count zero short jump instruction" in {
+        val jump = JumpIfCountZero("Label")
+
         val p = new MemoryPage(
-          JumpIfCountZero("Label") ::
+          jump ::
             filler(1) ::
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("E3 01 00 00"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E3 01")) }
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(1) ::
-            Jump("Label") ::
+            jump ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 00 EB FC"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB FC")) }
       }
 
       "Encode a simple program with an indirect backward conditional on count zero short jump instruction" in {
+        val jump = JumpIfCountZero("Label")
+
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(1) ::
-            JumpIfCountZero("Label") ::
+            jump ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 00 E3 FC"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E3 FC")) }
       }
 
       "Encode a simple program with an indirect forward near jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
-          Jump("Label") ::
+          jump ::
             filler(256) ::
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("E9 00 01" + " 00" * 257))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01")) }
       }
 
       "throw an AssertionError for a simple program with an indirect forward conditional on count zero near jump instruction" in {
+        val jump = JumpIfCountZero("Label")
+
         val p = new MemoryPage(
-          JumpIfCountZero("Label") ::
+          jump ::
             filler(256) ::
             labeledFiller(1, "Label") ::
             Nil)
@@ -259,138 +270,164 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect backward near jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(256) ::
-            Jump("Label") ::
+            jump ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 " * 257 + "E9 FC FE"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 FC FE")) }
       }
 
       "Encode a program with two indirect short jump instructions of which one jumps across the other" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
+
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump("Label2") ::
+            jump2 ::
             filler(1) ::
             labeledFiller(1, "Label2") ::
-            Jump("Label1") ::
+            jump1 ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 EB 01 " + "00 " * 2 + "EB F9"))
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB F9")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 01")) }
       }
 
-      "Encode a program with two indirect short jump instructions of which one jumps across the other and depends on the size of the other for its size" in {
-        // Instruction 1 is the instruction that jumps to label 1
-        // Instruction 2 is the instruction that jumps to label 2
-
-        // The distance between instruction 1 and its labels is 124 + size of instruction 1 (short=2 or near=3) + size of instruction 2 (short=2 or near=3),
-        // so the size of instruction 1 is short if instruction 2 is short (distance = 124 + 2 + 2 = 128)
-        // and the size of instruction 1 is near if instruction 2 is near (distance = 123 + 3 + 3 = 130)
+      "Encode a program with two indirect short jump instructions of which one depends on the size of the other for its size" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump("Label2") ::
+            jump2 ::
             filler(122) ::
             labeledFiller(1, "Label2") ::
-            Jump("Label1") ::
+            jump1 ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 EB 7A " + "00 " * 123 + "EB 80"))
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7A")) }
       }
 
-      "Encode a program with two indirect short jump instructions that jump across eachother and depends on the size of the other for its size" in {
-        // Instruction 1 is the instruction that jumps to label 1
-        // Instruction 2 is the instruction that jumps to label 2
-
-        // The distance between instruction 1 and its labels is 124 + size of instruction 1 (short=2 or near=3) + size of instruction 2 (short=2 or near=3),
-        // so the size of instruction 1 is short if instruction 2 is short (distance = 124 + 2 + 2 = 128)
-        // and the size of instruction 1 is near if instruction 2 is near (distance = 124 + 3 + 3 = 130)
+      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where both can be short" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump("Label2") ::
+            jump2 ::
             filler(123) ::
-            Jump("Label1") ::
+            jump1 ::
             filler(2) ::
             labeledFiller(1, "Label2") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 EB 7F " + "00 " * 123 + "EB 80 00 00 00"))
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7F")) }
       }
 
-      "Encode a program with two indirect near jump instructions that jump across eachother and depends on the size of the other for its size" in {
-        // Instruction 1 is the instruction that jumps to label 1
-        // Instruction 2 is the instruction that jumps to label 2
-
-        // The distance between instruction 1 and its labels is 124 + size of instruction 1 (short=2 or near=3) + size of instruction 2 (short=2 or near=3),
-        // so the size of instruction 1 is short if instruction 2 is short (distance = 124 + 2 + 2 = 128)
-        // and the size of instruction 1 is near if instruction 2 is near (distance = 123 + 3 + 3 = 130)
+      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the second forces the first to be near" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump("Label2") ::
+            jump2 ::
             filler(123) ::
-            Jump("Label1") ::
+            jump1 ::
             filler(3) ::
             labeledFiller(1, "Label2") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 E9 80 00 " + "00 " * 123 + "E9 7E FF 00 00 00 00"))
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7E FF")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
       }
 
-      "Encode a program with three indirect short jump instructions that jump across eachother and depends on the size of the others for its size" in {
-        // Instruction 1 is the instruction that jumps to label 1
-        // Instruction 2 is the instruction that jumps to label 2
-        // Instruction 3 is the instruction that jumps to label 3
+      "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the first forces the second to be near" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
 
-        // The distance between instruction 1 and its labels is 124 + size of instruction 1 + size of instruction 2 + size of instruction 3,
-        // The size of instruction 1 is short if both the other instructions are short (distance = 123 + 2 + 2 = 127)
-        // The size of instruction 2 is short if instruction 3 is short (distance = 125 + 2 = 127)
-        // The size of instruction 3 is short if both the other instructions are short (distance = 124 + 2 + 2 = 128)
-        // So, if one of them is near then all the others are near also
+        val p = new MemoryPage(
+          labeledFiller(2, "Label1") ::
+            jump2 ::
+            filler(123) ::
+            jump1 ::
+            filler(2) ::
+            labeledFiller(1, "Label2") ::
+            Nil)
+
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 80 00")) }
+      }
+
+      "Encode a program with three indirect jump instructions that depends on the size of the others for its size where all jumps can be short" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
+        val jump3 = Jump("Label3")
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump("Label2") ::
+            jump2 ::
             filler(60) ::
-            Jump("Label3") ::
+            jump3 ::
             filler(61) ::
-            Jump("Label1") ::
+            jump1 ::
             filler(2) ::
-            labeledFiller(1, "Label2") ::
-            filler(61) ::
+            labeledFiller(62, "Label2") ::
             labeledFiller(1, "Label3") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 EB 7F " + "00 " * 60 + "EB 7F " + "00 " * 61 + "EB 80" + " 00" * 65))
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7F")) }
+        withClue("Jump3") { jump3.encodeByte()(p) should be(Hex.lsb("EB 7F")) }
       }
 
-      "Encode a program with three indirect near jump instructions that jump across eachother and depends on the size of the others for its size" in {
-        // Instruction 1 is the instruction that jumps to label 1
-        // Instruction 2 is the instruction that jumps to label 2
-        // Instruction 3 is the instruction that jumps to label 3
-
-        // The distance between instruction 1 and its labels is 124 + size of instruction 1 + size of instruction 2 + size of instruction 3,
-        // The size of instruction 1 is short if both the other instructions are short (distance = 123 + 2 + 2 = 127)
-        // The size of instruction 2 is short if instruction 3 is short (distance = 125 + 2 = 127)
-        // The size of instruction 3 is short if both the other instructions are short (distance = 124 + 2 + 2 = 128)
-        // So, if one of them is near then all the others are near also
+      "Encode a program with three indirect jump instructions that depends on the size of the others for its size where instruction 3 forces the others to be long" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
+        val jump3 = Jump("Label3")
 
         val p = new MemoryPage(
           labeledFiller(1, "Label1") ::
-            Jump("Label2") ::
+            jump2 ::
             filler(60) ::
-            Jump("Label3") ::
+            jump3 ::
             filler(61) ::
-            Jump("Label1") ::
+            jump1 ::
             filler(2) ::
-            labeledFiller(1, "Label2") ::
-            filler(62) ::
+            labeledFiller(63, "Label2") ::
             labeledFiller(1, "Label3") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 E9 80 00 " + "00 " * 60 + "E9 80 00 " + "00 " * 61 + "E9 7E FF" + " 00" * 66))
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
+        withClue("Jump3") { jump3.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
+      }
+
+      "Encode a program with three indirect jump instructions that depends on the size of the others for its size where instruction 1 forces the others to be long" in {
+        val jump1 = Jump("Label1")
+        val jump2 = Jump("Label2")
+        val jump3 = Jump("Label3")
+
+        val p = new MemoryPage(
+          labeledFiller(2, "Label1") ::
+            jump2 ::
+            filler(60) ::
+            jump3 ::
+            filler(61) ::
+            jump1 ::
+            filler(2) ::
+            labeledFiller(62, "Label2") ::
+            labeledFiller(1, "Label3") ::
+            Nil)
+
+        withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7C FF")) }
+        withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
+        withClue("Jump3") { jump3.encodeByte()(p) should be(Hex.lsb("E9 80 00")) }
       }
     }
 
@@ -525,33 +562,39 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(1) ::
-            Jump("Label") ::
+            jump ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 00 EB FC"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB FC")) }
       }
 
       "Encode a simple program with an indirect backward near jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
           labeledFiller(1, "Label") ::
             filler(256) ::
-            Jump("Label") ::
+            jump ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("00 " * 257 + "E9 FA FE FF FF"))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 FA FE FF FF")) }
       }
 
       "Encode a simple program with an indirect forward near jump instruction" in {
+        val jump = Jump("Label")
+
         val p = new MemoryPage(
-          Jump("Label") ::
+          jump ::
             filler(256) ::
             labeledFiller(1, "Label") ::
             Nil)
 
-        p.encodeByte() should be(Hex.lsb("E9 00 01 00 00" + " 00" * 257))
+        withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01 00 00")) }
       }
 
     }
