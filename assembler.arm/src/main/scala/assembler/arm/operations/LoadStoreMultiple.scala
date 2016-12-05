@@ -21,6 +21,8 @@ class LoadStoreMultiple(direction: LoadStoreMultipleOperation)(implicit mnemonic
     assume(!(updateBase && userModeRegisters && !registers.contains(GeneralRegister.R15)))
 
     new ConditionalARMOperation(condition) {
+      override def mnemonic = LoadStoreMultiple.this.mnemonic
+
       def toRegisterBits(registers: List[GeneralRegister]): Int =
         registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
 

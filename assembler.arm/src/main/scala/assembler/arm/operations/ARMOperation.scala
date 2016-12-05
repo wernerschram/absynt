@@ -21,11 +21,11 @@ object ARMOperation {
 }
 
 abstract class ConditionalARMOperation(val condition: Condition) extends ARMOperation {
+  def mnemonic: String
 
   override def encodeWord()(implicit page: MemoryPage): Int =
     (condition.value << 28)
 }
-
 
 class LabeledARMOperation(instruction: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
   override def size()(implicit page: MemoryPage) = instruction.size()

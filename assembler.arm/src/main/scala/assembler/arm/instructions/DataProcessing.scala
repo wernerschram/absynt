@@ -5,35 +5,49 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.RightRotateImmediate
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operations.{ DataProcessing => DataProcessingOpcode }
 import assembler.arm.operations.ARMOperation
+import assembler.arm.operations.DataProcessingOperation
+import assembler.arm.operations.SetFlags
+import assembler.arm.operations.DataProcessingNoDestinationInstruction
+import assembler.arm.operations.DataProcessingNoRegisterInstruction
 
 class DataProcessing(val code: Byte, val opcode: String) {
-  private val RegAndShifterToReg = new DataProcessingOpcode(code)(opcode)
+  private def RegAndShifterToReg(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always) =
+    new DataProcessingOperation(opcode, code, condition, source1, source2, destination)
+
+  private def RegAndShifterToRegFlags(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always) =
+    new DataProcessingOperation(opcode, code, condition, source1, source2, destination) with SetFlags
 
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     RegAndShifterToReg(source1, source2, destination, condition)
 
   def setFlags(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
-    RegAndShifterToReg.setFlags(source1, source2, destination, condition)
+    RegAndShifterToRegFlags(source1, source2, destination, condition)
 }
 
 class DataProcessingNoDestination(val code: Byte, val opcode: String) {
-  private val RegAndShifter = new DataProcessingOpcode(code)(opcode)
+  private def RegAndShifter(register1: GeneralRegister, operand2: Shifter, condition: Condition) =
+    new DataProcessingNoDestinationInstruction(opcode, code, condition, register1, operand2)
 
   def apply(register1: GeneralRegister, source2: Shifter, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     RegAndShifter(register1, source2, condition)
-
 }
 
 class DataProcessingNoRegister(val code: Byte, val opcode: String) {
-  private val ShifterToReg = new DataProcessingOpcode(code)(opcode)
+//  private val ShifterToReg = new DataProcessingOpcode(code)(opcode)
+  private def ShifterToReg(operand2: Shifter, destination: GeneralRegister, condition: Condition) = {
+    new DataProcessingNoRegisterInstruction(opcode, code, condition, operand2, destination)
+  }
+
+  private def ShifterToRegFlags(operand2: Shifter, destination: GeneralRegister, condition: Condition) = {
+    new DataProcessingNoRegisterInstruction(opcode, code, condition, operand2, destination) with SetFlags
+  }
 
   def apply(source2: Shifter, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ShifterToReg(source2, destination, condition)
 
   def setFlags(source2: Shifter, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
-    ShifterToReg.setFlags(source2, destination, condition)
+    ShifterToRegFlags(source2, destination, condition)
 }
 
 object AddCarry extends DataProcessing(0x05.toByte, "adc") {

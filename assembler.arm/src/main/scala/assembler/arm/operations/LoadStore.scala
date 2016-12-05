@@ -134,6 +134,8 @@ class LoadStore(operation: LoadStoreOperation.LoadStoreOperation)(implicit mnemo
     addressingType: LoadStoreAddressingType): ARMOperation = {
 
     new ConditionalARMOperation(condition) {
+      override def mnemonic = LoadStore.this.mnemonic
+
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() |
           operation.bitMask | addressingType.bitMask |
@@ -154,6 +156,8 @@ class LoadStoreMiscelaneous(operation: LoadStoreMiscelaneousOperation.LoadStoreM
     addressingType: LoadStoreAddressingType): ARMOperation = {
 
     new ConditionalARMOperation(condition) {
+      override def mnemonic = LoadStoreMiscelaneous.this.mnemonic
+
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() |
           operation.bitMask | addressingType.bitMask |

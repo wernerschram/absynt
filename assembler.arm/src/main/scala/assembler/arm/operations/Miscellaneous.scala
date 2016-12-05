@@ -65,6 +65,8 @@ class ProcessorState(val code: Byte)(implicit mnemonic: String) {
 
   private def apply(condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Byte, stringValue: String)(implicit processorMode: ProcessorMode): ARMOperation =
     new ConditionalARMOperation(condition) {
+      override def mnemonic = ProcessorState.this.mnemonic
+
       override def encodeWord()(implicit page: MemoryPage) =
         (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
 
