@@ -8,19 +8,12 @@ import assembler.arm.operands.registers._
 import assembler.memory.MemoryPage
 import assembler.arm.operands.RightRotateImmediate
 
-class MoveFromStatusRegister()(implicit mnemonic: String)
-    extends Operation(mnemonic) {
+class MoveFromStatusRegister(override val opcode: String, source: StatusRegister, destination: GeneralRegister, override val condition: Condition)
+    extends Conditional {
+  override def encodeWord()(implicit page: MemoryPage) =
+    (super.encodeWord() | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12))
 
-  def apply(source: StatusRegister, destination: GeneralRegister, conditionValue: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new Conditional {
-      val condition = conditionValue
-      override val opcode = MoveFromStatusRegister.this.mnemonic
-
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12))
-
-      override def toString = s"${super.toString()} ${destination.toString}, ${source.toString}"
-    }
+  override def toString = s"${super.toString()} ${destination.toString}, ${source.toString}"
 }
 
 object Fields extends Enumeration {
@@ -36,29 +29,17 @@ object Fields extends Enumeration {
   }
 }
 
-class MoveToStatusRegister()(implicit mnemonic: String)
-    extends Operation(mnemonic) {
+class MoveToStatusRegister private(override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet, override val condition: Condition, val sourceString: String, val sourceValue: Int)
+    extends Conditional {
 
-  def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, conditionValue: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new Conditional {
-      val condition = conditionValue
-      override val opcode = MoveToStatusRegister.this.mnemonic
+  def this(opcode: String, source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
+    this(opcode, destination, fields, condition, source.toString, source.registerCode)
 
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | (source.registerCode)))
+  def this(opcode: String, source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
+    this(opcode, destination, fields, condition, source.toString, source.encode)
 
-      override def toString = s"${super.toString()}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
-    }
+  override def encodeWord()(implicit page: MemoryPage) =
+    super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | ((fields.toBitMask)(0).toInt) | sourceValue)
 
-  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, conditionValue: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
-    new Conditional {
-      val condition = conditionValue
-      override val opcode = MoveToStatusRegister.this.mnemonic
-
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | 0x0120f000 | (destination.registerCode << 22) | ((fields.toBitMask)(0).toInt) | source.encode)
-
-      override def toString = s"${super.toString()}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
-    }
-  }
+  override def toString = s"${super.toString()} ${destination.toString}_${Fields.fieldsToString(fields)}, ${sourceString}"
 }

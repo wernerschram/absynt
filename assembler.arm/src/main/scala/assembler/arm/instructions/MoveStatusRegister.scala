@@ -12,7 +12,8 @@ import assembler.arm.operations.{ MoveToStatusRegister => MoveToStatusRegisterOp
 object MoveFromStatusRegister {
   implicit val opcode = "mrs"
 
-  private val RegToStatus = new MoveFromStatusRegisterOpcode()(opcode)
+  private def RegToStatus(source: StatusRegister, destination: GeneralRegister, condition: Condition) =
+    new MoveFromStatusRegisterOpcode(opcode, source, destination, condition)
 
   def apply(source: StatusRegister, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     RegToStatus(source, destination, condition)
@@ -21,17 +22,21 @@ object MoveFromStatusRegister {
 object MoveToStatusRegister {
   implicit val opcode = "msr"
 
-  private val StatusToReg = new MoveToStatusRegisterOpcode()(opcode)
+  private def RegToReg(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
+    new MoveToStatusRegisterOpcode(opcode, source, destination, fields, condition)
+
+  private def ImmediateToReg(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
+    new MoveToStatusRegisterOpcode(opcode, source, destination, fields, condition)
 
   def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, destination, fields, Always)
+    RegToReg(source, destination, fields, Always)
 
   def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, destination, fields, condition)
+    RegToReg(source, destination, fields, condition)
 
   def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, destination, fields, Always)
+    ImmediateToReg(source, destination, fields, Always)
 
   def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode) =
-    StatusToReg(source, destination, fields, condition)
+    ImmediateToReg(source, destination, fields, condition)
 }

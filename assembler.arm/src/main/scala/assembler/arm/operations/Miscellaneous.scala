@@ -6,11 +6,8 @@ import assembler.arm.operands.Condition._
 import assembler.arm.ProcessorMode
 import assembler.memory.MemoryPage
 
-class Miscellaneous(val code: Byte, mnemonic: String, value: Short, condition: Condition)
+class Miscellaneous(val code: Byte, override val opcode: String, value: Short, condition: Condition)
     extends ARMOperation {
-
-  val opcode = Miscellaneous.this.mnemonic
-
   override def encodeWord()(implicit page: MemoryPage) = {
     val valuePart1: Byte = (value & 0x0f).toByte
     val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
