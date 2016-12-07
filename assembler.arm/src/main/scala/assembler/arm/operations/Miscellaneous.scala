@@ -6,25 +6,20 @@ import assembler.arm.operands.Condition._
 import assembler.arm.ProcessorMode
 import assembler.memory.MemoryPage
 
-class Miscellaneous(val code: Byte)(implicit mnemonic: String)
-    extends Operation(mnemonic) {
+class Miscellaneous(val code: Byte, mnemonic: String, value: Short, condition: Condition)
+    extends ARMOperation {
 
-  def apply(value: Short, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
-    new ARMOperation {
+  val opcode = Miscellaneous.this.mnemonic
 
-      val opcode = Miscellaneous.this.mnemonic
-
-      override def encodeWord()(implicit page: MemoryPage) = {
-        val valuePart1: Byte = (value & 0x0f).toByte
-        val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
-        val extraCode: Int = 0x7
-        val result = ((condition.value << 28) | (code << 21) | (valuePart2 << 8) | (extraCode << 4) | valuePart1)
-        result
-      }
-
-      override def toString = s"${super.toString()} ${value}"
-    }
+  override def encodeWord()(implicit page: MemoryPage) = {
+    val valuePart1: Byte = (value & 0x0f).toByte
+    val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
+    val extraCode: Int = 0x7
+    val result = ((condition.value << 28) | (code << 21) | (valuePart2 << 8) | (extraCode << 4) | valuePart1)
+    result
   }
+
+  override def toString = s"${super.toString()} ${value}"
 }
 
 sealed abstract class Effect(val iMod: Byte, val mnemonicExtension: String)

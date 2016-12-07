@@ -7,7 +7,7 @@ import assembler.arm.operations.Miscellaneous
 object Breakpoint {
   val code: Byte = 0x09
   val opcode: String = "bkpt"
-  private val Immed = new Miscellaneous(code)(opcode)
+  private def Immed(value: Short, condition: Condition) = new Miscellaneous(code, opcode, value, condition)
 
     def apply(value: Short, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
       Immed(value, condition)
