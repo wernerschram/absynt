@@ -125,9 +125,9 @@ object LoadStoreMiscelaneousOperation {
   object LoadSignedHalfWord extends LoadStoreMiscelaneousOperation(0x00100060, "sh")
 }
 
-class LoadStore(opcode: String, condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
+class LoadStore(opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
   addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
-    extends ConditionalARMOperation(condition) {
+    extends Conditional {
   override def mnemonic = opcode
 
   override def encodeWord()(implicit page: MemoryPage) =
@@ -140,9 +140,9 @@ class LoadStore(opcode: String, condition: Condition, register: GeneralRegister,
 
 }
 
-class LoadStoreMiscelaneous(opcode: String, condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
+class LoadStoreMiscelaneous(opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
   addressingType: LoadStoreAddressingType, operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)
-    extends ConditionalARMOperation(condition) {
+    extends Conditional {
 
   override def mnemonic = opcode
 

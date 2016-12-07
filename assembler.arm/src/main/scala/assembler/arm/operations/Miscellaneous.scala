@@ -11,6 +11,9 @@ class Miscellaneous(val code: Byte)(implicit mnemonic: String)
 
   def apply(value: Short, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
     new ARMOperation() {
+
+      def mnemonic = Miscellaneous.this.mnemonic
+
       override def encodeWord()(implicit page: MemoryPage) = {
         val valuePart1: Byte = (value & 0x0f).toByte
         val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
@@ -61,7 +64,8 @@ object InterruptDisableFlags extends Enumeration {
   }
 }
 
-class ProcessorState(val code: Byte, opcode: String, condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, stringValue: String) extends ConditionalARMOperation(condition) {
+class ProcessorState(val code: Byte, opcode: String, val condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, stringValue: String)
+    extends Conditional {
 
   def this(code: Byte, opcode: String, mode: ExecutionMode) =
     this(code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #${mode}")

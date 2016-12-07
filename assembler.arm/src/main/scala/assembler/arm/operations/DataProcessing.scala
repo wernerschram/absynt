@@ -6,8 +6,8 @@ import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
 
-class DataProcessingOperation(opcode: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister)
-    extends ConditionalARMOperation(condition) {
+class DataProcessingOperation(opcode: String, code: Byte, val condition: Condition, register1: GeneralRegister, operand2: Shifter, destination: GeneralRegister)
+    extends Conditional {
   override def mnemonic = opcode
 
   override def encodeWord()(implicit page: MemoryPage) =
@@ -16,8 +16,8 @@ class DataProcessingOperation(opcode: String, code: Byte, condition: Condition, 
   override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}, ${register1.toString}, ${operand2.toString}"
 }
 
-class DataProcessingNoDestinationInstruction(opcode: String, code: Byte, condition: Condition, register1: GeneralRegister, operand2: Shifter)
-    extends ConditionalARMOperation(condition) {
+class DataProcessingNoDestinationInstruction(opcode: String, code: Byte, val condition: Condition, register1: GeneralRegister, operand2: Shifter)
+    extends Conditional {
   override def mnemonic = opcode
 
   override def encodeWord()(implicit page: MemoryPage) =
@@ -26,8 +26,8 @@ class DataProcessingNoDestinationInstruction(opcode: String, code: Byte, conditi
   override def toString = s"${mnemonic}${condition.mnemonicExtension} ${register1.toString}, ${operand2.toString}"
 }
 
-class DataProcessingNoRegisterInstruction(opcode: String, code: Byte, condition: Condition, operand2: Shifter, destination: GeneralRegister)
-    extends ConditionalARMOperation(condition) {
+class DataProcessingNoRegisterInstruction(opcode: String, code: Byte, val condition: Condition, operand2: Shifter, destination: GeneralRegister)
+    extends Conditional {
   override def mnemonic = opcode
 
   override def encodeWord()(implicit page: MemoryPage) =

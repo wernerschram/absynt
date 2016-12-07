@@ -26,8 +26,8 @@ object LoadStoreMultipleDirection {
 //
 //}
 
-class LoadStoreMultiple(direction: LoadStoreMultipleDirection, condition: Condition, val registers: List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, opcode: String)
-    extends ConditionalARMOperation(condition) {
+class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Condition, val registers: List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, opcode: String)
+    extends Conditional {
   assume(!registers.isEmpty)
   assume(baseRegister != GeneralRegister.R15)
 
@@ -67,6 +67,7 @@ trait UserModeRegisters extends LoadStoreMultiple {
 
 class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, opcode: String)
     extends ARMOperation() {
+  def mnemonic = opcode
 
   override def encodeWord()(implicit page: MemoryPage) =
     (0xf8100a00 |
@@ -74,5 +75,5 @@ class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateM
       addressingMode.bitMask |
       (baseRegister.registerCode << 16))
 
-  override def toString = s"${opcode}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}"
+  override def toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}"
 }

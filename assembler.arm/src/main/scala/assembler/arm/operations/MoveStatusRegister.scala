@@ -11,8 +11,9 @@ import assembler.arm.operands.RightRotateImmediate
 class MoveFromStatusRegister()(implicit mnemonic: String)
     extends Operation(mnemonic) {
 
-  def apply(source: StatusRegister, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new ConditionalARMOperation(condition) {
+  def apply(source: StatusRegister, destination: GeneralRegister, conditionValue: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
+    new Conditional {
+      val condition = conditionValue
       override def mnemonic = MoveFromStatusRegister.this.mnemonic
 
       override def encodeWord()(implicit page: MemoryPage) =
@@ -38,8 +39,9 @@ object Fields extends Enumeration {
 class MoveToStatusRegister()(implicit mnemonic: String)
     extends Operation(mnemonic) {
 
-  def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
-    new ConditionalARMOperation(condition) {
+  def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, conditionValue: Condition)(implicit processorMode: ProcessorMode): ARMOperation =
+    new Conditional {
+      val condition = conditionValue
       override def mnemonic = MoveToStatusRegister.this.mnemonic
 
       override def encodeWord()(implicit page: MemoryPage) =
@@ -48,8 +50,9 @@ class MoveToStatusRegister()(implicit mnemonic: String)
       override def toString = s"${mnemonic}${condition.mnemonicExtension} ${destination.toString}_${Fields.fieldsToString(fields)}, ${source.toString}"
     }
 
-  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
-    new ConditionalARMOperation(condition) {
+  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, conditionValue: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
+    new Conditional {
+      val condition = conditionValue
       override def mnemonic = MoveToStatusRegister.this.mnemonic
 
       override def encodeWord()(implicit page: MemoryPage) =
