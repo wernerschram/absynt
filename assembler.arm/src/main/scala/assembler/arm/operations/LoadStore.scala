@@ -96,7 +96,6 @@ object LoadStoreMiscelaneousOffset {
   implicit def apply(offsetRegister: GeneralRegister): LoadStoreMiscelaneousOffset = apply(offsetRegister, UpdateDirection.Increment)
 }
 
-
 object UpdateDirection {
   sealed abstract class UpdateDirection(uBit: Boolean, val sign: String) {
     val bitMask = (if (uBit) 0x00800000 else 0)
@@ -126,45 +125,32 @@ object LoadStoreMiscelaneousOperation {
   object LoadSignedHalfWord extends LoadStoreMiscelaneousOperation(0x00100060, "sh")
 }
 
-class LoadStore(operation: LoadStoreOperation.LoadStoreOperation)(implicit mnemonic: String)
-    extends Operation(mnemonic) {
+class LoadStore(opcode: String, condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
+  addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
+    extends ConditionalARMOperation(condition) {
+  override def mnemonic = opcode
 
-  def apply(
-    condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
-    addressingType: LoadStoreAddressingType): ARMOperation = {
+  override def encodeWord()(implicit page: MemoryPage) =
+    (super.encodeWord() |
+      operation.bitMask | addressingType.bitMask |
+      (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
 
-    new ConditionalARMOperation(condition) {
-      override def mnemonic = LoadStore.this.mnemonic
+  override def toString =
+    s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatParameters(baseRegister, offset)}"
 
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() |
-          operation.bitMask | addressingType.bitMask |
-          (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
-
-      override def toString =
-        s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatParameters(baseRegister, offset)}"
-
-    }
-  }
 }
 
-class LoadStoreMiscelaneous(operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)(implicit mnemonic: String)
-    extends Operation(mnemonic) {
+class LoadStoreMiscelaneous(opcode: String, condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
+  addressingType: LoadStoreAddressingType, operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)
+    extends ConditionalARMOperation(condition) {
 
-  def apply(
-    condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
-    addressingType: LoadStoreAddressingType): ARMOperation = {
+  override def mnemonic = opcode
 
-    new ConditionalARMOperation(condition) {
-      override def mnemonic = LoadStoreMiscelaneous.this.mnemonic
+  override def encodeWord()(implicit page: MemoryPage) =
+    (super.encodeWord() |
+      operation.bitMask | addressingType.bitMask |
+      (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
 
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() |
-          operation.bitMask | addressingType.bitMask |
-          (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
-
-      override def toString =
-        s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatMiscelaneousParameters(baseRegister, offset)}"
-    }
-  }
+  override def toString =
+    s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatMiscelaneousParameters(baseRegister, offset)}"
 }

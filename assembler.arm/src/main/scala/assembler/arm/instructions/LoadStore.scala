@@ -9,8 +9,13 @@ import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemnonic: String) {
 
-  private val ImmedWord = new LoadStore(wordOperation)
-  private val ImmedByte = new LoadStore(byteOperation)
+  private def ImmedWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
+    addressingType: LoadStoreAddressingType) =
+    new LoadStore(mnemnonic, condition, register, baseRegister, offset, addressingType, wordOperation)
+
+  private def ImmedByte(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
+    addressingType: LoadStoreAddressingType) =
+    new LoadStore(mnemnonic, condition, register, baseRegister, offset, addressingType, byteOperation)
 
   def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ImmedWord(condition, register, baseRegister, offset, addressingType)
@@ -28,10 +33,18 @@ class LoadStoreRegister(
 }
 
 object LoadRegister extends LoadStoreRegister(LoadStoreOperation.LoadWord, LoadStoreOperation.LoadByte)("ldr") {
-  private val ImmedDoubleWord = new LoadStoreMiscelaneous(LoadStoreMiscelaneousOperation.LoadDoubleWord)
-  private val ImmedUnsignedHalfWord = new LoadStoreMiscelaneous(LoadStoreMiscelaneousOperation.LoadUnsignedHalfWord)
-  private val ImmedSignedByte = new LoadStoreMiscelaneous(LoadStoreMiscelaneousOperation.LoadSignedByte)
-  private val ImmedSignedHalfWord = new LoadStoreMiscelaneous(LoadStoreMiscelaneousOperation.LoadSignedHalfWord)
+  private def ImmedDoubleWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+      offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType) =
+    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType, LoadStoreMiscelaneousOperation.LoadDoubleWord)
+  private def ImmedUnsignedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+      offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType) =
+    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType, LoadStoreMiscelaneousOperation.LoadUnsignedHalfWord)
+  private def ImmedSignedByte(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+      offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType) =
+    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType, LoadStoreMiscelaneousOperation.LoadSignedByte)
+  private def ImmedSignedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+      offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType) =
+    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType, LoadStoreMiscelaneousOperation.LoadSignedHalfWord)
 
   def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
@@ -47,8 +60,12 @@ object LoadRegister extends LoadStoreRegister(LoadStoreOperation.LoadWord, LoadS
 }
 
 object StoreRegister extends LoadStoreRegister(LoadStoreOperation.StoreWord, LoadStoreOperation.StoreByte)("str") {
-  private val ImmedHalfWord = new LoadStoreMiscelaneous(LoadStoreMiscelaneousOperation.StoreHalfWord)
-  private val ImmedDoubleWord = new LoadStoreMiscelaneous(LoadStoreMiscelaneousOperation.StoreDoubleWord)
+  private def ImmedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+      offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType) =
+    new LoadStoreMiscelaneous("str", condition, register, baseRegister, offset, addressingType, LoadStoreMiscelaneousOperation.StoreHalfWord)
+  private def ImmedDoubleWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+      offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType) =
+    new LoadStoreMiscelaneous("str", condition, register, baseRegister, offset, addressingType, LoadStoreMiscelaneousOperation.StoreDoubleWord)
 
   def halfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ImmedHalfWord(condition, register, baseRegister, offset, addressingType)
