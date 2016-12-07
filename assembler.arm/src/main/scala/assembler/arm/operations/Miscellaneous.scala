@@ -54,41 +54,32 @@ object InterruptDisableFlags extends Enumeration {
 
   val none = ValueSet.empty
 
-  implicit def valueToSet(value: Value) : ValueSet = ValueSet(value)
+  implicit def valueToSet(value: Value): ValueSet = ValueSet(value)
 
-  implicit def flagsToString(set: ValueSet) : String = {
-    set.foldRight("")((a,b) => a + b).reverse
+  implicit def flagsToString(set: ValueSet): String = {
+    set.foldRight("")((a, b) => a + b).reverse
   }
 }
 
-class ProcessorState(val code: Byte)(implicit mnemonic: String) {
+class ProcessorState(val code: Byte, opcode: String, condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, stringValue: String) extends ConditionalARMOperation(condition) {
 
-  private def apply(condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Byte, stringValue: String)(implicit processorMode: ProcessorMode): ARMOperation =
-    new ConditionalARMOperation(condition) {
-      override def mnemonic = ProcessorState.this.mnemonic
+  def this(code: Byte, opcode: String, mode: ExecutionMode) =
+    this(code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #${mode}")
 
-      override def encodeWord()(implicit page: MemoryPage) =
-        (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
+  def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
+    this(code: Byte, opcode: String, Unpredictable, effect.iMod, 0x01.toByte,
+      ((interruptDisableFlags.toBitMask)(0).toInt << 6), 0x00,
+      s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
 
-      override def toString = stringValue
-    }
+  def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode) =
+    this(code, opcode, Unpredictable, effect.iMod, 0x01.toByte,
+      ((interruptDisableFlags.toBitMask)(0).toInt << 6), mode.mode,
+      s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #${mode}")
 
-  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMOperation =
-    apply(Unpredictable, effect.iMod, 0x01.toByte,
-        ((interruptDisableFlags.toBitMask)(0).toInt << 6), mode.mode,
-      s"${ProcessorState.this.mnemonic}${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #${mode}")
+  override def mnemonic = opcode
 
-  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet)(implicit processorMode: ProcessorMode): ARMOperation =
-    apply(Unpredictable, effect.iMod, 0x01.toByte,
-        ((interruptDisableFlags.toBitMask)(0).toInt << 6), 0x00,
-      s"${ProcessorState.this.mnemonic}${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
+  override def encodeWord()(implicit page: MemoryPage) =
+    (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
 
-
-  def apply(mode: ExecutionMode)(implicit processorMode: ProcessorMode): ARMOperation =
-    apply(Unpredictable,
-      0x00.toByte,
-      0x01.toByte,
-      0x00,
-      mode.mode,
-      s"${ProcessorState.this.mnemonic} #${mode}")
+  override def toString = s"${mnemonic}${stringValue}"
 }

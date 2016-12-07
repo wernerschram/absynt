@@ -9,14 +9,22 @@ import assembler.arm.operations.ProcessorState
 object ChangeProcessorState {
   val code: Byte = 0x10
   val opcode: String = "cps"
-  private val ProcessorState = new ProcessorState(code)(opcode)
+
+  private def ProcessorState(mode: ExecutionMode) =
+    new ProcessorState(code, opcode, mode)
+
+  private def ProcessorState(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
+    new ProcessorState(code, opcode, effect, interruptDisableFlags)
+
+  private def ProcessorState(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode) =
+    new ProcessorState(code, opcode, effect, interruptDisableFlags, mode)
 
     def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode)(implicit processorMode: ProcessorMode) =
       ProcessorState(effect, interruptDisableFlags, mode)
 
-    def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet)(implicit processorMode: ProcessorMode) =
+    def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
       ProcessorState(effect, interruptDisableFlags)
 
-    def apply(mode: ExecutionMode)(implicit processorMode: ProcessorMode) =
+    def apply(mode: ExecutionMode) =
       ProcessorState(mode)
 }
