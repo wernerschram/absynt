@@ -5,20 +5,31 @@ import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.memory.MemoryPage
 
-class LoadStoreMultipleOperation(val bitmask: Int)
+class LoadStoreMultipleDirection(val bitmask: Int)
 
-object LoadStoreMultipleOperation {
-  object Store extends LoadStoreMultipleOperation(0x00000000)
-  object Load extends LoadStoreMultipleOperation(0x00100000)
+object LoadStoreMultipleDirection {
+  object Store extends LoadStoreMultipleDirection(0x00000000)
+  object Load extends LoadStoreMultipleDirection(0x00100000)
 }
+//
+//abstract class LoadStoreMultipleOperation(baseRegister: GeneralRegister, addressingMode: UpdateMode, val opcode: String)
+//  extends ARMOperation {
+//
+//  override def encodeWord()(implicit page: MemoryPage) =
+//    (0xf8100a00 |
+//      addressingMode.bitMask |
+//      (baseRegister.registerCode << 16))
+//
+//  def baseRegisterString = baseRegister.toString()
+//
+//  override def toString = s"${opcode}${addressingMode.mnemonicExtension} ${baseRegisterString}"
+//
+//}
 
-//  def apply()(implicit processorMode: ProcessorMode): ARMOperation = {
-
-class LoadStoreMultiple(direction: LoadStoreMultipleOperation, condition: Condition, registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, userModeRegisters: Boolean, opcode: String)
+class LoadStoreMultiple(direction: LoadStoreMultipleDirection, condition: Condition, val registers: List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, opcode: String)
     extends ConditionalARMOperation(condition) {
   assume(!registers.isEmpty)
   assume(baseRegister != GeneralRegister.R15)
-  assume(!(updateBase && userModeRegisters && !registers.contains(GeneralRegister.R15)))
 
   override def mnemonic = opcode
 
@@ -27,13 +38,31 @@ class LoadStoreMultiple(direction: LoadStoreMultipleOperation, condition: Condit
 
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | 0x08000000 |
-      (if (updateBase) 0x00200000 else 0) |
-      (if (userModeRegisters) 0x00400000 else 0) |
       addressingMode.bitMask | direction.bitmask |
       (baseRegister.registerCode << 16) |
       toRegisterBits(registers))
 
-  override def toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}, {${registers.map { x => x.toString }.mkString(", ")}}${if (userModeRegisters) "^" else ""}" // ${value.toString()}}"
+  def baseRegisterString = baseRegister.toString()
+  def registerString = s"{${registers.map { x => x.toString }.mkString(", ")}}"
+
+  override def toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegisterString}, ${registerString}"
+}
+
+trait UpdateBase extends LoadStoreMultiple {
+  self: LoadStoreMultiple =>
+  override def encodeWord()(implicit page: MemoryPage) =
+    super.encodeWord() | 0x00200000
+
+  override def baseRegisterString = s"${super.baseRegisterString}!"
+}
+
+trait UserModeRegisters extends LoadStoreMultiple {
+  self: LoadStoreMultiple =>
+    assume(!(this.isInstanceOf[UpdateBase] && !registers.contains(GeneralRegister.R15)))
+  override def encodeWord()(implicit page: MemoryPage) =
+    super.encodeWord() | 0x00400000
+
+  override def registerString = s"${super.registerString}^"
 }
 
 class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, opcode: String)
