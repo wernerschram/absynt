@@ -11,7 +11,8 @@ import assembler.arm.operations.UpdateMode
 object LoadMultiple {
   //val code: Byte = 0x08
   implicit val opcode: String = "ldm"
-  private val Immed = new LoadStoreMultipleOpcode(LoadStoreMultipleOperation.Load)
+  private def Immed(condition: Condition, registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, userModeRegisters: Boolean) =
+    new LoadStoreMultipleOpcode(LoadStoreMultipleOperation.Load, condition, registers, baseRegister, addressingMode, updateBase, userModeRegisters, opcode)
 
   def apply(registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     Immed(condition, registers, baseRegister, addressingMode, false, false)
@@ -28,7 +29,8 @@ object LoadMultiple {
 
 object StoreMultiple {
   implicit val opcode: String = "stm"
-  private val Immed = new LoadStoreMultipleOpcode(LoadStoreMultipleOperation.Store)
+  private def Immed(condition: Condition, registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, userModeRegisters: Boolean) =
+    new LoadStoreMultipleOpcode(LoadStoreMultipleOperation.Store, condition, registers, baseRegister, addressingMode, updateBase, userModeRegisters, opcode)
 
   def apply(registers: List[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     Immed(condition, registers, baseRegister, addressingMode, false, false)
@@ -42,9 +44,10 @@ object StoreMultiple {
 
 object ReturnFromException {
   implicit val opcode: String = "rfe"
-  private val Immed = new ReturnFromExceptionOpcode()
+  private def Immed(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean) =
+    new ReturnFromExceptionOpcode(baseRegister, addressingMode, updateBase, opcode)
 
-  def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode)(implicit processorMode: ProcessorMode) =
+  def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode) =
     Immed(baseRegister, addressingMode, false)
 
   def withUpdateBase(baseRegister: GeneralRegister, addressingMode: UpdateMode)(implicit processorMode: ProcessorMode) =
