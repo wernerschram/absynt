@@ -8,5 +8,5 @@ trait SetFlags extends Conditional {
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | ARMOperation.sBit)
 
-  abstract override def mnemonic = s"${super.mnemonic}s"
+  override def mnemonic = PartialName("s", 2) :: super.mnemonic
 }

@@ -16,7 +16,7 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
     "in a32 mode" should {
 
       class MyInstruction extends ARMOperation {
-        def mnemonic = "my"
+        val opcode = "my"
         override def encodeWord()(implicit page: MemoryPage) = 4
       }
 

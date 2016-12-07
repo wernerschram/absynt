@@ -34,7 +34,6 @@ class DataProcessingNoDestination(val code: Byte, val opcode: String) {
 }
 
 class DataProcessingNoRegister(val code: Byte, val opcode: String) {
-//  private val ShifterToReg = new DataProcessingOpcode(code)(opcode)
   private def ShifterToReg(operand2: Shifter, destination: GeneralRegister, condition: Condition) = {
     new DataProcessingNoRegisterInstruction(opcode, code, condition, operand2, destination)
   }

@@ -125,26 +125,22 @@ object LoadStoreMiscelaneousOperation {
   object LoadSignedHalfWord extends LoadStoreMiscelaneousOperation(0x00100060, "sh")
 }
 
-class LoadStore(opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
+class LoadStore(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
   addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
     extends Conditional {
-  override def mnemonic = opcode
-
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() |
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
 
   override def toString =
-    s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatParameters(baseRegister, offset)}"
+    s"${super.toString()}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatParameters(baseRegister, offset)}"
 
 }
 
-class LoadStoreMiscelaneous(opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
+class LoadStoreMiscelaneous(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
   addressingType: LoadStoreAddressingType, operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)
     extends Conditional {
-
-  override def mnemonic = opcode
 
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() |
@@ -152,5 +148,5 @@ class LoadStoreMiscelaneous(opcode: String, val condition: Condition, register: 
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode)
 
   override def toString =
-    s"${mnemonic}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatMiscelaneousParameters(baseRegister, offset)}"
+    s"${super.toString()}${operation.opcodeExtension}${addressingType.opcodeExtension} ${register}, ${addressingType.formatMiscelaneousParameters(baseRegister, offset)}"
 }

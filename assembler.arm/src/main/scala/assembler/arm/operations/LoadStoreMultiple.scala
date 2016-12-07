@@ -26,12 +26,10 @@ object LoadStoreMultipleDirection {
 //
 //}
 
-class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Condition, val registers: List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, opcode: String)
+class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Condition, val registers: List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, val opcode: String)
     extends Conditional {
   assume(!registers.isEmpty)
   assume(baseRegister != GeneralRegister.R15)
-
-  override def mnemonic = opcode
 
   def toRegisterBits(registers: List[GeneralRegister]): Int =
     registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
@@ -45,7 +43,7 @@ class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Co
   def baseRegisterString = baseRegister.toString()
   def registerString = s"{${registers.map { x => x.toString }.mkString(", ")}}"
 
-  override def toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegisterString}, ${registerString}"
+  override def toString = s"${super.toString()}${addressingMode.mnemonicExtension} ${baseRegisterString}, ${registerString}"
 }
 
 trait UpdateBase extends LoadStoreMultiple {
@@ -65,15 +63,13 @@ trait UserModeRegisters extends LoadStoreMultiple {
   override def registerString = s"${super.registerString}^"
 }
 
-class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, opcode: String)
+class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, val opcode: String)
     extends ARMOperation() {
-  def mnemonic = opcode
-
   override def encodeWord()(implicit page: MemoryPage) =
     (0xf8100a00 |
       (if (updateBase) 0x00200000 else 0) |
       addressingMode.bitMask |
       (baseRegister.registerCode << 16))
 
-  override def toString = s"${mnemonic}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}"
+  override def toString = s"${super.toString()}${addressingMode.mnemonicExtension} ${baseRegister}${if (updateBase) "!" else ""}"
 }

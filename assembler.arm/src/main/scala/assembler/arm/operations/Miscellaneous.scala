@@ -10,9 +10,9 @@ class Miscellaneous(val code: Byte)(implicit mnemonic: String)
     extends Operation(mnemonic) {
 
   def apply(value: Short, condition: Condition)(implicit processorMode: ProcessorMode): ARMOperation = {
-    new ARMOperation() {
+    new ARMOperation {
 
-      def mnemonic = Miscellaneous.this.mnemonic
+      val opcode = Miscellaneous.this.mnemonic
 
       override def encodeWord()(implicit page: MemoryPage) = {
         val valuePart1: Byte = (value & 0x0f).toByte
@@ -22,7 +22,7 @@ class Miscellaneous(val code: Byte)(implicit mnemonic: String)
         result
       }
 
-      override def toString = s"${mnemonic} ${value}"
+      override def toString = s"${super.toString()} ${value}"
     }
   }
 }
@@ -64,7 +64,7 @@ object InterruptDisableFlags extends Enumeration {
   }
 }
 
-class ProcessorState(val code: Byte, opcode: String, val condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, stringValue: String)
+class ProcessorState(val code: Byte, val opcode: String, val condition: Condition, iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, stringValue: String)
     extends Conditional {
 
   def this(code: Byte, opcode: String, mode: ExecutionMode) =
@@ -80,10 +80,8 @@ class ProcessorState(val code: Byte, opcode: String, val condition: Condition, i
       ((interruptDisableFlags.toBitMask)(0).toInt << 6), mode.mode,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #${mode}")
 
-  override def mnemonic = opcode
-
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
 
-  override def toString = s"${mnemonic}${stringValue}"
+  override def toString = s"${super.toString()}${stringValue}"
 }
