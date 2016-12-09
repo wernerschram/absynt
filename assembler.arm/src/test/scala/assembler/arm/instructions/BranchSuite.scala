@@ -135,12 +135,20 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
       implicit val processorMode = ProcessorMode.A32
 
-      "correctly encode blx 0x123e" in {
+      "correctly encode blx 0x123c" in {
         BranchLinkExchange(0x1234).encodeByte should be(Hex.msb("fa00048d"))
       }
 
-      "correctly represent blx 0x123e as a string" in {
+      "correctly represent blx 0x123c as a string" in {
         BranchLinkExchange(0x1234).toString should be("blx 4660")
+      }
+
+      "correctly encode blx 0x123d" in {
+        BranchLinkExchange(0x1235).encodeByte should be(Hex.msb("fb00048d"))
+      }
+
+      "correctly represent blx 0x123d as a string" in {
+        BranchLinkExchange(0x1235).toString should be("blx 4661")
       }
 
       "correctly encode blx r12" in {

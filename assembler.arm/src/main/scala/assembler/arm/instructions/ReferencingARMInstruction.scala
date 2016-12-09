@@ -13,7 +13,7 @@ import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.reference.BranchInstructionOnPage
 
-abstract class ReferencingARMInstruction(mnemonic: String, condition: LabelCondition)(implicit processorMode: ProcessorMode)
+abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, condition: LabelCondition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
     extends Encodable with ReferencingInstruction[BranchInstructionOnPage] {
 
   class ARMBranchInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
@@ -30,9 +30,9 @@ abstract class ReferencingARMInstruction(mnemonic: String, condition: LabelCondi
 
     def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
       if (forward) {
-        RelativePointer(distance - 4)
+        newPointer(distance - 4)
       } else {
-        RelativePointer(-distance - 8)
+        newPointer(-distance - 8)
       }
     }
   }
@@ -42,7 +42,7 @@ abstract class ReferencingARMInstruction(mnemonic: String, condition: LabelCondi
   def createOperation(thisLocation: Int, targetLocation: Int, memoryPage: MemoryPage, processorMode: ProcessorMode): ARMBranchInstructionOnPage =
     new ARMBranchInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode)
 
-  def encodeWordForDistance(destination: RelativePointer)(implicit page: MemoryPage): Int
+  def encodeWordForDistance(destination: PointerType)(implicit page: MemoryPage): Int
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): ARMBranchInstructionOnPage = {
     val target = page.encodableLocation(page.getEncodableByCondition(condition))
