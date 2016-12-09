@@ -6,8 +6,8 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativePointer
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.BranchImmediate
-import assembler.memory.MemoryPage
 import assembler.arm.operations.BranchRegister
+import assembler.memory.MemoryPage
 
 class Branch(code: Byte, val opcode: String) {
   private def Immediate(destination: RelativePointer, condition: Condition = Always) =
@@ -31,7 +31,6 @@ class Branch(code: Byte, val opcode: String) {
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
   // TODO HBit
-//  private val Register = new BranchRegisterOperation(registerCode)(opcode)
   private def Register(destination: GeneralRegister, condition: Condition = Always) =
     new BranchRegister(destination, condition, registerCode, opcode)
 
@@ -41,7 +40,6 @@ class BranchExchange(registerCode: Byte, val opcode: String) {
 
 class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String) extends BranchExchange(registerCode, opcode) {
   // TODO HBit
-  //  private val Immediate = new BranchImmediateOperation(immediateCode)(opcode)
   private def Immediate(destination: RelativePointer, condition: Condition = Always) =
     new BranchImmediate(destination, condition, immediateCode, opcode)
 
