@@ -35,14 +35,8 @@ object Operation {
   def optionalOperandSizePrefix(operandSize: OperandSize)(implicit processorMode: ProcessorMode): List[Byte] =
     if (operandSize.requiresOperandSizePrefix(processorMode)) Operation.OperandSizeCode :: Nil else Nil
 
-  def optionalAddressSizePrefix(addressSize: Option[Int])(implicit processorMode: ProcessorMode): List[Byte] = {
-    (addressSize, processorMode) match {
-      case (Some(2), ProcessorMode.Protected) => Operation.AddressSizeCode :: Nil
-      case (Some(4), ProcessorMode.Real) => Operation.AddressSizeCode :: Nil
-      case (Some(4), ProcessorMode.Long) => Operation.AddressSizeCode :: Nil
-      case _ => Nil
-    }
-  }
+  def optionalAddressSizePrefix(addressSize: OperandSize)(implicit processorMode: ProcessorMode): List[Byte] =
+    if (addressSize.requiresAddressSizePrefix(processorMode)) Operation.AddressSizeCode :: Nil else Nil
 
   def optionalSegmentOverridePrefix(segmentOverride: Option[SegmentRegister]): List[Byte] = segmentOverride match {
     case Some(segment) => Operation.SegmentOverrideMap.get(segment).toList

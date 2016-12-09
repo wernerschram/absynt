@@ -9,7 +9,7 @@ import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands._
 
 sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister, displacement: List[Byte], val scale: Int, segment: SegmentRegister)
-    extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize.asInstanceOf[ValueSize].size, segment) with ModRMEncodableOperand {
+    extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize, segment) with ModRMEncodableOperand {
   assume(index.operandByteSize == base.operandByteSize)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 

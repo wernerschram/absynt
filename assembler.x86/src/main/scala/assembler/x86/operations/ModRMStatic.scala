@@ -30,9 +30,9 @@ class ModRMStaticOperation(
     case _ => super.operandSize
   }
 
-  override def addressSize: Option[Int] = operandRM match {
-    case address: MemoryLocationType => Some(address.addressSize)
-    case _ => None
+  override def addressSize: OperandSize = (super.addressSize, operandRM) match {
+    case (OperandSize.Unknown, address: MemoryLocationType) => address.addressSize
+    case _ => super.operandSize
   }
 
   override def segmentOverride: Option[SegmentRegister] = operandRM match {

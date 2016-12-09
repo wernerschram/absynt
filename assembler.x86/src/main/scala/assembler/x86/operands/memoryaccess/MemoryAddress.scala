@@ -11,7 +11,7 @@ import assembler.x86.RexExtendedRequirement
 import assembler.x86.operands.OperandSize
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
-    extends MemoryLocation(address, segment, address.size) with ModRMEncodableOperand {
+    extends MemoryLocation(address, segment, ValueSize.sizeOfValue(address.size)) with ModRMEncodableOperand {
 
   override val modValue = 0x00.toByte
 

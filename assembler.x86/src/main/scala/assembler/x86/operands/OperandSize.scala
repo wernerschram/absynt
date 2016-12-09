@@ -4,11 +4,12 @@ import assembler.x86.ProcessorMode
 
 sealed class OperandSize {
   def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = false
+  def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = false
 }
 
-sealed class ValueSize(val size: Int, override val toString: String) extends OperandSize
+sealed class ValueSize(size: Int, override val toString: String) extends OperandSize
 
-sealed class FarPointerSize(val size: Int, override val toString: String) extends OperandSize
+sealed class FarPointerSize(size: Int, override val toString: String) extends OperandSize
 
 object OperandSize {
   case object Unknown extends OperandSize
@@ -22,11 +23,21 @@ object ValueSize {
       case ProcessorMode.Protected | ProcessorMode.Long => true
       case default => false
     }
+
+    override def requiresAddressSizePrefix(processorMode: ProcessorMode) = processorMode match {
+      case ProcessorMode.Protected => true
+      case default => false
+    }
   }
 
   case object DoubleWord extends ValueSize(4,"DWORD") {
     override def requiresOperandSizePrefix(processorMode: ProcessorMode) = processorMode match {
       case ProcessorMode.Real => true
+      case default => false
+    }
+
+    override def requiresAddressSizePrefix(processorMode: ProcessorMode) = processorMode match {
+      case ProcessorMode.Real | ProcessorMode.Long => true
       case default => false
     }
   }

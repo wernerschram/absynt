@@ -24,7 +24,7 @@ trait X86Operation extends Encodable {
   def mnemonic: String
 
   def operandSize: OperandSize = OperandSize.Unknown
-  def addressSize: Option[Int] = None
+  def addressSize: OperandSize = OperandSize.Unknown
   def segmentOverride: Option[SegmentRegister] = None
   def rexRequirements: List[RexExtendedRequirement] = Nil
 

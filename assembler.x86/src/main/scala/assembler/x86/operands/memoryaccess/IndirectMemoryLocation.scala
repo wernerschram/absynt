@@ -1,9 +1,10 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.x86.operands.SegmentRegister
+import assembler.x86.operands.OperandSize
 
 abstract class IndirectMemoryLocation(
-  val registerOrMemoryModeCode: Byte, displacement: List[Byte] = List.empty[Byte], addressSize: Int, segment: SegmentRegister)
+  val registerOrMemoryModeCode: Byte, displacement: List[Byte] = List.empty[Byte], addressSize: OperandSize, segment: SegmentRegister)
     extends MemoryLocation(displacement, segment, addressSize) {
 
   val modValue = IndirectMemoryLocation.getModValue(displacement)
