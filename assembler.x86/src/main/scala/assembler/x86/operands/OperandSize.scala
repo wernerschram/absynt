@@ -7,18 +7,18 @@ sealed class OperandSize {
   def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = false
 }
 
-sealed class ValueSize(size: Int, override val toString: String) extends OperandSize
+sealed class ValueSize(override val toString: String) extends OperandSize
 
-sealed class FarPointerSize(size: Int, override val toString: String) extends OperandSize
+sealed class FarPointerSize(override val toString: String) extends OperandSize
 
 object OperandSize {
   case object Unknown extends OperandSize
 }
 
 object ValueSize {
-  case object Byte extends ValueSize(1, "BYTE")
+  case object Byte extends ValueSize("BYTE")
 
-  case object Word extends ValueSize(2,"WORD") {
+  case object Word extends ValueSize("WORD") {
     override def requiresOperandSizePrefix(processorMode: ProcessorMode) = processorMode match {
       case ProcessorMode.Protected | ProcessorMode.Long => true
       case default => false
@@ -30,7 +30,7 @@ object ValueSize {
     }
   }
 
-  case object DoubleWord extends ValueSize(4,"DWORD") {
+  case object DoubleWord extends ValueSize("DWORD") {
     override def requiresOperandSizePrefix(processorMode: ProcessorMode) = processorMode match {
       case ProcessorMode.Real => true
       case default => false
@@ -42,7 +42,7 @@ object ValueSize {
     }
   }
 
-  case object QuadWord extends ValueSize(8,"QWORD")
+  case object QuadWord extends ValueSize("QWORD")
 
   def sizeOfValue(size: Int) = size match {
     case 1 => Byte
@@ -54,14 +54,14 @@ object ValueSize {
 }
 
 object FarPointerSize {
-  case object DoubleWord extends FarPointerSize(4,"DWORD") {
+  case object DoubleWord extends FarPointerSize("DWORD") {
     override def requiresOperandSizePrefix(processorMode: ProcessorMode) = processorMode match {
       case ProcessorMode.Real => false
       case default => true
     }
   }
 
-  case object FarWord extends FarPointerSize(6,"FWORD") {
+  case object FarWord extends FarPointerSize("FWORD") {
     override def requiresOperandSizePrefix(processorMode: ProcessorMode) = processorMode match {
       case ProcessorMode.Real => true
       case default => false
@@ -73,5 +73,4 @@ object FarPointerSize {
     case (2, 4) => FarWord
     case default => throw new AssertionError
   }
-
 }
