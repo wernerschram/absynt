@@ -5,5 +5,5 @@ import assembler.x86.ProcessorMode
 import assembler.x86.RexExtendedRequirement
 
 trait Operand {
-  def isValidForMode(processorMode: ProcessorMode): Boolean = true
+  def isValidForMode(processorMode: ProcessorMode): Boolean = true // linter:ignore UnusedParameter
 }

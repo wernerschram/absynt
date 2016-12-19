@@ -3,8 +3,8 @@ package assembler.x86.operands
 import assembler.x86.ProcessorMode
 
 sealed class OperandSize {
-  def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = false
-  def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = false
+  def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = false // linter:ignore UnusedParameter
+  def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = false // linter:ignore UnusedParameter
 }
 
 sealed class ValueSize(override val toString: String) extends OperandSize

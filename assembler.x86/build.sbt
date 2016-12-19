@@ -1,4 +1,4 @@
-addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.15")
+addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.17")
 
 lazy val assembler = RootProject(file("../assembler"))
 
