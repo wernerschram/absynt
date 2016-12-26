@@ -19,4 +19,5 @@ object RexExtendedRequirement {
   val instanceOpcodeReg = new RexExtendedRequirement(0x01)
   val instanceOperandR = new RexExtendedRequirement(0x04)
   val instanceOperandRM = new RexExtendedRequirement(0x01)
+  val quadOperand = new RexExtendedRequirement(0x08)
 }
