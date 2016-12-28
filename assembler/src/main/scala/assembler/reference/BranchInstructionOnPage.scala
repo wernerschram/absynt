@@ -3,7 +3,7 @@ package assembler.reference
 import assembler.Encodable
 import assembler.memory.MemoryPage
 
-abstract class BranchInstructionOnPage(
+abstract class BranchInstructionOnPage (
   private val thisLocation: Int,
   private val destinationLocation: Int)(implicit page: MemoryPage)
     extends ReferencingInstructionOnPage() {
@@ -20,14 +20,14 @@ abstract class BranchInstructionOnPage(
   private val intermediateInstructions = page.intermediateEncodables(thisLocation, destinationLocation)
 
   private lazy val independentIntermediates: Seq[Encodable] = intermediateInstructions.filter {
-    case instruction: ReferencingInstruction[_] => false
+    case instruction: ReferencingInstruction => false
     case _ => true
   }
 
   private lazy val dependentIntermediates = intermediateInstructions.filter {
-    case instruction: ReferencingInstruction[_] => true
+    case instruction: ReferencingInstruction => true
     case _ => false
-  }.map { i => i.asInstanceOf[ReferencingInstruction[ReferencingInstructionOnPage]] }
+  }.map { i => i.asInstanceOf[ReferencingInstruction] }
 
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum

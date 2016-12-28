@@ -14,7 +14,7 @@ import assembler.reference.ReferencingInstructionOnPage
 import assembler.reference.BranchInstructionOnPage
 
 abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, condition: LabelCondition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
-    extends Encodable with ReferencingInstruction[BranchInstructionOnPage] {
+    extends Encodable with ReferencingInstruction {
 
   class ARMBranchInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends BranchInstructionOnPage(thisLocation, destinationLocation) {
@@ -48,6 +48,7 @@ abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemoni
     val target = page.encodableLocation(page.getEncodableByCondition(condition))
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target, page, processorMode))
   }
+
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
 
   override def toString = s"$mnemonic $condition"

@@ -12,7 +12,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerOperand }
 
 abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String, condition: LabelCondition)(implicit processorMode: ProcessorMode)
-    extends Encodable() with ReferencingInstruction[BranchInstructionOnPage] {
+    extends Encodable() with ReferencingInstruction {
 
   class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends BranchInstructionOnPage(thisLocation, destinationLocation) {
