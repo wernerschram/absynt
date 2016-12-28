@@ -1,25 +1,80 @@
 package assembler.x86.instructions.jump
 
+import assembler.Encodable
+import assembler.LabelCondition
+import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.memoryaccess.FarPointer
-import assembler.x86.operations.ModRMStaticOperation
-import assembler.x86.operations.Static
-import assembler.x86.operations.{FarPointer => FarPointerOperation}
-import assembler.x86.operations.{MemoryLocation => MemoryLocationOperation}
-import assembler.x86.operands.memoryaccess.MemoryLocation
-import assembler.x86.operands.ValueSize
 import assembler.x86.operands.FixedSizeOperand
+import assembler.x86.operands.ModRMEncodableOperand
+import assembler.x86.operands.ValueSize
+import assembler.x86.operands.memoryaccess.FarPointer
+import assembler.x86.operands.memoryaccess.MemoryLocation
+import assembler.x86.operands.memoryaccess.NearPointer
+import assembler.x86.operations.{ FarPointer => FarPointerOperation }
+import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.{ NearPointer => NearPointerOperation }
+import assembler.x86.operations.ShortJumpOperation
+import assembler.x86.operations.ShortOrNearJumpOperation
+import assembler.x86.operations.Static
+
+abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
+
+  protected def Rel8(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = new Static(shortOpcode, mnemonic) with NearPointerOperation {
+    override val pointer = nearPointer
+  }
+
+  def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
+    assume(nearPointer.operandByteSize == ValueSize.Byte)
+    Rel8(nearPointer)
+  }
+
+  def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode): Encodable =
+    new ShortJumpOperation(shortOpcode, mnemonic, condition) {
+
+      def encodeForPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = {
+        assume(nearPointer.operandByteSize == ValueSize.Byte)
+        Rel8(nearPointer).encodeByte()
+      }
+    }
+}
+
+abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: List[Byte], mnemonic: String) extends ShortRelativeJump(shortOpcode, mnemonic) {
+
+  private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = new Static(longOpcode, mnemonic) with NearPointerOperation {
+    override val pointer = nearPointer
+
+    override def validate = {
+      super.validate
+      processorMode match {
+        case ProcessorMode.Long | ProcessorMode.Protected => assume(pointer.operandByteSize != ValueSize.Word)
+        case ProcessorMode.Real => assume(pointer.operandByteSize == ValueSize.Word)
+      }
+    }
+  }
+
+  override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = nearPointer.operandByteSize match {
+    case ValueSize.Byte =>
+      super.apply(nearPointer)
+    case _ =>
+      Rel16(nearPointer)
+  }
+
+  override def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
+    new ShortOrNearJumpOperation(shortOpcode, longOpcode, mnemonic, condition) {
+      override def encodeForPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = Rel8(nearPointer).encodeByte()
+      override def encodeForNearPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = Rel16(nearPointer).encodeByte()
+    }
+}
 
 final object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
       assume((operandRM, processorMode) match {
-          case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Long) if (fixed.operandByteSize != ValueSize.QuadWord) => false
-          case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == ValueSize.QuadWord) => false
-          case _ => true
-        })
+        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Long) if (fixed.operandByteSize != ValueSize.QuadWord) => false
+        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == ValueSize.QuadWord) => false
+        case _ => true
+      })
     }
 
   private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) = new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
