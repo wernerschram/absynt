@@ -1,4 +1,4 @@
-package assembler.x86.instructions.jump
+package assembler.x86.instructions
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
@@ -13,28 +13,6 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler.Encodable
 import assembler.LabeledEncodable
-import assembler.x86.instructions.JumpIfNotLessOrEqual
-import assembler.x86.instructions.JumpIfNotLess
-import assembler.x86.instructions.JumpIfNotGreaterOrEqual
-import assembler.x86.instructions.JumpIfNotGreater
-import assembler.x86.instructions.JumpIfNotEqual
-import assembler.x86.instructions.JumpIfNotBelowOrEqual
-import assembler.x86.instructions.JumpIfNotBelow
-import assembler.x86.instructions.JumpIfNotAboveOrEqual
-import assembler.x86.instructions.JumpIfNotAbove
-import assembler.x86.instructions.JumpIfNoCarry
-import assembler.x86.instructions.JumpIfLessOrEqual
-import assembler.x86.instructions.JumpIfLess
-import assembler.x86.instructions.JumpIfGreaterOrEqual
-import assembler.x86.instructions.JumpIfGreater
-import assembler.x86.instructions.JumpIfEqual
-import assembler.x86.instructions.JumpIfCountZero
-import assembler.x86.instructions.JumpIfCarry
-import assembler.x86.instructions.JumpIfBelowOrEqual
-import assembler.x86.instructions.JumpIfBelow
-import assembler.x86.instructions.JumpIfAboveOrEqual
-import assembler.x86.instructions.JumpIfAbove
-import assembler.x86.instructions.Jump
 
 class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
