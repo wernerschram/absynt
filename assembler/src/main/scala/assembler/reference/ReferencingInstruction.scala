@@ -7,14 +7,14 @@ import assembler.memory.MemoryPage
 
 trait ReferencingInstruction
     extends Encodable {
-  def getOrElseCreateInstruction()(implicit page: MemoryPage): BranchInstructionOnPage
+  def getOrElseCreateInstruction()(implicit page: MemoryPage): ReferencingInstructionOnPage
 
   def minimumEstimatedSize()(implicit page: MemoryPage): Int = getOrElseCreateInstruction.minimumEstimatedSize
   def maximumEstimatedSize()(implicit page: MemoryPage): Int = getOrElseCreateInstruction.maximumEstimatedSize
 
   def isEstimated()(implicit page: MemoryPage): Boolean = getOrElseCreateInstruction.isEstimated
 
-  def estimatedSize(sizeAssumptions: Map[BranchInstructionOnPage, Int])(implicit page: MemoryPage): Int =
+  def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: MemoryPage): Int =
     getOrElseCreateInstruction.estimateSize(sizeAssumptions)
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = getOrElseCreateInstruction.encodeByte

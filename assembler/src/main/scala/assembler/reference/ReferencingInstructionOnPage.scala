@@ -3,7 +3,7 @@ package assembler.reference
 import assembler.Encodable
 import assembler.memory.MemoryPage
 
-abstract class BranchInstructionOnPage (
+abstract class ReferencingInstructionOnPage (
   private val thisLocation: Int,
   private val destinationLocation: Int)(implicit page: MemoryPage) {
 
@@ -45,7 +45,7 @@ abstract class BranchInstructionOnPage (
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize != None
 
-  private def predictedDistance(sizeAssumptions: Map[BranchInstructionOnPage, Int]) = independentDistance +
+  private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = independentDistance +
     dependentIntermediates.map { instruction =>
       if (sizeAssumptions.contains(instruction.getOrElseCreateInstruction()))
         sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get
@@ -54,7 +54,7 @@ abstract class BranchInstructionOnPage (
     }
     .sum
 
-  def estimateSize(sizeAssumptions: Map[BranchInstructionOnPage, Int]): Int = {
+  def estimateSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
     while (!assumption.isDefined || assumption.get < newAssumption) {

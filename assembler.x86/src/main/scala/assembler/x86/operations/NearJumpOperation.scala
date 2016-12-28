@@ -3,7 +3,7 @@ package assembler.x86.operations
 import assembler.LabelCondition
 import assembler.ListExtensions._
 import assembler.memory.MemoryPage
-import assembler.reference.BranchInstructionOnPage
+import assembler.reference.ReferencingInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerOperand }
 
@@ -11,7 +11,7 @@ abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte]
     extends ShortJumpOperation(shortOpcode, mnemonic, condition) {
 
   class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
-      extends BranchInstructionOnPage(thisLocation, destinationLocation) {
+      extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
 
     val shortJumpSize = shortOpcode.length + 1
     val longJumpSize = processorMode match {
@@ -63,7 +63,7 @@ abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte]
     }
   }
 
-  override def createOperation(thisLocation: Int, targetLocation: Int)(implicit memoryPage: MemoryPage, processorMode: ProcessorMode): BranchInstructionOnPage =
+  override def createOperation(thisLocation: Int, targetLocation: Int)(implicit memoryPage: MemoryPage, processorMode: ProcessorMode): ReferencingInstructionOnPage =
     new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisLocation, targetLocation)(memoryPage, processorMode)
 
   def encodeForLongPointer(pointer: NearPointerOperand)(implicit page: MemoryPage): List[Byte]

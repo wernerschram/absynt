@@ -10,13 +10,13 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
-import assembler.reference.BranchInstructionOnPage
+import assembler.reference.ReferencingInstructionOnPage
 
 abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, condition: LabelCondition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
     extends Encodable with ReferencingInstruction {
 
-  class ARMBranchInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
-      extends BranchInstructionOnPage(thisLocation, destinationLocation) {
+  class ARMReferencingInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
+      extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
 
     val branchSize = 4
     override val minimumSize = branchSize
@@ -36,14 +36,14 @@ abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemoni
     }
   }
 
-  val pageMap = new TrieMap[MemoryPage, ARMBranchInstructionOnPage]
+  val pageMap = new TrieMap[MemoryPage, ARMReferencingInstructionOnPage]
 
-  def createOperation(thisLocation: Int, targetLocation: Int, memoryPage: MemoryPage, processorMode: ProcessorMode): ARMBranchInstructionOnPage =
-    new ARMBranchInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode)
+  def createOperation(thisLocation: Int, targetLocation: Int, memoryPage: MemoryPage, processorMode: ProcessorMode): ARMReferencingInstructionOnPage =
+    new ARMReferencingInstructionOnPage(thisLocation, targetLocation)(memoryPage, processorMode)
 
   def encodeWordForDistance(destination: PointerType)(implicit page: MemoryPage): Int
 
-  override def getOrElseCreateInstruction()(implicit page: MemoryPage): ARMBranchInstructionOnPage = {
+  override def getOrElseCreateInstruction()(implicit page: MemoryPage): ARMReferencingInstructionOnPage = {
     val target = page.encodableLocation(page.getEncodableByCondition(condition))
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target, page, processorMode))
   }

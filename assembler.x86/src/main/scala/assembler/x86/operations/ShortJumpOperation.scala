@@ -6,7 +6,7 @@ import assembler.Encodable
 import assembler.LabelCondition
 import assembler.ListExtensions.ByteEncoder
 import assembler.memory.MemoryPage
-import assembler.reference.BranchInstructionOnPage
+import assembler.reference.ReferencingInstructionOnPage
 import assembler.reference.ReferencingInstruction
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerOperand }
@@ -15,7 +15,7 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
     extends Encodable() with ReferencingInstruction {
 
   class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
-      extends BranchInstructionOnPage(thisLocation, destinationLocation) {
+      extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
 
     val shortJumpSize = shortOpcode.length + 1
     override val minimumSize = shortJumpSize
@@ -35,12 +35,12 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
       }
   }
 
-  val pageMap = new TrieMap[MemoryPage, BranchInstructionOnPage]
+  val pageMap = new TrieMap[MemoryPage, ReferencingInstructionOnPage]
 
-  def createOperation(thisLocation: Int, targetLocation: Int)(implicit memoryPage: MemoryPage, processorMode: ProcessorMode): BranchInstructionOnPage =
+  def createOperation(thisLocation: Int, targetLocation: Int)(implicit memoryPage: MemoryPage, processorMode: ProcessorMode): ReferencingInstructionOnPage =
     new ShortJumpInstructionOnPage(shortOpcode, thisLocation, targetLocation)(memoryPage, processorMode)
 
-  override def getOrElseCreateInstruction()(implicit page: MemoryPage): BranchInstructionOnPage = {
+  override def getOrElseCreateInstruction()(implicit page: MemoryPage): ReferencingInstructionOnPage = {
     val target = page.encodableLocation(page.getEncodableByCondition(condition))
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target))
   }
