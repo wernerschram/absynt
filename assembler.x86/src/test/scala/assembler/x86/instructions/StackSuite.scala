@@ -1,8 +1,7 @@
-package assembler.x86.instructions.stack
+package assembler.x86.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
-
 import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage
@@ -12,7 +11,7 @@ import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
 
-class PushSuite extends WordSpec with ShouldMatchers {
+class StackSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 
@@ -133,6 +132,40 @@ class PushSuite extends WordSpec with ShouldMatchers {
 
       "correctly encode push rsi" in {
         Push(RSI).encodeByte should be(0x56.toByte :: Nil)
+      }
+    }
+  }
+
+    "a PushAll instruction" when {
+
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode pusha" in {
+        PushAll().encodeByte should be (Hex.lsb("60"))
+      }
+    }
+
+    "in long mode" should {
+
+      implicit val processorMode = ProcessorMode.Long
+
+      "throw an AssertionError for pusha" in {
+        an[AssertionError] should be thrownBy {
+          PushAll().encodeByte()
+        }
+      }
+    }
+  }
+
+  "an PushFlags instruction" when {
+    "in long mode" should {
+
+      implicit val processorMode = ProcessorMode.Long
+
+      "correctly encode pushf" in {
+        PushFlags().encodeByte should be (Hex.lsb("9C"))
       }
     }
   }

@@ -1,4 +1,4 @@
-package assembler.x86.instructions.stack
+package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
@@ -72,4 +72,25 @@ final object Push {
     case Register.FS => StaticFS()
     case Register.GS => StaticGS()
   }
+}
+
+object PushAll {
+  implicit val opcode = "pusha"
+
+  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x60.toByte :: Nil, opcode) {
+    override def validate = {
+      super.validate
+      assume(processorMode != ProcessorMode.Long)
+    }
+  }
+
+  def apply()(implicit processorMode: ProcessorMode) = Static()
+}
+
+object PushFlags {
+  implicit val opcode = "pushf"
+
+  def Static()(implicit processorMode: ProcessorMode) = new Static(0x9C.toByte :: Nil, opcode)
+
+  def apply()(implicit processorMode: ProcessorMode) = Static()
 }
