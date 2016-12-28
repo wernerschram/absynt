@@ -1,4 +1,4 @@
-package assembler.x86.instructions.string
+package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation

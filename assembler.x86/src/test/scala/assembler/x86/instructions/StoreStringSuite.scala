@@ -1,4 +1,4 @@
-package assembler.x86.instructions.string
+package assembler.x86.instructions
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
@@ -7,11 +7,10 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.operations.X86Operation
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation._
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
+import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper
+import assembler.x86.operations.X86Operation
 
 class StoreStringSuite extends WordSpec with ShouldMatchers with MockFactory {
 
