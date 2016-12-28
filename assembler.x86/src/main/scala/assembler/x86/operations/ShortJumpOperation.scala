@@ -28,9 +28,9 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
         assume(distance > (Byte.MinValue + shortJumpSize))
         assume(distance < Byte.MaxValue)
         if (forward) {
-          encodeForPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
+          encodeForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
         } else {
-          encodeForPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
+          encodeForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
         }
       }
   }
@@ -45,7 +45,7 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target))
   }
 
-  def encodeForPointer(pointer: NearPointerOperand)(implicit page: MemoryPage): List[Byte]
+  def encodeForShortPointer(pointer: NearPointerOperand)(implicit page: MemoryPage): List[Byte]
 
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
 

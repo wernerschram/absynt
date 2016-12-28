@@ -7,7 +7,7 @@ import assembler.reference.BranchInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerOperand }
 
-abstract class ShortOrNearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, condition: LabelCondition)(implicit processorMode: ProcessorMode)
+abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, condition: LabelCondition)(implicit processorMode: ProcessorMode)
     extends ShortJumpOperation(shortOpcode, mnemonic, condition) {
 
   class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
@@ -41,22 +41,22 @@ abstract class ShortOrNearJumpOperation(shortOpcode: List[Byte], longOpcode: Lis
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
       if (forward) {
         if (distance <= forwardShortLongBoundary) {
-          encodeForPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
+          encodeForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
         } else {
           if (processorMode == ProcessorMode.Real) {
-            encodeForNearPointer(NearPointerOperand(distance.toShort.encodeLittleEndian))
+            encodeForLongPointer(NearPointerOperand(distance.toShort.encodeLittleEndian))
           } else {
-            encodeForNearPointer(NearPointerOperand(distance.encodeLittleEndian))
+            encodeForLongPointer(NearPointerOperand(distance.encodeLittleEndian))
           }
         }
       } else {
         if (distance <= backwardShortLongBoundary) {
-          encodeForPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
+          encodeForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
         } else {
           if (processorMode == ProcessorMode.Real) {
-            encodeForNearPointer(NearPointerOperand((-distance - longJumpSize).toShort.encodeLittleEndian))
+            encodeForLongPointer(NearPointerOperand((-distance - longJumpSize).toShort.encodeLittleEndian))
           } else {
-            encodeForNearPointer(NearPointerOperand((-distance - longJumpSize).encodeLittleEndian))
+            encodeForLongPointer(NearPointerOperand((-distance - longJumpSize).encodeLittleEndian))
           }
         }
       }
@@ -66,5 +66,5 @@ abstract class ShortOrNearJumpOperation(shortOpcode: List[Byte], longOpcode: Lis
   override def createOperation(thisLocation: Int, targetLocation: Int)(implicit memoryPage: MemoryPage, processorMode: ProcessorMode): BranchInstructionOnPage =
     new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisLocation, targetLocation)(memoryPage, processorMode)
 
-  def encodeForNearPointer(pointer: NearPointerOperand)(implicit page: MemoryPage): List[Byte]
+  def encodeForLongPointer(pointer: NearPointerOperand)(implicit page: MemoryPage): List[Byte]
 }
