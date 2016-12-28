@@ -1,4 +1,4 @@
-package assembler.x86.instructions.interrupt
+package assembler.x86.instructions
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
@@ -7,9 +7,8 @@ import org.scalatest.WordSpec
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.operations.X86Operation
-import assembler.x86.instructions.Interrupt
 import assembler.x86.operands.ImmediateValue._
+import assembler.x86.operations.X86Operation
 
 class InterruptSuite extends WordSpec with ShouldMatchers with MockFactory {
 
