@@ -22,7 +22,7 @@ final object Push {
       }
     }
 
-  private def RM16(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+  private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
       override def validate = {
         super.validate
@@ -55,7 +55,7 @@ final object Push {
   def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
     R16(register)
 
-  def apply(operand: FixedSizeModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
     RM16(operand)
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate.operandByteSize match {

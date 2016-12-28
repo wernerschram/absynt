@@ -6,7 +6,6 @@ import assembler.ListExtensions._
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.RexRequirement
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands._
 
 sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacement: List[Byte], segment: SegmentRegister)
@@ -37,7 +36,7 @@ object RegisterMemoryLocation {
 
   final class FixedSizeRegisterMemoryLocation private (
     index: BaseIndexPair, displacement: List[Byte], override val operandByteSize: OperandSize, segment: SegmentRegister)
-      extends RegisterMemoryLocation(index, displacement, segment) with FixedSizeModRMEncodableOperand {
+      extends RegisterMemoryLocation(index, displacement, segment) with ModRMEncodableOperand with FixedSizeOperand {
 
     override def toString = s"${operandByteSize} PTR ${super.toString()}"
   }

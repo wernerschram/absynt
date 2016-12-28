@@ -67,13 +67,13 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       Imm32ToEAX(immediate)
     case (Register.RAX, ValueSize.DoubleWord) =>
       Imm32ToRAX(immediate)
-    case (destination: FixedSizeModRMEncodableOperand, ValueSize.Byte) if (destination.operandByteSize == ValueSize.Byte) =>
+    case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.Byte) if (destination.operandByteSize == ValueSize.Byte) =>
       Imm8ToRM8(destination, immediate)
-    case (destination: FixedSizeModRMEncodableOperand, ValueSize.Word | ValueSize.DoubleWord) if (immediate.operandByteSize == destination.operandByteSize) =>
+    case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.Word | ValueSize.DoubleWord) if (immediate.operandByteSize == destination.operandByteSize) =>
       Imm16ToRM16(destination, immediate)
-    case (destination: FixedSizeModRMEncodableOperand, ValueSize.DoubleWord) if (destination.operandByteSize == ValueSize.QuadWord) =>
+    case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.DoubleWord) if (destination.operandByteSize == ValueSize.QuadWord) =>
       Imm16ToRM16(destination, immediate)
-    case (destination: FixedSizeModRMEncodableOperand, ValueSize.Byte) if (destination.operandByteSize != ValueSize.Byte) =>
+    case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.Byte) if (destination.operandByteSize != ValueSize.Byte) =>
       Imm8ToRM16(destination, immediate)
     case default => throw new AssertionError
   }

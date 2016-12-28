@@ -16,5 +16,3 @@ trait ModRMEncodableOperand extends Operand {
 trait FixedSizeOperand {
   val operandByteSize: OperandSize
 }
-
-trait FixedSizeModRMEncodableOperand extends ModRMEncodableOperand with FixedSizeOperand

@@ -4,7 +4,6 @@ import assembler.ListExtensions._
 
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands._
 
@@ -45,7 +44,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
 object SIBMemoryLocation {
   final class FixedSizeSIBMemoryLocation private (index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte], scale: Int, val operandByteSize: OperandSize, segment: SegmentRegister)
-    extends SIBMemoryLocation(index, base, displacement, scale, segment) with FixedSizeModRMEncodableOperand
+    extends SIBMemoryLocation(index, base, displacement, scale, segment) with ModRMEncodableOperand with FixedSizeOperand
 
   private object FixedSizeSIBMemoryLocation {
     def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: List[Byte], scale: Int, operandByteSize: OperandSize, segment: SegmentRegister) =

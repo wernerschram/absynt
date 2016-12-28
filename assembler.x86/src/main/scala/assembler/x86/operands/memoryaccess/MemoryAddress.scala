@@ -3,12 +3,12 @@ package assembler.x86.operands.memoryaccess
 import assembler.ListExtensions.ListToImmediate
 import assembler.x86.ParameterPosition
 import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.ValueSize
 import assembler.x86.RexRequirement
 import assembler.x86.operands.OperandSize
+import assembler.x86.operands.FixedSizeOperand
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
     extends MemoryLocation(address, segment, ValueSize.sizeOfValue(address.size)) with ModRMEncodableOperand {
@@ -26,7 +26,7 @@ sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegiste
 
 object MemoryAddress {
   final class FixedSizeMemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS, val operandByteSize: OperandSize)
-      extends MemoryAddress(address, segment) with FixedSizeModRMEncodableOperand {
+      extends MemoryAddress(address, segment) with ModRMEncodableOperand with FixedSizeOperand {
   }
   def apply(address: List[Byte], segment: SegmentRegister = Register.DS) =
     new MemoryAddress(address, segment)

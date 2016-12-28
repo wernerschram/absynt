@@ -6,7 +6,7 @@ import assembler.x86.RexRequirement
 
 sealed abstract class Register extends Operand
 
-sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String) extends Register with FixedSizeModRMEncodableOperand {
+sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String) extends Register with ModRMEncodableOperand with FixedSizeOperand {
   val modValue = 0x03.toByte
   val registerOrMemoryModeCode = registerCode
 }
@@ -44,7 +44,7 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
   override def toString() = mnemonic
 }
 
-sealed trait BaseIndexPair extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
+sealed trait BaseIndexPair extends ModRMEncodableOperand with FixedSizeOperand {
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte = registerOrMemoryModeCode
 }
@@ -54,7 +54,7 @@ sealed trait IndexRegister extends Register with BaseIndexPair
 sealed trait RealModeIndexRegister extends IndexRegister
 sealed trait ProtectedModeIndexRegister extends IndexRegister
 
-sealed trait EncodedBaseRegister extends FixedSizeModRMEncodableOperand {
+sealed trait EncodedBaseRegister extends ModRMEncodableOperand with FixedSizeOperand {
   self: Register =>
 
   def getBaseCode(index: RealModeIndexRegister): Byte
@@ -72,12 +72,12 @@ sealed trait EncodedBaseRegister extends FixedSizeModRMEncodableOperand {
   }
 }
 
-sealed trait SIBIndexRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
+sealed trait SIBIndexRegister extends ModRMEncodableOperand with FixedSizeOperand {
   val defaultSIBSegment: SegmentRegister = Register.DS
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait SIBBaseRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
+sealed trait SIBBaseRegister extends ModRMEncodableOperand with FixedSizeOperand {
   val SIBBaseCode: Byte = registerOrMemoryModeCode
 }
 
