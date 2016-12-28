@@ -2,10 +2,10 @@ package assembler.x86.operations
 
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.EncodableRegister
 import assembler.x86.operands.Operand
+import assembler.x86.operands.GeneralPurposeRegister
 
-class RegisterEncoded[RegisterType <: EncodableRegister](
+class RegisterEncoded[RegisterType <: GeneralPurposeRegister](
   register: RegisterType,
   rawCode: List[Byte],
   override val mnemonic: String,

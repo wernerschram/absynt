@@ -4,17 +4,13 @@ import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
 import assembler.x86.RexRequirement
 
-sealed abstract class Register extends Operand {
-}
+sealed abstract class Register extends Operand
 
-sealed abstract class EncodableRegister(val registerCode: Byte) extends Register with FixedSizeModRMEncodableOperand {
-
+sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String) extends Register with FixedSizeModRMEncodableOperand {
   val modValue = 0x03.toByte
   val registerOrMemoryModeCode = registerCode
   val displacement = List.empty[Byte]
 }
-
-sealed abstract class GeneralPurposeRegister(registerCode: Byte, val mnemonic: String) extends EncodableRegister(registerCode)
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String) extends GeneralPurposeRegister(registerCode, mnemonic) {
   override def getRexRequirements(position: ParameterPosition): List[RexRequirement] = (position match {

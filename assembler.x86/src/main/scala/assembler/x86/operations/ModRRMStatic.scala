@@ -2,13 +2,13 @@ package assembler.x86.operations
 
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.EncodableRegister
 import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.OperandSize
+import assembler.x86.operands.GeneralPurposeRegister
 
-class ModRRMStaticOperation[RegisterType <: EncodableRegister](
+class ModRRMStaticOperation[RegisterType <: GeneralPurposeRegister](
   val register: RegisterType,
   operandRM: ModRMEncodableOperand,
   override val code: List[Byte],
