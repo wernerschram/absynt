@@ -13,7 +13,7 @@ sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacem
     extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
 
-  override def toString(): String = s"${segment.getSegmentPrefix(defaultSegment)}[${index}${displacementString}]"
+  override def toString(): String = s"${segmentPrefix}[${index}${displacementString}]"
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString()}"
 

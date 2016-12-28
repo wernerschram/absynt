@@ -10,6 +10,11 @@ abstract class MemoryLocation(val displacement: List[Byte], val segment: Segment
   assume(List(0, 1, 2, 4, 8).contains(displacement.length))
   val defaultSegment: SegmentRegister
 
-  lazy val getSegmentOverride = if (segment == defaultSegment) None else Some(segment)
+  lazy val segmentOverride = if (segment == defaultSegment) None else Some(segment)
+
+  def segmentPrefix = segmentOverride match {
+    case Some(segment) => s"${segment}:"
+    case None => ""
+  }
 }
 

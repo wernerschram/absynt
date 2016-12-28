@@ -36,7 +36,7 @@ class ModRMStaticOperation(
   }
 
   override def segmentOverride: Option[SegmentRegister] = operandRM match {
-    case location: MemoryLocationType => location.getSegmentOverride
+    case location: MemoryLocationType => location.segmentOverride
     case _ => None
   }
 

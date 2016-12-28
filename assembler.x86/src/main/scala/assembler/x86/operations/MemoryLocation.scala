@@ -17,7 +17,7 @@ trait MemoryLocation extends X86Operation {
 
   override def segmentOverride = super.segmentOverride match {
     case register: Some[SegmentRegister] => register
-    case None => location.getSegmentOverride
+    case None => location.segmentOverride
   }
 
   abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =

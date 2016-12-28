@@ -36,7 +36,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
 
-  override def toString() = s"${segment.getSegmentPrefix(defaultSegment)}[${base}+${index}${scaleString}${displacementString}]"
+  override def toString() = s"${segmentPrefix}[${base}+${index}${scaleString}${displacementString}]"
 
   private def scaleString = s"*${scale}"
 

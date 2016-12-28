@@ -49,9 +49,6 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
   val operandByteSize: Int = 2
 
   override def toString() = mnemonic
-
-  def getSegmentPrefix(defaultSegment: SegmentRegister) = if (this == defaultSegment) "" else s"${this}:"
-
 }
 
 sealed trait BaseIndexPair extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
@@ -128,7 +125,6 @@ sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SI
 object Register {
 
   // Small registers
-
   case object AL extends AccumulatorRegister with LowByteRegister
   case object CL extends CountRegister with LowByteRegister
   case object DL extends DataRegister with LowByteRegister
