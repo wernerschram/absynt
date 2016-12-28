@@ -57,7 +57,6 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
 sealed trait BaseIndexPair extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte = registerOrMemoryModeCode
-  val displaceOnly: Boolean = false
 }
 
 sealed trait IndexRegister extends Register with BaseIndexPair
@@ -94,7 +93,6 @@ sealed trait SIBIndexRegister extends FixedSizeModRMEncodableOperand with ModRME
 
 sealed trait SIBBaseRegister extends FixedSizeModRMEncodableOperand with ModRMEncodableOperand {
   val SIBBaseCode: Byte = registerOrMemoryModeCode
-  val scaleOnly: Boolean = false
 }
 
 sealed trait ByteRegister extends GeneralPurposeRegister {
@@ -186,10 +184,7 @@ object Register {
   case object EDX extends DataRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object EBX extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object ESP extends SourcePointer with DoubleWordRegister
-  case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister {
-    override val displaceOnly = true
-    override val scaleOnly = true
-  }
+  case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister
   case object ESI extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment = Register.ES
   }
@@ -201,9 +196,7 @@ object Register {
   case object RDX extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister
   case object RBX extends BaseRegister with QuadWordRegister with ProtectedModeIndexRegister
   case object RSP extends SourcePointer with QuadWordRegister
-  case object RBP extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister {
-    override val scaleOnly = true
-  }
+  case object RBP extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
   case object RSI extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment = Register.ES
   }
@@ -239,10 +232,7 @@ object Register {
   case object R10D extends Rex10 with DoubleWordRegister with ProtectedModeIndexRegister
   case object R11D extends Rex11 with DoubleWordRegister with ProtectedModeIndexRegister
   case object R12D extends Rex12 with DoubleWordRegister
-  case object R13D extends Rex13 with DoubleWordRegister with ProtectedModeIndexRegister {
-    override val displaceOnly = true
-    override val scaleOnly = true
-  }
+  case object R13D extends Rex13 with DoubleWordRegister with ProtectedModeIndexRegister
   case object R14D extends Rex14 with DoubleWordRegister with ProtectedModeIndexRegister
   case object R15D extends Rex15 with DoubleWordRegister with ProtectedModeIndexRegister
 
@@ -251,9 +241,7 @@ object Register {
   case object R10 extends Rex10 with QuadWordRegister with ProtectedModeIndexRegister
   case object R11 extends Rex11 with QuadWordRegister with ProtectedModeIndexRegister
   case object R12 extends Rex12 with QuadWordRegister
-  case object R13 extends Rex13 with QuadWordRegister with ProtectedModeIndexRegister {
-    override val scaleOnly = true
-  }
+  case object R13 extends Rex13 with QuadWordRegister with ProtectedModeIndexRegister
   case object R14 extends Rex14 with QuadWordRegister with ProtectedModeIndexRegister
   case object R15 extends Rex15 with QuadWordRegister with ProtectedModeIndexRegister
 }
