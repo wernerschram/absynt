@@ -7,7 +7,7 @@ import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands.Register
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.ValueSize
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 import assembler.x86.operands.OperandSize
 
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)

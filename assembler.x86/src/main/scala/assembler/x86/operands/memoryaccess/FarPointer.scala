@@ -5,7 +5,7 @@ import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.OperandSize
 import assembler.x86.ParameterPosition
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 import assembler.x86.operands.FarPointerSize
 
 class FarPointer(val segment: List[Byte], val offset: List[Byte]) extends Operand with FixedSizeOperand {

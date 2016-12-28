@@ -2,7 +2,7 @@ package assembler.x86.operands
 
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 
 sealed abstract class Register extends Operand {
 }
@@ -17,11 +17,12 @@ sealed abstract class EncodableRegister(val registerCode: Byte) extends Register
 sealed abstract class GeneralPurposeRegister(registerCode: Byte, val mnemonic: String) extends EncodableRegister(registerCode)
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String) extends GeneralPurposeRegister(registerCode, mnemonic) {
-  override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] = position match {
-    case ParameterPosition.Index => ParameterPosition.Index.rexRequirement.toList ::: super.getRexRequirements(position)
-    case ParameterPosition.Base => ParameterPosition.Base.rexRequirement.toList ::: super.getRexRequirements(position)
-    case default => position.rexRequirement.toList ::: super.getRexRequirements(position)
-  }
+  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] = (position match {
+    case ParameterPosition.Index => ParameterPosition.Index.rexRequirement.toList
+    case ParameterPosition.Base => ParameterPosition.Base.rexRequirement.toList
+    case default => position.rexRequirement.toList
+  }) ::: super.getRexRequirements(position)
+
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
 

@@ -5,7 +5,7 @@ import scala.language.implicitConversions
 import assembler.ListExtensions._
 import assembler.x86.ParameterPosition
 import assembler.x86.ProcessorMode
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 import assembler.x86.operands.FixedSizeModRMEncodableOperand
 import assembler.x86.operands._
 
@@ -21,7 +21,7 @@ sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacem
 
   override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: displacement
 
-  override def getRexRequirements(position: ParameterPosition): List[RexExtendedRequirement] =
+  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
     index.getRexRequirements(ParameterPosition.OperandRM) ::: super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = (index, processorMode) match {

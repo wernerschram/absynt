@@ -5,7 +5,7 @@ import assembler.Label
 import assembler.LabeledEncodable
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 import assembler.x86.operands.Operand
 import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.OperandSize
@@ -28,8 +28,8 @@ trait X86Operation extends Encodable {
   def operandSize: OperandSize = OperandSize.Unknown
   def addressSize: OperandSize = OperandSize.Unknown
   def segmentOverride: Option[SegmentRegister] = None
-  def rexRequirements: List[RexExtendedRequirement] =
-    if (includeRexW && operandSize == ValueSize.QuadWord) RexExtendedRequirement.quadOperand :: Nil else Nil
+  def rexRequirements: List[RexRequirement] =
+    if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
 
   private def optionalSegmentOverridePrefix: List[Byte] = segmentOverride match {
     case Some(segment) => X86Operation.SegmentOverrideMap.get(segment).toList

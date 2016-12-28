@@ -6,7 +6,7 @@ import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
 import assembler.x86.operations.ModRRMStaticOperation
 import assembler.x86.operations.Static
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 import assembler.x86.ParameterPosition
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {

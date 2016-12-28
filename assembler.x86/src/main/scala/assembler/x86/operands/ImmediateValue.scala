@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 
 import assembler.ListExtensions._
 import assembler.x86.ParameterPosition
-import assembler.x86.RexExtendedRequirement
+import assembler.x86.RexRequirement
 
 final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeOperand {
   override val operandByteSize: OperandSize = ValueSize.sizeOfValue(value.length)
