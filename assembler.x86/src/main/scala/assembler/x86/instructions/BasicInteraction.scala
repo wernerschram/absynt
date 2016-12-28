@@ -1,4 +1,4 @@
-package assembler.x86.instructions.arithmetic
+package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
@@ -6,7 +6,6 @@ import assembler.x86.operations.Immediate
 import assembler.x86.operations.ModRMStaticOperation
 import assembler.x86.operations.ModRRMStaticOperation
 import assembler.x86.operations.Static
-import assembler.x86.RexRequirement
 import assembler.x86.ParameterPosition
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
@@ -102,3 +101,17 @@ object Or extends BasicInteraction(0x08.toByte, 0x01.toByte, "or")
 object Subtract extends BasicInteraction(0x28.toByte, 0x05.toByte, "sub")
 object SubtractCarry extends BasicInteraction(0x18.toByte, 0x03.toByte, "sbc")
 object Xor extends BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
+
+object Not {
+  implicit val opcode = "not"
+
+  private def RM8(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xF6.toByte :: Nil, 2, opcode)
+  private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStaticOperation(operand, 0xF7.toByte :: Nil, 2, opcode)
+
+  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) = operand.operandByteSize match {
+    case ValueSize.Byte => RM8(operand)
+    case _ => RM16(operand)
+  }
+}

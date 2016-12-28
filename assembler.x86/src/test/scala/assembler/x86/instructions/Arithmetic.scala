@@ -1,4 +1,4 @@
-package assembler.x86.instructions.arithmetic
+package assembler.x86.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
@@ -7,14 +7,154 @@ import assembler.Hex
 import assembler.ListExtensions._
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.operations.X86Operation
 import assembler.x86.operands.ImmediateValue._
-import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
+import assembler.x86.operands.memoryaccess._
+import assembler.x86.operations.X86Operation
 
-class XorSuite extends WordSpec with ShouldMatchers {
+class ArithmeticSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
+
+  // ADC, ADD, AND, CMP, OR, SBC, SUB and XOR all inherits from BasicInteraction.
+  // BasicInteraction is covered by the XOR tests, for the others there are some testcases to test the opcode.
+
+  "an AddCarry instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encodeByte adc al, 0x40" in {
+        AddCarry(0x40.toByte, AL).encodeByte should be(Hex.lsb("14 40"))
+      }
+
+      "correctly encodeByte adc bl, 0x40" in {
+        AddCarry(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 D3 40"))
+      }
+    }
+  }
+
+  "an Add instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode add al, 0x40" in {
+        Add(0x40.toByte, AL).encodeByte should be(Hex.lsb("04 40"))
+      }
+
+      "correctly encode add bl, 0x40" in {
+        Add(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 C3 40"))
+      }
+    }
+  }
+
+  "an And instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode and al, 0x40" in {
+        And(0x40.toByte, AL).encodeByte should be (Hex.lsb("24 40"))
+      }
+
+      "correctly encode and bl, 0x40" in {
+        And(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 E3 40"))
+      }
+    }
+  }
+
+  "an Compare instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode cmp al, 0x40" in {
+        Compare(0x40.toByte, AL).encodeByte should be (Hex.lsb("3C 40"))
+      }
+
+      "correctly encode cmp bl, 0x40" in {
+        Compare(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 FB 40"))
+      }
+    }
+  }
+
+  "an Not instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode not BYTE PTR [0x01]" in {
+        Not(MemoryAddress.byteSize(0x0001.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("F6 16 01 00"))
+      }
+
+      "correctly encode not WORD PTR [0x0001]" in {
+        Not(MemoryAddress.wordSize(0x0001.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("F7 16 01 00"))
+      }
+    }
+    "in protected mode" should {
+
+      implicit val processorMode = ProcessorMode.Protected
+
+      "correctly encode not eax" in {
+        Not(EAX).encodeByte should be(Hex.lsb("F7 D0"))
+      }
+    }
+
+    "in long mode" should {
+
+      implicit val processorMode = ProcessorMode.Long
+
+      "correctly encode not QWORD PTR [rax]" in {
+        Not(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(Hex.lsb("48 F7 10"))
+      }
+    }
+  }
+
+  "an Or instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode or al, 0x40" in {
+        Or(0x40.toByte, AL).encodeByte should be (Hex.lsb("0C 40"))
+      }
+
+      "correctly encode or bl, 0x40" in {
+        Or(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 CB 40"))
+      }
+    }
+  }
+
+  "an SubtractCarry instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode sbb al, 0x40" in {
+        SubtractCarry(0x40.toByte, AL).encodeByte should be (Hex.lsb("1C 40"))
+      }
+
+      "correctly encode sbb bl, 0x40" in {
+        SubtractCarry(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 DB 40"))
+      }
+    }
+  }
+
+  "an Subtract instruction" when {
+    "in real mode" should {
+
+      implicit val processorMode = ProcessorMode.Real
+
+      "correctly encode sub al, 0x40" in {
+        Subtract(0x40.toByte, AL).encodeByte should be (Hex.lsb("2C 40"))
+      }
+
+      "correctly encode sub bl, 0x40" in {
+        Subtract(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 EB 40"))
+      }
+    }
+  }
 
   "an Xor instruction" when {
     "in real mode" should {
