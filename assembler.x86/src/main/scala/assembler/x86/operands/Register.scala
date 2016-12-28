@@ -9,7 +9,6 @@ sealed abstract class Register extends Operand
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String) extends Register with FixedSizeModRMEncodableOperand {
   val modValue = 0x03.toByte
   val registerOrMemoryModeCode = registerCode
-  val displacement = List.empty[Byte]
 }
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String) extends GeneralPurposeRegister(registerCode, mnemonic) {
@@ -42,8 +41,6 @@ sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14")
 sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15")
 
 sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register {
-  val operandByteSize: Int = 2
-
   override def toString() = mnemonic
 }
 
@@ -54,14 +51,10 @@ sealed trait BaseIndexPair extends FixedSizeModRMEncodableOperand with ModRMEnco
 
 sealed trait IndexRegister extends Register with BaseIndexPair
 
-sealed trait RealModeIndexRegister extends IndexRegister {
-}
-
-sealed trait ProtectedModeIndexRegister extends IndexRegister {
-}
+sealed trait RealModeIndexRegister extends IndexRegister
+sealed trait ProtectedModeIndexRegister extends IndexRegister
 
 sealed trait EncodedBaseRegister extends FixedSizeModRMEncodableOperand {
-
   self: Register =>
 
   def getBaseCode(index: RealModeIndexRegister): Byte
