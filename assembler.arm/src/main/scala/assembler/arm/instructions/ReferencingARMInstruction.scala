@@ -10,7 +10,6 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
-import assembler.reference.ReferencingInstructionOnPage
 import assembler.reference.BranchInstructionOnPage
 
 abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, condition: LabelCondition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)

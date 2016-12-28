@@ -14,16 +14,16 @@ trait ReferencingInstruction
 
   def isEstimated()(implicit page: MemoryPage): Boolean = getOrElseCreateInstruction.isEstimated
 
-  def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: MemoryPage): Int =
-    getOrElseCreateInstruction.estimatedSize(sizeAssumptions)
+  def estimatedSize(sizeAssumptions: Map[BranchInstructionOnPage, Int])(implicit page: MemoryPage): Int =
+    getOrElseCreateInstruction.estimateSize(sizeAssumptions)
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = getOrElseCreateInstruction.encodeByte
 
-  override def withLabel(label: Label): LabeledEncodable = new LabeledReferencingInstruction[BranchInstructionOnPage](this, label)
+  override def withLabel(label: Label): LabeledEncodable = new LabeledReferencingInstruction(this, label)
 }
 
 
-class LabeledReferencingInstruction[T <: ReferencingInstructionOnPage](
+class LabeledReferencingInstruction (
     instruction: ReferencingInstruction,
     val label: Label) extends ReferencingInstruction with LabeledEncodable {
   override def getOrElseCreateInstruction()(implicit page: MemoryPage) = instruction.getOrElseCreateInstruction()
