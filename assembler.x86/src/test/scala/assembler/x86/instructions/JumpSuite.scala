@@ -13,6 +13,7 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler.Encodable
 import assembler.LabeledEncodable
+import assembler.Label
 
 class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
@@ -23,7 +24,7 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
     filler
   }
 
-  def labeledFiller(size: Int, label: String) = {
+  def labeledFiller(size: Int, label: Label) = {
     val filler = stub[LabeledEncodable]
     (filler.size()(_: MemoryPage)).when(*).returns(size)
     (filler.label _).when.returns(label)
@@ -194,28 +195,31 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect forward short jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
           jump ::
             filler(1) ::
-            labeledFiller(1, "Label") ::
+            labeledFiller(1, label) ::
             Nil)
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB 01")) }
       }
 
       "correctly represent jmp Label as a string" in {
-        Jump("Label").toString should be("jmp Label")
+        val label: Label = "Label"
+        Jump(label).toString should be("jmp Label")
       }
 
       "Encode a simple program with an indirect forward conditional on count zero short jump instruction" in {
-        val jump = JumpIfCountZero("Label")
+        val label = Label.unique
+        val jump = JumpIfCountZero(label)
 
         val p = new MemoryPage(
           jump ::
             filler(1) ::
-            labeledFiller(1, "Label") ::
+            labeledFiller(1, label) ::
             Nil)
 
         jump.size()(p) should be(2);
@@ -224,10 +228,11 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label") ::
+          labeledFiller(1, label) ::
             filler(1) ::
             jump ::
             Nil)
@@ -236,10 +241,11 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect backward conditional on count zero short jump instruction" in {
-        val jump = JumpIfCountZero("Label")
+        val label = Label.unique
+        val jump = JumpIfCountZero(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label") ::
+          labeledFiller(1, label) ::
             filler(1) ::
             jump ::
             Nil)
@@ -248,34 +254,37 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect forward long jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
           jump ::
             filler(256) ::
-            labeledFiller(1, "Label") ::
+            labeledFiller(1, label) ::
             Nil)
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01")) }
       }
 
       "throw an AssertionError for a simple program with an indirect forward conditional on count zero long jump instruction" in {
-        val jump = JumpIfCountZero("Label")
+        val label = Label.unique
+        val jump = JumpIfCountZero(label)
 
         val p = new MemoryPage(
           jump ::
             filler(256) ::
-            labeledFiller(1, "Label") ::
+            labeledFiller(1, label) ::
             Nil)
 
         an[AssertionError] should be thrownBy { p.encodeByte() }
       }
 
       "Encode a simple program with an indirect backward long jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label") ::
+          labeledFiller(1, label) ::
             filler(256) ::
             jump ::
             Nil)
@@ -284,14 +293,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with two indirect short jump instructions of which one jumps across the other" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label1") ::
+          labeledFiller(1, label1) ::
             jump2 ::
             filler(1) ::
-            labeledFiller(1, "Label2") ::
+            labeledFiller(1, label2) ::
             jump1 ::
             Nil)
 
@@ -300,14 +311,16 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with two indirect short jump instructions of which one depends on the size of the other for its size" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label1") ::
+          labeledFiller(1, label1) ::
             jump2 ::
             filler(122) ::
-            labeledFiller(1, "Label2") ::
+            labeledFiller(1, label2) ::
             jump1 ::
             Nil)
 
@@ -316,16 +329,18 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where both can be short" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label1") ::
+          labeledFiller(1, label1) ::
             jump2 ::
             filler(123) ::
             jump1 ::
             filler(2) ::
-            labeledFiller(1, "Label2") ::
+            labeledFiller(1, label2) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
@@ -333,16 +348,18 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the second forces the first to be long" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label1") ::
+          labeledFiller(1, label1) ::
             jump2 ::
             filler(123) ::
             jump1 ::
             filler(3) ::
-            labeledFiller(1, "Label2") ::
+            labeledFiller(1, label2) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7E FF")) }
@@ -350,16 +367,18 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the first forces the second to be long" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(2, "Label1") ::
+          labeledFiller(2, label1) ::
             jump2 ::
             filler(123) ::
             jump1 ::
             filler(2) ::
-            labeledFiller(1, "Label2") ::
+            labeledFiller(1, label2) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
@@ -367,20 +386,23 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with three indirect jump instructions that depends on the size of the others for its size where all jumps can be short" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
-        val jump3 = Jump("Label3")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val label3 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
+        val jump3 = Jump(label3)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label1") ::
+          labeledFiller(1, label1) ::
             jump2 ::
             filler(60) ::
             jump3 ::
             filler(61) ::
             jump1 ::
             filler(2) ::
-            labeledFiller(62, "Label2") ::
-            labeledFiller(1, "Label3") ::
+            labeledFiller(62, label2) ::
+            labeledFiller(1, label3) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
@@ -389,20 +411,23 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with three indirect jump instructions that depends on the size of the others for its size where instruction 3 forces the others to be long" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
-        val jump3 = Jump("Label3")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val label3 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
+        val jump3 = Jump(label3)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label1") ::
+          labeledFiller(1, label1) ::
             jump2 ::
             filler(60) ::
             jump3 ::
             filler(61) ::
             jump1 ::
             filler(2) ::
-            labeledFiller(63, "Label2") ::
-            labeledFiller(1, "Label3") ::
+            labeledFiller(63, label2) ::
+            labeledFiller(1, label3) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
@@ -411,20 +436,23 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a program with three indirect jump instructions that depends on the size of the others for its size where instruction 1 forces the others to be long" in {
-        val jump1 = Jump("Label1")
-        val jump2 = Jump("Label2")
-        val jump3 = Jump("Label3")
+        val label1 = Label.unique
+        val label2 = Label.unique
+        val label3 = Label.unique
+        val jump1 = Jump(label1)
+        val jump2 = Jump(label2)
+        val jump3 = Jump(label3)
 
         val p = new MemoryPage(
-          labeledFiller(2, "Label1") ::
+          labeledFiller(2, label1) ::
             jump2 ::
             filler(60) ::
             jump3 ::
             filler(61) ::
             jump1 ::
             filler(2) ::
-            labeledFiller(62, "Label2") ::
-            labeledFiller(1, "Label3") ::
+            labeledFiller(62, label2) ::
+            labeledFiller(1, label3) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7C FF")) }
@@ -564,10 +592,11 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label") ::
+          labeledFiller(1, label) ::
             filler(1) ::
             jump ::
             Nil)
@@ -576,10 +605,11 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect backward long jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, "Label") ::
+          labeledFiller(1, label) ::
             filler(256) ::
             jump ::
             Nil)
@@ -588,12 +618,13 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "Encode a simple program with an indirect forward long jump instruction" in {
-        val jump = Jump("Label")
+        val label = Label.unique
+        val jump = Jump(label)
 
         val p = new MemoryPage(
           jump ::
             filler(256) ::
-            labeledFiller(1, "Label") ::
+            labeledFiller(1, label) ::
             Nil)
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01 00 00")) }

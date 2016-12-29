@@ -32,4 +32,6 @@ class LabeledReferencingInstruction (
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
 
   override def withLabel(label: Label): LabeledEncodable = new LabeledReferencingInstruction(this, label)
+
+  override def toString = s"$label: $instruction"
 }

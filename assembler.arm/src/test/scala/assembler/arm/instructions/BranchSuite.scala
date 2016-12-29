@@ -14,6 +14,7 @@ import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
 import assembler.arm.operations.ARMOperation
+import assembler.Label
 
 class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
@@ -24,10 +25,10 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
     filler
   }
 
-  def labeledFiller(size: Int, label: String) = {
+  def labeledFiller(size: Int, label: Label) = {
     val filler = stub[LabeledEncodable]
     (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.label _).when.returns(StringLabel(label))
+    (filler.label _).when.returns(label)
     (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
     filler
   }
@@ -56,51 +57,56 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "correctly encode a forward branch to a labeled instruction" in {
+        val label = Label.unique
         val p = new MemoryPage(
-          Branch("Label") ::
+          Branch(label) ::
             filler(4) ::
-            labeledFiller(4, "Label") ::
+            labeledFiller(4, label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("EA000000 00000000 00000000"))
       }
 
       "correctly encode a backward branch to a labeled instruction" in {
+        val label: Label = "Label"
         val p = new MemoryPage(
-          labeledFiller(4, "Label") ::
+          labeledFiller(4, label) ::
             filler(4) ::
-            Branch("Label", Condition.LowerOrSame) ::
+            Branch(label, Condition.LowerOrSame) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
+        val label = Label.unique
         val p = new MemoryPage(
-          Branch("Label") ::
+          Branch(label) ::
             filler(4) ::
-            Branch("Label") ::
+            Branch(label) ::
             filler(4) ::
-            labeledFiller(4, "Label") ::
+            labeledFiller(4, label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
       }
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
+        val label = Label.unique
         val p = new MemoryPage(
-          labeledFiller(4, "Label") ::
+          labeledFiller(4, label) ::
             filler(4) ::
-            Branch("Label") ::
+            Branch(label) ::
             filler(4) ::
-            Branch("Label") ::
+            Branch(label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
 
       "correctly represent b Label as a string" in {
-        Branch("Label").toString should be("b Label")
+        val label: Label = "Label"
+        Branch(label).toString should be("b Label")
       }
     }
   }
@@ -119,10 +125,11 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
       }
 
       "correctly encode a forward branch-link to a labeled instruction" in {
+        val label = Label.unique
         val p = new MemoryPage(
-          BranchLink("Label") ::
+          BranchLink(label) ::
             filler(4) ::
-            labeledFiller(4, "Label") ::
+            labeledFiller(4, label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("EB000000 00000000 00000000"))
@@ -157,10 +164,11 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
 
 
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
+        val label = Label.unique
         val p = new MemoryPage(
-          BranchLinkExchange("Label") ::
+          BranchLinkExchange(label) ::
             filler(4) ::
-            labeledFiller(4, "Label") ::
+            labeledFiller(4, label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("FA000000 00000000 00000000"))

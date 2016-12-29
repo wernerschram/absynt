@@ -11,6 +11,11 @@ object Condition {
     new LabelCondition(x => x.label match { case label: StringLabel => label.value == text }) {
       override def toString() = text
     }
+  
+  implicit def apply(label: Label): LabelCondition = 
+    new LabelCondition(x => x.label == label) {
+      override def toString() = label.toString()
+    }
 }
 
 class LabelCondition(labelMatcher: LabeledEncodable => Boolean) extends Condition {
