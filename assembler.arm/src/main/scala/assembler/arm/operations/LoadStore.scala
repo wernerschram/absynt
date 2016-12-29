@@ -54,12 +54,10 @@ object LoadStoreOffset {
     override def toString: String = s"#${updateDirection.sign}${offset}"
   }
 
-  implicit def apply(offset: Short): LoadStoreOffset = {
-    if (offset >= 0)
+  implicit def apply(offset: Short): LoadStoreOffset = if (offset >= 0)
       apply(offset, UpdateDirection.Increment)
     else
       apply((-offset).toShort, UpdateDirection.Decrement)
-  }
 
   implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreOffset(updateDirection) {
     override val encode = 0x06000000 | offsetRegister.registerCode | updateDirection.bitMask
@@ -81,14 +79,17 @@ abstract sealed class LoadStoreMiscelaneousOffset private (val updateDirection: 
 }
 
 object LoadStoreMiscelaneousOffset {
-  implicit def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreMiscelaneousOffset(updateDirection) {
+  def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreMiscelaneousOffset(updateDirection) {
     override val encode = 0x00400090 | updateDirection.bitMask | ((offset & 0xf0) << 4) | (offset & 0x0f)
     override def toString: String = s"#${updateDirection.sign}${offset}"
   }
 
-  implicit def apply(offset: Byte): LoadStoreMiscelaneousOffset = apply(offset, UpdateDirection.Increment)
+  implicit def apply(offset: Byte): LoadStoreMiscelaneousOffset = if (offset >= 0)
+    apply(offset, UpdateDirection.Increment)
+  else
+    apply((-offset).toByte, UpdateDirection.Decrement)
 
-  implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreMiscelaneousOffset(updateDirection) {
+  def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) = new LoadStoreMiscelaneousOffset(updateDirection) {
     override val encode = 0x00000090 | offsetRegister.registerCode | updateDirection.bitMask
     override def toString: String = s"${updateDirection.sign}${offsetRegister}"
   }
@@ -126,7 +127,7 @@ object LoadStoreMiscelaneousOperation {
 }
 
 class LoadStore(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset,
-  addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
+                addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
     extends Conditional {
   override def encodeWord()(implicit page: MemoryPage) =
     (super.encodeWord() |
@@ -139,7 +140,7 @@ class LoadStore(val opcode: String, val condition: Condition, register: GeneralR
 }
 
 class LoadStoreMiscelaneous(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
-  addressingType: LoadStoreAddressingType, operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)
+                            addressingType: LoadStoreAddressingType, operation: LoadStoreMiscelaneousOperation.LoadStoreMiscelaneousOperation)
     extends Conditional {
 
   override def encodeWord()(implicit page: MemoryPage) =
