@@ -17,10 +17,10 @@ class LoadStoreRegister(
     addressingType: LoadStoreAddressingType) =
     new LoadStore(mnemnonic, condition, register, baseRegister, offset, addressingType, byteOperation)
 
-  def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
+  def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset, addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ImmedWord(condition, register, baseRegister, offset, addressingType)
 
-  def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
+  def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset, addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ImmedByte(condition, register, baseRegister, offset, addressingType)
 
   object UserMode {

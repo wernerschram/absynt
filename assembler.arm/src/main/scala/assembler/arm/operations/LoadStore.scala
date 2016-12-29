@@ -54,6 +54,8 @@ object LoadStoreOffset {
     override def toString: String = s"#${updateDirection.sign}${offset}"
   }
 
+  val noOffset = apply(0.toShort)
+  
   implicit def apply(offset: Short): LoadStoreOffset = if (offset >= 0)
       apply(offset, UpdateDirection.Increment)
     else
