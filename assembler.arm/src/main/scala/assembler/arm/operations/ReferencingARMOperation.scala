@@ -15,7 +15,7 @@ import assembler.arm.operations.ARMOperation
 import assembler.arm.operations.Conditional
 import assembler.arm.operands.Condition.Condition
 
-abstract class ReferencingARMInstruction[PointerType <: RelativePointer](val opcode: String, val label: Label, val condition: Condition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
+abstract class ReferencingARMOperation[PointerType <: RelativePointer](val opcode: String, val label: Label, val condition: Condition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
     extends Conditional with ReferencingInstruction {
 
   class ARMReferencingInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
