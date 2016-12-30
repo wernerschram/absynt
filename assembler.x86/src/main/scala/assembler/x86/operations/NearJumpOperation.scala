@@ -1,14 +1,14 @@
 package assembler.x86.operations
 
-import assembler.LabelCondition
 import assembler.ListExtensions._
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{ NearPointer => NearPointerOperand }
+import assembler.Label
 
-abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, condition: LabelCondition)(implicit processorMode: ProcessorMode)
-    extends ShortJumpOperation(shortOpcode, mnemonic, condition) {
+abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, label: Label)(implicit processorMode: ProcessorMode)
+    extends ShortJumpOperation(shortOpcode, mnemonic, label) {
 
   class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {

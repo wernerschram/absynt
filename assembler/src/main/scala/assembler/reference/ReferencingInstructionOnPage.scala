@@ -2,6 +2,8 @@ package assembler.reference
 
 import assembler.Encodable
 import assembler.memory.MemoryPage
+import assembler.memory.MemoryPage
+import assembler.Label
 
 abstract class ReferencingInstructionOnPage (
   private val thisLocation: Int,

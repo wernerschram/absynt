@@ -1,13 +1,17 @@
 package assembler.memory
 
-import assembler.Condition
 import assembler.Encodable
+import assembler.Label
+import assembler.LabeledEncodable
 
 class MemoryPage(val content: Seq[Encodable]) {
   def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
-  def getEncodableByCondition(condition: Condition): Encodable =
-    condition.filter(content).head
+  def getEncodableByCondition(label: Label): Encodable =
+    content.filter {
+      case encodable: LabeledEncodable => encodable.label == label
+      case _ => false
+    }.head
 
   def intermediateEncodables(from: Int, to: Int): Seq[Encodable] =
     if (from < to) {

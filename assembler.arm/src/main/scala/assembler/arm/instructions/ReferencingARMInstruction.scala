@@ -5,14 +5,14 @@ import scala.collection.concurrent.TrieMap
 import assembler.ListExtensions._
 
 import assembler.Encodable
-import assembler.LabelCondition
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.RelativePointer
 import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
+import assembler.Label
 
-abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, condition: LabelCondition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
+abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, val label: Label, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
     extends Encodable with ReferencingInstruction {
 
   class ARMReferencingInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
@@ -44,11 +44,11 @@ abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemoni
   def encodeWordForDistance(destination: PointerType)(implicit page: MemoryPage): Int
 
   override def getOrElseCreateInstruction()(implicit page: MemoryPage): ARMReferencingInstructionOnPage = {
-    val target = page.encodableLocation(page.getEncodableByCondition(condition))
+    val target = page.encodableLocation(page.getEncodableByCondition(label))
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target, page, processorMode))
   }
 
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
 
-  override def toString = s"$mnemonic $condition"
+  override def toString = s"$mnemonic $label"
 }

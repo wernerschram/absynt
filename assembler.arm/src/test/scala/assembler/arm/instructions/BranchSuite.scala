@@ -4,7 +4,6 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
-import assembler.Condition.apply
 import assembler.Encodable
 import assembler.Hex
 import assembler.LabeledEncodable

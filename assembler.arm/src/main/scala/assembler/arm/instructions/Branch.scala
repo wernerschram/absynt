@@ -1,6 +1,5 @@
 package assembler.arm.instructions
 
-import assembler.LabelCondition
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.RelativeA32Pointer
@@ -9,6 +8,7 @@ import assembler.arm.operations.BranchImmediate
 import assembler.arm.operations.BranchRegister
 import assembler.memory.MemoryPage
 import assembler.arm.operands.RelativeThumbPointer
+import assembler.Label
 
 class Branch(code: Byte, val opcode: String) {
   private def Immediate(destination: RelativeA32Pointer, condition: Condition = Always) =
@@ -17,14 +17,14 @@ class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)(implicit processorMode: ProcessorMode): BranchImmediate =
     Immediate(destination, condition)
 
-  def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[RelativeA32Pointer](opcode, labelCondition, RelativeA32Pointer.apply) {
+  def apply(label: Label)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMInstruction[RelativeA32Pointer](opcode, label, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: MemoryPage): Int =
         Immediate(destination, Always).encodeWord()
     }
 
-  def apply(labelCondition: LabelCondition, condition: Condition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[RelativeA32Pointer](opcode, labelCondition, RelativeA32Pointer.apply) {
+  def apply(label: Label, condition: Condition)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMInstruction[RelativeA32Pointer](opcode, label, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: MemoryPage): Int =
         Immediate(destination, condition).encodeWord()
     }
@@ -45,8 +45,8 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
   def apply(destination: RelativeThumbPointer)(implicit processorMode: ProcessorMode) =
     Immediate(destination, Unpredictable)
 
-  def apply(labelCondition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[RelativeThumbPointer](opcode, labelCondition, RelativeThumbPointer.apply) {
+  def apply(label: Label)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMInstruction[RelativeThumbPointer](opcode, label, RelativeThumbPointer.apply) {
       override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: MemoryPage): Int =
         Immediate(destination, Unpredictable).encodeWord()
     }

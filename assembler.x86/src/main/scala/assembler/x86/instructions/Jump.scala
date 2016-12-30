@@ -1,7 +1,6 @@
 package assembler.x86.instructions
 
 import assembler.Encodable
-import assembler.LabelCondition
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.FixedSizeOperand
@@ -16,6 +15,7 @@ import assembler.x86.operations.NearJumpOperation
 import assembler.x86.operations.{ NearPointer => NearPointerOperation }
 import assembler.x86.operations.ShortJumpOperation
 import assembler.x86.operations.Static
+import assembler.Label
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
@@ -28,8 +28,8 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
     Rel8(nearPointer)
   }
 
-  def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode): Encodable =
-    new ShortJumpOperation(shortOpcode, mnemonic, condition) {
+  def apply(label: Label)(implicit processorMode: ProcessorMode): Encodable =
+    new ShortJumpOperation(shortOpcode, mnemonic, label) {
 
       def encodeForShortPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = {
         assume(nearPointer.operandByteSize == ValueSize.Byte)
@@ -59,8 +59,8 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
       Rel16(nearPointer)
   }
 
-  override def apply(condition: LabelCondition)(implicit processorMode: ProcessorMode) =
-    new NearJumpOperation(shortOpcode, longOpcode, mnemonic, condition) {
+  override def apply(label: Label)(implicit processorMode: ProcessorMode) =
+    new NearJumpOperation(shortOpcode, longOpcode, mnemonic, label) {
       override def encodeForShortPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = Rel8(nearPointer).encodeByte()
       override def encodeForLongPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = Rel16(nearPointer).encodeByte()
     }
