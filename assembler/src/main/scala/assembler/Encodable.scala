@@ -10,4 +10,11 @@ trait Encodable {
   def withLabel(label: Label): LabeledEncodable
 }
 
-trait LabeledEncodable extends Encodable with Labeled
+trait LabeledEncodable extends Encodable with Labeled {
+  val value: Encodable
+  
+  override def size()(implicit page: MemoryPage) = value.size()
+  override def encodeByte()(implicit page: MemoryPage): List[Byte] = value.encodeByte()
+
+  override def toString = s"$label: $value"
+}

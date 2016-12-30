@@ -39,14 +39,8 @@ trait Conditional extends ARMOperation {
     super.encodeWord() | (condition.value << 28)
 }
 
-class LabeledARMOperation(instruction: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
-  val opcode = instruction.opcode
-
-  override def size()(implicit page: MemoryPage) = instruction.size()
-  override def encodeByte()(implicit page: MemoryPage): List[Byte] = instruction.encodeByte()
-
-  override def encodeWord()(implicit page: MemoryPage): Int = instruction.encodeWord()
-
-  override def toString = s"$label: $instruction"
-
+class LabeledARMOperation(override val value: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
+  val opcode = value.opcode
+  
+  override def encodeWord()(implicit page: MemoryPage): Int = value.encodeWord()
 }
