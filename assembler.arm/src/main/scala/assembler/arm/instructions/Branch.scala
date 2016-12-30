@@ -18,13 +18,13 @@ class Branch(code: Byte, val opcode: String) {
     Immediate(destination, condition)
 
   def apply(label: Label)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[RelativeA32Pointer](opcode, label, RelativeA32Pointer.apply) {
+    new ReferencingARMInstruction[RelativeA32Pointer](opcode, label, Always, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: MemoryPage): Int =
         Immediate(destination, Always).encodeWord()
     }
 
   def apply(label: Label, condition: Condition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[RelativeA32Pointer](opcode, label, RelativeA32Pointer.apply) {
+    new ReferencingARMInstruction[RelativeA32Pointer](opcode, label, condition, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: MemoryPage): Int =
         Immediate(destination, condition).encodeWord()
     }
@@ -46,7 +46,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
     Immediate(destination, Unpredictable)
 
   def apply(label: Label)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMInstruction[RelativeThumbPointer](opcode, label, RelativeThumbPointer.apply) {
+    new ReferencingARMInstruction[RelativeThumbPointer](opcode, label, Unpredictable, RelativeThumbPointer.apply) {
       override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: MemoryPage): Int =
         Immediate(destination, Unpredictable).encodeWord()
     }

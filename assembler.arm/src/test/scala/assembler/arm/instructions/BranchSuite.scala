@@ -107,6 +107,11 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         val label: Label = "Label"
         Branch(label).toString should be("b Label")
       }
+
+      "correctly represent bne Label as a string" in {
+        val label: Label = "Label"
+        Branch(label, Condition.NotEqual).toString should be("bne Label")
+      }
     }
   }
 

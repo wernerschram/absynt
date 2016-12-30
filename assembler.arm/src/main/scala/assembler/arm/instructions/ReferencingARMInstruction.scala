@@ -11,9 +11,12 @@ import assembler.memory.MemoryPage
 import assembler.reference.ReferencingInstruction
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.Label
+import assembler.arm.operations.ARMOperation
+import assembler.arm.operations.Conditional
+import assembler.arm.operands.Condition.Condition
 
-abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemonic: String, val label: Label, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
-    extends Encodable with ReferencingInstruction {
+abstract class ReferencingARMInstruction[PointerType <: RelativePointer](val opcode: String, val label: Label, val condition: Condition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
+    extends Conditional with ReferencingInstruction {
 
   class ARMReferencingInstructionOnPage(thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
@@ -50,5 +53,5 @@ abstract class ReferencingARMInstruction[PointerType <: RelativePointer](mnemoni
 
   override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
 
-  override def toString = s"$mnemonic $label"
+  override def toString = s"${super.toString()} $label"
 }
