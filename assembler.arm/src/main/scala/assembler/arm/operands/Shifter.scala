@@ -106,10 +106,13 @@ object Shifter {
     new ShiftRegister(0x60, "rrx", register)
 
   def RightRotateImmediate(immediate: Byte, rotateValue: Byte) =
-    new RightRotateImmediate(immediate: Byte, rotateValue: Byte)
+    new RightRotateImmediate(immediate, rotateValue)
 
   implicit def RightRotateImmediate(immediate: Byte) =
-    new RightRotateImmediate(immediate: Byte, 0)
+    new RightRotateImmediate(immediate, 0)
+
+  implicit def RightRotateImmediate(immediate: Int) =
+    new RightRotateImmediate(immediate.toByte, 0)
 
   def ForImmediate(immediate: Int) = {
     val rotateValue = (0 to 30 by 2).find { x => ((Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x)) }

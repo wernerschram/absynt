@@ -5,6 +5,9 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations._
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
+import assembler.Label
+import assembler.memory.MemoryPage
+import assembler.arm.operands.registers.Register
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemnonic: String) {
@@ -22,6 +25,18 @@ class LoadStoreRegister(
 
   def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset, addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
     ImmedByte(condition, register, baseRegister, offset, addressingType)
+
+  def apply(label: Label, destination: GeneralRegister)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMOperation[LoadStoreOffset](mnemnonic, label, Always, value => LoadStoreOffset(value.toByte)) {
+      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: MemoryPage): Int =
+        ImmedWord(Always, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
+    }
+
+  def apply(label: Label, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode) =
+    new ReferencingARMOperation[LoadStoreOffset](mnemnonic, label, condition, value => LoadStoreOffset(value.toByte)) {
+      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: MemoryPage): Int =
+        ImmedWord(condition, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
+    }
 
   object UserMode {
     def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Always)(implicit processorMode: ProcessorMode) =

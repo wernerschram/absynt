@@ -1,5 +1,6 @@
 package assembler.arm.instructions.branch
 
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
@@ -15,9 +16,18 @@ import assembler.arm.operations.UpdateDirection
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
+import assembler.Encodable
+import assembler.Label
+import assembler.EncodedString
 
-class LoadStoreSuite extends WordSpec with ShouldMatchers {
+class LoadStoreSuite extends WordSpec with ShouldMatchers with MockFactory {
 
+  def filler(size: Int) = {
+    val filler = stub[Encodable]
+    (filler.size()(_: MemoryPage)).when(*).returns(size)
+    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
+    filler
+  }
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an LoadRegister instruction" when {
@@ -87,6 +97,18 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
       "correctly represent ldr r1, [r2], r10, asr #30 as a string" in {
         LoadRegister(R1, R2, Shifter.ArithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], r10, asr #30")
+      }
+      
+            
+      "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
+        val label = Label.unique
+        val p = new MemoryPage(
+          LoadRegister(label, R1) ::
+            filler(4) ::
+            EncodedString("Test").withLabel(label) ::
+            Nil)
+
+        p.encodeByte() should be(Hex.msb("e59f1000 00000000 74736554"))
       }
     }
   }
