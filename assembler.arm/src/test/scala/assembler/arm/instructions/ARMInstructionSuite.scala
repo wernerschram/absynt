@@ -1,6 +1,5 @@
 package assembler.arm.instructions
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 import assembler.memory.MemoryPage
@@ -8,7 +7,7 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operations.LabeledARMOperation
 import assembler.arm.operations.ARMOperation
 
-class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory {
+class ARMInstructionSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
@@ -39,25 +38,27 @@ class ARMInstructionSuite extends WordSpec with ShouldMatchers with MockFactory 
   "a Labeled ARM instruction" when {
     "in a32 mode" should {
 
+      class MyInstruction extends ARMOperation {
+        val opcode = "my"
+        override def encodeWord()(implicit page: MemoryPage) = 0x12345678
+      }
+      
       "correctly return the size of the instruction" in {
-        val instruction = stub[ARMOperation]
-        (instruction.size()(_: MemoryPage)).when(*).returns(4)
+        val instruction = new MyInstruction()
 
         val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.size() should be(4)
       }
 
       "return the encoded instruction when encodeByte is called" in {
-        val instruction = stub[ARMOperation]
-        (instruction.encodeByte()(_: MemoryPage)).when(*).returns(0x01.toByte :: 0x02.toByte :: Nil)
+        val instruction = new MyInstruction()
 
         val labeledInstruction = new LabeledARMOperation(instruction, "Label")
-        labeledInstruction.encodeByte() should be(0x01.toByte :: 0x02.toByte :: Nil)
+        labeledInstruction.encodeByte() should be(0x78.toByte :: 0x56.toByte :: 0x34.toByte :: 0x12.toByte :: Nil)
       }
 
       "return the encoded instruction when encodeWord is called" in {
-        val instruction = stub[ARMOperation]
-        (instruction.encodeWord()(_: MemoryPage)).when(*).returns(0x12345678)
+        val instruction = new MyInstruction()
 
         val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.encodeWord() should be(0x12345678)

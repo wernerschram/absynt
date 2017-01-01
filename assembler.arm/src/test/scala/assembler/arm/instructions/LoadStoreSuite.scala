@@ -1,6 +1,5 @@
 package assembler.arm.instructions.branch
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
@@ -19,15 +18,10 @@ import assembler.memory.MemoryPage
 import assembler.Encodable
 import assembler.Label
 import assembler.EncodedString
+import assembler.EncodedByteList
 
-class LoadStoreSuite extends WordSpec with ShouldMatchers with MockFactory {
+class LoadStoreSuite extends WordSpec with ShouldMatchers {
 
-  def filler(size: Int) = {
-    val filler = stub[Encodable]
-    (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
-    filler
-  }
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
   "an LoadRegister instruction" when {
@@ -104,7 +98,7 @@ class LoadStoreSuite extends WordSpec with ShouldMatchers with MockFactory {
         val label = Label.unique
         val p = new MemoryPage(
           LoadRegister(label, R1) ::
-            filler(4) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
             EncodedString("Test").withLabel(label) ::
             Nil)
 

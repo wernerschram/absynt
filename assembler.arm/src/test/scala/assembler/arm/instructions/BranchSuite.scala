@@ -1,6 +1,5 @@
 package assembler.arm.instructions
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
@@ -14,23 +13,9 @@ import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
 import assembler.arm.operations.ARMOperation
 import assembler.Label
+import assembler.EncodedByteList
 
-class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
-
-  def filler(size: Int) = {
-    val filler = stub[Encodable]
-    (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
-    filler
-  }
-
-  def labeledFiller(size: Int, label: Label) = {
-    val filler = stub[LabeledEncodable]
-    (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.label _).when.returns(label)
-    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
-    filler
-  }
+class BranchSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
@@ -59,8 +44,8 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         val label = Label.unique
         val p = new MemoryPage(
           Branch(label) ::
-            filler(4) ::
-            labeledFiller(4, label) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("EA000000 00000000 00000000"))
@@ -69,8 +54,8 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
       "correctly encode a backward branch to a labeled instruction" in {
         val label: Label = "Label"
         val p = new MemoryPage(
-          labeledFiller(4, label) ::
-            filler(4) ::
+          EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
             Branch(label, Condition.LowerOrSame) ::
             Nil)
 
@@ -81,10 +66,10 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         val label = Label.unique
         val p = new MemoryPage(
           Branch(label) ::
-            filler(4) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
             Branch(label) ::
-            filler(4) ::
-            labeledFiller(4, label) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
@@ -93,10 +78,10 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
       "correctly encode a backward branch over another branch to a labeled instruction" in {
         val label = Label.unique
         val p = new MemoryPage(
-          labeledFiller(4, label) ::
-            filler(4) ::
+          EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
             Branch(label) ::
-            filler(4) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
             Branch(label) ::
             Nil)
 
@@ -132,8 +117,8 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         val label = Label.unique
         val p = new MemoryPage(
           BranchLink(label) ::
-            filler(4) ::
-            labeledFiller(4, label) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("EB000000 00000000 00000000"))
@@ -166,13 +151,12 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
         BranchLinkExchange(R12).encodeByte should be(Hex.msb("e12fff3c"))
       }
 
-
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val label = Label.unique
         val p = new MemoryPage(
           BranchLinkExchange(label) ::
-            filler(4) ::
-            labeledFiller(4, label) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)) ::
+            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         p.encodeByte() should be(Hex.msb("FA000000 00000000 00000000"))
@@ -204,7 +188,6 @@ class BranchSuite extends WordSpec with ShouldMatchers with MockFactory {
       "correctly encode bxj r2" in {
         BranchExchangeJazelle(R2).encodeByte should be(Hex.msb("e12fff22"))
       }
-
 
       "correctly represent bxj r2 as a string" in {
         BranchExchangeJazelle(R2).toString should be("bxj r2")
