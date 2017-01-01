@@ -1,6 +1,5 @@
 package assembler.x86.instructions
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
@@ -14,7 +13,7 @@ import assembler.x86.operands.Register._
 import assembler.x86.operations.X86Operation
 import assembler.x86.operands.ImmediateValue
 
-class MoveSuite extends WordSpec with ShouldMatchers with MockFactory {
+class MoveSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

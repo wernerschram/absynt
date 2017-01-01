@@ -2,6 +2,7 @@ package assembler.x86.instructions
 
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
+
 import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage

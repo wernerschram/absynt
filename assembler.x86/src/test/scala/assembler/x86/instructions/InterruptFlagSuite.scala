@@ -1,14 +1,14 @@
 package assembler.x86.instructions
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
+
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operations.X86Operation
 
-class ClearInterruptFlagSuite extends WordSpec with ShouldMatchers with MockFactory {
+class ClearInterruptFlagSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

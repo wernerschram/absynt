@@ -1,6 +1,5 @@
 package assembler.x86.instructions
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 
@@ -14,23 +13,9 @@ import assembler.x86.operands.memoryaccess._
 import assembler.Encodable
 import assembler.LabeledEncodable
 import assembler.Label
+import assembler.EncodedByteList
 
-class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
-
-  def filler(size: Int) = {
-    val filler = stub[Encodable]
-    (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
-    filler
-  }
-
-  def labeledFiller(size: Int, label: Label) = {
-    val filler = stub[LabeledEncodable]
-    (filler.size()(_: MemoryPage)).when(*).returns(size)
-    (filler.label _).when.returns(label)
-    (filler.encodeByte()(_: MemoryPage)).when(*).returns(List.fill(size) { 0x00.toByte })
-    filler
-  }
+class JumpSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 
@@ -200,8 +185,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           jump ::
-            filler(1) ::
-            labeledFiller(1, label) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB 01")) }
@@ -218,8 +203,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           jump ::
-            filler(1) ::
-            labeledFiller(1, label) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         jump.size()(p) should be(2);
@@ -232,8 +217,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, label) ::
-            filler(1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)) ::
             jump ::
             Nil)
 
@@ -245,8 +230,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump = JumpIfCountZero(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, label) ::
-            filler(1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)) ::
             jump ::
             Nil)
 
@@ -259,8 +244,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           jump ::
-            filler(256) ::
-            labeledFiller(1, label) ::
+            EncodedByteList(List.fill(256)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01")) }
@@ -272,8 +257,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           jump ::
-            filler(256) ::
-            labeledFiller(1, label) ::
+            EncodedByteList(List.fill(256)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         an[AssertionError] should be thrownBy { p.encodeByte() }
@@ -284,8 +269,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, label) ::
-            filler(256) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(256)(0x00.toByte)) ::
             jump ::
             Nil)
 
@@ -299,10 +284,10 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, label1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(1) ::
-            labeledFiller(1, label2) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
             jump1 ::
             Nil)
 
@@ -317,10 +302,10 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, label1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(122) ::
-            labeledFiller(1, label2) ::
+            EncodedByteList(List.fill(122)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
             jump1 ::
             Nil)
 
@@ -335,12 +320,12 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, label1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(123) ::
+            EncodedByteList(List.fill(123)(0x00.toByte)) ::
             jump1 ::
-            filler(2) ::
-            labeledFiller(1, label2) ::
+            EncodedByteList(List.fill(2)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
@@ -354,12 +339,12 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(1, label1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(123) ::
+            EncodedByteList(List.fill(123)(0x00.toByte)) ::
             jump1 ::
-            filler(3) ::
-            labeledFiller(1, label2) ::
+            EncodedByteList(List.fill(3)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7E FF")) }
@@ -373,12 +358,12 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = new MemoryPage(
-          labeledFiller(2, label1) ::
+          EncodedByteList(List.fill(2)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(123) ::
+            EncodedByteList(List.fill(123)(0x00.toByte)) ::
             jump1 ::
-            filler(2) ::
-            labeledFiller(1, label2) ::
+            EncodedByteList(List.fill(2)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
@@ -394,15 +379,15 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump3 = Jump(label3)
 
         val p = new MemoryPage(
-          labeledFiller(1, label1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(60) ::
+            EncodedByteList(List.fill(60)(0x00.toByte)) ::
             jump3 ::
-            filler(61) ::
+            EncodedByteList(List.fill(61)(0x00.toByte)) ::
             jump1 ::
-            filler(2) ::
-            labeledFiller(62, label2) ::
-            labeledFiller(1, label3) ::
+            EncodedByteList(List.fill(2)(0x00.toByte)) ::
+            EncodedByteList(List.fill(62)(0x00.toByte)).withLabel(label2) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label3) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
@@ -419,15 +404,15 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump3 = Jump(label3)
 
         val p = new MemoryPage(
-          labeledFiller(1, label1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(60) ::
+            EncodedByteList(List.fill(60)(0x00.toByte)) ::
             jump3 ::
-            filler(61) ::
+            EncodedByteList(List.fill(61)(0x00.toByte)) ::
             jump1 ::
-            filler(2) ::
-            labeledFiller(63, label2) ::
-            labeledFiller(1, label3) ::
+            EncodedByteList(List.fill(2)(0x00.toByte)) ::
+            EncodedByteList(List.fill(63)(0x00.toByte)).withLabel(label2) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label3) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
@@ -444,15 +429,15 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump3 = Jump(label3)
 
         val p = new MemoryPage(
-          labeledFiller(2, label1) ::
+          EncodedByteList(List.fill(2)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
-            filler(60) ::
+            EncodedByteList(List.fill(60)(0x00.toByte)) ::
             jump3 ::
-            filler(61) ::
+            EncodedByteList(List.fill(61)(0x00.toByte)) ::
             jump1 ::
-            filler(2) ::
-            labeledFiller(62, label2) ::
-            labeledFiller(1, label3) ::
+            EncodedByteList(List.fill(2)(0x00.toByte)) ::
+            EncodedByteList(List.fill(62)(0x00.toByte)).withLabel(label2) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label3) ::
             Nil)
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7C FF")) }
@@ -596,8 +581,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, label) ::
-            filler(1) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)) ::
             jump ::
             Nil)
 
@@ -609,8 +594,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
         val jump = Jump(label)
 
         val p = new MemoryPage(
-          labeledFiller(1, label) ::
-            filler(256) ::
+          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
+            EncodedByteList(List.fill(256)(0x00.toByte)) ::
             jump ::
             Nil)
 
@@ -623,8 +608,8 @@ class JumpSuite extends WordSpec with ShouldMatchers with MockFactory {
 
         val p = new MemoryPage(
           jump ::
-            filler(256) ::
-            labeledFiller(1, label) ::
+            EncodedByteList(List.fill(256)(0x00.toByte)) ::
+            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             Nil)
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01 00 00")) }
