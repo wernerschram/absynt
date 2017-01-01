@@ -1,11 +1,10 @@
 package assembler
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpec
 import assembler.memory.MemoryPage
 
-class EncodedStringSuite extends WordSpec with ShouldMatchers with MockFactory {
+class EncodedStringSuite extends WordSpec with ShouldMatchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[Encodable])
 

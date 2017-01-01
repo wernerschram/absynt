@@ -6,6 +6,5 @@ lazy val root = (project in file(".")).
   version := "1.0",
   scalaVersion := "2.11.8",
   libraryDependencies += "org.specs2" %% "specs2-core" % "2.4.16" % "test",
-  libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
+  libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 )
