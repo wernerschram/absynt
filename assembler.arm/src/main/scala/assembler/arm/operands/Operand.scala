@@ -1,4 +1,3 @@
 package assembler.arm.operands
 
-trait Operand {
-}
+trait Operand
