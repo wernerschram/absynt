@@ -1,18 +1,14 @@
 package assembler.arm.instructions.branch
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.ARMOperation
-import assembler.arm.instructions.MoveFromStatusRegister
-import assembler.arm.instructions.MoveToStatusRegister
-import assembler.arm.operations.Fields
-import assembler.arm.operands.Condition
+import assembler.arm.instructions.{MoveFromStatusRegister, MoveToStatusRegister}
+import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.registers.StatusRegister._
+import assembler.arm.operations.{ARMOperation, Fields}
 import assembler.memory.MemoryPage
-import assembler.arm.operands.Shifter
+import org.scalatest.{Matchers, WordSpec}
 
 class MoveFromStatusRegisterSuite extends WordSpec with Matchers {
 

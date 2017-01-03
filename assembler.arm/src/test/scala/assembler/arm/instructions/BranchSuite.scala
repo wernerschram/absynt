@@ -1,18 +1,12 @@
 package assembler.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
-import assembler.Encodable
-import assembler.Hex
-import assembler.LabeledEncodable
-import assembler.StringLabel
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.memory.MemoryPage
 import assembler.arm.operations.ARMOperation
-import assembler.Label
-import assembler.EncodedByteList
+import assembler.memory.MemoryPage
+import assembler.{EncodedByteList, Hex, Label}
+import org.scalatest.{Matchers, WordSpec}
 
 class BranchSuite extends WordSpec with Matchers {
 

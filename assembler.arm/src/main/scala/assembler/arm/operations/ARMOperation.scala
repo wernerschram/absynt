@@ -1,8 +1,6 @@
 package assembler.arm.operations
 
-import assembler.Encodable
-import assembler.Label
-import assembler.LabeledEncodable
+import assembler.{Encodable, Label, LabeledEncodable}
 import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
 import assembler.memory.MemoryPage
@@ -19,19 +17,19 @@ trait ARMOperation extends Encodable {
 
   def encodeByte()(implicit page: MemoryPage): List[Byte] = encodeWord.encodeLittleEndian
 
-  override def toString = mnemonic.sortBy { part => part.order }.map { part => part.name }.mkString
+  override def toString: String = mnemonic.sortBy { part => part.order }.map { part => part.name }.mkString
 }
 
 object ARMOperation {
   val sBit = 0x00100000
 }
 
-case class PartialName(val name: String, val order: Int)
+case class PartialName(name: String, order: Int)
 
 trait Conditional extends ARMOperation {
   self: ARMOperation =>
 
-  override def mnemonic = PartialName(condition.mnemonicExtension, 3) :: super.mnemonic
+  override def mnemonic: List[PartialName] = PartialName(condition.mnemonicExtension, 3) :: super.mnemonic
 
   val condition: Condition
 
@@ -40,7 +38,7 @@ trait Conditional extends ARMOperation {
 }
 
 class LabeledARMOperation(override val value: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
-  val opcode = value.opcode
+  val opcode: String = value.opcode
   
   override def encodeWord()(implicit page: MemoryPage): Int = value.encodeWord()
 }

@@ -1,14 +1,10 @@
 package assembler.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.arm.ProcessorMode
+import assembler.arm.operations.{ARMOperation, Effect, ExecutionMode, InterruptDisableFlags}
 import assembler.memory.MemoryPage
-import assembler.arm.operations.ExecutionMode
-import assembler.arm.operations.Effect
-import assembler.arm.operations.InterruptDisableFlags
-import assembler.arm.operations.ARMOperation
+import org.scalatest.{Matchers, WordSpec}
 
 class MiscellaneousSuite extends WordSpec with Matchers {
 

@@ -1,12 +1,9 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.Condition.Always
-import assembler.arm.operands.Condition.Condition
+import assembler.arm.operands.Condition.{Always, Condition}
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operations.MultiplyOperation
-import assembler.arm.operations.MultiplyWithRegisterOperation
-import assembler.arm.operations.SetFlags
+import assembler.arm.operations.{MultiplyOperation, MultiplyWithRegisterOperation, SetFlags}
 
 class MultiplyWithRegister(val code: Byte, val opcode: String) {
 

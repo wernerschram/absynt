@@ -2,17 +2,9 @@ package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
-import assembler.arm.operands.RightRotateImmediate
-import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operations.ARMOperation
-import assembler.arm.operations.DataProcessingOperation
-import assembler.arm.operations.SetFlags
-import assembler.arm.operations.DataProcessingNoDestinationInstruction
-import assembler.arm.operations.DataProcessingNoRegisterInstruction
-import assembler.Label
-import assembler.arm.operands.RelativeA32Pointer
-import assembler.memory.MemoryPage
+import assembler.arm.operands.{RightRotateImmediate, Shifter}
+import assembler.arm.operations._
 
 class DataProcessing(val code: Byte, val opcode: String) {
   private def RegAndShifterToReg(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always) =

@@ -1,10 +1,7 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.Effect
-import assembler.arm.operations.ExecutionMode
-import assembler.arm.operations.InterruptDisableFlags
-import assembler.arm.operations.ProcessorState
+import assembler.arm.operations.{Effect, ExecutionMode, InterruptDisableFlags, ProcessorState}
 
 object ChangeProcessorState {
   val code: Byte = 0x10

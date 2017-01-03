@@ -1,12 +1,10 @@
-package assembler.arm.instructions.dataprocessing
-
-import org.scalatest.{Matchers, WordSpec}
+package assembler.arm.instructions
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.arm.operations.ARMOperation
-import assembler.arm.instructions.SoftwareInterrupt
 import assembler.memory.MemoryPage
+import org.scalatest.{Matchers, WordSpec}
 
 class SoftwareInterruptSuite extends WordSpec with Matchers {
 

@@ -1,14 +1,12 @@
 package assembler.arm.instructions
 
+import assembler.Label
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
-import assembler.arm.operands.RelativeA32Pointer
+import assembler.arm.operands.{RelativeA32Pointer, RelativeThumbPointer}
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operations.BranchImmediate
-import assembler.arm.operations.BranchRegister
+import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
 import assembler.memory.MemoryPage
-import assembler.arm.operands.RelativeThumbPointer
-import assembler.Label
 
 class Branch(code: Byte, val opcode: String) {
   private def Immediate(destination: RelativeA32Pointer, condition: Condition = Always) =

@@ -1,22 +1,21 @@
 package assembler.arm.operations
 
-import scala.language.implicitConversions
-
 import assembler.arm.operands.Condition._
-import assembler.arm.ProcessorMode
 import assembler.memory.MemoryPage
+
+import scala.language.implicitConversions
 
 class Miscellaneous(val code: Byte, override val opcode: String, value: Short, condition: Condition)
     extends ARMOperation {
-  override def encodeWord()(implicit page: MemoryPage) = {
+  override def encodeWord()(implicit page: MemoryPage): Int = {
     val valuePart1: Byte = (value & 0x0f).toByte
     val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
     val extraCode: Int = 0x7
-    val result = ((condition.value << 28) | (code << 21) | (valuePart2 << 8) | (extraCode << 4) | valuePart1)
+    val result = (condition.value << 28) | (code << 21) | (valuePart2 << 8) | (extraCode << 4) | valuePart1
     result
   }
 
-  override def toString = s"${super.toString()} ${value}"
+  override def toString = s"${super.toString()} $value"
 }
 
 sealed abstract class Effect(val iMod: Byte, val mnemonicExtension: String)
@@ -27,7 +26,7 @@ object Effect {
 }
 
 sealed abstract class ExecutionMode(val mode: Byte) {
-  override def toString = mode.toString()
+  override def toString: String = mode.toString
 }
 
 object ExecutionMode {
@@ -47,7 +46,7 @@ object InterruptDisableFlags extends Enumeration {
   val normalInterrupt = Value(1, "i")
   val impreciseDataAbort = Value(2, "a")
 
-  val none = ValueSet.empty
+  val none: _root_.assembler.arm.operations.InterruptDisableFlags.ValueSet = ValueSet.empty
 
   implicit def valueToSet(value: Value): ValueSet = ValueSet(value)
 
@@ -60,20 +59,20 @@ class ProcessorState(val code: Byte, val opcode: String, val condition: Conditio
     extends Conditional {
 
   def this(code: Byte, opcode: String, mode: ExecutionMode) =
-    this(code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #${mode}")
+    this(code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")
 
   def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
     this(code: Byte, opcode: String, Unpredictable, effect.iMod, 0x01.toByte,
-      ((interruptDisableFlags.toBitMask)(0).toInt << 6), 0x00,
+      interruptDisableFlags.toBitMask (0).toInt << 6, 0x00,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
 
   def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode) =
     this(code, opcode, Unpredictable, effect.iMod, 0x01.toByte,
-      ((interruptDisableFlags.toBitMask)(0).toInt << 6), mode.mode,
-      s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #${mode}")
+      interruptDisableFlags.toBitMask (0).toInt << 6, mode.mode,
+      s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #$mode")
 
-  override def encodeWord()(implicit page: MemoryPage) =
-    (super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue)
+  override def encodeWord()(implicit page: MemoryPage): Int =
+    super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
 
-  override def toString = s"${super.toString()}${stringValue}"
+  override def toString = s"${super.toString()}$stringValue"
 }

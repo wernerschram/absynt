@@ -1,15 +1,13 @@
 package assembler.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.Condition
-import assembler.arm.operands.Shifter
+import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.memory.MemoryPage
 import assembler.arm.operations.ARMOperation
+import assembler.memory.MemoryPage
+import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 

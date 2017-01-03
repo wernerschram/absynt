@@ -3,12 +3,7 @@ package assembler.arm.instructions
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operations.{ LoadStoreMultiple => LoadStoreMultipleOpcode }
-import assembler.arm.operations.LoadStoreMultipleDirection
-import assembler.arm.operations.{ ReturnFromException => ReturnFromExceptionOpcode }
-import assembler.arm.operations.UpdateMode
-import assembler.arm.operations.UpdateBase
-import assembler.arm.operations.UserModeRegisters
+import assembler.arm.operations.{LoadStoreMultipleDirection, UpdateBase, UpdateMode, UserModeRegisters, LoadStoreMultiple => LoadStoreMultipleOpcode, ReturnFromException => ReturnFromExceptionOpcode}
 
 object LoadMultiple {
   //val code: Byte = 0x08
@@ -65,18 +60,18 @@ object ReturnFromException {
     new ReturnFromExceptionOpcode(baseRegister, addressingMode, updateBase, opcode)
 
   def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode) =
-    Immed(baseRegister, addressingMode, false)
+    Immed(baseRegister, addressingMode, updateBase = false)
 
   def withUpdateBase(baseRegister: GeneralRegister, addressingMode: UpdateMode)(implicit processorMode: ProcessorMode) =
-    Immed(baseRegister, addressingMode, true)
+    Immed(baseRegister, addressingMode, updateBase = true)
 }
 
 object Push {
-  def apply(registers: List[GeneralRegister])(implicit processorMode: ProcessorMode) =
+  def apply(registers: List[GeneralRegister])(implicit processorMode: ProcessorMode): LoadStoreMultipleOpcode with UpdateBase =
     LoadMultiple.withUpdateBase(registers, GeneralRegister.SP, UpdateMode.DecrementAfter)
 }
 
 object Pop {
-  def apply(registers: List[GeneralRegister])(implicit processorMode: ProcessorMode) =
+  def apply(registers: List[GeneralRegister])(implicit processorMode: ProcessorMode): LoadStoreMultipleOpcode with UpdateBase =
     StoreMultiple.withUpdateBase(registers, GeneralRegister.SP, UpdateMode.IncrementBefore)
 }

@@ -1,19 +1,13 @@
-package assembler.arm.instructions
+package assembler.arm.operations
+
+import assembler.Label
+import assembler.ListExtensions._
+import assembler.arm.ProcessorMode
+import assembler.arm.operands.Condition.Condition
+import assembler.memory.MemoryPage
+import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage}
 
 import scala.collection.concurrent.TrieMap
-
-import assembler.ListExtensions._
-
-import assembler.Encodable
-import assembler.arm.ProcessorMode
-import assembler.arm.operands.RelativePointer
-import assembler.memory.MemoryPage
-import assembler.reference.ReferencingInstruction
-import assembler.reference.ReferencingInstructionOnPage
-import assembler.Label
-import assembler.arm.operations.ARMOperation
-import assembler.arm.operations.Conditional
-import assembler.arm.operands.Condition.Condition
 
 abstract class ReferencingARMOperation[PointerType](val opcode: String, val label: Label, val condition: Condition, newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
     extends Conditional with ReferencingInstruction {
@@ -22,15 +16,15 @@ abstract class ReferencingARMOperation[PointerType](val opcode: String, val labe
       extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
 
     val branchSize = 4
-    override val minimumSize = branchSize
-    override val maximumSize = branchSize
+    override val minimumSize: Int = branchSize
+    override val maximumSize: Int = branchSize
 
-    override def getSizeForDistance(forward: Boolean, distance: Int) = branchSize
+    override def getSizeForDistance(forward: Boolean, distance: Int): Int = branchSize
 
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte] =
       encodeWordForDistance(getPointerForDistance(forward, distance)).encodeLittleEndian
 
-    def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) = {
+    def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): PointerType = {
       if (forward) {
         newPointer(distance - 4)
       } else {
@@ -51,7 +45,7 @@ abstract class ReferencingARMOperation[PointerType](val opcode: String, val labe
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target, page, processorMode))
   }
 
-  override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
+  override def size()(implicit page: MemoryPage): Int = getOrElseCreateInstruction().size
 
   override def toString = s"${super.toString()} $label"
 }

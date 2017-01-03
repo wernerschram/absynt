@@ -1,8 +1,7 @@
 package assembler.arm.instructions
 
-import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
-import assembler.arm.operations.{ SoftwareInterrupt => SoftwareInterruptOpcode }
+import assembler.arm.operations.{SoftwareInterrupt => SoftwareInterruptOpcode}
 
 object SoftwareInterrupt {
   val opcode: String = "swi"

@@ -1,10 +1,9 @@
 package assembler.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-import assembler.memory.MemoryPage
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.LabeledARMOperation
-import assembler.arm.operations.ARMOperation
+import assembler.arm.operations.{ARMOperation, LabeledARMOperation}
+import assembler.memory.MemoryPage
+import org.scalatest.{Matchers, WordSpec}
 
 class ARMInstructionSuite extends WordSpec with Matchers {
 
@@ -28,7 +27,7 @@ class ARMInstructionSuite extends WordSpec with Matchers {
 
         val labeledInstruction = instruction.withLabel("Label")
 
-        labeledInstruction.label.toString() should be("Label")
+        labeledInstruction.label.toString should be("Label")
       }
 
     }

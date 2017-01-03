@@ -1,23 +1,12 @@
-package assembler.arm.instructions.branch
+package assembler.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
-import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.ARMOperation
-import assembler.arm.instructions.LoadRegister
-import assembler.arm.instructions.StoreRegister
-import assembler.arm.operations.LoadStoreAddressingTypeNormal
-import assembler.arm.operations.LoadStoreMiscelaneousOffset
-import assembler.arm.operations.LoadStoreOffset
-import assembler.arm.operations.UpdateDirection
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister._
+import assembler.arm.operations._
 import assembler.memory.MemoryPage
-import assembler.Encodable
-import assembler.Label
-import assembler.EncodedString
-import assembler.EncodedByteList
+import assembler.{EncodedByteList, EncodedString, Hex, Label}
+import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
 
@@ -37,11 +26,11 @@ class LoadStoreSuite extends WordSpec with Matchers {
       }
 
       "correctly encode ldr r1, [r2], #-20" in {
-        LoadRegister(R1, R2, -20.toShort, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e4121014"))
+        LoadRegister(R1, R2, (-20).toShort, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e4121014"))
       }
 
       "correctly represent ldr r1, [r2], #-20 as a string" in {
-        LoadRegister(R1, R2, -20.toShort, LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], #-20")
+        LoadRegister(R1, R2, (-20).toShort, LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], #-20")
       }
 
       "correctly encode ldr r1, [r2] #30" in {
@@ -61,7 +50,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
       }
 
       "correctly encode ldr r1, [r2, #-60]!" in {
-        LoadRegister(R1, R2, -60.toShort, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e532103c"))
+        LoadRegister(R1, R2, (-60).toShort, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e532103c"))
       }
 
       "correctly encode ldr r1, [r2, r3]" in {
@@ -127,11 +116,11 @@ class LoadStoreSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode ldrd r1, [r2], #-40" in {
-        LoadRegister.doubleWord(R1, R2, -40.toByte, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e04212d8"))
+        LoadRegister.doubleWord(R1, R2, (-40).toByte, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e04212d8"))
       }
 
       "correctly represent ldrd r1, [r2], #-40 as a string" in {
-        LoadRegister.doubleWord(R1, R2, -40.toByte, LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldrd r1, [r2], #-40")
+        LoadRegister.doubleWord(R1, R2, (-40).toByte, LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldrd r1, [r2], #-40")
       }
     }
   }
@@ -157,11 +146,11 @@ class LoadStoreSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode ldrh r1, [r2, #-60]!" in {
-        LoadRegister.unsignedHalfWord(R1, R2, -60.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e17213bc"))
+        LoadRegister.unsignedHalfWord(R1, R2, (-60).toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e17213bc"))
       }
 
       "correctly represent ldrh r1, [r2, #-60]! as a string" in {
-        LoadRegister.unsignedHalfWord(R1, R2, -60.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).toString should be("ldrh r1, [r2, #-60]!")
+        LoadRegister.unsignedHalfWord(R1, R2, (-60).toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).toString should be("ldrh r1, [r2, #-60]!")
       }
     }
   }
@@ -195,7 +184,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
       }
 
       "correctly encode ldrt r1, [r2], #-140" in {
-        LoadRegister.UserMode(R1, R2, -140.toShort).encodeByte should be(Hex.msb("e432108c"))
+        LoadRegister.UserMode(R1, R2, (-140).toShort).encodeByte should be(Hex.msb("e432108c"))
       }
 
       "correctly encode ldrt r1, [r2], r13" in {
@@ -214,7 +203,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
       }
 
       "correctly encode ldrbt r1, [r2], #-160" in {
-        LoadRegister.UserMode.byte(R1, R2, -160.toShort).encodeByte should be(Hex.msb("e47210a0"))
+        LoadRegister.UserMode.byte(R1, R2, (-160).toShort).encodeByte should be(Hex.msb("e47210a0"))
       }
 
       "correctly encode ldrbt r1, [r2], r15" in {

@@ -1,13 +1,12 @@
 package assembler.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.memory.MemoryPage
 import assembler.arm.operations.ARMOperation
+import assembler.memory.MemoryPage
+import org.scalatest.{Matchers, WordSpec}
 
 class MultiplySuite extends WordSpec with Matchers {
 

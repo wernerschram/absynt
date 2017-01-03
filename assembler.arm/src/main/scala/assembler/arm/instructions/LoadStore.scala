@@ -1,13 +1,12 @@
 package assembler.arm.instructions
 
+import assembler.Label
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operations._
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
-import assembler.Label
+import assembler.arm.operations._
 import assembler.memory.MemoryPage
-import assembler.arm.operands.registers.Register
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemnonic: String) {

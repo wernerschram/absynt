@@ -3,12 +3,12 @@ package assembler.arm.operands.registers
 import assembler.arm.operands._
 
 abstract class Register(mnemonic: String) extends Operand {
-    override def toString() = mnemonic
+    override def toString: String = mnemonic
 }
 
-sealed abstract class GeneralRegister(val registerCode: Byte) extends Register(s"r${registerCode}") with LeftShiftValue with RightShiftValue with RotateValue {
-  val shifter = registerCode.toShort
-  override def encodeShiftValue = registerCode << 8
+sealed abstract class GeneralRegister(val registerCode: Byte) extends Register(s"r$registerCode") with LeftShiftValue with RightShiftValue with RotateValue {
+  val shifter: Short = registerCode.toShort
+  override def encodeShiftValue: Int = registerCode << 8
 }
 
 object GeneralRegister {
@@ -34,7 +34,7 @@ object GeneralRegister {
 }
 
 sealed abstract class StatusRegister(val registerCode: Byte, mnemonic: String) extends Register(mnemonic) {
-  val shifter = registerCode.toShort
+  val shifter: Short = registerCode.toShort
 }
 
 object StatusRegister {
