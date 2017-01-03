@@ -3,7 +3,7 @@ package assembler.x86.instructions
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operations.Immediate
-import assembler.x86.operations.ModRMStaticOperation
+import assembler.x86.operations.ModRMStatic
 import assembler.x86.operations.RegisterEncoded
 import assembler.x86.operations.Static
 
@@ -23,7 +23,7 @@ final object Push {
     }
 
   private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
+    new ModRMStatic(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
       override def validate = {
         super.validate
         processorMode match {

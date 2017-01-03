@@ -3,24 +3,24 @@ package assembler.x86.instructions
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operations.Immediate
-import assembler.x86.operations.ModRMStaticOperation
-import assembler.x86.operations.ModRRMStaticOperation
+import assembler.x86.operations.ModRMStatic
+import assembler.x86.operations.ModRRMStatic
 import assembler.x86.operations.Static
 import assembler.x86.ParameterPosition
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic)
+    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic)
 
   private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic)
+    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic)
 
   private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic)
+    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic)
 
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStaticOperation[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic)
+    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic)
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with Immediate {
     override val immediate = immediateValue
@@ -42,17 +42,17 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+    new ModRMStatic(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate = immediateValue
     }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+    new ModRMStatic(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate = immediateValue
     }
 
   private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+    new ModRMStatic(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate = immediateValue
       override def rexRequirements = operand.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
     }
@@ -106,9 +106,9 @@ object Not {
   implicit val opcode = "not"
 
   private def RM8(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0xF6.toByte :: Nil, 2, opcode)
+    new ModRMStatic(operand, 0xF6.toByte :: Nil, 2, opcode)
   private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStaticOperation(operand, 0xF7.toByte :: Nil, 2, opcode)
+    new ModRMStatic(operand, 0xF7.toByte :: Nil, 2, opcode)
 
   def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) = operand.operandByteSize match {
     case ValueSize.Byte => RM8(operand)

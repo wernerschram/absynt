@@ -9,7 +9,7 @@ import assembler.x86.operations.X86Operation
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 
-class InputSuite extends WordSpec with Matchers {
+class IOSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

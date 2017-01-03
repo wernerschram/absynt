@@ -8,13 +8,13 @@ import assembler.x86.operands.Operand
 import assembler.x86.operands.OperandSize
 import assembler.x86.operands.GeneralPurposeRegister
 
-class ModRRMStaticOperation[RegisterType <: GeneralPurposeRegister](
+class ModRRMStatic[RegisterType <: GeneralPurposeRegister](
   val register: RegisterType,
   operandRM: ModRMEncodableOperand,
   override val code: List[Byte],
   override val mnemonic: String,
   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends ModRMStaticOperation(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
+    extends ModRMStatic(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
   override def operands: List[Operand] = register :: super.operands
 

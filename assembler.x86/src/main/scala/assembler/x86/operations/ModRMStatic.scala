@@ -10,7 +10,7 @@ import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.memoryaccess.{ MemoryLocation => MemoryLocationType }
 import assembler.x86.operands.OperandSize
 
-class ModRMStaticOperation(
+class ModRMStatic(
   val operandRM: ModRMEncodableOperand,
   override val code: List[Byte],
   val rValue: Byte,

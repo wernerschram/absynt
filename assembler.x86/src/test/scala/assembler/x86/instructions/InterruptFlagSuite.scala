@@ -7,7 +7,7 @@ import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operations.X86Operation
 
-class ClearInterruptFlagSuite extends WordSpec with Matchers {
+class InterruptFlagSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 
