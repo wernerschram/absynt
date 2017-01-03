@@ -10,7 +10,7 @@ import assembler.arm.operations.{ARMOperation, Fields}
 import assembler.memory.MemoryPage
 import org.scalatest.{Matchers, WordSpec}
 
-class MoveFromStatusRegisterSuite extends WordSpec with Matchers {
+class MoveStatusRegisterSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
