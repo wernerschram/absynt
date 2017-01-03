@@ -26,7 +26,7 @@ trait ReferencingInstruction
 class LabeledReferencingInstruction (
     override val value: ReferencingInstruction,
     val label: Label) extends ReferencingInstruction with LabeledEncodable {
-  override def getOrElseCreateInstruction()(implicit page: MemoryPage) = value.getOrElseCreateInstruction()
+  override def getOrElseCreateInstruction()(implicit page: MemoryPage): ReferencingInstructionOnPage = value.getOrElseCreateInstruction()
 
   override def withLabel(label: Label): LabeledEncodable = new LabeledReferencingInstruction(this, label)
 }

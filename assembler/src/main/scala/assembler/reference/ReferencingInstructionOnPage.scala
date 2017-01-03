@@ -16,7 +16,7 @@ abstract class ReferencingInstructionOnPage (
 
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte]
 
-  val forward = (thisLocation < destinationLocation)
+  val forward: Boolean = (thisLocation < destinationLocation)
 
   private val intermediateInstructions = page.intermediateEncodables(thisLocation, destinationLocation)
 
@@ -39,7 +39,7 @@ abstract class ReferencingInstructionOnPage (
   private def maximumDistance = independentDistance + dependentIntermediates.map(instruction =>
     if (instruction.isEstimated) instruction.size else maximumSize).sum
 
-  lazy val actualDistance = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
+  lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
   def minimumEstimatedSize: Int = getSizeForDistance(forward, minimumDistance)
   def maximumEstimatedSize: Int = getSizeForDistance(forward, maximumDistance)
@@ -77,5 +77,5 @@ abstract class ReferencingInstructionOnPage (
     _estimatedSize.get
   }
 
-  lazy val encodeByte = encodeForDistance(forward, actualDistance)
+  lazy val encodeByte: List[Byte] = encodeForDistance(forward, actualDistance)
 }
