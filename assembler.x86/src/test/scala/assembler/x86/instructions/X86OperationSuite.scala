@@ -1,11 +1,11 @@
 package assembler.x86.operations
 
 import org.scalatest.{Matchers, WordSpec}
-
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.Interrupt
 import assembler.x86.operands.Register
+import assembler.x86.operands.Register.AX
 
 class X86OperationSuite extends WordSpec with Matchers {
 
@@ -15,7 +15,7 @@ class X86OperationSuite extends WordSpec with Matchers {
     "in protected mode" should {
 
       class MyInstruction extends X86Operation {
-        override def code = 0x00.toByte :: Nil
+        override def code: List[Byte] = 0x00.toByte :: Nil
         override def mnemonic = "mis"
         override def operands = Nil
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
@@ -31,7 +31,7 @@ class X86OperationSuite extends WordSpec with Matchers {
 
         val labeledInstruction = instruction.withLabel("Label")
 
-        labeledInstruction.label.toString() should be("Label")
+        labeledInstruction.label.toString should be("Label")
       }
 
     }
@@ -41,9 +41,9 @@ class X86OperationSuite extends WordSpec with Matchers {
     "in protected mode" should {
 
       class MyInstruction extends X86Operation {
-        override def code = 0x01.toByte :: 0x02.toByte :: Nil
+        override def code: List[Byte] = 0x01.toByte :: 0x02.toByte :: Nil
         override def mnemonic = "mis"
-        val operands = Register.AX :: Nil
+        val operands: List[AX.type] = Register.AX :: Nil
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
       }
 

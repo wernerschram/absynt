@@ -7,7 +7,7 @@ abstract class IndirectMemoryLocation(
   val registerOrMemoryModeCode: Byte, displacement: List[Byte] = List.empty[Byte], addressSize: OperandSize, segment: SegmentRegister)
     extends MemoryLocation(displacement, segment, addressSize) {
 
-  val modValue = IndirectMemoryLocation.getModValue(displacement)
+  val modValue: Byte = IndirectMemoryLocation.getModValue(displacement)
 }
 
 object IndirectMemoryLocation {

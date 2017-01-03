@@ -12,8 +12,8 @@ final object Push {
 
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false) {
-      override def validate = {
-        super.validate
+      override def validate(): Unit = {
+        super.validate()
         processorMode match {
           case ProcessorMode.Protected => assume(register.operandByteSize != ValueSize.QuadWord)
           case ProcessorMode.Long => assume(register.operandByteSize != ValueSize.DoubleWord)
@@ -24,8 +24,8 @@ final object Push {
 
   private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
-      override def validate = {
-        super.validate
+      override def validate(): Unit = {
+        super.validate()
         processorMode match {
           case ProcessorMode.Protected => assume(operand.operandByteSize != ValueSize.QuadWord)
           case ProcessorMode.Long => assume(operand.operandByteSize != ValueSize.DoubleWord)
@@ -35,12 +35,12 @@ final object Push {
     }
 
   private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0x6A.toByte :: Nil, opcode) with Immediate {
-    override def immediate = immediateValue
+    override def immediate: ImmediateValue = immediateValue
   }
   private def Imm16(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0x68.toByte :: Nil, opcode) with Immediate {
-    override def immediate = immediateValue
-    override def validate = {
-      super.validate
+    override def immediate: ImmediateValue = immediateValue
+    override def validate(): Unit = {
+      super.validate()
       assume(immediate.operandByteSize != ValueSize.QuadWord)
     }
   }
@@ -58,13 +58,13 @@ final object Push {
   def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
     RM16(operand)
 
-  def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode) = immediate.operandByteSize match {
+  def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate = immediate.operandByteSize match {
     case ValueSize.Byte => Imm8(immediate)
     case ValueSize.Word | ValueSize.DoubleWord => Imm16(immediate)
-    case default => throw new AssertionError
+    case _ => throw new AssertionError
   }
 
-  def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode) = segment match {
+  def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode): Static = segment match {
     case Register.CS => StaticCS()
     case Register.SS => StaticSS()
     case Register.DS => StaticDS()
@@ -78,8 +78,8 @@ object PushAll {
   implicit val opcode = "pusha"
 
   private def Static()(implicit processorMode: ProcessorMode) = new Static(0x60.toByte :: Nil, opcode) {
-    override def validate = {
-      super.validate
+    override def validate(): Unit = {
+      super.validate()
       assume(processorMode != ProcessorMode.Long)
     }
   }

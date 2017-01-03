@@ -13,15 +13,15 @@ import assembler.x86.operands.FixedSizeOperand
 sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegister = Register.DS)
     extends MemoryLocation(address, segment, ValueSize.sizeOfValue(address.size)) with ModRMEncodableOperand {
 
-  override val modValue = 0x00.toByte
+  override val modValue: Byte = 0x00.toByte
 
-  override val registerOrMemoryModeCode = if (address.length == 2) 0x06.toByte else 0x05.toByte
+  override val registerOrMemoryModeCode: Byte = if (address.length == 2) 0x06.toByte else 0x05.toByte
 
   override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: displacement
 
   override val defaultSegment: SegmentRegister = Register.DS
 
-  override def toString = s"${segmentPrefix}[${address.decimalString}]"
+  override def toString = s"$segmentPrefix[${address.decimalString}]"
 }
 
 object MemoryAddress {

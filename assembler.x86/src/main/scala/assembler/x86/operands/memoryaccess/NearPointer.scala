@@ -7,9 +7,9 @@ import assembler.x86.operands.ValueSize
 
 class NearPointer private(val displacement: List[Byte]) extends Operand with FixedSizeOperand {
   assume(List(1, 2, 4).contains(displacement.length))
-  val operandByteSize = ValueSize.sizeOfValue(displacement.length)
+  val operandByteSize: ValueSize = ValueSize.sizeOfValue(displacement.length)
 
-  override def toString() = s"0x${displacement.bigEndianHexString}"
+  override def toString = s"0x${displacement.bigEndianHexString}"
 }
 
 object NearPointer {

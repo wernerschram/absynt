@@ -13,11 +13,11 @@ import assembler.x86.operands.Register
 import assembler.x86.operands.ValueSize
 
 trait X86Operation extends Encodable {
-  def validate: Unit = Unit
+  def validate(): Unit = Unit
 
   def operands: List[Operand]
 
-  override def size()(implicit page: MemoryPage) = encodeByte().length
+  override def size()(implicit page: MemoryPage): Int = encodeByte().length
   override def withLabel(label: Label): LabeledEncodable = new LabeledX86Operation(this, label)
 
   implicit val processorMode: ProcessorMode
@@ -49,7 +49,7 @@ trait X86Operation extends Encodable {
       rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitmask).toByte) :: Nil
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
-    validate
+    validate()
 
     optionalSegmentOverridePrefix :::
       optionalAddressSizePrefix :::
@@ -58,12 +58,11 @@ trait X86Operation extends Encodable {
       code
   }
 
-  override def toString() = s"${mnemonic} ${operands.reverseMap { operand => operand.toString() }.mkString(", ")}"
+  override def toString = s"$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
 }
 
 object X86Operation {
   private val RexCode = 0x40.toByte
-  private val RexWBitValue: Byte = 8
 
   private val OperandSizeCode = 0x66.toByte
   private val AddressSizeCode = 0x67.toByte

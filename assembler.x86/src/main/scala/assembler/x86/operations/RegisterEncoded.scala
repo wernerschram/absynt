@@ -1,7 +1,6 @@
 package assembler.x86.operations
 
-import assembler.x86.ParameterPosition
-import assembler.x86.ProcessorMode
+import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import assembler.x86.operands.Operand
 import assembler.x86.operands.GeneralPurposeRegister
 
@@ -14,7 +13,7 @@ class RegisterEncoded[RegisterType <: GeneralPurposeRegister](
 
   override def operands: List[Operand] = register :: Nil
 
-  override def rexRequirements = super.rexRequirements ::: register.getRexRequirements(ParameterPosition.OpcodeReg)
+  override def rexRequirements: List[RexRequirement] = super.rexRequirements ::: register.getRexRequirements(ParameterPosition.OpcodeReg)
 
   override def code: List[Byte] = {
     rawCode.take(rawCode.length - 1) ::: (rawCode.last | register.registerCode).toByte :: Nil

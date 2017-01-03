@@ -1,9 +1,7 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
-
-import assembler.x86.ParameterPosition
-import assembler.x86.ProcessorMode
+import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands._
 
@@ -28,16 +26,16 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
   override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: getSIB :: displacement
 
-  override def getRexRequirements(position: ParameterPosition) =
+  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
     super.getRexRequirements(position) :::
       base.getRexRequirements(ParameterPosition.Base) :::
       index.getRexRequirements(ParameterPosition.Index)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
 
-  override def toString() = s"${segmentPrefix}[${base}+${index}${scaleString}${displacementString}]"
+  override def toString = s"$segmentPrefix[$base+$index$scaleString$displacementString]"
 
-  private def scaleString = s"*${scale}"
+  private def scaleString = s"*$scale"
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 }

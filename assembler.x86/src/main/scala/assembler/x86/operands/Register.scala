@@ -7,15 +7,15 @@ import assembler.x86.RexRequirement
 sealed abstract class Register extends Operand
 
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String) extends Register with ModRMEncodableOperand with FixedSizeOperand {
-  val modValue = 0x03.toByte
-  val registerOrMemoryModeCode = registerCode
+  val modValue: Byte = 0x03.toByte
+  val registerOrMemoryModeCode: Byte = registerCode
 }
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String) extends GeneralPurposeRegister(registerCode, mnemonic) {
   override def getRexRequirements(position: ParameterPosition): List[RexRequirement] = (position match {
     case ParameterPosition.Index => ParameterPosition.Index.rexRequirement.toList
     case ParameterPosition.Base => ParameterPosition.Base.rexRequirement.toList
-    case default => position.rexRequirement.toList
+    case _ => position.rexRequirement.toList
   }) ::: super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
@@ -41,7 +41,7 @@ sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14")
 sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15")
 
 sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register {
-  override def toString() = mnemonic
+  override def toString: String = mnemonic
 }
 
 sealed trait BaseIndexPair extends ModRMEncodableOperand with FixedSizeOperand {
@@ -60,15 +60,15 @@ sealed trait EncodedBaseRegister extends ModRMEncodableOperand with FixedSizeOpe
   def getBaseCode(index: RealModeIndexRegister): Byte
 
   def combinedIndex(index: RealModeIndexRegister): BaseIndexPair = new BaseIndexPair {
-    override val defaultSegment = index.defaultSegment
-    override val indexCode = getBaseCode(index)
+    override val defaultSegment: SegmentRegister = index.defaultSegment
+    override val indexCode: Byte = getBaseCode(index)
 
     val operandByteSize: OperandSize = index.operandByteSize
 
     val modValue: Byte = index.modValue
     val registerOrMemoryModeCode: Byte = getBaseCode(index)
 
-    override def toString() = s"${EncodedBaseRegister.this}+${index}"
+    override def toString = s"${EncodedBaseRegister.this}+$index"
   }
 }
 
@@ -86,29 +86,29 @@ sealed trait ByteRegister extends GeneralPurposeRegister {
 }
 
 sealed trait LowByteRegister extends ByteRegister {
-  override def toString = if (mnemonic.startsWith("r")) s"${mnemonic}l" else mnemonic.replace('x', 'l')
+  override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}l" else mnemonic.replace('x', 'l')
 }
 
 sealed trait HighByteRegister extends ByteRegister {
-  override val registerOrMemoryModeCode = (registerCode + 0x04).toByte
-  override def toString = mnemonic.replace('x', 'h')
+  override val registerOrMemoryModeCode: Byte = (registerCode + 0x04).toByte
+  override def toString: String = mnemonic.replace('x', 'h')
 }
 
 sealed trait WideRegister extends GeneralPurposeRegister
 
 sealed trait WordRegister extends WideRegister {
   override val operandByteSize = ValueSize.Word
-  override def toString = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
+  override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
 }
 
 sealed trait DoubleWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
   override val operandByteSize = ValueSize.DoubleWord
-  override def toString = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e${mnemonic}"
+  override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
 }
 
 sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
   override val operandByteSize = ValueSize.QuadWord
-  override def toString = if (mnemonic.startsWith("r")) mnemonic else s"r${mnemonic}"
+  override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
 }
 
 object Register {
@@ -135,32 +135,32 @@ object Register {
   case object CX extends CountRegister with WordRegister
   case object DX extends DataRegister with WordRegister
   case object BX extends BaseRegister with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
-    override val indexCode = 0x07.toByte
-    def getBaseCode(index: RealModeIndexRegister) = {
+    override val indexCode: Byte = 0x07.toByte
+    def getBaseCode(index: RealModeIndexRegister): Byte = {
       index match {
         case SI => 0x00
         case DI => 0x01
-        case default => throw new AssertionError
+        case _ => throw new AssertionError
       }
     }
   }
   case object SP extends SourcePointer with WordRegister
   case object BP extends BasePointer with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
-    override val indexCode = 0x06.toByte
-    def getBaseCode(index: RealModeIndexRegister) = {
+    override val indexCode: Byte = 0x06.toByte
+    def getBaseCode(index: RealModeIndexRegister): Byte = {
       index match {
         case SI => 0x02
         case DI => 0x03
-        case default => throw new AssertionError
+        case _ => throw new AssertionError
       }
     }
   }
   final case object SI extends SourceIndex with WordRegister with RealModeIndexRegister {
-    override val indexCode = 0x04.toByte
+    override val indexCode: Byte = 0x04.toByte
   }
   final case object DI extends DestinationIndex with WordRegister with RealModeIndexRegister {
     override val defaultSegment = Register.ES
-    override val indexCode = 0x05.toByte
+    override val indexCode: Byte = 0x05.toByte
   }
 
   // i386 registers

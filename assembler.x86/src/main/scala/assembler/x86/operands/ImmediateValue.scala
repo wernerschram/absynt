@@ -9,9 +9,9 @@ import assembler.x86.RexRequirement
 final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeOperand {
   override val operandByteSize: OperandSize = ValueSize.sizeOfValue(value.length)
 
-  val isPositive = (value.last & 0x80.toByte) == 0
+  val isPositive: Boolean = (value.last & 0x80.toByte) == 0
 
-  override def toString() = value.decimalString
+  override def toString: String = value.decimalString
 }
 
 object ImmediateValue {

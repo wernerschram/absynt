@@ -20,10 +20,10 @@ import assembler.Label
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
   protected def Rel8(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = new Static(shortOpcode, mnemonic) with NearPointerOperation {
-    override val pointer = nearPointer
+    override val pointer: NearPointer = nearPointer
   }
 
-  def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
+  def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode): Static with NearPointerOperation = {
     assume(nearPointer.operandByteSize == ValueSize.Byte)
     Rel8(nearPointer)
   }
@@ -41,10 +41,10 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
 abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: List[Byte], mnemonic: String) extends ShortRelativeJump(shortOpcode, mnemonic) {
 
   private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = new Static(longOpcode, mnemonic) with NearPointerOperation {
-    override val pointer = nearPointer
+    override val pointer: NearPointer = nearPointer
 
-    override def validate = {
-      super.validate
+    override def validate(): Unit = {
+      super.validate()
       processorMode match {
         case ProcessorMode.Long | ProcessorMode.Protected => assume(pointer.operandByteSize != ValueSize.Word)
         case ProcessorMode.Real => assume(pointer.operandByteSize == ValueSize.Word)
@@ -52,7 +52,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
     }
   }
 
-  override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = nearPointer.operandByteSize match {
+  override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode): Static with NearPointerOperation = nearPointer.operandByteSize match {
     case ValueSize.Byte =>
       super.apply(nearPointer)
     case _ =>
@@ -71,20 +71,20 @@ final object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByt
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
       assume((operandRM, processorMode) match {
-        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Long) if (fixed.operandByteSize != ValueSize.QuadWord) => false
-        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == ValueSize.QuadWord) => false
+        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Long) if fixed.operandByteSize != ValueSize.QuadWord => false
+        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected) if fixed.operandByteSize == ValueSize.QuadWord => false
         case _ => true
       })
     }
 
   private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) = new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
-    override def pointer = farPointer
+    override def pointer: FarPointer = farPointer
   }
 
   private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xFF.toByte :: Nil, 5, s"${mnemonic} FAR") {
+    new ModRMStatic(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
       assume((operandRM, processorMode) match {
-        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected) if (fixed.operandByteSize == ValueSize.QuadWord) => false
+        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected) if fixed.operandByteSize == ValueSize.QuadWord => false
         case _ => true
       })
     }

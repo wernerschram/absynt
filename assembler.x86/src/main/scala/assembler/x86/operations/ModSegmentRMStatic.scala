@@ -15,8 +15,8 @@ class ModSegmentRMStatic(
 
   override def operands: List[Operand] = register :: super.operands
 
-  override def validate = {
-    super.validate
+  override def validate(): Unit = {
+    super.validate()
     assume(register.isValidForMode(processorMode))
   }
 }

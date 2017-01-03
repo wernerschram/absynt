@@ -1,7 +1,6 @@
 package assembler.x86.operations
 
-import assembler.x86.ParameterPosition
-import assembler.x86.ProcessorMode
+import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
@@ -18,8 +17,8 @@ class ModRRMStatic[RegisterType <: GeneralPurposeRegister](
 
   override def operands: List[Operand] = register :: super.operands
 
-  override def validate = {
-    super.validate
+  override def validate(): Unit = {
+    super.validate()
     assume(register.isValidForMode(processorMode))
   }
 
@@ -28,7 +27,7 @@ class ModRRMStatic[RegisterType <: GeneralPurposeRegister](
     case _ => super.operandSize
   }
 
-  override def rexRequirements = super.rexRequirements :::
+  override def rexRequirements: List[RexRequirement] = super.rexRequirements :::
     register.getRexRequirements(ParameterPosition.OperandR) :::
     operandRM.getRexRequirements(ParameterPosition.OperandRM)
 }

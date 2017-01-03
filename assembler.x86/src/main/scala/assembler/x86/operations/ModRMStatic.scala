@@ -1,13 +1,12 @@
 package assembler.x86.operations
 
 import assembler.memory.MemoryPage
-import assembler.x86.ParameterPosition
-import assembler.x86.ProcessorMode
+import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import assembler.x86.operands.FixedSizeOperand
 import assembler.x86.operands.ModRMEncodableOperand
 import assembler.x86.operands.Operand
 import assembler.x86.operands.SegmentRegister
-import assembler.x86.operands.memoryaccess.{ MemoryLocation => MemoryLocationType }
+import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operands.OperandSize
 
 class ModRMStatic(
@@ -20,8 +19,8 @@ class ModRMStatic(
 
   override def operands: List[Operand] = operandRM :: Nil
 
-  override def validate = {
-    super.validate
+  override def validate(): Unit = {
+    super.validate()
     assume(operandRM.isValidForMode(processorMode))
   }
 
@@ -40,7 +39,7 @@ class ModRMStatic(
     case _ => None
   }
 
-  override def rexRequirements = super.rexRequirements :::
+  override def rexRequirements: List[RexRequirement] = super.rexRequirements :::
     operandRM.getRexRequirements(ParameterPosition.OperandRM)
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {

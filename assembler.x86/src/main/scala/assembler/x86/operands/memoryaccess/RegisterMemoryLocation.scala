@@ -12,7 +12,7 @@ sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacem
     extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
 
-  override def toString(): String = s"${segmentPrefix}[${index}${displacementString}]"
+  override def toString: String = s"$segmentPrefix[$index$displacementString]"
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 
@@ -24,8 +24,8 @@ sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacem
     index.getRexRequirements(ParameterPosition.OperandRM) ::: super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = (index, processorMode) match {
-    case (realIndex: BaseIndexPair, ProcessorMode.Real | ProcessorMode.Protected) => true
-    case (protectedIndex: ProtectedModeIndexRegister, _) => true
+    case (_: BaseIndexPair, ProcessorMode.Real | ProcessorMode.Protected) => true
+    case (_: ProtectedModeIndexRegister, _) => true
     case _ => false
   }
 }
@@ -38,7 +38,7 @@ object RegisterMemoryLocation {
     index: BaseIndexPair, displacement: List[Byte], override val operandByteSize: OperandSize, segment: SegmentRegister)
       extends RegisterMemoryLocation(index, displacement, segment) with ModRMEncodableOperand with FixedSizeOperand {
 
-    override def toString = s"${operandByteSize} PTR ${super.toString()}"
+    override def toString = s"$operandByteSize PTR ${super.toString()}"
   }
 
   private object FixedSizeRegisterMemoryLocation {
@@ -55,7 +55,7 @@ object RegisterMemoryLocation {
   def apply(index: DestinationIndex) =
     new DIReference(index, List.empty[Byte], index.defaultSegment)
 
-  implicit def indexWrapper(index: DestinationIndex) = apply(index)
+  implicit def indexWrapper(index: DestinationIndex): DIReference = apply(index)
 
   object withSegmentOverride {
     def apply(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =

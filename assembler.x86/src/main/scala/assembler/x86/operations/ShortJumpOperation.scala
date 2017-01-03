@@ -17,13 +17,13 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
   class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
       extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
 
-    val shortJumpSize = shortOpcode.length + 1
-    override val minimumSize = shortJumpSize
-    override val maximumSize = shortJumpSize
+    val shortJumpSize: Int = shortOpcode.length + 1
+    override val minimumSize: Int = shortJumpSize
+    override val maximumSize: Int = shortJumpSize
 
-    override def getSizeForDistance(forward: Boolean, distance: Int) = shortJumpSize
+    override def getSizeForDistance(forward: Boolean, distance: Int): Int = shortJumpSize
 
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage) =
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte] =
       {
         assume(distance > (Byte.MinValue + shortJumpSize))
         assume(distance < Byte.MaxValue)
@@ -47,7 +47,7 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
 
   def encodeForShortPointer(pointer: NearPointerOperand)(implicit page: MemoryPage): List[Byte]
 
-  override def size()(implicit page: MemoryPage) = getOrElseCreateInstruction().size
+  override def size()(implicit page: MemoryPage): Int = getOrElseCreateInstruction().size
 
-  override def toString() = s"${mnemonic} ${label}"
+  override def toString = s"$mnemonic $label"
 }
