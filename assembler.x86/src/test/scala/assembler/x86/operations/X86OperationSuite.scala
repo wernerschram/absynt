@@ -1,11 +1,11 @@
 package assembler.x86.operations
 
-import org.scalatest.{Matchers, WordSpec}
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.Interrupt
 import assembler.x86.operands.Register
 import assembler.x86.operands.Register.AX
+import org.scalatest.{Matchers, WordSpec}
 
 class X86OperationSuite extends WordSpec with Matchers {
 

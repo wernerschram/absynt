@@ -1,6 +1,6 @@
 scalaVersion in ThisBuild := "2.12.0"
 
-lazy val root = project in file(".") aggregate(assembler,assemblerX86,assemblerARM)
+lazy val root = project in file(".") aggregate(assembler, assemblerX86, assemblerARM, ARMBootRpiExample)
 
 addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.17")
 
@@ -29,4 +29,9 @@ lazy val assemblerARM = (project in file("assembler.arm"))
   libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 ).dependsOn(assembler)
 
+lazy val ARMBootRpiExample = (project in file("examples/arm/bootRpi")) 
+.settings(
+  name := "assembler.examples.arm.bootRpi",
+  version := "1.0"
+).dependsOn(assembler)
 
