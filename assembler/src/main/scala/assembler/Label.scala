@@ -7,7 +7,7 @@ class Label
 object Label {
   implicit def apply(value: String): Label = StringLabel(value)
 
-  def unique = {
+  def unique: UniqueLabel = {
     lastId += 1
     UniqueLabel(lastId)
   }
@@ -15,11 +15,11 @@ object Label {
   private var lastId = 0
 }
 
-case class StringLabel private (val value: String) extends Label {
-  override def toString(): String = value
+case class StringLabel private (value: String) extends Label {
+  override def toString: String = value
 }
 
-case class UniqueLabel private (val id: Int) extends Label {
+case class UniqueLabel private (id: Int) extends Label {
   
 }
 

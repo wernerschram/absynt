@@ -14,7 +14,7 @@ sealed class RegisterMemoryLocation private (val index: BaseIndexPair, displacem
 
   override def toString(): String = s"${segmentPrefix}[${index}${displacementString}]"
 
-  private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString()}"
+  private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
 

@@ -9,7 +9,7 @@ class NearPointer private(val displacement: List[Byte]) extends Operand with Fix
   assume(List(1, 2, 4).contains(displacement.length))
   val operandByteSize = ValueSize.sizeOfValue(displacement.length)
 
-  override def toString() = s"0x${displacement.bigEndianHexString()}"
+  override def toString() = s"0x${displacement.bigEndianHexString}"
 }
 
 object NearPointer {

@@ -21,7 +21,7 @@ sealed class MemoryAddress private (address: List[Byte], segment: SegmentRegiste
 
   override val defaultSegment: SegmentRegister = Register.DS
 
-  override def toString = s"${segmentPrefix}[${address.decimalString()}]"
+  override def toString = s"${segmentPrefix}[${address.decimalString}]"
 }
 
 object MemoryAddress {

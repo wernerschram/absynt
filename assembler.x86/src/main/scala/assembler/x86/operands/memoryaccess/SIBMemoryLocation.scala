@@ -39,7 +39,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
   private def scaleString = s"*${scale}"
 
-  private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString()}"
+  private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 }
 
 object SIBMemoryLocation {
