@@ -1,13 +1,13 @@
 package assembler.x86.operations
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
+
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions.Interrupt
 import assembler.x86.operands.Register
 
-class X86OperationSuite extends WordSpec with ShouldMatchers {
+class X86OperationSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

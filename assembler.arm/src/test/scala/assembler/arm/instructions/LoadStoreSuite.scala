@@ -1,7 +1,6 @@
 package assembler.arm.instructions.branch
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
@@ -20,7 +19,7 @@ import assembler.Label
 import assembler.EncodedString
 import assembler.EncodedByteList
 
-class LoadStoreSuite extends WordSpec with ShouldMatchers {
+class LoadStoreSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 

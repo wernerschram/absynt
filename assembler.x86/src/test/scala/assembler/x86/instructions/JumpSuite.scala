@@ -1,7 +1,6 @@
 package assembler.x86.instructions
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
 
 import assembler.Hex
 import assembler.ListExtensions._
@@ -15,7 +14,7 @@ import assembler.LabeledEncodable
 import assembler.Label
 import assembler.EncodedByteList
 
-class JumpSuite extends WordSpec with ShouldMatchers {
+class JumpSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

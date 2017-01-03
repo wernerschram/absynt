@@ -1,7 +1,7 @@
 package assembler.x86.instructions
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
+
 
 import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
@@ -12,7 +12,7 @@ import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
 
-class StackSuite extends WordSpec with ShouldMatchers {
+class StackSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

@@ -1,7 +1,6 @@
 package assembler.x86.instructions
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
 
 import assembler.Hex
 import assembler.ListExtensions._
@@ -12,7 +11,7 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operations.X86Operation
 
-class ArithmeticSuite extends WordSpec with ShouldMatchers {
+class ArithmeticSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
 

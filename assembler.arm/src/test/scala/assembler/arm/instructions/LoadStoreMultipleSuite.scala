@@ -1,7 +1,6 @@
 package assembler.arm.instructions
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
@@ -10,7 +9,7 @@ import assembler.arm.operands.registers.GeneralRegister._
 import assembler.memory.MemoryPage
 import assembler.arm.operations.ARMOperation
 
-class LoadStoreMultipleSuite extends WordSpec with ShouldMatchers {
+class LoadStoreMultipleSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 

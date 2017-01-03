@@ -1,7 +1,6 @@
 package assembler.arm.instructions
 
-import org.scalatest.ShouldMatchers
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
@@ -11,7 +10,7 @@ import assembler.arm.operations.Effect
 import assembler.arm.operations.InterruptDisableFlags
 import assembler.arm.operations.ARMOperation
 
-class MiscellaneousSuite extends WordSpec with ShouldMatchers {
+class MiscellaneousSuite extends WordSpec with Matchers {
 
   implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
 
