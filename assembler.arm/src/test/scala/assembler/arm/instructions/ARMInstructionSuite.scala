@@ -14,6 +14,7 @@ class ARMInstructionSuite extends WordSpec with Matchers {
 
       class MyInstruction extends ARMOperation {
         val opcode = "my"
+
         override def encodeWord()(implicit page: MemoryPage) = 4
       }
 
@@ -38,9 +39,10 @@ class ARMInstructionSuite extends WordSpec with Matchers {
 
       class MyInstruction extends ARMOperation {
         val opcode = "my"
+
         override def encodeWord()(implicit page: MemoryPage) = 0x12345678
       }
-      
+
       "correctly return the size of the instruction" in {
         val instruction = new MyInstruction()
 
@@ -70,6 +72,6 @@ class ARMInstructionSuite extends WordSpec with Matchers {
         val labeledInstruction = new LabeledARMOperation(instruction, "Label")
         labeledInstruction.toString() should be("Label: bkpt 4")
       }
-}
+    }
   }
 }

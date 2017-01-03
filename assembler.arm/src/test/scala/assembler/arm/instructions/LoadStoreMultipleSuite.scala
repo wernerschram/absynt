@@ -35,11 +35,11 @@ class LoadStoreMultipleSuite extends WordSpec with Matchers {
         LoadMultiple.withUserModeRegisters(R14 :: Nil, R1, UpdateMode.IncrementAfter).toString should be("ldm r1, {r14}^")
       }
 
-       "correctly encode ldm r1!, {r15, r14}^" in {
+      "correctly encode ldm r1!, {r15, r14}^" in {
         LoadMultiple.withUserModeRegistersAndUpdateBase(R15 :: R14 :: Nil, R1, UpdateMode.IncrementAfter).encodeByte should be(Hex.msb("e8f1c000"))
       }
 
-       "correctly encode push lr" in {
+      "correctly encode push lr" in {
         Push(LR :: Nil).encodeByte should be(Hex.msb("e83d4000"))
       }
 

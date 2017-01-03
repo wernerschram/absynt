@@ -80,8 +80,8 @@ class LoadStoreSuite extends WordSpec with Matchers {
       "correctly represent ldr r1, [r2], r10, asr #30 as a string" in {
         LoadRegister(R1, R2, Shifter.ArithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], r10, asr #30")
       }
-      
-            
+
+
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
         val label = Label.unique
         val p = new MemoryPage(

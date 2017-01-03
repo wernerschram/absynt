@@ -2,9 +2,9 @@ package assembler.arm.instructions
 
 import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
+import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operations.ARMOperation
 import assembler.memory.MemoryPage
 import org.scalatest.{Matchers, WordSpec}
@@ -85,7 +85,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly encode adc r1, r2, 1, 2" in {
-        AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,2.toByte), R1).encodeByte should be(Hex.msb("e2a21101"))
+        AddCarry(R2, Shifter.RightRotateImmediate(1.toByte, 2.toByte), R1).encodeByte should be(Hex.msb("e2a21101"))
       }
 
       "correctly encode adc r1, r2, #1073741824" in {
@@ -94,13 +94,13 @@ class DataProcessingSuite extends WordSpec with Matchers {
 
       "throw an AssertionError for adc r1, r2, 1, 1" in {
         an[AssertionError] should be thrownBy {
-          AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,1.toByte), R1)
+          AddCarry(R2, Shifter.RightRotateImmediate(1.toByte, 1.toByte), R1)
         }
       }
 
       "throw an AssertionError for adc r1, r2, 1, 32" in {
         an[AssertionError] should be thrownBy {
-          AddCarry(R2, Shifter.RightRotateImmediate(1.toByte,32.toByte), R1)
+          AddCarry(R2, Shifter.RightRotateImmediate(1.toByte, 32.toByte), R1)
         }
       }
 

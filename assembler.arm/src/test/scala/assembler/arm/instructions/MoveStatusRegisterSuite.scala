@@ -3,9 +3,9 @@ package assembler.arm.instructions.branch
 import assembler.Hex
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions.{MoveFromStatusRegister, MoveToStatusRegister}
-import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.registers.StatusRegister._
+import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operations.{ARMOperation, Fields}
 import assembler.memory.MemoryPage
 import org.scalatest.{Matchers, WordSpec}
