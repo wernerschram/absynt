@@ -1,10 +1,8 @@
 package assembler.x86.operands
 
-import scala.language.implicitConversions
-
 import assembler.ListExtensions._
-import assembler.x86.ParameterPosition
-import assembler.x86.RexRequirement
+
+import scala.language.implicitConversions
 
 final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeOperand {
   override val operandByteSize: OperandSize = ValueSize.sizeOfValue(value.length)
@@ -16,7 +14,10 @@ final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSize
 
 object ImmediateValue {
   implicit def byteToImmediate(value: Byte): ImmediateValue = new ImmediateValue(value.encodeLittleEndian)
+
   implicit def shortToImmediate(value: Short): ImmediateValue = new ImmediateValue(value.encodeLittleEndian)
+
   implicit def intToImmediate(value: Int): ImmediateValue = new ImmediateValue(value.encodeLittleEndian)
+
   implicit def longToImmediate(value: Long): ImmediateValue = new ImmediateValue(value.encodeLittleEndian)
 }

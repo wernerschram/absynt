@@ -1,7 +1,6 @@
 package assembler.x86.operations
 
 import assembler.memory.MemoryPage
-import assembler.x86.ParameterPosition
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
 import assembler.x86.operands.{Operand, OperandSize}
 

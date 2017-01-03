@@ -1,9 +1,8 @@
 package assembler.x86.operations
 
 import assembler.memory.MemoryPage
-import assembler.x86.ParameterPosition
 import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType}
-import assembler.x86.operands.{FarPointerSize, Operand, OperandSize}
+import assembler.x86.operands.{FarPointerSize, Operand}
 
 trait FarPointer extends X86Operation {
 

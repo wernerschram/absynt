@@ -1,12 +1,11 @@
 package assembler.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operations.X86Operation
+import org.scalatest.{Matchers, WordSpec}
 
 class InterruptSuite extends WordSpec with Matchers {
 

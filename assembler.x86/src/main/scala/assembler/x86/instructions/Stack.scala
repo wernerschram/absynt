@@ -2,13 +2,13 @@ package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.operations.Immediate
-import assembler.x86.operations.ModRMStatic
-import assembler.x86.operations.RegisterEncoded
-import assembler.x86.operations.Static
+import assembler.x86.operations.{Immediate, ModRMStatic, RegisterEncoded, Static}
 
-final object Push {
+object Push {
   implicit val opcode = "push"
+
+  def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
+    R16(register)
 
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](register, 0x50.toByte :: Nil, opcode, includeRexW = false) {
@@ -22,6 +22,9 @@ final object Push {
       }
     }
 
+  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+    RM16(operand)
+
   private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
       override def validate(): Unit = {
@@ -34,35 +37,26 @@ final object Push {
       }
     }
 
-  private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0x6A.toByte :: Nil, opcode) with Immediate {
-    override def immediate: ImmediateValue = immediateValue
-  }
-  private def Imm16(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) = new Static(0x68.toByte :: Nil, opcode) with Immediate {
-    override def immediate: ImmediateValue = immediateValue
-    override def validate(): Unit = {
-      super.validate()
-      assume(immediate.operandByteSize != ValueSize.QuadWord)
-    }
-  }
-
-  private def StaticCS()(implicit processorMode: ProcessorMode) = new Static(0x0E.toByte :: Nil, opcode)
-  private def StaticSS()(implicit processorMode: ProcessorMode) = new Static(0x16.toByte :: Nil, opcode)
-  private def StaticDS()(implicit processorMode: ProcessorMode) = new Static(0x1E.toByte :: Nil, opcode)
-  private def StaticES()(implicit processorMode: ProcessorMode) = new Static(0x06.toByte :: Nil, opcode)
-  private def StaticFS()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, opcode)
-  private def StaticGS()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, opcode)
-
-  def apply(register: WideRegister)(implicit processorMode: ProcessorMode) =
-    R16(register)
-
-  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
-    RM16(operand)
-
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate = immediate.operandByteSize match {
     case ValueSize.Byte => Imm8(immediate)
     case ValueSize.Word | ValueSize.DoubleWord => Imm16(immediate)
     case _ => throw new AssertionError
   }
+
+  private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static(0x6A.toByte :: Nil, opcode) with Immediate {
+      override def immediate: ImmediateValue = immediateValue
+    }
+
+  private def Imm16(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static(0x68.toByte :: Nil, opcode) with Immediate {
+      override def immediate: ImmediateValue = immediateValue
+
+      override def validate(): Unit = {
+        super.validate()
+        assume(immediate.operandByteSize != ValueSize.QuadWord)
+      }
+    }
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode): Static = segment match {
     case Register.CS => StaticCS()
@@ -72,10 +66,19 @@ final object Push {
     case Register.FS => StaticFS()
     case Register.GS => StaticGS()
   }
+
+  private def StaticCS()(implicit processorMode: ProcessorMode) = new Static(0x0E.toByte :: Nil, opcode)
+  private def StaticSS()(implicit processorMode: ProcessorMode) = new Static(0x16.toByte :: Nil, opcode)
+  private def StaticDS()(implicit processorMode: ProcessorMode) = new Static(0x1E.toByte :: Nil, opcode)
+  private def StaticES()(implicit processorMode: ProcessorMode) = new Static(0x06.toByte :: Nil, opcode)
+  private def StaticFS()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, opcode)
+  private def StaticGS()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, opcode)
 }
 
 object PushAll {
   implicit val opcode = "pusha"
+
+  def apply()(implicit processorMode: ProcessorMode) = Static()
 
   private def Static()(implicit processorMode: ProcessorMode) = new Static(0x60.toByte :: Nil, opcode) {
     override def validate(): Unit = {
@@ -83,14 +86,12 @@ object PushAll {
       assume(processorMode != ProcessorMode.Long)
     }
   }
-
-  def apply()(implicit processorMode: ProcessorMode) = Static()
 }
 
 object PushFlags {
   implicit val opcode = "pushf"
 
-  def Static()(implicit processorMode: ProcessorMode) = new Static(0x9C.toByte :: Nil, opcode)
-
   def apply()(implicit processorMode: ProcessorMode) = Static()
+
+  def Static()(implicit processorMode: ProcessorMode) = new Static(0x9C.toByte :: Nil, opcode)
 }

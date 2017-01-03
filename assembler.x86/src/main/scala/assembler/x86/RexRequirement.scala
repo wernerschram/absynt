@@ -1,6 +1,6 @@
 package assembler.x86
 
-sealed protected class RexRequirement(val rexBitmask: Byte)
+sealed protected class RexRequirement private (val rexBitMask: Byte)
 
 object RexRequirement {
   val instanceIndex = new RexRequirement(0x02)

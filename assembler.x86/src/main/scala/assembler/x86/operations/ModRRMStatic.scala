@@ -1,19 +1,15 @@
 package assembler.x86.operations
 
+import assembler.x86.operands._
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
-import assembler.x86.operands.FixedSizeOperand
-import assembler.x86.operands.ModRMEncodableOperand
-import assembler.x86.operands.Operand
-import assembler.x86.operands.OperandSize
-import assembler.x86.operands.GeneralPurposeRegister
 
-class ModRRMStatic[RegisterType <: GeneralPurposeRegister](
-  val register: RegisterType,
-  operandRM: ModRMEncodableOperand,
-  override val code: List[Byte],
-  override val mnemonic: String,
-  override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-    extends ModRMStatic(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
+class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register: RegisterType,
+                                                           operandRM: ModRMEncodableOperand,
+                                                           override val code: List[Byte],
+                                                           override val mnemonic: String,
+                                                           override val includeRexW: Boolean = true)
+                                                          (override implicit val processorMode: ProcessorMode)
+  extends ModRMStatic(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
   override def operands: List[Operand] = register :: super.operands
 

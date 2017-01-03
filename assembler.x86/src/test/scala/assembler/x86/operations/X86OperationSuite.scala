@@ -16,8 +16,11 @@ class X86OperationSuite extends WordSpec with Matchers {
 
       class MyInstruction extends X86Operation {
         override def code: List[Byte] = 0x00.toByte :: Nil
+
         override def mnemonic = "mis"
+
         override def operands = Nil
+
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
       }
 
@@ -42,14 +45,16 @@ class X86OperationSuite extends WordSpec with Matchers {
 
       class MyInstruction extends X86Operation {
         override def code: List[Byte] = 0x01.toByte :: 0x02.toByte :: Nil
+
         override def mnemonic = "mis"
+
         val operands: List[AX.type] = Register.AX :: Nil
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
       }
 
       "correctly return the size of the instruction" in {
         val instruction = new MyInstruction()
-        
+
         val labeledInstruction = new LabeledX86Operation(instruction, "Label")
         labeledInstruction.size() should be(2)
       }
@@ -83,6 +88,6 @@ class X86OperationSuite extends WordSpec with Matchers {
         val labeledInstruction = new LabeledX86Operation(instruction, "Label")
         labeledInstruction.toString() should be("Label: int 3")
       }
-}
+    }
   }
 }

@@ -1,52 +1,16 @@
 package assembler.x86.operations
 
-import assembler.Encodable
-import assembler.Label
-import assembler.LabeledEncodable
 import assembler.memory.MemoryPage
-import assembler.x86.ProcessorMode
-import assembler.x86.RexRequirement
-import assembler.x86.operands.Operand
-import assembler.x86.operands.SegmentRegister
-import assembler.x86.operands.OperandSize
-import assembler.x86.operands.Register
-import assembler.x86.operands.ValueSize
+import assembler.x86.operands._
+import assembler.x86.{ProcessorMode, RexRequirement}
+import assembler.{Encodable, Label, LabeledEncodable}
 
 trait X86Operation extends Encodable {
-  def validate(): Unit = Unit
+  val includeRexW: Boolean = true
 
   def operands: List[Operand]
 
   override def size()(implicit page: MemoryPage): Int = encodeByte().length
-  override def withLabel(label: Label): LabeledEncodable = new LabeledX86Operation(this, label)
-
-  implicit val processorMode: ProcessorMode
-  val includeRexW: Boolean = true
-  def code: List[Byte]
-  def mnemonic: String
-
-  def operandSize: OperandSize = OperandSize.Unknown
-  def addressSize: OperandSize = OperandSize.Unknown
-  def segmentOverride: Option[SegmentRegister] = None
-  def rexRequirements: List[RexRequirement] =
-    if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
-
-  private def optionalSegmentOverridePrefix: List[Byte] = segmentOverride match {
-    case Some(segment) => X86Operation.SegmentOverrideMap.get(segment).toList
-    case _ => Nil
-  }
-
-  private def optionalAddressSizePrefix()(implicit processorMode: ProcessorMode): List[Byte] =
-    if (addressSize.requiresAddressSizePrefix(processorMode)) X86Operation.AddressSizeCode :: Nil else Nil
-
-  private def optionalOperandSizePrefix()(implicit processorMode: ProcessorMode): List[Byte] =
-    if (operandSize.requiresOperandSizePrefix(processorMode)) X86Operation.OperandSizeCode :: Nil else Nil
-
-  private def optionalRexPrefix()(implicit processorMode: ProcessorMode): List[Byte] =
-    if (rexRequirements.isEmpty)
-      Nil
-    else
-      rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitmask).toByte) :: Nil
 
   override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
     validate()
@@ -57,6 +21,42 @@ trait X86Operation extends Encodable {
       optionalRexPrefix :::
       code
   }
+
+  implicit val processorMode: ProcessorMode
+
+  def validate(): Unit = Unit
+
+  private def optionalSegmentOverridePrefix: List[Byte] = segmentOverride match {
+    case Some(segment) => X86Operation.SegmentOverrideMap.get(segment).toList
+    case _ => Nil
+  }
+
+  def segmentOverride: Option[SegmentRegister] = None
+
+  private def optionalAddressSizePrefix()(implicit processorMode: ProcessorMode): List[Byte] =
+    if (addressSize.requiresAddressSizePrefix(processorMode)) X86Operation.AddressSizeCode :: Nil else Nil
+
+  def addressSize: OperandSize = OperandSize.Unknown
+
+  private def optionalOperandSizePrefix()(implicit processorMode: ProcessorMode): List[Byte] =
+    if (operandSize.requiresOperandSizePrefix(processorMode)) X86Operation.OperandSizeCode :: Nil else Nil
+
+  def operandSize: OperandSize = OperandSize.Unknown
+
+  private def optionalRexPrefix()(implicit processorMode: ProcessorMode): List[Byte] =
+    if (rexRequirements.isEmpty)
+      Nil
+    else
+      rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitMask).toByte) :: Nil
+
+  def rexRequirements: List[RexRequirement] =
+    if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
+
+  override def withLabel(label: Label): LabeledEncodable = new LabeledX86Operation(this, label)
+
+  def code: List[Byte]
+
+  def mnemonic: String
 
   override def toString = s"$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
 }

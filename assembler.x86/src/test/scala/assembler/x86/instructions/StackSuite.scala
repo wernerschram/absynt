@@ -1,16 +1,14 @@
 package assembler.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
-
 import assembler.Hex
 import assembler.ListExtensions.ShortEncoder
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
-import assembler.x86.operations.X86Operation
 import assembler.x86.operands.ImmediateValue._
-import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.Register._
+import assembler.x86.operands.memoryaccess._
+import assembler.x86.operations.X86Operation
+import org.scalatest.{Matchers, WordSpec}
 
 class StackSuite extends WordSpec with Matchers {
 
@@ -137,14 +135,14 @@ class StackSuite extends WordSpec with Matchers {
     }
   }
 
-    "a PushAll instruction" when {
+  "a PushAll instruction" when {
 
     "in real mode" should {
 
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode pusha" in {
-        PushAll().encodeByte should be (Hex.lsb("60"))
+        PushAll().encodeByte should be(Hex.lsb("60"))
       }
     }
 
@@ -166,7 +164,7 @@ class StackSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Long
 
       "correctly encode pushf" in {
-        PushFlags().encodeByte should be (Hex.lsb("9C"))
+        PushFlags().encodeByte should be(Hex.lsb("9C"))
       }
     }
   }

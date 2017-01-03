@@ -1,8 +1,5 @@
 package assembler.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
-
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
@@ -10,6 +7,7 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper
 import assembler.x86.operations.X86Operation
+import org.scalatest.{Matchers, WordSpec}
 
 class StoreStringSuite extends WordSpec with Matchers {
 
@@ -21,7 +19,7 @@ class StoreStringSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode stos [di], al" in {
-        StoreString(AL, DI).encodeByte should be (Hex.lsb("AA"))
+        StoreString(AL, DI).encodeByte should be(Hex.lsb("AA"))
       }
 
       "correctly represent stos [di], al as a string" in {
@@ -29,7 +27,7 @@ class StoreStringSuite extends WordSpec with Matchers {
       }
 
       "correctly encode REP stos [di], al" in {
-        StoreString.Repeat(AL, DI).encodeByte should be (Hex.lsb("F3 AA"))
+        StoreString.Repeat(AL, DI).encodeByte should be(Hex.lsb("F3 AA"))
       }
 
       "correctly represent rep stos [di], al as a string" in {
@@ -37,7 +35,7 @@ class StoreStringSuite extends WordSpec with Matchers {
       }
 
       "correctly encode REP stos [di], ax" in {
-        StoreString.Repeat(AX, DI).encodeByte should be (Hex.lsb("F3 AB"))
+        StoreString.Repeat(AX, DI).encodeByte should be(Hex.lsb("F3 AB"))
       }
 
       "correctly represent rep stos [di], ax as a string" in {
@@ -45,7 +43,7 @@ class StoreStringSuite extends WordSpec with Matchers {
       }
 
       "correctly encode stos [di], ax" in {
-        StoreString(AX, DI).encodeByte should be (Hex.lsb("AB"))
+        StoreString(AX, DI).encodeByte should be(Hex.lsb("AB"))
       }
 
       "correctly represent stos [di], ax as a string" in {
@@ -53,7 +51,7 @@ class StoreStringSuite extends WordSpec with Matchers {
       }
 
       "correctly encode stos [edi], ax" in {
-        StoreString(AX, EDI).encodeByte should be (Hex.lsb("67 AB"))
+        StoreString(AX, EDI).encodeByte should be(Hex.lsb("67 AB"))
       }
 
       "correctly represent rep stos [edi], ax as a string" in {
@@ -61,7 +59,7 @@ class StoreStringSuite extends WordSpec with Matchers {
       }
 
       "correctly encode stos cs:[edi], ax" in {
-        StoreString(AX, EDI).encodeByte should be (Hex.lsb("67 AB"))
+        StoreString(AX, EDI).encodeByte should be(Hex.lsb("67 AB"))
       }
 
 
@@ -75,15 +73,15 @@ class StoreStringSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Protected
 
       "correctly encode stos [edi], al" in {
-        StoreString(AL, EDI).encodeByte should be (Hex.lsb("AA"))
+        StoreString(AL, EDI).encodeByte should be(Hex.lsb("AA"))
       }
 
       "correctly encode stos [di], al" in {
-        StoreString(AL, DI).encodeByte should be (Hex.lsb("67 AA"))
+        StoreString(AL, DI).encodeByte should be(Hex.lsb("67 AA"))
       }
 
       "correctly encode stos [di], ax" in {
-        StoreString(AX, DI).encodeByte should be (Hex.lsb("67 66 AB"))
+        StoreString(AX, DI).encodeByte should be(Hex.lsb("67 66 AB"))
       }
 
     }

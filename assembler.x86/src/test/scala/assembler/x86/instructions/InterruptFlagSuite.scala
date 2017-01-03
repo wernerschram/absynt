@@ -1,11 +1,10 @@
 package assembler.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.memory.MemoryPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operations.X86Operation
+import org.scalatest.{Matchers, WordSpec}
 
 class InterruptFlagSuite extends WordSpec with Matchers {
 
@@ -18,7 +17,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode cli" in {
-        ClearInterruptFlag().encodeByte should be (Hex.lsb("FA"))
+        ClearInterruptFlag().encodeByte should be(Hex.lsb("FA"))
       }
     }
 
@@ -27,7 +26,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Long
 
       "correctly encode cli" in {
-        ClearInterruptFlag().encodeByte should be (Hex.lsb("FA"))
+        ClearInterruptFlag().encodeByte should be(Hex.lsb("FA"))
       }
     }
   }
@@ -39,7 +38,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode sti" in {
-          SetInterruptFlag().encodeByte should be (Hex.lsb("FB"))
+        SetInterruptFlag().encodeByte should be(Hex.lsb("FB"))
       }
     }
     "in long mode" should {
@@ -48,7 +47,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
 
 
       "correctly encode sti" in {
-          SetInterruptFlag().encodeByte should be (Hex.lsb("FB"))
+        SetInterruptFlag().encodeByte should be(Hex.lsb("FB"))
       }
     }
   }

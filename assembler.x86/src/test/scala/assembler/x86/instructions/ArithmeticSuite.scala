@@ -1,7 +1,5 @@
 package assembler.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
-
 import assembler.Hex
 import assembler.ListExtensions._
 import assembler.memory.MemoryPage
@@ -10,6 +8,7 @@ import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operations.X86Operation
+import org.scalatest.{Matchers, WordSpec}
 
 class ArithmeticSuite extends WordSpec with Matchers {
 
@@ -54,11 +53,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode and al, 0x40" in {
-        And(0x40.toByte, AL).encodeByte should be (Hex.lsb("24 40"))
+        And(0x40.toByte, AL).encodeByte should be(Hex.lsb("24 40"))
       }
 
       "correctly encode and bl, 0x40" in {
-        And(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 E3 40"))
+        And(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 E3 40"))
       }
     }
   }
@@ -69,11 +68,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode cmp al, 0x40" in {
-        Compare(0x40.toByte, AL).encodeByte should be (Hex.lsb("3C 40"))
+        Compare(0x40.toByte, AL).encodeByte should be(Hex.lsb("3C 40"))
       }
 
       "correctly encode cmp bl, 0x40" in {
-        Compare(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 FB 40"))
+        Compare(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 FB 40"))
       }
     }
   }
@@ -116,11 +115,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode or al, 0x40" in {
-        Or(0x40.toByte, AL).encodeByte should be (Hex.lsb("0C 40"))
+        Or(0x40.toByte, AL).encodeByte should be(Hex.lsb("0C 40"))
       }
 
       "correctly encode or bl, 0x40" in {
-        Or(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 CB 40"))
+        Or(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 CB 40"))
       }
     }
   }
@@ -131,11 +130,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode sbb al, 0x40" in {
-        SubtractCarry(0x40.toByte, AL).encodeByte should be (Hex.lsb("1C 40"))
+        SubtractCarry(0x40.toByte, AL).encodeByte should be(Hex.lsb("1C 40"))
       }
 
       "correctly encode sbb bl, 0x40" in {
-        SubtractCarry(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 DB 40"))
+        SubtractCarry(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 DB 40"))
       }
     }
   }
@@ -146,11 +145,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.Real
 
       "correctly encode sub al, 0x40" in {
-        Subtract(0x40.toByte, AL).encodeByte should be (Hex.lsb("2C 40"))
+        Subtract(0x40.toByte, AL).encodeByte should be(Hex.lsb("2C 40"))
       }
 
       "correctly encode sub bl, 0x40" in {
-        Subtract(0x40.toByte, BL).encodeByte should be (Hex.lsb("80 EB 40"))
+        Subtract(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 EB 40"))
       }
     }
   }
