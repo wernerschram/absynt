@@ -1,13 +1,13 @@
 package assembler.arm.operations
 
 import assembler.arm.operands.Condition._
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 import scala.language.implicitConversions
 
 class Miscellaneous(val code: Byte, override val opcode: String, value: Short, condition: Condition)
   extends ARMOperation {
-  override def encodeWord()(implicit page: MemoryPage): Int = {
+  override def encodeWord()(implicit page: Section): Int = {
     val valuePart1: Byte = (value & 0x0f).toByte
     val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
     val extraCode: Int = 0x7
@@ -76,7 +76,7 @@ class ProcessorState(val code: Byte, val opcode: String, val condition: Conditio
       interruptDisableFlags.toBitMask(0).toInt << 6, mode.mode,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #$mode")
 
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
 
   override def toString = s"${super.toString()}$stringValue"

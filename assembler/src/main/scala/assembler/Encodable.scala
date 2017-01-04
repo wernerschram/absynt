@@ -1,11 +1,11 @@
 package assembler
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 trait Encodable {
-  def encodeByte()(implicit page: MemoryPage): List[Byte]
+  def encodeByte()(implicit page: Section): List[Byte]
 
-  def size()(implicit page: MemoryPage): Int
+  def size()(implicit page: Section): Int
 
   def withLabel(label: Label): LabeledEncodable
 }
@@ -13,8 +13,8 @@ trait Encodable {
 trait LabeledEncodable extends Encodable with Labeled {
   val value: Encodable
   
-  override def size()(implicit page: MemoryPage): Int = value.size()
-  override def encodeByte()(implicit page: MemoryPage): List[Byte] = value.encodeByte()
+  override def size()(implicit page: Section): Int = value.size()
+  override def encodeByte()(implicit page: Section): List[Byte] = value.encodeByte()
 
   override def toString = s"$label: $value"
 }

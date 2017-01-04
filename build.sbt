@@ -33,5 +33,5 @@ lazy val ARMBootRpiExample = (project in file("examples/arm/bootRpi"))
 .settings(
   name := "assembler.examples.arm.bootRpi",
   version := "1.0"
-).dependsOn(assembler)
+).dependsOn(assembler, assemblerARM)
 

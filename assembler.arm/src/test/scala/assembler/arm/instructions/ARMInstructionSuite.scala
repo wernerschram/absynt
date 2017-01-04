@@ -2,12 +2,12 @@ package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
 import assembler.arm.operations.{ARMOperation, LabeledARMOperation}
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class ARMInstructionSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
+  implicit val page: Section = new Section(List.empty[ARMOperation])
 
   "an ARM instruction" when {
     "in a32 mode" should {
@@ -15,7 +15,7 @@ class ARMInstructionSuite extends WordSpec with Matchers {
       class MyInstruction extends ARMOperation {
         val opcode = "my"
 
-        override def encodeWord()(implicit page: MemoryPage) = 4
+        override def encodeWord()(implicit page: Section) = 4
       }
 
       "return the size of the instruction" in {
@@ -40,7 +40,7 @@ class ARMInstructionSuite extends WordSpec with Matchers {
       class MyInstruction extends ARMOperation {
         val opcode = "my"
 
-        override def encodeWord()(implicit page: MemoryPage) = 0x12345678
+        override def encodeWord()(implicit page: Section) = 0x12345678
       }
 
       "correctly return the size of the instruction" in {

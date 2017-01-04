@@ -3,7 +3,7 @@ package assembler.arm.operations
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{ImmediateShiftValue, ShiftRegisterWithShift}
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 import scala.language.implicitConversions
 
@@ -155,7 +155,7 @@ class LoadStore(val opcode: String, val condition: Condition, register: GeneralR
                 offset: LoadStoreOffset,
                 addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
   extends Conditional {
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() |
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
@@ -170,7 +170,7 @@ class LoadStoreMiscelaneous(val opcode: String, val condition: Condition, regist
                             operation: LoadStoreMiscellaneousOperation.LoadStoreMiscellaneousOperation)
   extends Conditional {
 
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() |
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode

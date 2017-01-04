@@ -2,11 +2,11 @@ package assembler
 
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 class EncodedStringSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[Encodable])
+  implicit val page: Section = new Section(List.empty[Encodable])
 
   "an Encoded String" should {
     "correctly encode \"Test\"" in {

@@ -6,7 +6,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RelativeA32Pointer, RelativeThumbPointer}
 import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)(implicit processorMode: ProcessorMode): BranchImmediate =
@@ -14,7 +14,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(label: Label)(implicit processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeA32Pointer](opcode, label, Always, RelativeA32Pointer.apply) {
-      override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: MemoryPage): Int =
+      override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
         Immediate(destination, Always).encodeWord()
     }
 
@@ -23,7 +23,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(label: Label, condition: Condition)(implicit processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeA32Pointer](opcode, label, condition, RelativeA32Pointer.apply) {
-      override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: MemoryPage): Int =
+      override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
         Immediate(destination, condition).encodeWord()
     }
 }
@@ -45,7 +45,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(label: Label)(implicit processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeThumbPointer](opcode, label, Unpredictable, RelativeThumbPointer.apply) {
-      override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: MemoryPage): Int =
+      override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: Section): Int =
         Immediate(destination, Unpredictable).encodeWord()
     }
 }

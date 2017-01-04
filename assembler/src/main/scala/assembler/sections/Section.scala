@@ -1,10 +1,10 @@
-package assembler.memory
+package assembler.sections
 
 import assembler.Encodable
 import assembler.Label
 import assembler.LabeledEncodable
 
-class MemoryPage(val content: Seq[Encodable]) {
+class Section(val content: Seq[Encodable]) {
   def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
   def getEncodableByCondition(label: Label): Encodable =

@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.{Encodable, Label, LabeledEncodable}
@@ -10,9 +10,9 @@ trait X86Operation extends Encodable {
 
   def operands: List[Operand]
 
-  override def size()(implicit page: MemoryPage): Int = encodeByte().length
+  override def size()(implicit page: Section): Int = encodeByte().length
 
-  override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
+  override def encodeByte()(implicit page: Section): List[Byte] = {
     validate()
 
     optionalSegmentOverridePrefix :::

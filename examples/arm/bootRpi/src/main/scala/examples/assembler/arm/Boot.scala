@@ -9,7 +9,7 @@ import assembler.arm.instructions._
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 object Boot extends App {
 
@@ -61,7 +61,7 @@ object Boot extends App {
     val text: Label = "text"
     val label: Label = "bla"
     
-    val page: MemoryPage = new MemoryPage(
+    val page: Section = new Section(
 
       LoadRegister(label, R1) ::
         StoreRegister(R1, R0, UART0.CR) ::

@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{FarPointer, MemoryLocation, NearPointer}
 import assembler.x86.operands.{FixedSizeOperand, ModRMEncodableOperand, ValueSize}
@@ -18,7 +18,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   def apply(label: Label)(implicit processorMode: ProcessorMode): Encodable =
     new ShortJumpOperation(shortOpcode, mnemonic, label) {
 
-      def encodeForShortPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = {
+      def encodeForShortPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = {
         assume(nearPointer.operandByteSize == ValueSize.Byte)
         Rel8(nearPointer).encodeByte()
       }
@@ -56,9 +56,9 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
 
   override def apply(label: Label)(implicit processorMode: ProcessorMode) =
     new NearJumpOperation(shortOpcode, longOpcode, mnemonic, label) {
-      override def encodeForShortPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = Rel8(nearPointer).encodeByte()
+      override def encodeForShortPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = Rel8(nearPointer).encodeByte()
 
-      override def encodeForLongPointer(nearPointer: NearPointer)(implicit page: MemoryPage): List[Byte] = Rel16(nearPointer).encodeByte()
+      override def encodeForLongPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = Rel16(nearPointer).encodeByte()
     }
 }
 

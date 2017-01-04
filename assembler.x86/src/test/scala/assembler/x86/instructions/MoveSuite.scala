@@ -2,7 +2,7 @@ package assembler.x86.instructions
 
 import assembler.Hex
 import assembler.ListExtensions._
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ImmediateValue._
@@ -13,7 +13,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
+  implicit val page: Section = new Section(List.empty[X86Operation])
 
   "a Move instruction" when {
     "in real mode" should {

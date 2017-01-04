@@ -3,7 +3,7 @@ package examples.assembler.x86
 import java.io.FileOutputStream
 
 import assembler.Encodable
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.ListExtensions._
 
 import assembler.x86.ProcessorMode
@@ -22,7 +22,7 @@ object Boot extends App {
 
     implicit val processorMode = ProcessorMode.Long
 
-    val page: MemoryPage = new MemoryPage(
+    val page: Section = new Section(
         Move(EBP, RegisterMemoryLocation(RDX)) ::
         Move(EBP, RegisterMemoryLocation(R9)) ::
         Move(EBP, RegisterMemoryLocation(EDX)) ::

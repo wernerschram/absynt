@@ -5,12 +5,12 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operations.ARMOperation
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class MultiplySuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
+  implicit val page: Section = new Section(List.empty[ARMOperation])
 
   "an MultiplyAccumulate instruction" when {
     "in a32 mode" should {

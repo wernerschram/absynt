@@ -1,13 +1,13 @@
 package assembler
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 trait EncodedByteList extends Encodable {
   val bytes: List[Byte]
 
-  def encodeByte()(implicit page: MemoryPage): List[Byte] = bytes
+  def encodeByte()(implicit page: Section): List[Byte] = bytes
 
-  def size()(implicit page: MemoryPage): Int = bytes.length
+  def size()(implicit page: Section): Int = bytes.length
 
   def withLabel(label: Label): LabeledEncodable = new LabeledEncodedByteList(this, label)
 }

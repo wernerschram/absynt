@@ -6,12 +6,12 @@ import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operations.ARMOperation
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
+  implicit val page: Section = new Section(List.empty[ARMOperation])
 
   "an AddCarry instruction" when {
     "in a32 mode" should {

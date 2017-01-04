@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
 import assembler.x86.operands.{Operand, OperandSize}
 
@@ -18,6 +18,6 @@ trait NearPointer extends X86Operation {
     assume(pointer.isValidForMode(processorMode))
   }
 
-  abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
+  abstract override def encodeByte()(implicit page: Section): List[Byte] =
     super.encodeByte() ::: pointer.displacement
 }

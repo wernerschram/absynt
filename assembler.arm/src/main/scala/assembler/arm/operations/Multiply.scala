@@ -2,12 +2,12 @@ package assembler.arm.operations
 
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 class MultiplyOperation(val code: Byte, override val opcode: String, destination: GeneralRegister, source: GeneralRegister,
                         multiplyValue: GeneralRegister, val condition: Condition)
   extends Conditional {
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() |
       0x00000090 |
       (code << 21) |
@@ -22,7 +22,7 @@ class MultiplyWithRegisterOperation(code: Byte, opcode: String, destination: Gen
                                     multiplyValue: GeneralRegister, addValue: GeneralRegister, condition: Condition)
   extends MultiplyOperation(code, opcode, destination, source, multiplyValue, condition) {
 
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | (addValue.registerCode << 12)
 
   override def toString = s"${super.toString()}, ${addValue.toString}"

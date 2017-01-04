@@ -1,7 +1,7 @@
 package assembler.x86.instructions
 
 import assembler.Hex
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operations.X86Operation
@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class InterruptSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[X86Operation])
+  implicit val page: Section = new Section(List.empty[X86Operation])
 
   "an Interrupt instruction" when {
 

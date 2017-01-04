@@ -2,7 +2,7 @@ package assembler.x86.operations
 
 import assembler.Label
 import assembler.ListExtensions._
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.reference.ReferencingInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
@@ -12,18 +12,16 @@ abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte]
   extends ShortJumpOperation(shortOpcode, mnemonic, label) {
 
   override def createOperation(thisLocation: Int, targetLocation: Int)
-                              (implicit memoryPage: MemoryPage, processorMode: ProcessorMode): ReferencingInstructionOnPage =
-    new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisLocation, targetLocation)(memoryPage, processorMode)
+                              (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
+    new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisLocation, targetLocation)(section, processorMode)
 
   def encodeForLongPointer(pointer: NearPointerOperand)
-                          (implicit page: MemoryPage): List[Byte]
+                          (implicit page: Section): List[Byte]
 
   class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisLocation: Int,
-                                         destinationLocation: Int)(implicit page: MemoryPage, processorMode: ProcessorMode)
+                                         destinationLocation: Int)(implicit page: Section, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
 
-    override val minimumSize: Int = shortJumpSize
-    override val maximumSize: Int = longJumpSize
     val shortJumpSize: Int = shortOpcode.length + 1
     val longJumpSize: Int = processorMode match {
       case ProcessorMode.Real => longOpcode.length + 2
@@ -31,6 +29,9 @@ abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte]
     }
     val forwardShortLongBoundary = Byte.MaxValue
     val backwardShortLongBoundary: Int = (-Byte.MinValue) - shortJumpSize
+
+    override val minimumSize: Int = shortJumpSize
+    override val maximumSize: Int = longJumpSize
 
     override def getSizeForDistance(forward: Boolean, distance: Int): Int =
       if (forward) {
@@ -45,7 +46,7 @@ abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte]
           longJumpSize
       }
 
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte] = {
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = {
       if (forward) {
         if (distance <= forwardShortLongBoundary) {
           encodeForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))

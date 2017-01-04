@@ -7,12 +7,12 @@ import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.registers.StatusRegister._
 import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operations.{ARMOperation, Fields}
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class MoveStatusRegisterSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
+  implicit val page: Section = new Section(List.empty[ARMOperation])
 
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {

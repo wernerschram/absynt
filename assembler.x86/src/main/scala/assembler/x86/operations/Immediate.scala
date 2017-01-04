@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.operands.{ImmediateValue, Operand, OperandSize}
 
 trait Immediate extends X86Operation {
@@ -15,7 +15,7 @@ trait Immediate extends X86Operation {
     case _ => super.operandSize
   }
 
-  abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
+  abstract override def encodeByte()(implicit page: Section): List[Byte] = {
     super.encodeByte() ::: immediate.value
   }
 

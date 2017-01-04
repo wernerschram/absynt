@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operands.{Operand, OperandSize, SegmentRegister}
 
@@ -18,6 +18,6 @@ trait MemoryLocation extends X86Operation {
     case None => location.segmentOverride
   }
 
-  abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
+  abstract override def encodeByte()(implicit page: Section): List[Byte] =
     super.encodeByte() ::: location.displacement
 }

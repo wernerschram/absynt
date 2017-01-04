@@ -2,11 +2,11 @@ package assembler
 
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 class EncodedByteListSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[Encodable])
+  implicit val page: Section = new Section(List.empty[Encodable])
 
   "an Encoded Byte List" should {
     "correctly encode 0x00, 0x01, 0x02" in {

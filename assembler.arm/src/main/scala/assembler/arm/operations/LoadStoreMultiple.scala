@@ -2,7 +2,7 @@ package assembler.arm.operations
 
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 class LoadStoreMultipleDirection(val bitMask: Int)
 
@@ -19,7 +19,7 @@ class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Co
   assume(registers.nonEmpty)
   assume(baseRegister != GeneralRegister.R15)
 
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | 0x08000000 |
       addressingMode.bitMask | direction.bitMask |
       (baseRegister.registerCode << 16) |
@@ -37,7 +37,7 @@ class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Co
 
 trait UpdateBase extends LoadStoreMultiple {
   self: LoadStoreMultiple =>
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | 0x00200000
 
   override def baseRegisterString = s"${super.baseRegisterString}!"
@@ -47,7 +47,7 @@ trait UserModeRegisters extends LoadStoreMultiple {
   self: LoadStoreMultiple =>
   assume(!(this.isInstanceOf[UpdateBase] && !registers.contains(GeneralRegister.R15)))
 
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | 0x00400000
 
   override def registerString = s"${super.registerString}^"
@@ -55,7 +55,7 @@ trait UserModeRegisters extends LoadStoreMultiple {
 
 class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, val opcode: String)
   extends ARMOperation() {
-  override def encodeWord()(implicit page: MemoryPage): Int =
+  override def encodeWord()(implicit page: Section): Int =
     0xf8100a00 |
       (if (updateBase) 0x00200000 else 0) |
       addressingMode.bitMask |

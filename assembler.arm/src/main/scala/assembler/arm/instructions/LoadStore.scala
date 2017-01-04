@@ -6,7 +6,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemnonic: String) {
@@ -31,13 +31,13 @@ class LoadStoreRegister(
 
   def apply(label: Label, destination: GeneralRegister)(implicit processorMode: ProcessorMode) =
     new ReferencingARMOperation[LoadStoreOffset](mnemnonic, label, Always, value => LoadStoreOffset(value.toByte)) {
-      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: MemoryPage): Int =
+      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: Section): Int =
         ImmedWord(Always, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
     }
 
   def apply(label: Label, destination: GeneralRegister, condition: Condition)(implicit processorMode: ProcessorMode) =
     new ReferencingARMOperation[LoadStoreOffset](mnemnonic, label, condition, value => LoadStoreOffset(value.toByte)) {
-      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: MemoryPage): Int =
+      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: Section): Int =
         ImmedWord(condition, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
     }
 

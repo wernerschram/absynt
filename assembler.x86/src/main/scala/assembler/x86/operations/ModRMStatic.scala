@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
@@ -37,7 +37,7 @@ class ModRMStatic(val operandRM: ModRMEncodableOperand,
   override def rexRequirements: List[RexRequirement] = super.rexRequirements :::
     operandRM.getRexRequirements(ParameterPosition.OperandRM)
 
-  override def encodeByte()(implicit page: MemoryPage): List[Byte] = {
+  override def encodeByte()(implicit page: Section): List[Byte] = {
     super.encodeByte() ::: operandRM.getExtendedBytes(rValue)
   }
 }

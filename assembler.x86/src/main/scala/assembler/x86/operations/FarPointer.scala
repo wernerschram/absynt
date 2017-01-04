@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType}
 import assembler.x86.operands.{FarPointerSize, Operand}
 
@@ -13,6 +13,6 @@ trait FarPointer extends X86Operation {
 
   abstract override def operandSize: FarPointerSize = pointer.operandByteSize
 
-  abstract override def encodeByte()(implicit page: MemoryPage): List[Byte] =
+  abstract override def encodeByte()(implicit page: Section): List[Byte] =
     super.encodeByte() ::: pointer.offset ::: pointer.segment
 }

@@ -1,20 +1,20 @@
 package assembler.reference
 
 import assembler.Encodable
-import assembler.memory.MemoryPage
-import assembler.memory.MemoryPage
+import assembler.sections.Section
+import assembler.sections.Section
 import assembler.Label
 
 abstract class ReferencingInstructionOnPage (
   private val thisLocation: Int,
-  private val destinationLocation: Int)(implicit page: MemoryPage) {
+  private val destinationLocation: Int)(implicit page: Section) {
 
   def minimumSize: Int
   def maximumSize: Int
 
   def getSizeForDistance(forward: Boolean, distance: Int): Int
 
-  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: MemoryPage): List[Byte]
+  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
 
   val forward: Boolean = (thisLocation < destinationLocation)
 

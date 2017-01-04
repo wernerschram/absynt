@@ -4,13 +4,13 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operations._
-import assembler.memory.MemoryPage
+import assembler.sections.Section
 import assembler.{EncodedByteList, EncodedString, Hex, Label}
 import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
 
-  implicit val page: MemoryPage = new MemoryPage(List.empty[ARMOperation])
+  implicit val page: Section = new Section(List.empty[ARMOperation])
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {
@@ -84,7 +84,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
 
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
         val label = Label.unique
-        val p = new MemoryPage(
+        val p = new Section(
           LoadRegister(label, R1) ::
             EncodedByteList(List.fill(4)(0x00.toByte)) ::
             EncodedString("Test").withLabel(label) ::
