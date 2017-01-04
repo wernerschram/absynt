@@ -4,7 +4,7 @@ import assembler.Encodable
 import assembler.Label
 import assembler.LabeledEncodable
 
-class Section(val content: Seq[Encodable]) {
+class Section private(val content: Seq[Encodable]) {
   def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
   def getEncodableByCondition(label: Label): Encodable =
@@ -21,4 +21,8 @@ class Section(val content: Seq[Encodable]) {
     }
 
   def encodeByte(): Seq[Byte] = content.flatMap { x => x.encodeByte()(this) }
+}
+
+object Section {
+  def apply(content: Seq[Encodable]) = new Section(content)
 }

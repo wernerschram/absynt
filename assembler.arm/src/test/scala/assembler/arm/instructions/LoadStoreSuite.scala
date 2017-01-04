@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[ARMOperation])
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {
@@ -84,7 +84,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
 
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
         val label = Label.unique
-        val p = new Section(
+        val p = Section(
           LoadRegister(label, R1) ::
             EncodedByteList(List.fill(4)(0x00.toByte)) ::
             EncodedString("Test").withLabel(label) ::

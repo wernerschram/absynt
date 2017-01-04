@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class StoreStringSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[X86Operation])
 
   "an StoreString instruction" when {
     "in real mode" should {

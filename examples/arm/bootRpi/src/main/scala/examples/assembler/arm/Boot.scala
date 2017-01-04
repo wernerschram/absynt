@@ -61,7 +61,7 @@ object Boot extends App {
     val text: Label = "text"
     val label: Label = "bla"
     
-    val page: Section = new Section(
+    val page: Section = Section(
 
       LoadRegister(label, R1) ::
         StoreRegister(R1, R0, UART0.CR) ::

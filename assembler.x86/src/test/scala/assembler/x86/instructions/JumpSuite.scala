@@ -16,7 +16,7 @@ import assembler.EncodedByteList
 
 class JumpSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[X86Operation])
 
   "an Jump instruction" when {
     "in real mode" should {
@@ -182,7 +182,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           jump ::
             EncodedByteList(List.fill(1)(0x00.toByte)) ::
             EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
@@ -200,7 +200,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = JumpIfCountZero(label)
 
-        val p = new Section(
+        val p = Section(
           jump ::
             EncodedByteList(List.fill(1)(0x00.toByte)) ::
             EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
@@ -215,7 +215,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             EncodedByteList(List.fill(1)(0x00.toByte)) ::
             jump ::
@@ -228,7 +228,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = JumpIfCountZero(label)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             EncodedByteList(List.fill(1)(0x00.toByte)) ::
             jump ::
@@ -241,7 +241,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           jump ::
             EncodedByteList(List.fill(256)(0x00.toByte)) ::
             EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
@@ -254,7 +254,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = JumpIfCountZero(label)
 
-        val p = new Section(
+        val p = Section(
           jump ::
             EncodedByteList(List.fill(256)(0x00.toByte)) ::
             EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
@@ -267,7 +267,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             EncodedByteList(List.fill(256)(0x00.toByte)) ::
             jump ::
@@ -282,7 +282,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(1)(0x00.toByte)) ::
@@ -300,7 +300,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(122)(0x00.toByte)) ::
@@ -318,7 +318,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(123)(0x00.toByte)) ::
@@ -337,7 +337,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(123)(0x00.toByte)) ::
@@ -356,7 +356,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(2)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(123)(0x00.toByte)) ::
@@ -377,7 +377,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(60)(0x00.toByte)) ::
@@ -402,7 +402,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(60)(0x00.toByte)) ::
@@ -427,7 +427,7 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(2)(0x00.toByte)).withLabel(label1) ::
             jump2 ::
             EncodedByteList(List.fill(60)(0x00.toByte)) ::
@@ -579,7 +579,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             EncodedByteList(List.fill(1)(0x00.toByte)) ::
             jump ::
@@ -592,7 +592,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
             EncodedByteList(List.fill(256)(0x00.toByte)) ::
             jump ::
@@ -605,7 +605,7 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = new Section(
+        val p = Section(
           jump ::
             EncodedByteList(List.fill(256)(0x00.toByte)) ::
             EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::

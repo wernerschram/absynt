@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[ARMOperation])
 
   "an AddCarry instruction" when {
     "in a32 mode" should {

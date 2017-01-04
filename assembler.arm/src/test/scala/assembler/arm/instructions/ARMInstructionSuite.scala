@@ -7,7 +7,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ARMInstructionSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[ARMOperation])
 
   "an ARM instruction" when {
     "in a32 mode" should {

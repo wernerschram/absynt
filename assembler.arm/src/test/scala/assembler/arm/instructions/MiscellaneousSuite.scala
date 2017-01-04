@@ -8,7 +8,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MiscellaneousSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[ARMOperation])
 
   "a Breakpoint instruction" when {
     "in a32 mode" should {

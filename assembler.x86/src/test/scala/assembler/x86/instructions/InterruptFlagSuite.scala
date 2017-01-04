@@ -8,7 +8,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class InterruptFlagSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[X86Operation])
 
   "a ClearInterruptFlag instruction" when {
 

@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class X86OperationSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = new Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[X86Operation])
 
   "an X86 instruction" when {
     "in protected mode" should {
