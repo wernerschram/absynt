@@ -14,7 +14,7 @@ trait Section {
   def encodeByte(): Seq[Byte]
 }
 
-class MySection(val content: Seq[Encodable]) extends Section {
+class SimpleSection(val content: Seq[Encodable]) extends Section {
   def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
   def getEncodableByLabel(label: Label): Encodable =
@@ -39,5 +39,5 @@ trait SectionLocation {
 }
 
 object Section {
-  def apply(content: Seq[Encodable]) = new MySection(content)
+  def apply(content: Seq[Encodable]) = new SimpleSection(content)
 }
