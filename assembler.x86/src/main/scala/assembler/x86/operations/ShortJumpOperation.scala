@@ -19,7 +19,7 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
-    val target = page.encodableLocation(page.getEncodableByCondition(label))
+    val target = page.encodableLocation(page.getEncodableByLabel(label))
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target))
   }
 

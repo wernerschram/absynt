@@ -20,7 +20,7 @@ abstract class ReferencingARMOperation[PointerType](val opcode: String, val labe
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getOrElseCreateInstruction()(implicit page: Section): ARMReferencingInstructionOnPage = {
-    val target = page.encodableLocation(page.getEncodableByCondition(label))
+    val target = page.encodableLocation(page.getEncodableByLabel(label))
     pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target, page, processorMode))
   }
 
