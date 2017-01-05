@@ -4,7 +4,17 @@ import assembler.Encodable
 import assembler.Label
 import assembler.LabeledEncodable
 
-class Section private(val content: Seq[Encodable]) {
+trait Section {
+  val content: Seq[Encodable]
+  def encodableLocation(encodable: Encodable): Int
+
+  def getEncodableByLabel(label: Label): Encodable
+  def intermediateEncodables(from: Int, to: Int): Seq[Encodable]
+
+  def encodeByte(): Seq[Byte]
+}
+
+class MySection(val content: Seq[Encodable]) extends Section {
   def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
   def getEncodableByLabel(label: Label): Encodable =
@@ -23,8 +33,11 @@ class Section private(val content: Seq[Encodable]) {
   def encodeByte(): Seq[Byte] = content.flatMap { x => x.encodeByte()(this) }
 }
 
+trait SectionLocation {
+  self: Section =>
 
+}
 
 object Section {
-  def apply(content: Seq[Encodable]) = new Section(content)
+  def apply(content: Seq[Encodable]) = new MySection(content)
 }
