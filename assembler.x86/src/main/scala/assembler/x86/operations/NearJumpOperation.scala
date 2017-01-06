@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.Label
+import assembler.{Encodable, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.reference.ReferencingInstructionOnPage
@@ -11,16 +11,16 @@ abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte]
                                 (implicit processorMode: ProcessorMode)
   extends ShortJumpOperation(shortOpcode, mnemonic, label) {
 
-  override def createOperation(thisLocation: Int, targetLocation: Int)
+  override def createOperation(thisOperation: Encodable, destination: Label)
                               (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
-    new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisLocation, targetLocation)(section, processorMode)
+    new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisOperation, destination)(section, processorMode)
 
   def encodeForLongPointer(pointer: NearPointerOperand)
                           (implicit page: Section): List[Byte]
 
-  class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisLocation: Int,
-                                         destinationLocation: Int)(implicit page: Section, processorMode: ProcessorMode)
-    extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
+  class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisOperation: Encodable,
+                                         destination: Label)(implicit page: Section, processorMode: ProcessorMode)
+    extends ReferencingInstructionOnPage(thisOperation, destination) {
 
     val shortJumpSize: Int = shortOpcode.length + 1
     val longJumpSize: Int = processorMode match {

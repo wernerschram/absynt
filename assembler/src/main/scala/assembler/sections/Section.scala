@@ -6,29 +6,34 @@ import assembler.LabeledEncodable
 
 trait Section {
   val content: Seq[Encodable]
-  def encodableLocation(encodable: Encodable): Int
+  def intermediateEncodables(from: Encodable, to: Label): Seq[Encodable]
 
-  def getEncodableByLabel(label: Label): Encodable
-  def intermediateEncodables(from: Int, to: Int): Seq[Encodable]
+  def isForwardReference(from: Encodable, to: Label): Boolean
 
   def encodeByte(): Seq[Byte]
 }
 
 class SimpleSection(val content: Seq[Encodable]) extends Section {
-  def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
+  private def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
-  def getEncodableByLabel(label: Label): Encodable =
+  private def getEncodableByLabel(label: Label): Encodable =
     content.filter {
       case encodable: LabeledEncodable => encodable.label == label
       case _ => false
     }.head
 
-  def intermediateEncodables(from: Int, to: Int): Seq[Encodable] =
+  private def intermediateEncodables(from: Int, to: Int): Seq[Encodable] =
     if (from < to) {
       content.slice(from + 1, to)
     } else {
       content.slice(to, from)
     }
+
+  def intermediateEncodables(from: Encodable, to: Label): Seq[Encodable] =
+    intermediateEncodables(encodableLocation(from), encodableLocation(getEncodableByLabel(to)))
+
+  def isForwardReference(from: Encodable, to: Label): Boolean =
+    encodableLocation(from) < encodableLocation(getEncodableByLabel(to))
 
   def encodeByte(): Seq[Byte] = content.flatMap { x => x.encodeByte()(this) }
 }

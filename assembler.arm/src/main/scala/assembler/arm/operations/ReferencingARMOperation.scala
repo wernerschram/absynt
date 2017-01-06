@@ -1,6 +1,6 @@
 package assembler.arm.operations
 
-import assembler.Label
+import assembler.{Encodable, Label}
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition.Condition
@@ -20,19 +20,18 @@ abstract class ReferencingARMOperation[PointerType](val opcode: String, val labe
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getOrElseCreateInstruction()(implicit page: Section): ARMReferencingInstructionOnPage = {
-    val target = page.encodableLocation(page.getEncodableByLabel(label))
-    pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target, page, processorMode))
+    pageMap.getOrElseUpdate(page, createOperation(this, label, page, processorMode))
   }
 
-  def createOperation(thisLocation: Int, targetLocation: Int, section: Section, processorMode: ProcessorMode):
+  def createOperation(thisOperation: Encodable, destination: Label, section: Section, processorMode: ProcessorMode):
   ARMReferencingInstructionOnPage =
-    new ARMReferencingInstructionOnPage(thisLocation, targetLocation)(section, processorMode)
+    new ARMReferencingInstructionOnPage(thisOperation, destination)(section, processorMode)
 
   override def toString = s"${super.toString()} $label"
 
-  class ARMReferencingInstructionOnPage(thisLocation: Int, destinationLocation: Int)
+  class ARMReferencingInstructionOnPage(thisOperation: Encodable, destination: Label)
                                        (implicit page: Section, processorMode: ProcessorMode)
-    extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
+    extends ReferencingInstructionOnPage(thisOperation, destination) {
 
     val branchSize = 4
     override val minimumSize: Int = branchSize

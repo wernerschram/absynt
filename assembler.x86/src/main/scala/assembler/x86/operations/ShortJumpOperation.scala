@@ -19,19 +19,18 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
-    val target = page.encodableLocation(page.getEncodableByLabel(label))
-    pageMap.getOrElseUpdate(page, createOperation(page.encodableLocation(this), target))
+    pageMap.getOrElseUpdate(page, createOperation(this, label))
   }
 
-  def createOperation(thisLocation: Int, targetLocation: Int)
+  def createOperation(thisOperation: Encodable, destination: Label)
                      (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
-    new ShortJumpInstructionOnPage(shortOpcode, thisLocation, targetLocation)(section, processorMode)
+    new ShortJumpInstructionOnPage(shortOpcode, thisOperation, destination)(section, processorMode)
 
   override def toString = s"$mnemonic $label"
 
-  class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisLocation: Int, destinationLocation: Int)
+  class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisOperation: Encodable, destination: Label)
                                   (implicit page: Section, processorMode: ProcessorMode)
-    extends ReferencingInstructionOnPage(thisLocation, destinationLocation) {
+    extends ReferencingInstructionOnPage(thisOperation, destination) {
 
     val shortJumpSize: Int = shortOpcode.length + 1
     override val minimumSize: Int = shortJumpSize

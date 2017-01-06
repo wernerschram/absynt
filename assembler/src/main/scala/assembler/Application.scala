@@ -11,9 +11,7 @@ class ARMBootSector(val initialSection: Section) extends Application (initialSec
 
   override val content: Seq[Encodable] = initialSection.content
 
-  override def encodableLocation(encodable: Encodable): Int = initialSection.encodableLocation(encodable)
+  override def intermediateEncodables(from: Encodable, to: Label)  = initialSection.intermediateEncodables(from, to)
 
-  override def getEncodableByLabel(label: Label): Encodable = initialSection.getEncodableByLabel(label)
-
-  override def intermediateEncodables(from: Int, to: Int): Seq[Encodable] = initialSection.intermediateEncodables(from, to)
+  override def isForwardReference(from: Encodable, to: Label) = initialSection.isForwardReference(from, to)
 }

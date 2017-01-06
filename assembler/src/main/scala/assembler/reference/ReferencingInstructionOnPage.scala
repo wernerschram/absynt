@@ -6,8 +6,8 @@ import assembler.sections.Section
 import assembler.Label
 
 abstract class ReferencingInstructionOnPage (
-  private val thisLocation: Int,
-  private val destinationLocation: Int)(implicit page: Section) {
+  private val thisOperation: Encodable,
+  private val destination: Label)(implicit page: Section) {
 
   def minimumSize: Int
   def maximumSize: Int
@@ -16,9 +16,9 @@ abstract class ReferencingInstructionOnPage (
 
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
 
-  val forward: Boolean = (thisLocation < destinationLocation)
+  val forward: Boolean = page.isForwardReference(thisOperation, destination)
 
-  private val intermediateInstructions = page.intermediateEncodables(thisLocation, destinationLocation)
+  private val intermediateInstructions = page.intermediateEncodables(thisOperation, destination)
 
   private lazy val independentIntermediates: Seq[Encodable] = intermediateInstructions.filter {
     case instruction: ReferencingInstruction => false
