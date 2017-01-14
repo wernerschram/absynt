@@ -39,5 +39,20 @@ class SectionSuite extends WordSpec with Matchers {
 
       section.intermediateEncodables(reference, label) should be(intermediate :: Nil)
     }
+
+    "provide the intermediate instructions between a label and a relatie instruction" in {
+      val label = Label.unique
+      val reference = new MyReferencingInstruction(label)
+      val intermediate = EncodedByteList(List.fill(5)(0))
+      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+
+      val section = Section(
+        target ::
+          intermediate ::
+          reference ::
+          Nil)
+
+      section.intermediateEncodables(reference, label) should be(target :: intermediate :: Nil)
+    }
   }
 }
