@@ -12,11 +12,8 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
-  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] = (position match {
-    case ParameterPosition.Index => ParameterPosition.Index.rexRequirement.toList
-    case ParameterPosition.Base => ParameterPosition.Base.rexRequirement.toList
-    case _ => position.rexRequirement.toList
-  }) ::: super.getRexRequirements(position)
+  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
+    position.rexRequirement.toList ::: super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
@@ -86,7 +83,7 @@ sealed trait ByteRegister extends GeneralPurposeRegister {
 }
 
 sealed trait LowByteRegister extends ByteRegister {
-  override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}l" else mnemonic.replace('x', 'l')
+  override def toString: String = if ( mnemonic.startsWith("r")) s"${mnemonic}l" else mnemonic.replace('x', 'l')
 }
 
 sealed trait HighByteRegister extends ByteRegister {
