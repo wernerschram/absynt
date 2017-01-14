@@ -1,8 +1,7 @@
 package assembler
 
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
 import assembler.sections.Section
+import org.scalatest.{Matchers, WordSpec}
 
 class EncodedByteListSuite extends WordSpec with Matchers {
 

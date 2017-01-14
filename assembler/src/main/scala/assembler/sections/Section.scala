@@ -6,11 +6,16 @@ import assembler.LabeledEncodable
 
 trait Section {
   val content: Seq[Encodable]
+  def getRelativeAddress(encodable: Encodable): Int =
+    content.takeWhile(current => current != encodable).map(current => current.size()(this)).sum
+
   def intermediateEncodables(from: Encodable, to: Label): Seq[Encodable]
 
   def isForwardReference(from: Encodable, to: Label): Boolean
 
   def encodeByte(): Seq[Byte]
+
+  def size: Int
 }
 
 class SimpleSection(val content: Seq[Encodable]) extends Section {
@@ -22,7 +27,7 @@ class SimpleSection(val content: Seq[Encodable]) extends Section {
       case _ => false
     }.head
 
-  private def intermediateEncodables(from: Int, to: Int): Seq[Encodable] =
+  def intermediateEncodables(from: Int, to: Int): Seq[Encodable] =
     if (from < to) {
       content.slice(from + 1, to)
     } else {
@@ -32,17 +37,23 @@ class SimpleSection(val content: Seq[Encodable]) extends Section {
   def intermediateEncodables(from: Encodable, to: Label): Seq[Encodable] =
     intermediateEncodables(encodableLocation(from), encodableLocation(getEncodableByLabel(to)))
 
-  def isForwardReference(from: Encodable, to: Label): Boolean =
+  override def isForwardReference(from: Encodable, to: Label): Boolean =
     encodableLocation(from) < encodableLocation(getEncodableByLabel(to))
 
-  def encodeByte(): Seq[Byte] = content.flatMap { x => x.encodeByte()(this) }
+  lazy val encodeByte: Seq[Byte] = content.flatMap { x => x.encodeByte()(this) }
+
+  lazy val size = encodeByte.length
 }
 
-trait SectionLocation {
+trait BaseAddress {
   self: Section =>
 
+  val baseAddress: Int
 }
 
 object Section {
   def apply(content: Seq[Encodable]) = new SimpleSection(content)
+  def apply(content: Seq[Encodable], sectionBaseAddress: Int) = new SimpleSection(content) with BaseAddress {
+    val baseAddress = sectionBaseAddress
+  }
 }
