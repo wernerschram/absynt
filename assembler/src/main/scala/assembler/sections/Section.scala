@@ -42,7 +42,7 @@ class SimpleSection(val content: Seq[Encodable]) extends Section {
 
   lazy val encodeByte: Seq[Byte] = content.flatMap { x => x.encodeByte()(this) }
 
-  lazy val size = encodeByte.length
+  lazy val size: Int = encodeByte.length
 }
 
 trait BaseAddress {
@@ -52,8 +52,8 @@ trait BaseAddress {
 }
 
 object Section {
-  def apply(content: Seq[Encodable]) = new SimpleSection(content)
-  def apply(content: Seq[Encodable], sectionBaseAddress: Int) = new SimpleSection(content) with BaseAddress {
-    val baseAddress = sectionBaseAddress
+  def apply(content: Seq[Encodable]): Section = new SimpleSection(content)
+  def apply(content: Seq[Encodable], sectionBaseAddress: Int): Section = new SimpleSection(content) with BaseAddress {
+    val baseAddress: Int = sectionBaseAddress
   }
 }

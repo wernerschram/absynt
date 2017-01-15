@@ -40,7 +40,7 @@ class SectionSuite extends WordSpec with Matchers {
       section.intermediateEncodables(reference, label) should be(intermediate :: Nil)
     }
 
-    "provide the intermediate instructions between a label and a relatie instruction" in {
+    "provide the intermediate instructions between a label and a relative instruction" in {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
       val intermediate = EncodedByteList(List.fill(5)(0))
@@ -54,5 +54,69 @@ class SectionSuite extends WordSpec with Matchers {
 
       section.intermediateEncodables(reference, label) should be(target :: intermediate :: Nil)
     }
+
+    "know when a indirect reference is a forward reference" in {
+      val label = Label.unique
+      val reference = new MyReferencingInstruction(label)
+      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+
+      val section = Section(
+        reference ::
+          target ::
+          Nil)
+
+      section.isForwardReference(reference, label) should be(true)
+    }
+
+    "know when a indirect reference is a backward reference" in {
+      val label = Label.unique
+      val reference = new MyReferencingInstruction(label)
+      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+
+      val section = Section(
+        target ::
+          reference ::
+          Nil)
+
+      section.isForwardReference(reference, label) should be(false)
+    }
+
+    "be able to encode itself" in {
+      val section = Section(
+        EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil) ::
+          EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil) ::
+          Nil)
+
+      section.encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
+    }
+
+    "correctly calculate its size" in {
+      val oneSize = 4
+      val twoSize = 6
+      val one = EncodedByteList(List.fill(oneSize)(1))
+      val two = EncodedByteList(List.fill(twoSize)(2))
+
+      val section = Section(
+        one ::
+          two ::
+          Nil)
+
+      section.size should be(oneSize + twoSize)
+    }
+
+    "correctly provide the section relative address of a label " in {
+      val oneSize = 4
+      val twoSize = 6
+      val one = EncodedByteList(List.fill(oneSize)(1))
+      val two = EncodedByteList(List.fill(twoSize)(2))
+
+      val section = Section(
+        one ::
+          two ::
+          Nil)
+
+      section.size should be(oneSize + twoSize)
+    }
+
   }
 }
