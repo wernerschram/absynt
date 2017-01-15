@@ -105,17 +105,16 @@ class SectionSuite extends WordSpec with Matchers {
     }
 
     "correctly provide the section relative address of a label " in {
-      val oneSize = 4
-      val twoSize = 6
-      val one = EncodedByteList(List.fill(oneSize)(1))
-      val two = EncodedByteList(List.fill(twoSize)(2))
+      val label = Label.unique
+      val intermediate = EncodedByteList(List.fill(5)(0))
+      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
 
       val section = Section(
-        one ::
-          two ::
+        intermediate ::
+          target ::
           Nil)
 
-      section.size should be(oneSize + twoSize)
+      section.getRelativeAddress(target) should be(5)
     }
 
   }
