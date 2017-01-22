@@ -15,7 +15,6 @@ abstract class Application protected (val sections: List[Section]) extends Secti
       }.map(section => section.size).sum + base
   }
 
-
   def getAbsoluteAddress(encodable: Encodable): Int = {
     val actual = orderedSections.filter(section => !section.content.contains(encodable)).head
     getBaseAddress(actual) + actual.getRelativeAddress(encodable)
