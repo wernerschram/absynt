@@ -63,11 +63,6 @@ object Boot extends App {
     
     val page: Section = Section(
 
-      LoadRegister(label, R1) ::
-        StoreRegister(R1, R0, UART0.CR) ::
-        EncodedString("Test").withLabel(label) ::
-
-        
       // Disable UART0
       Move.forConstant(UART0.Base, R0) :::
         Move.forConstant(0, R1) :::
