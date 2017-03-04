@@ -23,11 +23,11 @@ abstract class Application protected (val sections: List[Section]) extends Secti
 
 class ARMBootSector(val initialSection: Section) extends Application (initialSection :: Nil) {
 
-  override def encodeByte(): Seq[Byte] = initialSection.encodeByte()
+  override def encodeByte: List[Byte] = initialSection.encodeByte
 
-  override val content: Seq[Encodable] = initialSection.content
+  override val content: List[Encodable] = initialSection.content
 
-  override def intermediateEncodables(from: Encodable, to: Label): Seq[Encodable] = initialSection.intermediateEncodables(from, to)
+  override def intermediateEncodables(from: Encodable, to: Label): List[Encodable] = initialSection.intermediateEncodables(from, to)
 
   override def isForwardReference(from: Encodable, to: Label): Boolean = initialSection.isForwardReference(from, to)
 

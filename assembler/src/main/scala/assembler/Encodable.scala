@@ -12,7 +12,7 @@ trait Encodable {
 
 trait LabeledEncodable extends Encodable with Labeled {
   val value: Encodable
-  
+
   override def size()(implicit page: Section): Int = value.size()
   override def encodeByte()(implicit page: Section): List[Byte] = value.encodeByte()
 
