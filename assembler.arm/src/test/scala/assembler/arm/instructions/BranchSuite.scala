@@ -55,6 +55,16 @@ class BranchSuite extends WordSpec with Matchers {
         p.encodeByte() should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
 
+      "correctly encode a branch to self instruction" in {
+        val label = Label.unique
+        val p = Section(
+          EncodedByteList(List.fill(8)(0x00.toByte)) ::
+            Branch(label).withLabel(label) ::
+            Nil)
+
+        p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFE"))
+      }
+
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val label = Label.unique
         val p = Section(
