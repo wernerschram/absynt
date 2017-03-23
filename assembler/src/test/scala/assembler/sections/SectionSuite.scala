@@ -29,7 +29,7 @@ class SectionSuite extends WordSpec with Matchers {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
       val intermediate = EncodedByteList(List.fill(5)(0))
-      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
 
       val section = Section(
         reference ::
@@ -44,7 +44,7 @@ class SectionSuite extends WordSpec with Matchers {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
       val intermediate = EncodedByteList(List.fill(5)(0))
-      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
 
       val section = Section(
         target ::
@@ -58,7 +58,7 @@ class SectionSuite extends WordSpec with Matchers {
     "know when a indirect reference is a forward reference" in {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
-      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
 
       val section = Section(
         reference ::
@@ -71,7 +71,7 @@ class SectionSuite extends WordSpec with Matchers {
     "know when a indirect reference is a backward reference" in {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
-      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
 
       val section = Section(
         target ::
@@ -107,7 +107,7 @@ class SectionSuite extends WordSpec with Matchers {
     "correctly provide the section relative address of a label " in {
       val label = Label.unique
       val intermediate = EncodedByteList(List.fill(5)(0))
-      val target = EncodedByteList(0.toByte :: Nil).withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
 
       val section = Section(
         intermediate ::
