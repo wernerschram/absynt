@@ -3,12 +3,10 @@ package assembler.arm.operations
 import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
 import assembler.sections.Section
-import assembler.{Encodable, Label, LabeledEncodable}
+import assembler.Encodable
 
 trait ARMOperation extends Encodable {
   val opcode: String
-
-  def withLabel(label: Label): LabeledEncodable = new LabeledARMOperation(this, label)
 
   override def size()(implicit page: Section) = 4
 
@@ -36,10 +34,4 @@ trait Conditional extends ARMOperation {
 
   override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | (condition.value << 28)
-}
-
-class LabeledARMOperation(override val value: ARMOperation, override val label: Label) extends ARMOperation with LabeledEncodable {
-  val opcode: String = value.opcode
-
-  override def encodeWord()(implicit page: Section): Int = value.encodeWord()
 }

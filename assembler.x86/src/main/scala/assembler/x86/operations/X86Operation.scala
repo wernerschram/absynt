@@ -3,7 +3,7 @@ package assembler.x86.operations
 import assembler.sections.Section
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
-import assembler.{Encodable, Label, LabeledEncodable}
+import assembler.Encodable
 
 trait X86Operation extends Encodable {
   val includeRexW: Boolean = true
@@ -51,8 +51,6 @@ trait X86Operation extends Encodable {
 
   def rexRequirements: List[RexRequirement] =
     if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
-
-  override def withLabel(label: Label): LabeledEncodable = new LabeledX86Operation(this, label)
 
   def code: List[Byte]
 

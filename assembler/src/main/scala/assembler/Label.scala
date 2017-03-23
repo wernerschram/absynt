@@ -19,10 +19,6 @@ case class StringLabel private (value: String) extends Label {
   override def toString: String = value
 }
 
-case class UniqueLabel private (id: Int) extends Label {
-  
-}
+case class UniqueLabel private (id: Int) extends Label
 
-trait Labeled {
-  def label: Label
-}
+case class Labeled[TargetType >: Encodable](label: Label, target: TargetType)

@@ -48,7 +48,7 @@ object Boot extends App {
   private def naiveDelay(delay: Int, register: GeneralRegister)(implicit processorMode: ProcessorMode) = {
     val label = Label.unique
     Move.forConstant(delay, register) :::
-      Subtract.setFlags(register, 2.toByte, register).withLabel(label) ::
+//      Subtract.setFlags(register, 2.toByte, register).withLabel(label) ::
       Branch(label, NotEqual) ::
       Nil
   }
@@ -112,7 +112,7 @@ object Boot extends App {
 
         Move(0.toByte, R6) ::
 
-        LoadRegister(R4, R0, UART0.FR).withLabel(putString) ::
+//        LoadRegister(R4, R0, UART0.FR).withLabel(putString) ::
         Compare(R4, 0x20.toByte) ::
         Branch(putString, NotEqual) ::
         
@@ -125,16 +125,16 @@ object Boot extends App {
         Compare(R6, 12.toByte) ::
         Branch(putString, NotEqual) ::
         
-        Branch(loop).withLabel(loop) ::
+//        Branch(loop).withLabel(loop) ::
         
-        EncodedString("Hello World!").withLabel(text) ::
+//        EncodedString("Hello World!").withLabel(text) ::
         
         Nil)
  
     
     val out = new FileOutputStream("c:\\temp\\test.arm")
     page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
-    out.write(page.encodeByte().toArray)
+    out.write(page.encodeByte()(page).toArray)
     out.flush()
     //arm-eabi-objdump -b binary -marm -D test.arm
   }

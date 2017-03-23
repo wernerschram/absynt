@@ -2,7 +2,6 @@ package assembler.sections
 
 import assembler.Encodable
 import assembler.Label
-import assembler.LabeledEncodable
 
 trait Section extends Encodable {
   val content: List[Encodable]
@@ -18,33 +17,14 @@ trait Section extends Encodable {
 
   def encodeByte: List[Byte]
   override def encodeByte()(implicit section: Section) = encodeByte
-
-  override def withLabel(label: Label) = new LabeledSection(this, label)
-
-}
-
-class LabeledSection(override val value: Section, override val label: Label) extends Section with LabeledEncodable {
-  override def size = value.size
-
-  override def isForwardReference(from: Encodable, to: Label) = value.isForwardReference(from, to)
-
-  override val content = value.content
-
-  override def encodeByte = value.encodeByte
-
-  override def getRelativeAddress(encodable: Encodable): Int = value.getRelativeAddress(encodable)
-
-  override def intermediateEncodables(from: Encodable, to: Label) = value.intermediateEncodables(from, to)
 }
 
 class SimpleSection(val content: List[Encodable]) extends Section {
   private def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
 
+  // TODO reimplement this
   private def getEncodableByLabel(label: Label): Encodable =
-    content.filter {
-      case encodable: LabeledEncodable => encodable.label == label
-      case _ => false
-    }.head
+    content.head
 
   def intermediateEncodables(from: Int, to: Int): List[Encodable] =
     if (from < to) {
