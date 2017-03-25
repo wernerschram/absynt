@@ -1,12 +1,11 @@
-package assembler.arm.instructions.branch
+package assembler.arm.instructions
 
 import assembler.{Designation, Encodable, Hex}
 import assembler.arm.ProcessorMode
-import assembler.arm.instructions.{MoveFromStatusRegister, MoveToStatusRegister}
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.registers.StatusRegister._
 import assembler.arm.operands.{Condition, Shifter}
-import assembler.arm.operations.{ARMOperation, Fields}
+import assembler.arm.operations.Fields
 import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 

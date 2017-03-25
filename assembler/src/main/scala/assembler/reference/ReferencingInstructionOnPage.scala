@@ -2,7 +2,6 @@ package assembler.reference
 
 import assembler.Encodable
 import assembler.sections.Section
-import assembler.sections.Section
 import assembler.Label
 
 abstract class ReferencingInstructionOnPage (
@@ -21,12 +20,12 @@ abstract class ReferencingInstructionOnPage (
   private val intermediateInstructions = section.intermediateEncodables(thisOperation, destination)
 
   private lazy val independentIntermediates: Seq[Encodable] = intermediateInstructions.filter {
-    case instruction: ReferencingInstruction => false
+    case _: ReferencingInstruction => false
     case _ => true
   }
 
   private lazy val dependentIntermediates = intermediateInstructions.filter {
-    case instruction: ReferencingInstruction => true
+    case _: ReferencingInstruction => true
     case _ => false
   }.map { i => i.asInstanceOf[ReferencingInstruction] }
 
@@ -45,12 +44,12 @@ abstract class ReferencingInstructionOnPage (
   def maximumEstimatedSize: Int = getSizeForDistance(forward, maximumDistance)
 
   private var _estimatedSize: Option[Int] = None
-  def isEstimated: Boolean = _estimatedSize != None
+  def isEstimated: Boolean = _estimatedSize.isDefined
 
   private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = independentDistance +
     dependentIntermediates.map { instruction =>
       if (sizeAssumptions.contains(instruction.getOrElseCreateInstruction()))
-        sizeAssumptions.get(instruction.getOrElseCreateInstruction()).get
+        sizeAssumptions(instruction.getOrElseCreateInstruction())
       else
         instruction.estimatedSize(sizeAssumptions)
     }
@@ -59,7 +58,7 @@ abstract class ReferencingInstructionOnPage (
   def estimateSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
-    while (!assumption.isDefined || assumption.get < newAssumption) {
+    while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
       newAssumption = getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
     }
@@ -67,7 +66,7 @@ abstract class ReferencingInstructionOnPage (
   }
 
   def size: Int = {
-    if (_estimatedSize == None) {
+    if (_estimatedSize.isEmpty) {
       if (minimumEstimatedSize == maximumEstimatedSize) {
         _estimatedSize = Some(minimumEstimatedSize)
       } else {

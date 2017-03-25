@@ -17,7 +17,7 @@ trait Section extends Encodable {
   def size()(implicit section: Section): Int = size
 
   def encodeByte: List[Byte]
-  override def encodeByte()(implicit section: Section) = encodeByte
+  override def encodeByte()(implicit section: Section): List[Byte] = encodeByte
 }
 
 class SimpleSection(val content: List[Designation[Encodable]]) extends Section {

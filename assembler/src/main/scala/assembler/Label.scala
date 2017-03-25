@@ -35,7 +35,7 @@ case class Unlabeled[TargetType >: Encodable](t: TargetType) extends Designation
   override def label: Nothing =
     throw new NoSuchElementException("head of empty labeled list")
 
-  val target = t
+  val target: TargetType = t
 
   override def isLabeled: Boolean = false
 }

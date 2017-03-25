@@ -105,7 +105,7 @@ class SectionSuite extends WordSpec with Matchers {
 
       val section = Section(List[Designation[Encodable]](
         intermediate,
-          target))
+          Labeled(label, target)))
 
       section.getRelativeAddress(target) should be(5)
     }
