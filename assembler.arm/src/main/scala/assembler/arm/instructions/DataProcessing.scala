@@ -1,10 +1,12 @@
 package assembler.arm.instructions
 
+import assembler.{Designation, Encodable, Unlabeled}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RightRotateImmediate, Shifter}
 import assembler.arm.operations._
+import assembler.arm.instructions.DataProcessing._
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -21,6 +23,11 @@ class DataProcessing(val code: Byte, val opcode: String) {
   private def RegAndShifterToRegFlags(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister,
                                       condition: Condition = Always) =
     new DataProcessingOperation(opcode, code, condition, source1, source2, destination) with SetFlags
+}
+
+object DataProcessing {
+  type Designator = (Encodable)=>Designation[Encodable]
+  val UnLabeledDesignator: Designator = Unlabeled(_)
 }
 
 class DataProcessingNoDestination(val code: Byte, val opcode: String) {
@@ -48,46 +55,58 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
 }
 
 object AddCarry extends DataProcessing(0x05.toByte, "adc") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    apply(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Add(destination, value, destination, condition))
+    designator(apply(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Add(destination, value, destination, condition)))
   }
 }
 
 object Add extends DataProcessing(0x04.toByte, "add") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
-    if (source2 == 0)
-      return Nil
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
+    if (source2 == 0) {
+      return if (designator == UnLabeledDesignator)
+        Nil
+      else
+        designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
+    }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    apply(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Add(destination, value, destination, condition))
+    designator(apply(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Add(destination, value, destination, condition)))
   }
 }
 
 object And extends DataProcessing(0x00.toByte, "and") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(~source2)
-    BitClear(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => BitClear(destination, value, destination, condition))
+    designator(BitClear(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(BitClear(destination, value, destination, condition)))
   }
 }
 
 object BitClear extends DataProcessing(0x0E.toByte, "bic") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
-    if (source2 == 0)
-      return Nil
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
+    if (source2 == 0) {
+      return if (designator == UnLabeledDesignator)
+        Nil
+      else
+        designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
+    }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    BitClear(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => BitClear(destination, value, destination, condition))
+    designator(BitClear(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(BitClear(destination, value, destination, condition)))
   }
 }
 
@@ -96,80 +115,100 @@ object CompareNegative extends DataProcessingNoDestination(0x0B.toByte, "cmn")
 object Compare extends DataProcessingNoDestination(0x0A.toByte, "cmp")
 
 object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
-    if (source2 == 0)
-      return Nil
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
+    if (source2 == 0) {
+      return if (designator == UnLabeledDesignator)
+        Nil
+      else
+        designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
+    }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ExclusiveOr(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => ExclusiveOr(destination, value, destination, condition))
+    designator(ExclusiveOr(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(ExclusiveOr(destination, value, destination, condition)))
   }
 }
 
 object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
-  def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
+  def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
     if (source2 == 0)
-      return apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return designator(apply(Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    apply(shifters.head, destination, condition) :: shifters.tail.map(value => Or(destination, value, destination, condition))
+    designator(apply(shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Or(destination, value, destination, condition)))
   }
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
 
 object Or extends DataProcessing(0x0C.toByte, "orr") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
-    if (source2 == 0)
-      return Nil
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
+    if (source2 == 0) {
+      return if (designator == UnLabeledDesignator)
+        Nil
+      else
+        designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
+    }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    apply(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Or(destination, value, destination, condition))
+    designator(apply(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Or(destination, value, destination, condition)))
   }
 }
 
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
     if (source2 == 0)
-      return ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return designator(ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ReverseSubtract(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Add(destination, value, destination, condition))
+    designator(ReverseSubtract(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Add(destination, value, destination, condition)))
   }
 }
 
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
     if (source2 == 0)
-      return ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return designator(ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ReverseSubtractCarry(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Add(destination, value, destination, condition))
+    designator(ReverseSubtractCarry(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Add(destination, value, destination, condition)))
   }
 }
 
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
     if (source2 == 0)
-      return apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil
+      return designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    SubtractCarry(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Subtract(destination, value, destination, condition))
+    designator(SubtractCarry(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Subtract(destination, value, destination, condition)))
   }
 }
 
 object Subtract extends DataProcessing(0x02.toByte, "sub") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode): List[ARMOperation] = {
-    if (source2 == 0)
-      return Nil
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always,
+                  designator: Designator = UnLabeledDesignator)
+                 (implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
+    if (source2 == 0) {
+      return if (designator == UnLabeledDesignator)
+        Nil
+      else
+        designator(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition)) :: Nil
+    }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    Subtract(source1, shifters.head, destination, condition) ::
-      shifters.tail.map(value => Subtract(destination, value, destination, condition))
+    designator(Subtract(source1, shifters.head, destination, condition)) ::
+      shifters.tail.map(value => Unlabeled(Subtract(destination, value, destination, condition)))
   }
 }
 
