@@ -25,7 +25,7 @@ class ARMBootSector(val initialSection: Section) extends Application (initialSec
 
   override def encodeByte: List[Byte] = initialSection.encodeByte
 
-  override val content: List[Encodable] = initialSection.content
+  override val content: List[Designation[Encodable]] = initialSection.content
 
   override def intermediateEncodables(from: Encodable, to: Label): List[Encodable] = initialSection.intermediateEncodables(from, to)
 

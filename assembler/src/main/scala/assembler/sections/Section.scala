@@ -1,12 +1,13 @@
 package assembler.sections
 
-import assembler.Encodable
-import assembler.Label
+import assembler._
+
+import scala.language.implicitConversions
 
 trait Section extends Encodable {
-  val content: List[Encodable]
+  val content: List[Designation[Encodable]]
   def getRelativeAddress(encodable: Encodable): Int =
-    content.takeWhile(current => current != encodable).map(current => current.size()(this)).sum
+    content.takeWhile(current => current.target != encodable).map(current => current.target.size()(this)).sum
 
   def intermediateEncodables(from: Encodable, to: Label): List[Encodable]
 
@@ -19,27 +20,24 @@ trait Section extends Encodable {
   override def encodeByte()(implicit section: Section) = encodeByte
 }
 
-class SimpleSection(val content: List[Encodable]) extends Section {
-  private def encodableLocation(encodable: Encodable): Int = content.indexOf(encodable)
+class SimpleSection(val content: List[Designation[Encodable]]) extends Section {
+  def intermediateEncodables(from: Encodable, to: Label): List[Encodable] = {
+    val trimLeft = content
+      .dropWhile(x => !(x.target == from || (x.isLabeled && x.label == to)))
 
-  // TODO reimplement this
-  private def getEncodableByLabel(label: Label): Encodable =
-    content.head
+    val trimRight = trimLeft.tail
+      .takeWhile(x => !(x.target == from || (x.isLabeled && x.label == to)))
 
-  def intermediateEncodables(from: Int, to: Int): List[Encodable] =
-    if (from < to) {
-      content.slice(from + 1, to)
-    } else {
-      content.slice(to, from)
-    }
-
-  def intermediateEncodables(from: Encodable, to: Label): List[Encodable] =
-    intermediateEncodables(encodableLocation(from), encodableLocation(getEncodableByLabel(to)))
+    if (trimLeft.head.target == from)
+      trimRight.map { x => x.target }
+    else
+      trimLeft.head.target :: trimRight.map { x => x.target }
+  }
 
   override def isForwardReference(from: Encodable, to: Label): Boolean =
-    encodableLocation(from) < encodableLocation(getEncodableByLabel(to))
+    content.find(x => x.target == from || (x.isLabeled && x.label == to)).get.target == from
 
-  lazy val encodeByte: List[Byte] = content.flatMap { x => x.encodeByte()(this) }
+  lazy val encodeByte: List[Byte] = content.flatMap { x => x.target.encodeByte()(this) }
 
   lazy val size: Int = encodeByte.length
 }
@@ -51,8 +49,8 @@ trait BaseAddress {
 }
 
 object Section {
-  def apply(content: List[Encodable]): Section = new SimpleSection(content)
-  def apply(content: List[Encodable], sectionBaseAddress: Int): Section = new SimpleSection(content) with BaseAddress {
+  def apply(content: List[Designation[Encodable]]): Section = new SimpleSection(content)
+  def apply(content: List[Designation[Encodable]], sectionBaseAddress: Int): Section = new SimpleSection(content) with BaseAddress {
     val baseAddress: Int = sectionBaseAddress
   }
 }
