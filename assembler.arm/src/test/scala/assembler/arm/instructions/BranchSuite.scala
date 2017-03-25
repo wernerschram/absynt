@@ -3,14 +3,13 @@ package assembler.arm.instructions
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operations.ARMOperation
 import assembler.sections.Section
-import assembler.{EncodedByteList, Hex, Label}
+import assembler.{Designation, Encodable, EncodedByteList, Hex, Label, Labeled}
 import org.scalatest.{Matchers, WordSpec}
 
 class BranchSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "an Branch instruction" when {
     "in a32 mode" should {
@@ -35,58 +34,53 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch to a labeled instruction" in {
         val label = Label.unique
-        val p = Section(
-          Branch(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Branch(label),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(4)(0x00.toByte)))))
 
         p.encodeByte() should be(Hex.msb("EA000000 00000000 00000000"))
       }
 
       "correctly encode a backward branch to a labeled instruction" in {
         val label: Label = "Label"
-        val p = Section(
-          EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            Branch(label, Condition.LowerOrSame) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(4)(0x00.toByte))),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Branch(label, Condition.LowerOrSame)))
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
 
       "correctly encode a branch to self instruction" in {
         val label = Label.unique
-        val p = Section(
-          EncodedByteList(List.fill(8)(0x00.toByte)) ::
-            Branch(label).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          EncodedByteList(List.fill(8)(0x00.toByte)),
+            Labeled(label, Branch(label))))
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFE"))
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val label = Label.unique
-        val p = Section(
-          Branch(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            Branch(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Branch(label),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Branch(label),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(4)(0x00.toByte)))))
 
         p.encodeByte() should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
       }
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
         val label = Label.unique
-        val p = Section(
-          EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            Branch(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            Branch(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(4)(0x00.toByte))),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Branch(label),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Branch(label)))
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
@@ -118,11 +112,10 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch-link to a labeled instruction" in {
         val label = Label.unique
-        val p = Section(
-          BranchLink(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          BranchLink(label),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(4)(0x00.toByte)))))
 
         p.encodeByte() should be(Hex.msb("EB000000 00000000 00000000"))
       }
@@ -156,11 +149,10 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val label = Label.unique
-        val p = Section(
-          BranchLinkExchange(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          BranchLinkExchange(label),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(4)(0x00.toByte)))))
 
         p.encodeByte() should be(Hex.msb("FA000000 00000000 00000000"))
       }

@@ -34,8 +34,10 @@ class SimpleSection(val content: List[Designation[Encodable]]) extends Section {
       trimLeft.head.target :: trimRight.map { x => x.target }
   }
 
-  override def isForwardReference(from: Encodable, to: Label): Boolean =
-    content.find(x => x.target == from || (x.isLabeled && x.label == to)).get.target == from
+  override def isForwardReference(from: Encodable, to: Label): Boolean = {
+    val firstInstruction = content.find(x => x.target == from || (x.isLabeled && x.label == to)).get
+    !(firstInstruction.isLabeled && firstInstruction.label == to)
+  }
 
   lazy val encodeByte: List[Byte] = content.flatMap { x => x.target.encodeByte()(this) }
 

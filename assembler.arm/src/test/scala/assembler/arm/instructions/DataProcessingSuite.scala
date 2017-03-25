@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.Hex
+import assembler.{Designation, Encodable, Hex}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "an AddCarry instruction" when {
     "in a32 mode" should {

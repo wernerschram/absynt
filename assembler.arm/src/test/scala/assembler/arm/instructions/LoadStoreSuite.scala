@@ -5,12 +5,12 @@ import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operations._
 import assembler.sections.Section
-import assembler.{EncodedByteList, EncodedString, Hex, Label}
+import assembler.{Designation, Encodable, EncodedByteList, EncodedString, Hex, Label, Labeled}
 import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[ARMOperation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {
@@ -84,22 +84,20 @@ class LoadStoreSuite extends WordSpec with Matchers {
 
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
         val label = Label.unique
-        val p = Section(
-          LoadRegister(label, R1) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            EncodedString("Test").withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          LoadRegister(label, R1),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            Labeled(label, EncodedString("Test"))))
 
         p.encodeByte() should be(Hex.msb("e59f1000 00000000 74736554"))
       }
 
       "correctly encode a conditional indirect ldr instruction with an indirect reference to a labeled resource" in {
         val label = Label.unique
-        val p = Section(
-          EncodedString("Test").withLabel(label) ::
-            EncodedByteList(List.fill(4)(0x00.toByte)) ::
-            LoadRegister(label, R1, Condition.CarrySet) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedString("Test")),
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            LoadRegister(label, R1, Condition.CarrySet)))
 
         p.encodeByte() should be(Hex.msb("74736554 00000000 251F1010"))
       }
