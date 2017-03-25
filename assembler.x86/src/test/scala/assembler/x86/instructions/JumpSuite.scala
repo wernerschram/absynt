@@ -1,22 +1,17 @@
 package assembler.x86.instructions
 
 import org.scalatest.{Matchers, WordSpec}
-
-import assembler.Hex
+import assembler.{Designation, Encodable, EncodedByteList, Hex, Label, Labeled}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operations.X86Operation
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
-import assembler.Encodable
-import assembler.LabeledEncodable
-import assembler.Label
-import assembler.EncodedByteList
 
 class JumpSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "an Jump instruction" when {
     "in real mode" should {
@@ -182,11 +177,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          jump ::
-            EncodedByteList(List.fill(1)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          jump,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB 01")) }
       }
@@ -200,11 +194,11 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = JumpIfCountZero(label)
 
-        val p = Section(
-          jump ::
-            EncodedByteList(List.fill(1)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          jump,
+          EncodedByteList(List.fill(1)(0x00.toByte)),
+          Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte)))))
+
 
         jump.size()(p) should be(2)
 
@@ -215,11 +209,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)) ::
-            jump ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte))),
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            jump))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB FC")) }
       }
@@ -228,11 +221,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = JumpIfCountZero(label)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)) ::
-            jump ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte))),
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            jump))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E3 FC")) }
       }
@@ -241,11 +233,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          jump ::
-            EncodedByteList(List.fill(256)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          jump,
+            EncodedByteList(List.fill(256)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01")) }
       }
@@ -254,11 +245,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = JumpIfCountZero(label)
 
-        val p = Section(
-          jump ::
-            EncodedByteList(List.fill(256)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          jump,
+            EncodedByteList(List.fill(256)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         an[AssertionError] should be thrownBy { p.encodeByte() }
       }
@@ -267,11 +257,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(256)(0x00.toByte)) ::
-            jump ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte))),
+            EncodedByteList(List.fill(256)(0x00.toByte)),
+            jump))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 FC FE")) }
       }
@@ -282,13 +271,12 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(1)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
-            jump1 ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump1))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB F9")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 01")) }
@@ -300,13 +288,12 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(122)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
-            jump1 ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(122)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump1))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7A")) }
@@ -318,14 +305,13 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(123)(0x00.toByte)) ::
-            jump1 ::
-            EncodedByteList(List.fill(2)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(123)(0x00.toByte)),
+            jump1,
+            EncodedByteList(List.fill(2)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7F")) }
@@ -337,14 +323,13 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(123)(0x00.toByte)) ::
-            jump1 ::
-            EncodedByteList(List.fill(3)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(123)(0x00.toByte)),
+            jump1,
+            EncodedByteList(List.fill(3)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7E FF")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
@@ -356,14 +341,13 @@ class JumpSuite extends WordSpec with Matchers {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(
-          EncodedByteList(List.fill(2)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(123)(0x00.toByte)) ::
-            jump1 ::
-            EncodedByteList(List.fill(2)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label2) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(2)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(123)(0x00.toByte)),
+            jump1,
+            EncodedByteList(List.fill(2)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 80 00")) }
@@ -377,17 +361,16 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(60)(0x00.toByte)) ::
-            jump3 ::
-            EncodedByteList(List.fill(61)(0x00.toByte)) ::
-            jump1 ::
-            EncodedByteList(List.fill(2)(0x00.toByte)) ::
-            EncodedByteList(List.fill(62)(0x00.toByte)).withLabel(label2) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label3) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(60)(0x00.toByte)),
+            jump3,
+            EncodedByteList(List.fill(61)(0x00.toByte)),
+            jump1,
+            EncodedByteList(List.fill(2)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(62)(0x00.toByte))),
+            Labeled(label3, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("EB 80")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("EB 7F")) }
@@ -402,17 +385,16 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(60)(0x00.toByte)) ::
-            jump3 ::
-            EncodedByteList(List.fill(61)(0x00.toByte)) ::
-            jump1 ::
-            EncodedByteList(List.fill(2)(0x00.toByte)) ::
-            EncodedByteList(List.fill(63)(0x00.toByte)).withLabel(label2) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label3) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(1)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(60)(0x00.toByte)),
+            jump3,
+            EncodedByteList(List.fill(61)(0x00.toByte)),
+            jump1,
+            EncodedByteList(List.fill(2)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(63)(0x00.toByte))),
+            Labeled(label3, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7D FF")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
@@ -427,17 +409,16 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = Section(
-          EncodedByteList(List.fill(2)(0x00.toByte)).withLabel(label1) ::
-            jump2 ::
-            EncodedByteList(List.fill(60)(0x00.toByte)) ::
-            jump3 ::
-            EncodedByteList(List.fill(61)(0x00.toByte)) ::
-            jump1 ::
-            EncodedByteList(List.fill(2)(0x00.toByte)) ::
-            EncodedByteList(List.fill(62)(0x00.toByte)).withLabel(label2) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label3) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label1, EncodedByteList(List.fill(2)(0x00.toByte))),
+            jump2,
+            EncodedByteList(List.fill(60)(0x00.toByte)),
+            jump3,
+            EncodedByteList(List.fill(61)(0x00.toByte)),
+            jump1,
+            EncodedByteList(List.fill(2)(0x00.toByte)),
+            Labeled(label2, EncodedByteList(List.fill(62)(0x00.toByte))),
+            Labeled(label3, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump1") { jump1.encodeByte()(p) should be(Hex.lsb("E9 7C FF")) }
         withClue("Jump2") { jump2.encodeByte()(p) should be(Hex.lsb("E9 81 00")) }
@@ -579,11 +560,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)) ::
-            jump ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte))),
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            jump))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("EB FC")) }
       }
@@ -592,11 +572,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            EncodedByteList(List.fill(256)(0x00.toByte)) ::
-            jump ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte))),
+            EncodedByteList(List.fill(256)(0x00.toByte)),
+            jump))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 FA FE FF FF")) }
       }
@@ -605,11 +584,10 @@ class JumpSuite extends WordSpec with Matchers {
         val label = Label.unique
         val jump = Jump(label)
 
-        val p = Section(
-          jump ::
-            EncodedByteList(List.fill(256)(0x00.toByte)) ::
-            EncodedByteList(List.fill(1)(0x00.toByte)).withLabel(label) ::
-            Nil)
+        val p = Section(List[Designation[Encodable]](
+          jump,
+            EncodedByteList(List.fill(256)(0x00.toByte)),
+            Labeled(label, EncodedByteList(List.fill(1)(0x00.toByte)))))
 
         withClue("Jump") { jump.encodeByte()(p) should be(Hex.lsb("E9 00 01 00 00")) }
       }

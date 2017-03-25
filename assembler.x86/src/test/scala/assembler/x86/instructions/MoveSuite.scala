@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.Hex
+import assembler.{Designation, Encodable, Hex}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -13,7 +13,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "a Move instruction" when {
     "in real mode" should {

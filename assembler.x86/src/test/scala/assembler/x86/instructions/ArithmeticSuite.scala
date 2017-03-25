@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.Hex
+import assembler.{Designation, Encodable, Hex}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -12,7 +12,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ArithmeticSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   // ADC, ADD, AND, CMP, OR, SBC, SUB and XOR all inherits from BasicInteraction.
   // BasicInteraction is covered by the XOR tests, for the others there are some testcases to test the opcode.

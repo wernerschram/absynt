@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.Hex
+import assembler.{Designation, Encodable, Hex}
 import assembler.ListExtensions.ShortEncoder
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -12,7 +12,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class StackSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "an Push instruction" when {
     "in real mode" should {

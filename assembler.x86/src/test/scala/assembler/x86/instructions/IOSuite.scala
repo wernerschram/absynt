@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.Hex
+import assembler.{Designation, Encodable, Hex}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class IOSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[X86Operation])
+  implicit val page: Section = Section(List.empty[Designation[Encodable]])
 
   "an Input instruction" when {
     "in real mode" should {
