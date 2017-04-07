@@ -7,7 +7,7 @@ class Label
 object Label {
   implicit def apply(value: String): Label = StringLabel(value)
 
-  def unique: UniqueLabel = {
+  def unique: UniqueLabel = synchronized {
     lastId += 1
     UniqueLabel(lastId)
   }
