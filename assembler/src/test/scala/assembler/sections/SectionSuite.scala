@@ -6,7 +6,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers {
 
-  class MyReferencingInstructionOnPage(thisOperation: Encodable, label: Label)(implicit section: Section)
+  class MyReferencingInstructionOnPage(thisOperation: ReferencingInstruction, label: Label)(implicit section: Section)
     extends ReferencingInstructionOnPage(thisOperation, label) {
     override def minimumSize: Int = 5
 
@@ -17,9 +17,9 @@ class SectionSuite extends WordSpec with Matchers {
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
   }
 
-  class MyReferencingInstruction(label: Label) extends ReferencingInstruction {
+  class MyReferencingInstruction(override val target: Label) extends ReferencingInstruction {
     override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage =
-      new MyReferencingInstructionOnPage(this, label)
+      new MyReferencingInstructionOnPage(this, target)
 
     override def size()(implicit page: Section): Int = 5
   }
@@ -36,7 +36,7 @@ class SectionSuite extends WordSpec with Matchers {
         intermediate,
         Labeled(label, target)))
 
-      section.intermediateEncodables(reference, label) should be(intermediate :: Nil)
+      section.intermediateEncodables(reference) should be(intermediate :: Nil)
     }
 
     "provide the intermediate instructions between a label and a relative instruction" in {
@@ -50,7 +50,7 @@ class SectionSuite extends WordSpec with Matchers {
         intermediate,
         reference))
 
-      section.intermediateEncodables(reference, label) should be(target :: intermediate :: Nil)
+      section.intermediateEncodables(reference) should be(target :: intermediate :: Nil)
     }
 
     "know when a indirect reference is a forward reference" in {
@@ -62,7 +62,7 @@ class SectionSuite extends WordSpec with Matchers {
         reference,
         Labeled(label, target)))
 
-      section.isForwardReference(reference, label) should be(true)
+      section.isForwardReference(reference) should be(true)
     }
 
     "know when a indirect reference is a backward reference" in {
@@ -74,7 +74,7 @@ class SectionSuite extends WordSpec with Matchers {
         Labeled(label, target),
         reference))
 
-      section.isForwardReference(reference, label) should be(false)
+      section.isForwardReference(reference) should be(false)
     }
 
     "be able to encode itself" in {

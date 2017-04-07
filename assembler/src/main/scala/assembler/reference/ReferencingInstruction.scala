@@ -1,10 +1,12 @@
 package assembler.reference
 
-import assembler.Encodable
+import assembler.{Encodable, Label}
 import assembler.sections.Section
 
 trait ReferencingInstruction
     extends Encodable {
+  def target: Label
+
   def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage
 
   def minimumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.minimumEstimatedSize

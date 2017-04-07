@@ -1,5 +1,6 @@
 package assembler
 
+import assembler.reference.ReferencingInstruction
 import assembler.sections.{BaseAddress, Section}
 
 abstract class Application protected (val sections: List[Section]) extends Section {
@@ -27,9 +28,9 @@ class ARMBootSector(val initialSection: Section) extends Application (initialSec
 
   override val content: List[Designation[Encodable]] = initialSection.content
 
-  override def intermediateEncodables(from: Encodable, to: Label): List[Encodable] = initialSection.intermediateEncodables(from, to)
+  override def intermediateEncodables(from: ReferencingInstruction): List[Encodable] = initialSection.intermediateEncodables(from)
 
-  override def isForwardReference(from: Encodable, to: Label): Boolean = initialSection.isForwardReference(from, to)
+  override def isForwardReference(from: ReferencingInstruction): Boolean = initialSection.isForwardReference(from)
 
   override def size: Int = initialSection.size
 }

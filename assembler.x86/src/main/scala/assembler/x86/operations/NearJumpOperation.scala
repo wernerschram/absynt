@@ -3,22 +3,22 @@ package assembler.x86.operations
 import assembler.{Encodable, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
-import assembler.reference.ReferencingInstructionOnPage
+import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
 
-abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, label: Label)
+abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
-  extends ShortJumpOperation(shortOpcode, mnemonic, label) {
+  extends ShortJumpOperation(shortOpcode, mnemonic, target) {
 
-  override def createOperation(thisOperation: Encodable, destination: Label)
+  override def createOperation(thisOperation: ReferencingInstruction, destination: Label)
                               (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
     new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisOperation, destination)(section, processorMode)
 
   def encodeForLongPointer(pointer: NearPointerOperand)
                           (implicit page: Section): List[Byte]
 
-  class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisOperation: Encodable,
+  class ShortOrNearJumpInstructionOnPage(val shortOpcode: List[Byte], val longOpcode: List[Byte], thisOperation: ReferencingInstruction,
                                          destination: Label)(implicit page: Section, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage(thisOperation, destination) {
 

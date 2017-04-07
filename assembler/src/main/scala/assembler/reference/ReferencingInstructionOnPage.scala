@@ -5,7 +5,7 @@ import assembler.sections.Section
 import assembler.Label
 
 abstract class ReferencingInstructionOnPage (
-  private val thisOperation: Encodable,
+  private val thisOperation: ReferencingInstruction,
   private val destination: Label)(implicit section: Section) {
 
   def minimumSize: Int
@@ -15,9 +15,9 @@ abstract class ReferencingInstructionOnPage (
 
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
 
-  val forward: Boolean = section.isForwardReference(thisOperation, destination)
+  val forward: Boolean = section.isForwardReference(thisOperation)
 
-  private val intermediateInstructions = section.intermediateEncodables(thisOperation, destination)
+  private val intermediateInstructions = section.intermediateEncodables(thisOperation)
 
   private lazy val independentIntermediates: Seq[Encodable] = intermediateInstructions.filter {
     case _: ReferencingInstruction => false

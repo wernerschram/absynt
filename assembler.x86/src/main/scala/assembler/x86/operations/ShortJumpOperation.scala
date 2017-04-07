@@ -9,7 +9,8 @@ import assembler.{Encodable, Label}
 
 import scala.collection.concurrent.TrieMap
 
-abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String, label: Label)(implicit processorMode: ProcessorMode)
+abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String, override val target: Label)(implicit processorMode:
+ProcessorMode)
   extends Encodable() with ReferencingInstruction {
 
   val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
@@ -19,16 +20,16 @@ abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String,
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
-    pageMap.getOrElseUpdate(page, createOperation(this, label))
+    pageMap.getOrElseUpdate(page, createOperation(this, target))
   }
 
-  def createOperation(thisOperation: Encodable, destination: Label)
+  def createOperation(thisOperation: ReferencingInstruction, destination: Label)
                      (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
     new ShortJumpInstructionOnPage(shortOpcode, thisOperation, destination)(section, processorMode)
 
-  override def toString = s"$mnemonic $label"
+  override def toString = s"$mnemonic $target"
 
-  class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisOperation: Encodable, destination: Label)
+  class ShortJumpInstructionOnPage(val shortOpcode: List[Byte], thisOperation: ReferencingInstruction, destination: Label)
                                   (implicit page: Section, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage(thisOperation, destination) {
 

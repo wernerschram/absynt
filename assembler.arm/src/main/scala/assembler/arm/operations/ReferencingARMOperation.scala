@@ -1,6 +1,6 @@
 package assembler.arm.operations
 
-import assembler.{Encodable, Label}
+import assembler.Label
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition.Condition
@@ -9,7 +9,7 @@ import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage
 
 import scala.collection.concurrent.TrieMap
 
-abstract class ReferencingARMOperation[PointerType](val opcode: String, val label: Label, val condition: Condition,
+abstract class ReferencingARMOperation[PointerType](val opcode: String, override val target: Label, val condition: Condition,
                                                     newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
   extends Conditional with ReferencingInstruction {
 
@@ -20,16 +20,16 @@ abstract class ReferencingARMOperation[PointerType](val opcode: String, val labe
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getOrElseCreateInstruction()(implicit page: Section): ARMReferencingInstructionOnPage = {
-    pageMap.getOrElseUpdate(page, createOperation(this, label, page, processorMode))
+    pageMap.getOrElseUpdate(page, createOperation(this, target, page, processorMode))
   }
 
-  def createOperation(thisOperation: Encodable, destination: Label, section: Section, processorMode: ProcessorMode):
+  def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section, processorMode: ProcessorMode):
   ARMReferencingInstructionOnPage =
     new ARMReferencingInstructionOnPage(thisOperation, destination)(section, processorMode)
 
-  override def toString = s"${super.toString()} $label"
+  override def toString = s"${super.toString()} $target"
 
-  class ARMReferencingInstructionOnPage(thisOperation: Encodable, destination: Label)
+  class ARMReferencingInstructionOnPage(thisOperation: ReferencingInstruction, destination: Label)
                                        (implicit page: Section, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage(thisOperation, destination) {
 
