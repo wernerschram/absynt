@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Designation, Encodable}
+import assembler.{Designation, Encodable, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operations.ARMOperation
 import assembler.sections.Section
@@ -17,6 +17,8 @@ class ARMInstructionSuite extends WordSpec with Matchers {
         val opcode = "my"
 
         override def encodeWord()(implicit page: Section) = 4
+
+        val label: Label = Label.NoLabel
       }
 
       "return the size of the instruction" in {

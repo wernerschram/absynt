@@ -11,6 +11,7 @@ trait EncodedByteList extends Encodable {
 }
 
 object EncodedByteList {
-  def apply(bytesValue: List[Byte]) = new EncodedByteList { val bytes: List[Byte] = bytesValue }
+  def apply(bytesValue: List[Byte])(implicit newLabel: Label) = new EncodedByteList { val label = newLabel; val bytes: List[Byte] =
+    bytesValue }
 }
 

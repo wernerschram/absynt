@@ -1,11 +1,8 @@
 package assembler.x86.operations
 
-import assembler.{Designation, Encodable}
+import assembler.{Designation, Encodable, Label}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions.Interrupt
-import assembler.x86.operands.Register
-import assembler.x86.operands.Register.AX
 import org.scalatest.{Matchers, WordSpec}
 
 class X86OperationSuite extends WordSpec with Matchers {
@@ -23,6 +20,8 @@ class X86OperationSuite extends WordSpec with Matchers {
         override def operands = Nil
 
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
+
+        override val label: Label = Label.NoLabel
       }
 
       "return the size of the instruction" in {

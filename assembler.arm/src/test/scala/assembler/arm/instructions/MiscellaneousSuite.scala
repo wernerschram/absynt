@@ -1,9 +1,9 @@
 package assembler.arm.instructions
 
-import assembler.{Designation, Encodable, Hex}
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.{ARMOperation, Effect, ExecutionMode, InterruptDisableFlags}
+import assembler.arm.operations.{Effect, ExecutionMode, InterruptDisableFlags}
 import assembler.sections.Section
+import assembler.{Designation, Encodable, Hex}
 import org.scalatest.{Matchers, WordSpec}
 
 class MiscellaneousSuite extends WordSpec with Matchers {

@@ -7,9 +7,9 @@ import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
 
-abstract class NearJumpOperation(shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
+abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
-  extends ShortJumpOperation(shortOpcode, mnemonic, target) {
+  extends ShortJumpOperation(label, shortOpcode, mnemonic, target) {
 
   override def createOperation(thisOperation: ReferencingInstruction, destination: Label)
                               (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =

@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Designation, Encodable, Hex}
+import assembler.{Designation, Encodable, Hex, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._

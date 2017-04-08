@@ -1,10 +1,10 @@
 package assembler.arm.instructions
 
-import assembler.{Designation, Encodable, Hex}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operations.{ARMOperation, UpdateMode}
+import assembler.arm.operations.UpdateMode
 import assembler.sections.Section
+import assembler.{Designation, Encodable, Hex, Label}
 import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreMultipleSuite extends WordSpec with Matchers {

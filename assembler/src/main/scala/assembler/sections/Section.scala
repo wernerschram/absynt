@@ -21,7 +21,7 @@ trait Section extends Encodable {
   override def encodeByte()(implicit section: Section): List[Byte] = encodeByte
 }
 
-class SimpleSection(val content: List[Designation[Encodable]]) extends Section {
+class SimpleSection(val content: List[Designation[Encodable]])(implicit val label: Label) extends Section {
   def intermediateEncodables(from: ReferencingInstruction): List[Encodable] = {
     val trimLeft = content
       .dropWhile(x => !(x.target == from || (x.isLabeled && x.label == from.target)))

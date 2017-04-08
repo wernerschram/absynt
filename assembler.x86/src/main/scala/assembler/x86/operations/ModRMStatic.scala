@@ -1,11 +1,12 @@
 package assembler.x86.operations
 
+import assembler.Label
 import assembler.sections.Section
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class ModRMStatic(val operandRM: ModRMEncodableOperand,
+class ModRMStatic(val label: Label, val operandRM: ModRMEncodableOperand,
                   override val code: List[Byte],
                   val rValue: Byte,
                   override val mnemonic: String,

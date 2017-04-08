@@ -1,5 +1,6 @@
 package assembler.arm.operations
 
+import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.RightRotateImmediate
 import assembler.arm.operands.registers._
@@ -7,7 +8,7 @@ import assembler.sections.Section
 
 import scala.language.implicitConversions
 
-class MoveFromStatusRegister(override val opcode: String, source: StatusRegister, destination: GeneralRegister,
+class MoveFromStatusRegister(val label: Label, override val opcode: String, source: StatusRegister, destination: GeneralRegister,
                              override val condition: Condition)
   extends Conditional {
   override def encodeWord()(implicit page: Section): Int =
@@ -29,15 +30,17 @@ object Fields extends Enumeration {
   }
 }
 
-class MoveToStatusRegister private(override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,
+class MoveToStatusRegister private(val label: Label, override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,
                                    override val condition: Condition, val sourceString: String, val sourceValue: Int)
   extends Conditional {
 
-  def this(opcode: String, source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
-    this(opcode, destination, fields, condition, source.toString, source.registerCode)
+  def this(label: Label, opcode: String, source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet,
+           condition: Condition) =
+    this(label, opcode, destination, fields, condition, source.toString, source.registerCode)
 
-  def this(opcode: String, source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
-    this(opcode, destination, fields, condition, source.toString, source.encode)
+  def this(label: Label, opcode: String, source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet,
+           condition: Condition) =
+    this(label, opcode, destination, fields, condition, source.toString, source.encode)
 
   override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | fields.toBitMask(0).toInt | sourceValue)

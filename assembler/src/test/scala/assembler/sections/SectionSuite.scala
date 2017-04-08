@@ -17,7 +17,7 @@ class SectionSuite extends WordSpec with Matchers {
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
   }
 
-  class MyReferencingInstruction(override val target: Label) extends ReferencingInstruction {
+  class MyReferencingInstruction(override val target: Label)(implicit val label: Label) extends ReferencingInstruction {
     override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage =
       new MyReferencingInstructionOnPage(this, target)
 

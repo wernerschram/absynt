@@ -5,12 +5,16 @@ import scala.language.implicitConversions
 class Label
 
 object Label {
+  implicit val label = NoLabel
+
   implicit def apply(value: String): Label = StringLabel(value)
 
   def unique: UniqueLabel = synchronized {
     lastId += 1
     UniqueLabel(lastId)
   }
+
+  def NoLabel: Label = new Label()
 
   private var lastId = 0
 }

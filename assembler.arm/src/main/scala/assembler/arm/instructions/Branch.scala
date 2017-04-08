@@ -9,44 +9,44 @@ import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARM
 import assembler.sections.Section
 
 class Branch(code: Byte, val opcode: String) {
-  def apply(destination: RelativeA32Pointer, condition: Condition = Always)(implicit processorMode: ProcessorMode): BranchImmediate =
-    Immediate(destination, condition)
+  def apply(destination: RelativeA32Pointer, condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): BranchImmediate =
+    Immediate(label, destination, condition)
 
-  def apply(label: Label)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMOperation[RelativeA32Pointer](opcode, label, Always, RelativeA32Pointer.apply) {
+  def apply(targetLabel: Label)(implicit processorMode: ProcessorMode, label: Label) =
+    new ReferencingARMOperation[RelativeA32Pointer](label, opcode, targetLabel, Always, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
-        Immediate(destination, Always).encodeWord()
+        Immediate(label, destination, Always).encodeWord()
     }
 
-  private def Immediate(destination: RelativeA32Pointer, condition: Condition = Always) =
-    new BranchImmediate(destination, condition, code, opcode)
+  private def Immediate(label: Label, destination: RelativeA32Pointer, condition: Condition = Always) =
+    new BranchImmediate(label, destination, condition, code, opcode)
 
-  def apply(label: Label, condition: Condition)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMOperation[RelativeA32Pointer](opcode, label, condition, RelativeA32Pointer.apply) {
+  def apply(targetLabel: Label, condition: Condition)(implicit processorMode: ProcessorMode, label: Label) =
+    new ReferencingARMOperation[RelativeA32Pointer](label, opcode, targetLabel, condition, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
-        Immediate(destination, condition).encodeWord()
+        Immediate(label, destination, condition).encodeWord()
     }
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode) =
-    Register(destination, condition)
+  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label) =
+    Register(label, destination, condition)
 
-  private def Register(destination: GeneralRegister, condition: Condition = Always) =
-    new BranchRegister(destination, condition, registerCode, opcode)
+  private def Register(label: Label, destination: GeneralRegister, condition: Condition = Always) =
+    new BranchRegister(label, destination, condition, registerCode, opcode)
 }
 
 class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String) extends BranchExchange(registerCode, opcode) {
-  def apply(destination: RelativeThumbPointer)(implicit processorMode: ProcessorMode) =
-    Immediate(destination, Unpredictable)
+  def apply(destination: RelativeThumbPointer)(implicit processorMode: ProcessorMode, label: Label) =
+    Immediate(label, destination, Unpredictable)
 
-  private def Immediate(destination: RelativeThumbPointer, condition: Condition = Always) =
-    new BranchImmediate(destination, condition, immediateCode, opcode)
+  private def Immediate(label: Label, destination: RelativeThumbPointer, condition: Condition = Always) =
+    new BranchImmediate(label, destination, condition, immediateCode, opcode)
 
-  def apply(label: Label)(implicit processorMode: ProcessorMode) =
-    new ReferencingARMOperation[RelativeThumbPointer](opcode, label, Unpredictable, RelativeThumbPointer.apply) {
+  def apply(targetLabel: Label)(implicit processorMode: ProcessorMode, label: Label) =
+    new ReferencingARMOperation[RelativeThumbPointer](label, opcode, targetLabel, Unpredictable, RelativeThumbPointer.apply) {
       override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: Section): Int =
-        Immediate(destination, Unpredictable).encodeWord()
+        Immediate(label, destination, Unpredictable).encodeWord()
     }
 }
 

@@ -1,5 +1,6 @@
 package assembler.arm.operations
 
+import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{ImmediateShiftValue, ShiftRegisterWithShift}
@@ -151,9 +152,8 @@ object LoadStoreMiscellaneousOperation {
 
 }
 
-class LoadStore(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                offset: LoadStoreOffset,
-                addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
+class LoadStore(val label: Label, val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+                offset: LoadStoreOffset, addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
   extends Conditional {
   override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() |
@@ -165,8 +165,8 @@ class LoadStore(val opcode: String, val condition: Condition, register: GeneralR
 
 }
 
-class LoadStoreMiscelaneous(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                            offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType,
+class LoadStoreMiscelaneous(val label: Label, val opcode: String, val condition: Condition, register: GeneralRegister,
+                            baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType,
                             operation: LoadStoreMiscellaneousOperation.LoadStoreMiscellaneousOperation)
   extends Conditional {
 

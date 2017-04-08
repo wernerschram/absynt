@@ -9,8 +9,9 @@ import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage
 
 import scala.collection.concurrent.TrieMap
 
-abstract class ReferencingARMOperation[PointerType](val opcode: String, override val target: Label, val condition: Condition,
-                                                    newPointer: (Int) => PointerType)(implicit processorMode: ProcessorMode)
+abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode: String, override val target: Label,
+                                                    val condition: Condition, newPointer: (Int) => PointerType)
+                                                   (implicit processorMode: ProcessorMode)
   extends Conditional with ReferencingInstruction {
 
   val pageMap = new TrieMap[Section, ARMReferencingInstructionOnPage]

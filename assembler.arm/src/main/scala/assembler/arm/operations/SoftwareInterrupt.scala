@@ -1,9 +1,10 @@
 package assembler.arm.operations
 
+import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.sections.Section
 
-class SoftwareInterrupt(override val opcode: String, interrupt: Int, condition: Condition)
+class SoftwareInterrupt(val label: Label, override val opcode: String, interrupt: Int, condition: Condition)
   extends ARMOperation() {
   override def encodeWord()(implicit page: Section): Int = (condition.value << 28) | 0x0f000000 | interrupt
 

@@ -1,5 +1,6 @@
 package assembler.arm.operations
 
+import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.sections.Section
@@ -13,8 +14,8 @@ object LoadStoreMultipleDirection {
 
 }
 
-class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Condition, val registers: List[GeneralRegister],
-                        val baseRegister: GeneralRegister, val addressingMode: UpdateMode, val opcode: String)
+class LoadStoreMultiple(val label: Label, direction: LoadStoreMultipleDirection, val condition: Condition, val registers:
+                        List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, val opcode: String)
   extends Conditional {
   assume(registers.nonEmpty)
   assume(baseRegister != GeneralRegister.R15)
@@ -53,7 +54,8 @@ trait UserModeRegisters extends LoadStoreMultiple {
   override def registerString = s"${super.registerString}^"
 }
 
-class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean, val opcode: String)
+class ReturnFromException(val label: Label, baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean,
+                          val opcode: String)
   extends ARMOperation() {
   override def encodeWord()(implicit page: Section): Int =
     0xf8100a00 |

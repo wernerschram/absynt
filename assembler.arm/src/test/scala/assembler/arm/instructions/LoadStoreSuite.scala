@@ -83,21 +83,21 @@ class LoadStoreSuite extends WordSpec with Matchers {
 
 
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
-        val label = Label.unique
+        val targetLabel = Label.unique
         val p = Section(List[Designation[Encodable]](
-          LoadRegister(label, R1),
+          LoadRegister(targetLabel, R1),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Labeled(label, EncodedString("Test"))))
+            Labeled(targetLabel, EncodedString("Test"))))
 
         p.encodeByte() should be(Hex.msb("e59f1000 00000000 74736554"))
       }
 
       "correctly encode a conditional indirect ldr instruction with an indirect reference to a labeled resource" in {
-        val label = Label.unique
+        val targetLabel = Label.unique
         val p = Section(List[Designation[Encodable]](
-          Labeled(label, EncodedString("Test")),
+          Labeled(targetLabel, EncodedString("Test")),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            LoadRegister(label, R1, Condition.CarrySet)))
+            LoadRegister(targetLabel, R1, Condition.CarrySet)))
 
         p.encodeByte() should be(Hex.msb("74736554 00000000 251F1010"))
       }

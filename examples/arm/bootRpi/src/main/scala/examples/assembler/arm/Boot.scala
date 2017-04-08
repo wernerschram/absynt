@@ -45,13 +45,13 @@ object Boot extends App {
 
   createFile()
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit processorMode: ProcessorMode): List[Designation[Encodable]] = {
-    val label = Label.unique
+  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit processorMode: ProcessorMode, label: Label): List[Designation[Encodable]] = {
+    val targetLabel = Label.unique
 
     Move.forConstant(delay, register) :::
     List[Designation[Encodable]](
-      Labeled(label, Subtract.setFlags(register, 2.toByte, register)),
-      Branch(label, NotEqual)
+      Labeled(targetLabel, Subtract.setFlags(register, 2.toByte, register)),
+      Branch(targetLabel, NotEqual)
     )
   }
 
@@ -61,7 +61,6 @@ object Boot extends App {
     val loop: Label = "Loop"
     val putString: Label = "PutString"
     val text: Label = "text"
-    val label: Label = "bla"
 
     val page: Section = Section(
       // Disable UART0

@@ -1,9 +1,8 @@
 package assembler.x86.instructions
 
-import assembler.{Designation, Encodable, Hex}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
-import assembler.x86.operations.X86Operation
+import assembler.{Designation, Encodable, Hex, Label}
 import org.scalatest.{Matchers, WordSpec}
 
 class InterruptFlagSuite extends WordSpec with Matchers {

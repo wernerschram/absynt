@@ -1,13 +1,12 @@
 package assembler.x86.instructions
 
-import assembler.{Designation, Encodable, Hex}
+import assembler.{Designation, Encodable, Hex, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
-import assembler.x86.operations.X86Operation
 import org.scalatest.{Matchers, WordSpec}
 
 class ArithmeticSuite extends WordSpec with Matchers {

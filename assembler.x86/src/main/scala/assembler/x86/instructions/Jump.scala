@@ -10,13 +10,13 @@ import assembler.{Encodable, Label}
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
-  def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode): Static with NearPointerOperation = {
+  def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode, label: Label): Static with NearPointerOperation = {
     assume(nearPointer.operandByteSize == ValueSize.Byte)
     Rel8(nearPointer)
   }
 
-  def apply(label: Label)(implicit processorMode: ProcessorMode): Encodable =
-    new ShortJumpOperation(shortOpcode, mnemonic, label) {
+  def apply(targetLabel: Label)(implicit processorMode: ProcessorMode, label: Label): Encodable =
+    new ShortJumpOperation(label, shortOpcode, mnemonic, targetLabel) {
 
       def encodeForShortPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = {
         assume(nearPointer.operandByteSize == ValueSize.Byte)
@@ -24,8 +24,8 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
       }
     }
 
-  protected def Rel8(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) =
-    new Static(shortOpcode, mnemonic) with NearPointerOperation {
+  protected def Rel8(nearPointer: NearPointer)(implicit processorMode: ProcessorMode, label: Label) =
+    new Static(label, shortOpcode, mnemonic) with NearPointerOperation {
       override val pointer: NearPointer = nearPointer
     }
 }
@@ -33,7 +33,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
 abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: List[Byte], mnemonic: String)
   extends ShortRelativeJump(shortOpcode, mnemonic) {
 
-  override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode): Static with NearPointerOperation =
+  override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode, label: Label): Static with NearPointerOperation =
     nearPointer.operandByteSize match {
       case ValueSize.Byte =>
         super.apply(nearPointer)
@@ -41,8 +41,8 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
         Rel16(nearPointer)
     }
 
-  private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) =
-    new Static(longOpcode, mnemonic) with NearPointerOperation {
+  private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode, label: Label) =
+    new Static(label, longOpcode, mnemonic) with NearPointerOperation {
       override val pointer: NearPointer = nearPointer
 
       override def validate(): Unit = {
@@ -54,8 +54,8 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
       }
     }
 
-  override def apply(label: Label)(implicit processorMode: ProcessorMode) =
-    new NearJumpOperation(shortOpcode, longOpcode, mnemonic, label) {
+  override def apply(targetLabel: Label)(implicit processorMode: ProcessorMode, label: Label) =
+    new NearJumpOperation(label, shortOpcode, longOpcode, mnemonic, targetLabel) {
       override def encodeForShortPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = Rel8(nearPointer).encodeByte()
 
       override def encodeForLongPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = Rel16(nearPointer).encodeByte()
@@ -64,11 +64,11 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
 
 object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-  def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+  def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode, label: Label) =
     RM16(operand)
 
-  private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
+  private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode, label: Label) =
+    new ModRMStatic(label, operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
       assume((operandRM, processorMode) match {
         case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Long)
           if fixed.operandByteSize != ValueSize.QuadWord => false
@@ -78,13 +78,13 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
       })
     }
 
-  private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
-    new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
+  private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode, label: Label) =
+    new Static(label, 0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
       override def pointer: FarPointer = farPointer
     }
 
-  private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
+  private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode, label: Label) =
+    new ModRMStatic(label, operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
       assume((operandRM, processorMode) match {
         case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected)
           if fixed.operandByteSize == ValueSize.QuadWord => false
@@ -93,10 +93,10 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   object Far {
-    def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
+    def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode, label: Label) =
       Ptr1616(farPointer)
 
-    def apply(pointer: MemoryLocation)(implicit processorMode: ProcessorMode) =
+    def apply(pointer: MemoryLocation)(implicit processorMode: ProcessorMode, label: Label) =
       M1616(pointer)
   }
 

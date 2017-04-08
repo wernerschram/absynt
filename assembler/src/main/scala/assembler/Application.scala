@@ -22,7 +22,7 @@ abstract class Application protected (val sections: List[Section]) extends Secti
   }
 }
 
-class ARMBootSector(val initialSection: Section) extends Application (initialSection :: Nil) {
+class ARMBootSector(val initialSection: Section)(implicit val label: Label) extends Application (initialSection :: Nil) {
 
   override def encodeByte: List[Byte] = initialSection.encodeByte
 

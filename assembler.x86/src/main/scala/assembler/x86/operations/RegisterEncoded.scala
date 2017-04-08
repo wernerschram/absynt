@@ -1,9 +1,11 @@
 package assembler.x86.operations
 
+import assembler.Label
 import assembler.x86.operands.{GeneralPurposeRegister, Operand}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register: RegisterType,
+class RegisterEncoded[RegisterType <: GeneralPurposeRegister](val label: Label,
+                                                              register: RegisterType,
                                                               rawCode: List[Byte],
                                                               override val mnemonic: String,
                                                               override val includeRexW: Boolean = true)

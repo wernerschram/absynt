@@ -9,8 +9,8 @@ import assembler.{Encodable, Label}
 
 import scala.collection.concurrent.TrieMap
 
-abstract class ShortJumpOperation(val shortOpcode: List[Byte], mnemonic: String, override val target: Label)(implicit processorMode:
-ProcessorMode)
+abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
+                                 (implicit processorMode: ProcessorMode)
   extends Encodable() with ReferencingInstruction {
 
   val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
