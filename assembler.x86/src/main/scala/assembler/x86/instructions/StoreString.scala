@@ -11,13 +11,13 @@ object StoreString {
   implicit val mnemonic = "stos"
 
   def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
-           (implicit processorMode: ProcessorMode, label: Label): Static with ReversedOperands =
+           (implicit label: Label, processorMode: ProcessorMode): Static with ReversedOperands =
     (register, destination) match {
       case (Register.AL, _) => Static8(destination)
       case _ => Static16(register, destination)
     }
 
-  private def Static8(destination: RegisterMemoryLocation.DIReference)(implicit processorMode: ProcessorMode, label: Label) =
+  private def Static8(destination: RegisterMemoryLocation.DIReference)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAA.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands: List[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
@@ -27,7 +27,7 @@ object StoreString {
     }
 
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
-                      (implicit processorMode: ProcessorMode, label: Label) =
+                      (implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAB.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands: List[ModRMEncodableOperand] = destination :: register :: Nil
 
@@ -36,7 +36,7 @@ object StoreString {
       override def addressSize: OperandSize = destination.addressSize
     }
 
-  private def RepStatic8(destination: RegisterMemoryLocation.DIReference)(implicit processorMode: ProcessorMode, label: Label) =
+  private def RepStatic8(destination: RegisterMemoryLocation.DIReference)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAA.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands: List[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
@@ -46,7 +46,7 @@ object StoreString {
     }
 
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
-                         (implicit processorMode: ProcessorMode, label: Label) =
+                         (implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAB.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands: List[ModRMEncodableOperand] = destination :: register :: Nil
 
@@ -57,7 +57,7 @@ object StoreString {
 
   object Repeat {
     def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
-             (implicit processorMode: ProcessorMode, label: Label): Static with Repeated with ReversedOperands =
+             (implicit label: Label, processorMode: ProcessorMode): Static with Repeated with ReversedOperands =
       (register, destination) match {
         case (Register.AL, _) => RepStatic8(destination)
         case _ => RepStatic16(register, destination)

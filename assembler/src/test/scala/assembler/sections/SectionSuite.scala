@@ -29,12 +29,12 @@ class SectionSuite extends WordSpec with Matchers {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
       val intermediate = EncodedByteList(List.fill(5)(0))
-      val target = EncodedByteList(0.toByte :: Nil)
+      val target = EncodedByteList(0.toByte :: Nil)(label)
 
-      val section = Section(List[Designation[Encodable]](
+      val section = Section(List[Encodable](
         reference,
         intermediate,
-        Labeled(label, target)))
+        target))
 
       section.intermediateEncodables(reference) should be(intermediate :: Nil)
     }
@@ -43,10 +43,10 @@ class SectionSuite extends WordSpec with Matchers {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
       val intermediate = EncodedByteList(List.fill(5)(0))
-      val target = EncodedByteList(0.toByte :: Nil)
+      val target = EncodedByteList(0.toByte :: Nil)(label)
 
-      val section = Section(List[Designation[Encodable]](
-        Labeled(label, target),
+      val section = Section(List[Encodable](
+        target,
         intermediate,
         reference))
 
@@ -56,11 +56,11 @@ class SectionSuite extends WordSpec with Matchers {
     "know when a indirect reference is a forward reference" in {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
-      val target = EncodedByteList(0.toByte :: Nil)
+      val target = EncodedByteList(0.toByte :: Nil)(label)
 
-      val section = Section(List[Designation[Encodable]](
+      val section = Section(List[Encodable](
         reference,
-        Labeled(label, target)))
+        target))
 
       section.isForwardReference(reference) should be(true)
     }
@@ -68,17 +68,17 @@ class SectionSuite extends WordSpec with Matchers {
     "know when a indirect reference is a backward reference" in {
       val label = Label.unique
       val reference = new MyReferencingInstruction(label)
-      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil)(label)
 
-      val section = Section(List[Designation[Encodable]](
-        Labeled(label, target),
+      val section = Section(List[Encodable](
+        target,
         reference))
 
       section.isForwardReference(reference) should be(false)
     }
 
     "be able to encode itself" in {
-      val section = Section(List[Designation[Encodable]](
+      val section = Section(List[Encodable](
         EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
         EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)))
 
@@ -91,7 +91,7 @@ class SectionSuite extends WordSpec with Matchers {
       val one = EncodedByteList(List.fill(oneSize)(1))
       val two = EncodedByteList(List.fill(twoSize)(2))
 
-      val section = Section(List[Designation[Encodable]](
+      val section = Section(List[Encodable](
         one,
         two))
 
@@ -101,11 +101,11 @@ class SectionSuite extends WordSpec with Matchers {
     "correctly provide the section relative address of a label " in {
       val label = Label.unique
       val intermediate = EncodedByteList(List.fill(5)(0))
-      val target = EncodedByteList(0.toByte :: Nil) //.withLabel(label)
+      val target = EncodedByteList(0.toByte :: Nil)(label)
 
-      val section = Section(List[Designation[Encodable]](
+      val section = Section(List[Encodable](
         intermediate,
-          Labeled(label, target)))
+        target))
 
       section.getRelativeAddress(target) should be(5)
     }

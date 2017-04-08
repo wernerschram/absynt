@@ -1,13 +1,13 @@
 package assembler.x86.operations
 
-import assembler.{Designation, Encodable, Label}
+import assembler.{Encodable, Label}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import org.scalatest.{Matchers, WordSpec}
 
 class X86OperationSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Designation[Encodable]])
+  implicit val page: Section = Section(List.empty[Encodable])
 
   "an X86 instruction" when {
     "in protected mode" should {
@@ -21,7 +21,7 @@ class X86OperationSuite extends WordSpec with Matchers {
 
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
 
-        override val label: Label = Label.NoLabel
+        override val label: Label = Label.noLabel
       }
 
       "return the size of the instruction" in {

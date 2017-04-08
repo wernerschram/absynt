@@ -45,12 +45,25 @@ object Boot extends App {
 
   createFile()
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit processorMode: ProcessorMode, label: Label): List[Designation[Encodable]] = {
+  def Labeled(label: Label, encodable:(Label) => Encodable): Unit = {
+
+  }
+
+  def x(a: Int=  5)(b: Int) = a + b
+  def y(a: Int)(b: Int=  5) = a + b
+
+  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
+    val x1: Int = x(1)(2)
+    val x2: Int = x()(2)
+
+    val y1: Int = y(1)(2)
+    val y2: Int = y(1)()
+
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) :::
-    List[Designation[Encodable]](
-      Labeled(targetLabel, Subtract.setFlags(register, 2.toByte, register)),
+    List[Encodable](
+      { implicit val label = targetLabel; Subtract.setFlags(register, 2.toByte, register) },
       Branch(targetLabel, NotEqual)
     )
   }
@@ -58,42 +71,32 @@ object Boot extends App {
   def createFile(): Unit = {
     implicit val processorMode = ProcessorMode.A32
 
-    val loop: Label = "Loop"
-    val putString: Label = "PutString"
-    val text: Label = "text"
+    val loop: Label = Label.unique
+    val putString: Label = Label.unique
+    val text: Label = Label.unique
 
     val page: Section = Section(
       // Disable UART0
       Move.forConstant(UART0.Base, R0) :::
       Move.forConstant(0, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.CR)
-      ) :::
+      StoreRegister(R1, R0, UART0.CR) ::
       //
       // Disable pull up/down for all GPIO pins & delay for 150 cycles.
       Move.forConstant(GPIO.Base, R2) :::
       //
-      List[Designation[Encodable]](
-        StoreRegister(R1, R2, GPIO.GPPUD)
-      ) :::
+      StoreRegister(R1, R2, GPIO.GPPUD) ::
       naiveDelay(150, R1) :::
       //
       // Disable pull up/down for pin 14,15 & delay for 150 cycles.
       Move.forConstant(3 << 14, R3) :::
-      List[Designation[Encodable]](
-        StoreRegister(R3, R2, GPIO.GPPUDCLK0)
-      ) :::
+      StoreRegister(R3, R2, GPIO.GPPUDCLK0) ::
       naiveDelay(150, R1) :::
       //
       // Write 0 to GPPUDCLK0 to make it take effect.
-      List[Designation[Encodable]](
-        StoreRegister(R1, R2, GPIO.GPPUDCLK0)
-      ) :::
+      StoreRegister(R1, R2, GPIO.GPPUDCLK0) ::
       // Clear pending interrupts.
       Move.forConstant(0x7FF, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.ICR)
-      ) :::
+      StoreRegister(R1, R0, UART0.ICR) ::
       //
       // Set integer & fractional part of baud rate.
       // Divider = UART_CLOCK/(16 * Baud)
@@ -103,45 +106,35 @@ object Boot extends App {
       // Divider = 3000000 / (16 * 115200) = 1.627 = ~1.
       // Fractional part register = (.627 * 64) + 0.5 = 40.6 = ~40.
       Move.forConstant(1, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.IBRD)
-      ) :::
+      StoreRegister(R1, R0, UART0.IBRD) ::
       //
       // Enable FIFO & 8 bit data transmissio (1 stop bit, no parity).
       Move.forConstant(40, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.FBRD)
-      ) :::
+      StoreRegister(R1, R0, UART0.FBRD) ::
       //
       // Mask all interrupts.
       Move.forConstant(0x70, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.LCRH)
-      ) :::
+      StoreRegister(R1, R0, UART0.LCRH) ::
       Move.forConstant(0x7F1, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.IMSC)
-      ) :::
+      StoreRegister(R1, R0, UART0.IMSC) ::
       //
       // Enable UART0, receive & transfer part of UART.
       Move.forConstant(0x7F1, R1) :::
-      List[Designation[Encodable]](
-        StoreRegister(R1, R0, UART0.CR),
-        Move(0.toByte, R6),
-        Labeled(putString, LoadRegister(R4, R0, UART0.FR)),
-        Compare(R4, 0x20.toByte),
-        Branch(putString, NotEqual),
-        //
-        // TODO: get R6th character from string into R5
-        LoadRegister(text, R5),
-        StoreRegister(R5, R0, UART0.CR),
-        Add(R6, 1.toByte, R6),
-        Compare(R6, 12.toByte),
-        Branch(putString, NotEqual),
-        Labeled(text, EncodedString("Hello World!"))
-      )
-    )
+      StoreRegister(R1, R0, UART0.CR) ::
+      Move(0.toByte, R6) ::
+      { implicit val label = putString; LoadRegister(R4, R0, UART0.FR)} ::
+      Compare(R4, 0x20.toByte) ::
+      Branch(putString, NotEqual) ::
+      //
+      // TODO: get R6th character from string into R5
+      LoadRegister(text, R5) ::
+      StoreRegister(R5, R0, UART0.CR) ::
+      Add(R6, 1.toByte, R6) ::
+      Compare(R6, 12.toByte) ::
+      Branch(putString, NotEqual) ::
+      { implicit val label = text; EncodedString("Hello World!") } :: Nil
 
+    )
 
     val out = new FileOutputStream("c:\\temp\\test.arm")
     page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }

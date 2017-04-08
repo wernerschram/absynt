@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Designation, Encodable, Hex, Label}
+import assembler.{Encodable, Hex, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Designation[Encodable]])
+  implicit val page: Section = Section(List.empty[Encodable])
 
   "an AddCarry instruction" when {
     "in a32 mode" should {
@@ -105,7 +105,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
 
       "correctly encode adc r4, r5, 0x0" in {
         //        e2a54000        adc     r4, r5, #0
-        AddCarry.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2a54000"))
+        AddCarry.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2a54000"))
       }
 
       "correctly encode adc r4, r5, 0xffffffff" in {
@@ -113,7 +113,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //        e2844cff        add     r4, r4, #65280  ; 0xff00
         //        e28448ff        add     r4, r4, #16711680       ; 0xff0000
         //        e28444ff        add     r4, r4, #-16777216      ; 0xff000000
-        AddCarry.forConstant(R5, 0xffffffff, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2a540ff e2844cff e28448ff e28444ff"))
+        AddCarry.forConstant(R5, 0xffffffff, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2a540ff e2844cff e28448ff e28444ff"))
       }
 
     }
@@ -131,14 +131,14 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly encode add r4, r5, 0x0" in {
-        Add.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Nil)
+        Add.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
 
       "correctly encode add r4, r5, 0x10011001" in {
         //        e2854001        add     r4, r5, #1
         //        e2844a11        add     r4, r4, #69632  ; 0x11000
         //        e2844201        add     r4, r4, #268435456      ; 0x10000000
-        Add.forConstant(R5, 0x10011001, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2854001 e2844a11 e2844201"))
+        Add.forConstant(R5, 0x10011001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2854001 e2844a11 e2844201"))
       }
 
       "correctly represent add r9, r10, r10, lsr #2 as a string" in {
@@ -159,7 +159,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
 
       "correctly encode and r4, r5, 0x0" in {
         //        e2054000        and     r4, r5, #0
-        And.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2054000"))
+        And.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2054000"))
       }
 
       "correctly encode and r4, r5, 0x55555555" in {
@@ -167,13 +167,13 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //        e3c44caa        bic     r4, r4, #43520  ; 0xaa00
         //        e3c448aa        bic     r4, r4, #11141120       ; 0xaa0000
         //        e3c444aa        bic     r4, r4, #-1442840576    ; 0xaa000000
-        And.forConstant(R5, 0x55555555, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448aa e3c444aa"))
+        And.forConstant(R5, 0x55555555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448aa e3c444aa"))
       }
 
       "correctly encode and r4, r5, 0xFFFF5555" in {
         //        e3c540aa        bic     r4, r5, #170    ; 0xaa
         //        e3c44caa        bic     r4, r4, #43520  ; 0xaa00
-        And.forConstant(R5, 0xFFFF5555, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa"))
+        And.forConstant(R5, 0xFFFF5555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa"))
       }
 
       "correctly encode and r4, r5, 0x00005555" in {
@@ -181,7 +181,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //        e3c44caa        bic     r4, r4, #43520  ; 0xaa00
         //        e3c448ff        bic     r4, r4, #16711680       ; 0xff0000
         //        e3c444ff        bic     r4, r4, #-16777216      ; 0xff000000
-        And.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448ff e3c444ff"))
+        And.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c540aa e3c44caa e3c448ff e3c444ff"))
       }
 
       "correctly represent and r9, r10, r10, lsr #2 as a string" in {
@@ -200,13 +200,13 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly encode bic r4, r5, 0x0" in {
-        BitClear.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Nil)
+        BitClear.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
 
       "correctly encode bic r4, r5, 0x00005555" in {
         //        e3c54055        bic     r4, r5, #85     ; 0x55
         //        e3c44c55        bic     r4, r4, #21760  ; 0x5500
-        BitClear.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3c54055 e3c44c55"))
+        BitClear.forConstant(R5, 0x00005555, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3c54055 e3c44c55"))
       }
 
       "correctly represent bic r9, r10, r10, lsr #2 as a string" in {
@@ -261,11 +261,11 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly encode mov r4, 0x20200000" in {
         //        e3a04602        mov     r4, #2097152    ; 0x200000
         //        e3844202        orr     r4, r4, #536870912      ; 0x20000000
-        Move.forConstant(0x20200000, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3a04602 e3844202"))
+        Move.forConstant(0x20200000, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04602 e3844202"))
       }
 
       "correctly encode mov r4, 0x0" in {
-        Move.forConstant(0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3a04000"))
+        Move.forConstant(0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3a04000"))
       }
 
       "correctly represent movscs r2, r1 as a string" in {
@@ -286,11 +286,11 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly encode eor r4, r5, 0x10000001" in {
         //        e2254001        eor     r4, r5, #1
         //        e2244201        eor     r4, r4, #268435456      ; 0x10000000
-        ExclusiveOr.forConstant(R5, 0x10000001, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2254001 e2244201"))
+        ExclusiveOr.forConstant(R5, 0x10000001, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2254001 e2244201"))
       }
 
       "correctly encode eor r4, r5, 0x0" in {
-        ExclusiveOr.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Nil)
+        ExclusiveOr.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
 
       "correctly represent eor r9, r10, r10, lsr #2 as a string" in {
@@ -329,11 +329,11 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //    e3844b15        orr     r4, r4, #21504  ; 0x5400
         //    e384478d        orr     r4, r4, #36962304       ; 0x2340000
         //    e3844201        orr     r4, r4, #268435456      ; 0x10000000
-        Or.forConstant(R5, 0x12345678, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e3854f9e e3844b15 e384478d e3844201"))
+        Or.forConstant(R5, 0x12345678, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e3854f9e e3844b15 e384478d e3844201"))
       }
 
       "correctly encode orr r4, r5, 0x0" in {
-        Or.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Nil)
+        Or.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
 
       "correctly represent orr r9, r10, r10, lsr #2 as a string" in {
@@ -355,12 +355,12 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //        e2654cee        rsb     r4, r5, #60928  ; 0xee00
         //        e28448ff        add     r4, r4, #16711680       ; 0xff0000
         //        e2844103        add     r4, r4, #-1073741824    ; 0xc0000000
-        ReverseSubtract.forConstant(R5, 0xC0FFEE00, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2654cee e28448ff e2844103"))
+        ReverseSubtract.forConstant(R5, 0xC0FFEE00, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2654cee e28448ff e2844103"))
       }
 
       "correctly encode rsb r4, r5, 0x0" in {
         //        e2654000        rsb     r4, r5, #0
-        ReverseSubtract.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2654000"))
+        ReverseSubtract.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2654000"))
       }
 
       "correctly represent rsb r9, r10, r10, lsr #2 as a string" in {
@@ -382,12 +382,12 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //          e2e54e0f        rsc     r4, r5, #15, 28 ; 0xf0
         //          e2844a0f        add     r4, r4, #61440  ; 0xf000
         //          e284420f        add     r4, r4, #-268435456     ; 0xf0000000
-        ReverseSubtractCarry.forConstant(R5, 0xF000F0F0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2e54e0f e2844a0f e284420f"))
+        ReverseSubtractCarry.forConstant(R5, 0xF000F0F0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2e54e0f e2844a0f e284420f"))
       }
 
       "correctly encode rsc r4, r5, 0x0" in {
         //        e2e54000        rsc     r4, r5, #0
-        ReverseSubtractCarry.forConstant(R5, 0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2e54000"))
+        ReverseSubtractCarry.forConstant(R5, 0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2e54000"))
       }
 
 
@@ -411,12 +411,12 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //        e2c54e0f        sbc     r4, r5, #15, 28 ; 0xf0
         //        e2444a0f        sub     r4, r4, #61440  ; 0xf000
         //        e244420f        sub     r4, r4, #-268435456     ; 0xf0000000
-        SubtractCarry.forConstant(R5, 0xF000F0F0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2c54e0f e2444a0f e244420f"))
+        SubtractCarry.forConstant(R5, 0xF000F0F0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2c54e0f e2444a0f e244420f"))
       }
 
       "correctly encode sbc r4, r5, 0x0" in {
         //        e2c54000        sbc     r4, r5, #0
-        SubtractCarry.forConstant(R5, 0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2c54000"))
+        SubtractCarry.forConstant(R5, 0, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2c54000"))
       }
 
       "correctly represent sbc r9, r10, r10, lsr #2 as a string" in {
@@ -436,7 +436,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly encode sub r4, r5, 0x0" in {
-        Subtract.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Nil)
+        Subtract.forConstant(R5, 0x0, R4).flatMap { instruction => instruction.encodeByte() } should be(Nil)
       }
 
       "correctly encode sub r4, r5, 0x88888888" in {
@@ -444,7 +444,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         //        e2444b22        sub     r4, r4, #34816  ; 0x8800
         //        e2444722        sub     r4, r4, #8912896        ; 0x880000
         //        e2444322        sub     r4, r4, #-2013265920    ; 0x88000000
-        Subtract.forConstant(R5, 0x88888888, R4).flatMap { instruction => instruction.target.encodeByte() } should be(Hex.msb("e2454f22 e2444b22 e2444722 e2444322"))
+        Subtract.forConstant(R5, 0x88888888, R4).flatMap { instruction => instruction.encodeByte() } should be(Hex.msb("e2454f22 e2444b22 e2444722 e2444322"))
       }
 
       "correctly represent sub r9, r10, r10, lsr #2 as a string" in {

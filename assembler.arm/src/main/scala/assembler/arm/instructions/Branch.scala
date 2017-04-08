@@ -9,10 +9,11 @@ import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARM
 import assembler.sections.Section
 
 class Branch(code: Byte, val opcode: String) {
-  def apply(destination: RelativeA32Pointer, condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): BranchImmediate =
+  def apply(destination: RelativeA32Pointer, condition: Condition = Always)
+           (implicit label: Label, processorMode: ProcessorMode):  BranchImmediate =
     Immediate(label, destination, condition)
 
-  def apply(targetLabel: Label)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeA32Pointer](label, opcode, targetLabel, Always, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
         Immediate(label, destination, Always).encodeWord()
@@ -21,7 +22,7 @@ class Branch(code: Byte, val opcode: String) {
   private def Immediate(label: Label, destination: RelativeA32Pointer, condition: Condition = Always) =
     new BranchImmediate(label, destination, condition, code, opcode)
 
-  def apply(targetLabel: Label, condition: Condition)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(targetLabel: Label, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeA32Pointer](label, opcode, targetLabel, condition, RelativeA32Pointer.apply) {
       override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
         Immediate(label, destination, condition).encodeWord()
@@ -29,7 +30,7 @@ class Branch(code: Byte, val opcode: String) {
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit label: Label, processorMode: ProcessorMode) =
     Register(label, destination, condition)
 
   private def Register(label: Label, destination: GeneralRegister, condition: Condition = Always) =
@@ -37,13 +38,13 @@ class BranchExchange(registerCode: Byte, val opcode: String) {
 }
 
 class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String) extends BranchExchange(registerCode, opcode) {
-  def apply(destination: RelativeThumbPointer)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(destination: RelativeThumbPointer)(implicit label: Label, processorMode: ProcessorMode) =
     Immediate(label, destination, Unpredictable)
 
   private def Immediate(label: Label, destination: RelativeThumbPointer, condition: Condition = Always) =
     new BranchImmediate(label, destination, condition, immediateCode, opcode)
 
-  def apply(targetLabel: Label)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeThumbPointer](label, opcode, targetLabel, Unpredictable, RelativeThumbPointer.apply) {
       override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: Section): Int =
         Immediate(label, destination, Unpredictable).encodeWord()

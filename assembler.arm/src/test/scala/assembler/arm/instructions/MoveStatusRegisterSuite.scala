@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Designation, Encodable, Hex}
+import assembler.{Encodable, Hex}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.registers.StatusRegister._
@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MoveStatusRegisterSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Designation[Encodable]])
+  implicit val page: Section = Section(List.empty[Encodable])
 
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {

@@ -9,19 +9,19 @@ object ChangeProcessorState {
   val opcode: String = "cps"
 
   def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode)
-           (implicit processorMode: ProcessorMode, label: Label) =
+           (implicit label: Label, processorMode: ProcessorMode) =
     ProcessorState(label, effect, interruptDisableFlags, mode)
 
   private def ProcessorState(label: Label, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet, mode: ExecutionMode) =
     new ProcessorState(label, code, opcode, effect, interruptDisableFlags, mode)
 
-  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet)(implicit label: Label, processorMode: ProcessorMode) =
     ProcessorState(label, effect, interruptDisableFlags)
 
   private def ProcessorState(label: Label, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
     new ProcessorState(label, code, opcode, effect, interruptDisableFlags)
 
-  def apply(mode: ExecutionMode)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(mode: ExecutionMode)(implicit label: Label, processorMode: ProcessorMode) =
     ProcessorState(label, mode)
 
   private def ProcessorState(label: Label, mode: ExecutionMode) =

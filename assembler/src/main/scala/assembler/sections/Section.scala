@@ -6,9 +6,9 @@ import assembler.reference.ReferencingInstruction
 import scala.language.implicitConversions
 
 trait Section extends Encodable {
-  val content: List[Designation[Encodable]]
+  val content: List[Encodable]
   def getRelativeAddress(encodable: Encodable): Int =
-    content.takeWhile(current => current.target != encodable).map(current => current.target.size()(this)).sum
+    content.takeWhile(current => current != encodable).map(current => current.size()(this)).sum
 
   def intermediateEncodables(from: ReferencingInstruction): List[Encodable]
 
@@ -21,26 +21,26 @@ trait Section extends Encodable {
   override def encodeByte()(implicit section: Section): List[Byte] = encodeByte
 }
 
-class SimpleSection(val content: List[Designation[Encodable]])(implicit val label: Label) extends Section {
+class SimpleSection(val content: List[Encodable])(implicit val label: Label) extends Section {
   def intermediateEncodables(from: ReferencingInstruction): List[Encodable] = {
     val trimLeft = content
-      .dropWhile(x => !(x.target == from || (x.isLabeled && x.label == from.target)))
+      .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
     val trimRight = trimLeft.tail
-      .takeWhile(x => !(x.target == from || (x.isLabeled && x.label == from.target)))
+      .takeWhile(x => !(x == from || x.label.matches(from.target)))
 
-    if (trimLeft.head.target == from)
-      trimRight.map { x => x.target }
+    if (trimLeft.head == from)
+      trimRight
     else
-      trimLeft.head.target :: trimRight.map { x => x.target }
+      trimLeft.head :: trimRight
   }
 
   override def isForwardReference(from: ReferencingInstruction): Boolean = {
-    val firstInstruction = content.find(x => x.target == from || (x.isLabeled && x.label == from.target)).get
-    !(firstInstruction.isLabeled && firstInstruction.label == from.target)
+    val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
+    !firstInstruction.label.matches(from.target)
   }
 
-  lazy val encodeByte: List[Byte] = content.flatMap { x => x.target.encodeByte()(this) }
+  lazy val encodeByte: List[Byte] = content.flatMap { x => x.encodeByte()(this) }
 
   lazy val size: Int = encodeByte.length
 }
@@ -52,8 +52,8 @@ trait BaseAddress {
 }
 
 object Section {
-  def apply(content: List[Designation[Encodable]]): Section = new SimpleSection(content)
-  def apply(content: List[Designation[Encodable]], sectionBaseAddress: Int): Section = new SimpleSection(content) with BaseAddress {
+  def apply(content: List[Encodable])(implicit label: Label): Section = new SimpleSection(content)
+  def apply(content: List[Encodable], sectionBaseAddress: Int)(implicit label: Label): Section = new SimpleSection(content) with BaseAddress {
     val baseAddress: Int = sectionBaseAddress
   }
 }

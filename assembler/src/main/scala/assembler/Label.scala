@@ -2,10 +2,12 @@ package assembler
 
 import scala.language.implicitConversions
 
-class Label
+abstract class Label {
+  def matches(label: Label): Boolean
+}
 
 object Label {
-  implicit val label = NoLabel
+  implicit val label = noLabel
 
   implicit def apply(value: String): Label = StringLabel(value)
 
@@ -14,32 +16,21 @@ object Label {
     UniqueLabel(lastId)
   }
 
-  def NoLabel: Label = new Label()
+  def noLabel: Label = NoLabel()
 
   private var lastId = 0
 }
 
+case class NoLabel private() extends Label {
+  def matches(label: Label): Boolean = false
+}
+
 case class StringLabel private (value: String) extends Label {
   override def toString: String = value
+
+  def matches(label: Label): Boolean = this.equals(label)
 }
 
-case class UniqueLabel private (id: Int) extends Label
-
-abstract class Designation[TargetType >: Encodable] {
-  def label: Label
-  def target: TargetType
-  def isLabeled: Boolean
-}
-
-case class Labeled[TargetType >: Encodable](override val label: Label, override val target: TargetType) extends Designation[TargetType] {
-  override def isLabeled: Boolean = true
-}
-
-case class Unlabeled[TargetType >: Encodable](t: TargetType) extends Designation[TargetType] {
-  override def label: Nothing =
-    throw new NoSuchElementException("head of empty labeled list")
-
-  val target: TargetType = t
-
-  override def isLabeled: Boolean = false
+case class UniqueLabel private (id: Int) extends Label {
+  def matches(label: Label): Boolean = this.equals(label)
 }
