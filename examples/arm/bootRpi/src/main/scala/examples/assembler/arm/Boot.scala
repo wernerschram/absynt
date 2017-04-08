@@ -43,25 +43,11 @@ object Boot extends App {
     val TDR: Short = 0x8C
   }
 
-  createFile()
-
-  def Labeled(label: Label, encodable:(Label) => Encodable): Unit = {
-
-  }
-
-  def x(a: Int=  5)(b: Int) = a + b
-  def y(a: Int)(b: Int=  5) = a + b
 
   private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
-    val x1: Int = x(1)(2)
-    val x2: Int = x()(2)
-
-    val y1: Int = y(1)(2)
-    val y2: Int = y(1)()
-
     val targetLabel = Label.unique
 
-    Move.forConstant(delay, register) :::
+    Move.forConstant(delay, register) ::
     List[Encodable](
       { implicit val label = targetLabel; Subtract.setFlags(register, 2.toByte, register) },
       Branch(targetLabel, NotEqual)
@@ -77,25 +63,25 @@ object Boot extends App {
 
     val page: Section = Section(
       // Disable UART0
-      Move.forConstant(UART0.Base, R0) :::
-      Move.forConstant(0, R1) :::
+      Move.forConstant(UART0.Base, R0) ::
+      Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       //
       // Disable pull up/down for all GPIO pins & delay for 150 cycles.
-      Move.forConstant(GPIO.Base, R2) :::
+      Move.forConstant(GPIO.Base, R2) ::
       //
       StoreRegister(R1, R2, GPIO.GPPUD) ::
       naiveDelay(150, R1) :::
       //
       // Disable pull up/down for pin 14,15 & delay for 150 cycles.
-      Move.forConstant(3 << 14, R3) :::
+      Move.forConstant(3 << 14, R3) ::
       StoreRegister(R3, R2, GPIO.GPPUDCLK0) ::
       naiveDelay(150, R1) :::
       //
       // Write 0 to GPPUDCLK0 to make it take effect.
       StoreRegister(R1, R2, GPIO.GPPUDCLK0) ::
       // Clear pending interrupts.
-      Move.forConstant(0x7FF, R1) :::
+      Move.forConstant(0x7FF, R1) ::
       StoreRegister(R1, R0, UART0.ICR) ::
       //
       // Set integer & fractional part of baud rate.
@@ -105,21 +91,21 @@ object Boot extends App {
       //
       // Divider = 3000000 / (16 * 115200) = 1.627 = ~1.
       // Fractional part register = (.627 * 64) + 0.5 = 40.6 = ~40.
-      Move.forConstant(1, R1) :::
+      Move.forConstant(1, R1) ::
       StoreRegister(R1, R0, UART0.IBRD) ::
       //
       // Enable FIFO & 8 bit data transmissio (1 stop bit, no parity).
-      Move.forConstant(40, R1) :::
+      Move.forConstant(40, R1) ::
       StoreRegister(R1, R0, UART0.FBRD) ::
       //
       // Mask all interrupts.
-      Move.forConstant(0x70, R1) :::
+      Move.forConstant(0x70, R1) ::
       StoreRegister(R1, R0, UART0.LCRH) ::
-      Move.forConstant(0x7F1, R1) :::
+      Move.forConstant(0x7F1, R1) ::
       StoreRegister(R1, R0, UART0.IMSC) ::
       //
       // Enable UART0, receive & transfer part of UART.
-      Move.forConstant(0x7F1, R1) :::
+      Move.forConstant(0x7F1, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       Move(0.toByte, R6) ::
       { implicit val label = putString; LoadRegister(R4, R0, UART0.FR)} ::
@@ -132,6 +118,7 @@ object Boot extends App {
       Add(R6, 1.toByte, R6) ::
       Compare(R6, 12.toByte) ::
       Branch(putString, NotEqual) ::
+      { implicit val label = Label.unique; Branch(label) } ::
       { implicit val label = text; EncodedString("Hello World!") } :: Nil
 
     )
@@ -142,5 +129,7 @@ object Boot extends App {
     out.flush()
     //arm-eabi-objdump -b binary -marm -D test.arm
   }
+
+  createFile()
 
 }
