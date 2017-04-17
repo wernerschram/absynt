@@ -43,7 +43,6 @@ object Boot extends App {
     val TDR: Short = 0x8C
   }
 
-
   private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
     val targetLabel = Label.unique
 
@@ -54,10 +53,11 @@ object Boot extends App {
     )
   }
 
+  private def halt()(implicit label: Label, processorMode: ProcessorMode) = { implicit val label = Label.unique; Branch(label) }
+
   def createFile(): Unit = {
     implicit val processorMode = ProcessorMode.A32
 
-    val loop: Label = Label.unique
     val putString: Label = Label.unique
     val text: Label = Label.unique
 
@@ -118,18 +118,18 @@ object Boot extends App {
       Add(R6, 1.toByte, R6) ::
       Compare(R6, 12.toByte) ::
       Branch(putString, NotEqual) ::
-      { implicit val label = Label.unique; Branch(label) } ::
+      halt() ::
       { implicit val label = text; EncodedString("Hello World!") } :: Nil
-
     )
 
     val out = new FileOutputStream("c:\\temp\\test.arm")
     page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
     out.write(page.encodeByte()(page).toArray)
     out.flush()
-    //arm-eabi-objdump -b binary -marm -D test.arm
   }
 
   createFile()
 
+  // To decompile the output download the gcc cross compiler for arm and execute:
+  //   arm-eabi-objdump -b binary -marm -D test.arm
 }

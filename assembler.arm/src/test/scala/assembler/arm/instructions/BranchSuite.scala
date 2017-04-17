@@ -56,9 +56,10 @@ class BranchSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val p = Section(List[Encodable](
           EncodedByteList(List.fill(8)(0x00.toByte)),
-          { implicit val label =  targetLabel; Branch(targetLabel)}))
+          { implicit val label =  targetLabel; Branch(targetLabel)},
+          EncodedByteList(List.fill(8)(0x00.toByte))))
 
-        p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFE"))
+        p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {

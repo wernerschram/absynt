@@ -22,9 +22,13 @@ trait Section extends Encodable {
 }
 
 class SimpleSection(val content: List[Encodable])(implicit val label: Label) extends Section {
+
   def intermediateEncodables(from: ReferencingInstruction): List[Encodable] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
+
+    if (trimLeft.head == from && trimLeft.head.label.matches(from.target))  // reference to self
+      return Nil
 
     val trimRight = trimLeft.tail
       .takeWhile(x => !(x == from || x.label.matches(from.target)))
