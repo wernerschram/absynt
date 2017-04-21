@@ -10,7 +10,7 @@ import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage
 import scala.collection.concurrent.TrieMap
 
 abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode: String, override val target: Label,
-                                                    val condition: Condition, newPointer: (Int) => PointerType)
+                                                    val condition: Condition, newPointer: (Int, Section) => PointerType)
                                                    (implicit processorMode: ProcessorMode)
   extends Conditional with ReferencingInstruction {
 
@@ -45,9 +45,9 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
 
     def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: Section): PointerType = {
       if (forward) {
-        newPointer(distance - 4)
+        newPointer(distance - 4, page)
       } else {
-        newPointer(-distance - 8)
+        newPointer(-distance - 8, page)
       }
     }
   }

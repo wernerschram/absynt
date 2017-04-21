@@ -1,5 +1,7 @@
 package assembler.arm.operands
 
+import assembler.sections.Section
+
 import scala.language.implicitConversions
 
 sealed class RelativePointer(val displacement: Int) extends Operand {

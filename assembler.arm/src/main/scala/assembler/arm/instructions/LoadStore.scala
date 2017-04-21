@@ -30,13 +30,14 @@ class LoadStoreRegister(
     ImmedByte(label, condition, register, baseRegister, offset, addressingType)
 
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode) =
-    new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, Always, value => LoadStoreOffset(value.toByte)) {
+    new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, Always, (value, page) => LoadStoreOffset(value.toByte)) {
       override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: Section): Int =
         ImmedWord(label, Always, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
     }
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
-    new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, condition, value => LoadStoreOffset(value.toByte)) {
+    new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, condition, (value, page) => LoadStoreOffset(value
+      .toByte)) {
       override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: Section): Int =
         ImmedWord(label, condition, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
     }
