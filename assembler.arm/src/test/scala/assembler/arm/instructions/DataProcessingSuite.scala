@@ -221,7 +221,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode cmn r0, r1" in {
-        CompareNegative(R0, R1).encodeByte should be(Hex.msb("e1600001"))
+        CompareNegative(R0, R1).encodeByte should be(Hex.msb("e1700001"))
       }
 
       "correctly represent cmn r0, r1 as a string" in {
@@ -236,7 +236,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode cmp r2, r0, r1" in {
-        Compare(R0, R1).encodeByte should be(Hex.msb("e1400001"))
+        Compare(R0, R1).encodeByte should be(Hex.msb("e1500001"))
       }
 
       "correctly represent cmp r0, r1 as a string" in {
@@ -459,7 +459,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode teq r0, r1" in {
-        TestEquivalence(R0, R1).encodeByte should be(Hex.msb("e1200001"))
+        TestEquivalence(R0, R1).encodeByte should be(Hex.msb("e1300001"))
       }
 
       "correctly represent teq r10, r10, lsr #2 as a string" in {
@@ -475,7 +475,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       implicit val processorMode = ProcessorMode.A32
 
       "correctly encode tst r2, r0, r1" in {
-        Test(R0, R1).encodeByte should be(Hex.msb("e1000001"))
+        Test(R0, R1).encodeByte should be(Hex.msb("e1100001"))
       }
 
       "correctly represent tst r10, r10, lsr #2 as a string" in {

@@ -19,7 +19,7 @@ class DataProcessingNoDestinationInstruction(val label: Label, val opcode: Strin
                                              register1: GeneralRegister, operand2: Shifter)
   extends Conditional {
   override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | (code << 21) | (register1.registerCode << 16) | operand2.encode
+    super.encodeWord() | 0x00100000 | (code << 21) | (register1.registerCode << 16) | operand2.encode
 
   override def toString = s"${super.toString()} ${register1.toString}, ${operand2.toString}"
 }
