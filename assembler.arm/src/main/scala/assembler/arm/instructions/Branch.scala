@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.Label
+import assembler.{Encodable, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
@@ -15,8 +15,8 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeA32Pointer](label, opcode, targetLabel, Always, (value, page) => RelativeA32Pointer(value)) {
-      override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
-        Immediate(label, destination, Always).encodeWord()
+      override def encodableForDistance(destination: RelativeA32Pointer)(implicit page: Section): Encodable =
+        Immediate(label, destination, Always)
     }
 
   private def Immediate(label: Label, destination: RelativeA32Pointer, condition: Condition = Always) =
@@ -24,8 +24,8 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeA32Pointer](label, opcode, targetLabel, condition, (value, page) => RelativeA32Pointer(value)) {
-      override def encodeWordForDistance(destination: RelativeA32Pointer)(implicit page: Section): Int =
-        Immediate(label, destination, condition).encodeWord()
+      override def encodableForDistance(destination: RelativeA32Pointer)(implicit page: Section): Encodable =
+        Immediate(label, destination, condition)
     }
 }
 
@@ -46,8 +46,8 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[RelativeThumbPointer](label, opcode, targetLabel, Unpredictable, (value, page) => RelativeThumbPointer(value)) {
-      override def encodeWordForDistance(destination: RelativeThumbPointer)(implicit page: Section): Int =
-        Immediate(label, destination, Unpredictable).encodeWord()
+      override def encodableForDistance(destination: RelativeThumbPointer)(implicit page: Section): Encodable =
+        Immediate(label, destination, Unpredictable)
     }
 }
 

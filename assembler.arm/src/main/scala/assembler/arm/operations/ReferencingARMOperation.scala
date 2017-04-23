@@ -1,6 +1,6 @@
 package assembler.arm.operations
 
-import assembler.Label
+import assembler.{Encodable, Label}
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition.Condition
@@ -16,7 +16,7 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
 
   val pageMap = new TrieMap[Section, ARMReferencingInstructionOnPage]
 
-  def encodeWordForDistance(destination: PointerType)(implicit page: Section): Int
+  def encodableForDistance(destination: PointerType)(implicit page: Section): Encodable
 
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
@@ -41,7 +41,7 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
     override def getSizeForDistance(forward: Boolean, distance: Int): Int = branchSize
 
     override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] =
-      encodeWordForDistance(getPointerForDistance(forward, distance)).encodeLittleEndian
+      ReferencingARMOperation.this.encodableForDistance(getPointerForDistance(forward, distance)).encodeByte
 
     def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: Section): PointerType = {
       if (forward) {

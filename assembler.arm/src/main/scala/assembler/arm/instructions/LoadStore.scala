@@ -1,6 +1,7 @@
 package assembler.arm.instructions
 
-import assembler.Label
+import assembler.{Encodable, Label}
+import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
@@ -31,15 +32,15 @@ class LoadStoreRegister(
 
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, Always, (value, page) => LoadStoreOffset(value.toByte)) {
-      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: Section): Int =
-        ImmedWord(label, Always, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
+      override def encodableForDistance(source: LoadStoreOffset)(implicit page: Section): Encodable =
+        ImmedWord(label, Always, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, condition, (value, page) => LoadStoreOffset(value
       .toByte)) {
-      override def encodeWordForDistance(source: LoadStoreOffset)(implicit page: Section): Int =
-        ImmedWord(label, condition, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal).encodeWord()
+      override def encodableForDistance(source: LoadStoreOffset)(implicit page: Section): Encodable =
+        ImmedWord(label, condition, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   object UserMode {
