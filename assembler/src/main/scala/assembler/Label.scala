@@ -7,7 +7,7 @@ abstract class Label {
 }
 
 object Label {
-  implicit val label = noLabel
+  implicit val label: Label = noLabel
 
   implicit def apply(value: String): Label = StringLabel(value)
 

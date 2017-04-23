@@ -11,5 +11,6 @@ trait EncodedString extends Encodable {
 }
 
 object EncodedString {
-  def apply(stringValue: String)(implicit newLabel: Label) = new EncodedString { val label = newLabel; val string: String = stringValue }
+  def apply(stringValue: String)(implicit newLabel: Label) = new EncodedString { val label: Label = newLabel; val string: String =
+    stringValue }
 }

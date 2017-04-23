@@ -138,7 +138,7 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label) = ???
+              (implicit processorMode: ProcessorMode, label: Label): Encodable = ???
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
