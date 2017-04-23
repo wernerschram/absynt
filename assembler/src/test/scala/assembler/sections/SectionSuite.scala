@@ -6,22 +6,15 @@ import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers {
 
-  class MyReferencingInstructionOnPage(thisOperation: ReferencingInstruction, label: Label)(implicit section: Section)
-    extends ReferencingInstructionOnPage(thisOperation, label) {
-
-    override def getSizeForDistance(forward: Boolean, distance: Int): Int = 5
-
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
-  }
-
   class MyReferencingInstruction(override val target: Label)(implicit val label: Label) extends ReferencingInstruction {
     override def minimumSize: Int = 5
     override def maximumSize: Int = 5
 
     override def size()(implicit page: Section): Int = 5
 
-    override def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section): ReferencingInstructionOnPage =
-      new MyReferencingInstructionOnPage(this, target)(section)
+    override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = 5
+
+    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
   }
 
   "a Section" when {

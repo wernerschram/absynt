@@ -4,7 +4,7 @@ import assembler.{Encodable, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition.Condition
 import assembler.sections.Section
-import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage}
+import assembler.reference.ReferencingInstruction
 
 abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode: String, override val target: Label,
                                                     val condition: Condition, newPointer: (Int, Section) => PointerType)
@@ -19,28 +19,19 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
 
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
-  override def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section):
-  ARMReferencingInstructionOnPage =
-    new ARMReferencingInstructionOnPage(thisOperation, destination)(section, processorMode)
+  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
+    encodableForDistance(getPointerForDistance(forward, distance)).size
 
-  override def toString = s"${super.toString()} $target"
+  override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] =
+    ReferencingARMOperation.this.encodableForDistance(getPointerForDistance(forward, distance)).encodeByte
 
-  class ARMReferencingInstructionOnPage(thisOperation: ReferencingInstruction, destination: Label)
-                                       (implicit page: Section, processorMode: ProcessorMode)
-    extends ReferencingInstructionOnPage(thisOperation, destination) {
-
-    override def getSizeForDistance(forward: Boolean, distance: Int): Int = branchSize
-
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] =
-      ReferencingARMOperation.this.encodableForDistance(getPointerForDistance(forward, distance)).encodeByte
-
-    def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: Section): PointerType = {
-      if (forward) {
-        newPointer(distance - 4, page)
-      } else {
-        newPointer(-distance - 8, page)
-      }
+  def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: Section): PointerType = {
+    if (forward) {
+      newPointer(distance - 4, page)
+    } else {
+      newPointer(-distance - 8, page)
     }
   }
+  override def toString = s"${super.toString()} $target"
 
 }

@@ -4,13 +4,9 @@ import assembler.Encodable
 import assembler.sections.Section
 import assembler.Label
 
-abstract class ReferencingInstructionOnPage (
+class ReferencingInstructionOnPage (
   private val thisOperation: ReferencingInstruction,
   private val destination: Label)(implicit section: Section) {
-
-  def getSizeForDistance(forward: Boolean, distance: Int): Int
-
-  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
 
   val forward: Boolean = section.isForwardReference(thisOperation)
 
@@ -37,8 +33,8 @@ abstract class ReferencingInstructionOnPage (
 
   lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
-  def minimumEstimatedSize: Int = getSizeForDistance(forward, minimumDistance)
-  def maximumEstimatedSize: Int = getSizeForDistance(forward, maximumDistance)
+  def minimumEstimatedSize: Int = thisOperation.getSizeForDistance(forward, minimumDistance)
+  def maximumEstimatedSize: Int = thisOperation.getSizeForDistance(forward, maximumDistance)
 
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize.isDefined
@@ -57,7 +53,7 @@ abstract class ReferencingInstructionOnPage (
     var newAssumption = minimumEstimatedSize
     while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
-      newAssumption = getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
+      newAssumption = thisOperation.getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
     }
     newAssumption
   }
@@ -73,5 +69,5 @@ abstract class ReferencingInstructionOnPage (
     _estimatedSize.get
   }
 
-  lazy val encodeByte: List[Byte] = encodeForDistance(forward, actualDistance)
+  lazy val encodeByte: List[Byte] = thisOperation.encodeForDistance(forward, actualDistance)
 }
