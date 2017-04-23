@@ -1,7 +1,6 @@
 package assembler.arm.operations
 
 import assembler.{Encodable, Label}
-import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition.Condition
 import assembler.sections.Section
@@ -13,6 +12,10 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
                                                     val condition: Condition, newPointer: (Int, Section) => PointerType)
                                                    (implicit processorMode: ProcessorMode)
   extends Conditional with ReferencingInstruction {
+
+  val branchSize = 4
+  override val minimumSize: Int = branchSize
+  override val maximumSize: Int = branchSize
 
   val pageMap = new TrieMap[Section, ARMReferencingInstructionOnPage]
 
@@ -33,10 +36,6 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
   class ARMReferencingInstructionOnPage(thisOperation: ReferencingInstruction, destination: Label)
                                        (implicit page: Section, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage(thisOperation, destination) {
-
-    val branchSize = 4
-    override val minimumSize: Int = branchSize
-    override val maximumSize: Int = branchSize
 
     override def getSizeForDistance(forward: Boolean, distance: Int): Int = branchSize
 

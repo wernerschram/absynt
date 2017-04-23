@@ -8,9 +8,6 @@ class SectionSuite extends WordSpec with Matchers {
 
   class MyReferencingInstructionOnPage(thisOperation: ReferencingInstruction, label: Label)(implicit section: Section)
     extends ReferencingInstructionOnPage(thisOperation, label) {
-    override def minimumSize: Int = 5
-
-    override def maximumSize: Int = 5
 
     override def getSizeForDistance(forward: Boolean, distance: Int): Int = 5
 
@@ -18,6 +15,9 @@ class SectionSuite extends WordSpec with Matchers {
   }
 
   class MyReferencingInstruction(override val target: Label)(implicit val label: Label) extends ReferencingInstruction {
+    override def minimumSize: Int = 5
+    override def maximumSize: Int = 5
+
     override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage =
       new MyReferencingInstructionOnPage(this, target)
 

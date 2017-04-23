@@ -7,6 +7,9 @@ trait ReferencingInstruction
     extends Encodable {
   def target: Label
 
+  def minimumSize: Int
+  def maximumSize: Int
+
   def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage
 
   def minimumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.minimumEstimatedSize

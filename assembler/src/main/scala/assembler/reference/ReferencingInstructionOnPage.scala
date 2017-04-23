@@ -8,9 +8,6 @@ abstract class ReferencingInstructionOnPage (
   private val thisOperation: ReferencingInstruction,
   private val destination: Label)(implicit section: Section) {
 
-  def minimumSize: Int
-  def maximumSize: Int
-
   def getSizeForDistance(forward: Boolean, distance: Int): Int
 
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
@@ -33,10 +30,10 @@ abstract class ReferencingInstructionOnPage (
     independentIntermediates.map { instruction => instruction.size }.sum
 
   private def minimumDistance = independentDistance + dependentIntermediates.map(instruction =>
-    if (instruction.isEstimated) instruction.size else minimumSize).sum
+    if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum
 
   private def maximumDistance = independentDistance + dependentIntermediates.map(instruction =>
-    if (instruction.isEstimated) instruction.size else maximumSize).sum
+    if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum
 
   lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 

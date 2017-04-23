@@ -11,6 +11,13 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
                                 (implicit processorMode: ProcessorMode)
   extends ShortJumpOperation(label, shortOpcode, mnemonic, target) {
 
+  val longJumpSize: Int = processorMode match {
+    case ProcessorMode.Real => longOpcode.length + 2
+    case ProcessorMode.Protected | ProcessorMode.Long => longOpcode.length + 4
+  }
+
+  override val maximumSize: Int = longJumpSize
+
   override def createOperation(thisOperation: ReferencingInstruction, destination: Label)
                               (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
     new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisOperation, destination)(section, processorMode)
@@ -22,16 +29,8 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
                                          destination: Label)(implicit page: Section, processorMode: ProcessorMode)
     extends ReferencingInstructionOnPage(thisOperation, destination) {
 
-    val shortJumpSize: Int = shortOpcode.length + 1
-    val longJumpSize: Int = processorMode match {
-      case ProcessorMode.Real => longOpcode.length + 2
-      case ProcessorMode.Protected | ProcessorMode.Long => longOpcode.length + 4
-    }
     val forwardShortLongBoundary = Byte.MaxValue
     val backwardShortLongBoundary: Int = (-Byte.MinValue) - shortJumpSize
-
-    override val minimumSize: Int = shortJumpSize
-    override val maximumSize: Int = longJumpSize
 
     override def getSizeForDistance(forward: Boolean, distance: Int): Int =
       if (forward) {
