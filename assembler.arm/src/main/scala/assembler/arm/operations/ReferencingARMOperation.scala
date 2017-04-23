@@ -23,7 +23,7 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
     encodableForDistance(getPointerForDistance(forward, distance)).size
 
   override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] =
-    ReferencingARMOperation.this.encodableForDistance(getPointerForDistance(forward, distance)).encodeByte
+    encodableForDistance(getPointerForDistance(forward, distance)).encodeByte
 
   def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: Section): PointerType = {
     if (forward) {
