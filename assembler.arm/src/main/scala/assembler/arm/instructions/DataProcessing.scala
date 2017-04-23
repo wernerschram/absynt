@@ -5,6 +5,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RightRotateImmediate, Shifter}
 import assembler.arm.operations._
+import assembler.sections.Section
 import assembler.{Encodable, EncodableCollection, Label}
 
 class DataProcessing(val code: Byte, val opcode: String) {
@@ -64,18 +65,21 @@ object AddCarry extends DataProcessing(0x05.toByte, "adc") {
 }
 
 object Add extends DataProcessing(0x04.toByte, "add") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
-    if (source2 == 0) {
+  def forShifters(source1: GeneralRegister, shifters: List[RightRotateImmediate], destination: GeneralRegister,
+                                          condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): Encodable = {
+    if (shifters.isEmpty) {
       return if (label == Label.noLabel)
         EncodableCollection(Nil)
       else
         EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
     EncodableCollection(apply(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
+
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
+                 (implicit processorMode: ProcessorMode, label: Label): Encodable =
+    forShifters(source1, Shifter.apply(source2), destination, condition)
 }
 
 object And extends DataProcessing(0x00.toByte, "and") {
@@ -132,6 +136,9 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
     EncodableCollection(apply(shifters.head, destination, condition) ::
       shifters.tail.map(value => Or(destination, value, destination, condition)))
   }
+
+  def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
+              (implicit processorMode: ProcessorMode, label: Label) = ???
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
