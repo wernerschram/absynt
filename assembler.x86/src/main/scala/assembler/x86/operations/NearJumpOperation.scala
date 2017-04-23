@@ -18,8 +18,8 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
 
   override val maximumSize: Int = longJumpSize
 
-  override def createOperation(thisOperation: ReferencingInstruction, destination: Label)
-                              (implicit section: Section, processorMode: ProcessorMode): ReferencingInstructionOnPage =
+
+  override def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section) =
     new ShortOrNearJumpInstructionOnPage(shortOpcode, longOpcode, thisOperation, destination)(section, processorMode)
 
   def encodeForLongPointer(pointer: NearPointerOperand)

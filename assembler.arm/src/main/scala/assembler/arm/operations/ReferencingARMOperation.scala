@@ -6,8 +6,6 @@ import assembler.arm.operands.Condition.Condition
 import assembler.sections.Section
 import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage}
 
-import scala.collection.concurrent.TrieMap
-
 abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode: String, override val target: Label,
                                                     val condition: Condition, newPointer: (Int, Section) => PointerType)
                                                    (implicit processorMode: ProcessorMode)
@@ -17,17 +15,11 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
   override val minimumSize: Int = branchSize
   override val maximumSize: Int = branchSize
 
-  val pageMap = new TrieMap[Section, ARMReferencingInstructionOnPage]
-
   def encodableForDistance(destination: PointerType)(implicit page: Section): Encodable
 
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
-  override def getOrElseCreateInstruction()(implicit page: Section): ARMReferencingInstructionOnPage = {
-    pageMap.getOrElseUpdate(page, createOperation(this, target, page, processorMode))
-  }
-
-  def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section, processorMode: ProcessorMode):
+  override def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section):
   ARMReferencingInstructionOnPage =
     new ARMReferencingInstructionOnPage(thisOperation, destination)(section, processorMode)
 

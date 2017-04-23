@@ -18,10 +18,10 @@ class SectionSuite extends WordSpec with Matchers {
     override def minimumSize: Int = 5
     override def maximumSize: Int = 5
 
-    override def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage =
-      new MyReferencingInstructionOnPage(this, target)
-
     override def size()(implicit page: Section): Int = 5
+
+    override def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section): ReferencingInstructionOnPage =
+      new MyReferencingInstructionOnPage(this, target)(section)
   }
 
   "a Section" when {

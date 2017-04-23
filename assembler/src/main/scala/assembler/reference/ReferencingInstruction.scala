@@ -3,6 +3,8 @@ package assembler.reference
 import assembler.{Encodable, Label}
 import assembler.sections.Section
 
+import scala.collection.concurrent.TrieMap
+
 trait ReferencingInstruction
     extends Encodable {
   def target: Label
@@ -10,7 +12,13 @@ trait ReferencingInstruction
   def minimumSize: Int
   def maximumSize: Int
 
-  def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage
+  val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
+
+  def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
+    pageMap.getOrElseUpdate(page, createOperation(this, target, page))
+  }
+
+  def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section): ReferencingInstructionOnPage
 
   def minimumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.minimumEstimatedSize
   def maximumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.maximumEstimatedSize
