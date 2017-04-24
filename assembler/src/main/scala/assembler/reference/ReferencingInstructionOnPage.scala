@@ -39,21 +39,21 @@ class ReferencingInstructionOnPage (
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]) = independentDistance +
+  private def predictedDistance(sizeAssumptions: Map[ReferencingInstruction, Int]) = independentDistance +
     dependentIntermediates.map { instruction =>
-      if (sizeAssumptions.contains(instruction.getOrElseCreateInstruction()))
-        sizeAssumptions(instruction.getOrElseCreateInstruction())
+      if (sizeAssumptions.contains(instruction))
+        sizeAssumptions(instruction)
       else
         instruction.estimatedSize(sizeAssumptions)
     }
     .sum
 
-  def estimateSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int]): Int = {
+  def estimateSize(sizeAssumptions: Map[ReferencingInstruction, Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
     while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
-      newAssumption = thisOperation.getSizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
+      newAssumption = thisOperation.getSizeForDistance(forward, predictedDistance(sizeAssumptions + (thisOperation -> assumption.get)))
     }
     newAssumption
   }

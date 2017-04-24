@@ -27,7 +27,7 @@ trait ReferencingInstruction
 
   def isEstimated()(implicit page: Section): Boolean = getOrElseCreateInstruction.isEstimated
 
-  def estimatedSize(sizeAssumptions: Map[ReferencingInstructionOnPage, Int])(implicit page: Section): Int =
+  def estimatedSize(sizeAssumptions: Map[ReferencingInstruction, Int])(implicit page: Section): Int =
     getOrElseCreateInstruction.estimateSize(sizeAssumptions)
 
   def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int
