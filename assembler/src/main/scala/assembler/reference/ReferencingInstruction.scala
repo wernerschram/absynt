@@ -12,15 +12,15 @@ trait ReferencingInstruction
   def minimumSize: Int
   def maximumSize: Int
 
+  def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int
+
+  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
+
   val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
 
-  def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
-    pageMap.getOrElseUpdate(page, createOperation(this, target, page))
+  private def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
+    pageMap.getOrElseUpdate(page, new ReferencingInstructionOnPage(this, target)(page))
   }
-
-  def createOperation(thisOperation: ReferencingInstruction, destination: Label, section: Section):
-  ReferencingInstructionOnPage =
-    new ReferencingInstructionOnPage(thisOperation, destination)(section)
 
   def minimumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.minimumEstimatedSize
   def maximumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.maximumEstimatedSize
@@ -30,9 +30,7 @@ trait ReferencingInstruction
   def estimatedSize(sizeAssumptions: Map[ReferencingInstruction, Int])(implicit page: Section): Int =
     getOrElseCreateInstruction.estimateSize(sizeAssumptions)
 
-  def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int
-
-  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
+  override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def encodeByte()(implicit page: Section): List[Byte] = getOrElseCreateInstruction.encodeByte
 }

@@ -17,7 +17,6 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
 
   def encodableForDistance(destination: PointerType)(implicit page: Section): Encodable
 
-  override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
   override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
     encodableForDistance(getPointerForDistance(forward, distance)).size
