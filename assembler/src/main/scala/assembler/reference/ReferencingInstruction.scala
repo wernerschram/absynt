@@ -16,11 +16,10 @@ trait ReferencingInstruction
 
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte]
 
-  val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
+  private val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
 
-  private def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage = {
+  private def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage =
     pageMap.getOrElseUpdate(page, new ReferencingInstructionOnPage(this, target)(page))
-  }
 
   def minimumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.minimumEstimatedSize
   def maximumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.maximumEstimatedSize
