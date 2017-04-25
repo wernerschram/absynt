@@ -17,20 +17,16 @@ abstract class ReferencingARMOperation[PointerType](val label: Label, val opcode
 
   def encodableForDistance(destination: PointerType)(implicit page: Section): Encodable
 
+  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = branchSize
 
-  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
-    encodableForDistance(getPointerForDistance(forward, distance)).size
-
-  override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] =
-    encodableForDistance(getPointerForDistance(forward, distance)).encodeByte
-
-  def getPointerForDistance(forward: Boolean, distance: Int)(implicit page: Section): PointerType = {
+  def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable = {
     if (forward) {
-      newPointer(distance - 4, page)
+      encodableForDistance(newPointer(distance - 4, page))
     } else {
-      newPointer(-distance - 8, page)
+      encodableForDistance(newPointer(-distance - 8, page))
     }
   }
+
   override def toString = s"${super.toString()} $target"
 
 }

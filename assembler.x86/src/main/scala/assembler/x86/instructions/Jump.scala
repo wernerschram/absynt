@@ -18,9 +18,9 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode): Encodable =
     new ShortJumpOperation(label, shortOpcode, mnemonic, targetLabel) {
 
-      def encodeForShortPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = {
+      def encodableForShortPointer(nearPointer: NearPointer)(implicit page: Section): Encodable = {
         assume(nearPointer.operandByteSize == ValueSize.Byte)
-        Rel8(nearPointer).encodeByte()
+        Rel8(nearPointer)
       }
     }
 
@@ -56,9 +56,9 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
 
   override def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new NearJumpOperation(label, shortOpcode, longOpcode, mnemonic, targetLabel) {
-      override def encodeForShortPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = Rel8(nearPointer).encodeByte()
+      override def encodableForShortPointer(nearPointer: NearPointer)(implicit page: Section): Encodable = Rel8(nearPointer)
 
-      override def encodeForLongPointer(nearPointer: NearPointer)(implicit page: Section): List[Byte] = Rel16(nearPointer).encodeByte()
+      override def encodableForLongPointer(nearPointer: NearPointer)(implicit page: Section): Encodable = Rel16(nearPointer)
     }
 }
 

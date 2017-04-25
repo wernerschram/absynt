@@ -16,19 +16,19 @@ abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte],
   override val minimumSize: Int = shortJumpSize
   override val maximumSize: Int = shortJumpSize
 
-  def encodeForShortPointer(pointer: NearPointerOperand)(implicit page: Section): List[Byte]
+  def encodableForShortPointer(pointer: NearPointerOperand)(implicit page: Section): Encodable
 
   override def toString = s"$mnemonic $target"
 
   override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = shortJumpSize
 
-  override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = {
+  override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable = {
     assume(distance > (Byte.MinValue + shortJumpSize))
     assume(distance < Byte.MaxValue)
     if (forward) {
-      encodeForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
+      encodableForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
     } else {
-      encodeForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
+      encodableForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
     }
   }
 }

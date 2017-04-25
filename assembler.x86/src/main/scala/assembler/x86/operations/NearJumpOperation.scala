@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.Label
+import assembler.{Encodable, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -20,8 +20,7 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
 
   override val maximumSize: Int = longJumpSize
 
-  def encodeForLongPointer(pointer: NearPointerOperand)
-                          (implicit page: Section): List[Byte]
+  def encodableForLongPointer(pointer: NearPointerOperand)(implicit page: Section): Encodable
 
   override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
     if (forward) {
@@ -36,25 +35,25 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
         longJumpSize
     }
 
-  override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = {
+  override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable = {
     if (forward) {
       if (distance <= forwardShortLongBoundary) {
-        encodeForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
+        encodableForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
       } else {
         if (processorMode == ProcessorMode.Real) {
-          encodeForLongPointer(NearPointerOperand(distance.toShort.encodeLittleEndian))
+          encodableForLongPointer(NearPointerOperand(distance.toShort.encodeLittleEndian))
         } else {
-          encodeForLongPointer(NearPointerOperand(distance.encodeLittleEndian))
+          encodableForLongPointer(NearPointerOperand(distance.encodeLittleEndian))
         }
       }
     } else {
       if (distance <= backwardShortLongBoundary) {
-        encodeForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
+        encodableForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
       } else {
         if (processorMode == ProcessorMode.Real) {
-          encodeForLongPointer(NearPointerOperand((-distance - longJumpSize).toShort.encodeLittleEndian))
+          encodableForLongPointer(NearPointerOperand((-distance - longJumpSize).toShort.encodeLittleEndian))
         } else {
-          encodeForLongPointer(NearPointerOperand((-distance - longJumpSize).encodeLittleEndian))
+          encodableForLongPointer(NearPointerOperand((-distance - longJumpSize).encodeLittleEndian))
         }
       }
     }

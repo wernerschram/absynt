@@ -10,11 +10,11 @@ class SectionSuite extends WordSpec with Matchers {
     override def minimumSize: Int = 5
     override def maximumSize: Int = 5
 
-    override def size()(implicit page: Section): Int = 5
-
-    override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = 5
-
-    override def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
+    override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable = new Encodable {
+      override def encodeByte()(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
+      override def label: Label = NoLabel()
+      override def size()(implicit page: Section): Int = 5
+    }
   }
 
   "a Section" when {
