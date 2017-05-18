@@ -1,7 +1,6 @@
 package assembler.arm.instructions
 
 import assembler.{Encodable, Label}
-import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
@@ -31,16 +30,16 @@ class LoadStoreRegister(
     ImmedByte(label, condition, register, baseRegister, offset, addressingType)
 
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode) =
-    new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, Always, (value, _) => LoadStoreOffset(value.toByte)) {
-      override def encodableForDistance(source: LoadStoreOffset)(implicit page: Section): Encodable =
-        ImmedWord(label, Always, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal)
+    new ReferencingARMOperation(label, mnemnonic, targetLabel, Always) {
+      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(distance.toByte), LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
-    new ReferencingARMOperation[LoadStoreOffset](label, mnemnonic, targetLabel, condition, (value, _) => LoadStoreOffset(value
-      .toByte)) {
-      override def encodableForDistance(source: LoadStoreOffset)(implicit page: Section): Encodable =
-        ImmedWord(label, condition, destination, GeneralRegister.PC, source, LoadStoreAddressingTypeNormal.OffsetNormal)
+    new ReferencingARMOperation(label, mnemnonic, targetLabel, condition) {
+      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(distance.toByte),
+          LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   object UserMode {
