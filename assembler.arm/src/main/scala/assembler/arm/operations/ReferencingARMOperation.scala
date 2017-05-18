@@ -11,22 +11,21 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
                                                    (implicit processorMode: ProcessorMode)
   extends Conditional with ReferencingInstruction {
 
-  val branchSize = 4
-  override val minimumSize: Int = branchSize
-  override val maximumSize: Int = branchSize
+  val instructionSize = 4
+  override val minimumSize: Int = instructionSize
+  override val maximumSize: Int = instructionSize
 
   def encodableForDistance(distance: Int)(implicit page: Section): Encodable
 
-  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = branchSize
+  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = instructionSize
 
   def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable = {
     if (forward) {
-      encodableForDistance(distance - 4)
+      encodableForDistance(distance + instructionSize)
     } else {
-      encodableForDistance(-distance - 8)
+      encodableForDistance(-distance)
     }
   }
 
   override def toString = s"${super.toString()} $target"
-
 }

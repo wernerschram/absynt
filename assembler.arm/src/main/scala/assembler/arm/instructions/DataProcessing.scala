@@ -55,7 +55,7 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
 
 object AddCarry extends DataProcessing(0x05.toByte, "adc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                    (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
     if (source2 == 0)
       return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -66,7 +66,7 @@ object AddCarry extends DataProcessing(0x05.toByte, "adc") {
 
 object Add extends DataProcessing(0x04.toByte, "add") {
   def forShifters(source1: GeneralRegister, shifters: List[RightRotateImmediate], destination: GeneralRegister,
-                                          condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                  condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): Encodable = {
     if (shifters.isEmpty) {
       return if (label == Label.noLabel)
         EncodableCollection(Nil)
@@ -138,7 +138,11 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label): Encodable = ???
+              (implicit processorMode: ProcessorMode, label: Label): Encodable =
+    new ReferencingARMOperation(label, opcode, targetLabel, Always) {
+      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+        forConstant(distance + page.getRelativeAddress(this), destination, condition)
+    }
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")

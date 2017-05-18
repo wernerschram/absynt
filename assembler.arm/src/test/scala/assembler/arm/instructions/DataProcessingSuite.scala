@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Encodable, Hex}
+import assembler.{Encodable, EncodedByteList, Hex, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
@@ -271,6 +271,38 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly represent movscs r2, r1 as a string" in {
         Move.setFlags(R1, R2, Condition.CarrySet).toString should be("movscs r2, r1")
       }
+
+      "correctly encode a move of a labeled address to a register" in {
+        val targetLabel = Label.unique
+        val instruction = Move.forLabel(targetLabel, R1)
+        val p = Section(List[Encodable](
+          instruction,
+            EncodedByteList(List.fill(4)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+        instruction.encodeByte()(p) should be(Hex.msb("e3a01f02"))
+      }
+
+      "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
+        val targetLabel = Label.unique
+        val instruction = Move.forLabel(targetLabel, R1)
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(4)(0x00.toByte)),
+          instruction,
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+        instruction.encodeByte()(p) should be(Hex.msb("e3a01f02"))
+      }
+
+      "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
+        val targetLabel = Label.unique
+        val instruction = Move.forLabel(targetLabel, R1)
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(4)(0x00.toByte)),
+          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
+          EncodedByteList(List.fill(4)(0x00.toByte)),
+          instruction))
+        instruction.encodeByte()(p) should be(Hex.msb("e3a01f01"))
+      }
+
     }
   }
 

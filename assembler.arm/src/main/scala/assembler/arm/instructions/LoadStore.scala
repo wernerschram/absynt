@@ -32,13 +32,13 @@ class LoadStoreRegister(
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, mnemnonic, targetLabel, Always) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(distance.toByte), LoadStoreAddressingTypeNormal.OffsetNormal)
+        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset((distance - 8).toByte), LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, mnemnonic, targetLabel, condition) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(distance.toByte),
+        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset((distance - 8).toByte),
           LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 

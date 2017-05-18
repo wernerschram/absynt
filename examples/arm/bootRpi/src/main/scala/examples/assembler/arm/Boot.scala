@@ -62,6 +62,7 @@ object Boot extends App {
     val text: Label = Label.unique
 
     val page: Section = Section(
+      Move.forConstant(4, R1) ::
       // Disable UART0
       Move.forConstant(UART0.Base, R0) ::
       Move.forConstant(0, R1) ::

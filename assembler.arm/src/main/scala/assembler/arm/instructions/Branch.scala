@@ -16,7 +16,7 @@ class Branch(code: Byte, val opcode: String) {
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        Immediate(label, RelativeA32Pointer(distance), Always)
+        Immediate(label, RelativeA32Pointer(distance - 8), Always)
     }
 
   private def Immediate(label: Label, destination: RelativeA32Pointer, condition: Condition = Always) =
@@ -25,7 +25,7 @@ class Branch(code: Byte, val opcode: String) {
   def apply(targetLabel: Label, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, condition) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        Immediate(label, RelativeA32Pointer(distance), condition)
+        Immediate(label, RelativeA32Pointer(distance - 8), condition)
     }
 }
 
@@ -47,7 +47,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Unpredictable) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        Immediate(label, RelativeThumbPointer(distance), Unpredictable)
+        Immediate(label, RelativeThumbPointer(distance - 8), Unpredictable)
     }
 }
 
