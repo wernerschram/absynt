@@ -12,51 +12,54 @@ import assembler.x86.ProcessorMode
 object Boot extends App {
   createFile()
 
-  case class Color(val r: Byte, val g: Byte, val b: Byte)
+  case class Color(r: Byte, g: Byte, b: Byte)
 
   def SetColor(col: Color)(implicit processorMode: ProcessorMode) =
+        Move(0x3c9, DX) ::
         Move(col.r, AL) ::
-        Output(AL, 0x3c9) ::
+        Output(AL, DX) ::
         Move(col.g, AL) ::
-        Output(AL, 0x3c9) ::
+        Output(AL, DX) ::
         Move(col.b, AL) ::
-        Output(AL, 0x3c9) :: Nil
+        Output(AL, DX) ::
+        Nil
 
   def createFile() = {
 
-    implicit val processorMode = ProcessorMode.Long
+    implicit val processorMode = ProcessorMode.Real
 
-    val col1 = Color(63, 0, 0)
-    val col2 = Color(63, 63, 63)
-    val col3 = Color(0, 0, 63)
+    val topColor = Color(63, 0, 0)
+    val middleColor = Color(63, 63, 63)
+    val bottomColor = Color(0, 0, 63)
 
     val page: Section = Section(
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
-        //
-        Xor(AL, AL) ::
-        Move(0x3c8, DX) ::
-        Output(AL, DX) ::
-        //
-        SetColor(col1) :::
-        SetColor(col2) :::
-        SetColor(col3) :::
-        //
-        Xor(DI, DI) ::
-        Move(0xa000.toByte, AX) ::
-        Move(AX, DS) ::
-        //
-        Move(0x0, AX) ::
-        Move(320*66, CX) ::
-        StoreString.Repeat(AX, DI) ::
-        //
-        Move(0x1, AX) ::
-        Move(320*67, CX) ::
-        StoreString.Repeat(AX, DI) ::
-        //
-        Move(0x2, AX) ::
-        Move(320*66, CX) ::
-        StoreString.Repeat(AX, DI) ::
+      //
+      Xor(AL, AL) ::
+      Move(0x3c8, DX) ::
+      Output(AL, DX) ::
+      //
+      SetColor(topColor) :::
+      SetColor(middleColor) :::
+      SetColor(bottomColor) :::
+      //
+      Xor(DI, DI) ::
+      Move(0xa000.toShort, AX) ::
+      Move(AX, ES) ::
+      //
+      Move(0x0.toByte, AL) ::
+      Move((320*66).toShort, CX) ::
+      StoreString.Repeat(AL, DI) ::
+      //
+      Move(0x1.toByte, AL) ::
+      Move((320*67).toShort, CX) ::
+      StoreString.Repeat(AL, DI) ::
+      //
+      Move(0x2.toByte, AL) ::
+      Move((320*66).toShort, CX) ::
+      StoreString.Repeat(AL, DI) ::
+
       Nil
     )
 
