@@ -137,7 +137,7 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
       shifters.tail.map(value => Or(destination, value, destination, condition)))
   }
 
-  def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
+  def labelAddress(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
               (implicit processorMode: ProcessorMode, label: Label): Encodable = ???
 }
 
