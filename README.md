@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/wernerschram/scasm.svg?branch=master)](https://travis-ci.org/wernerschram/scasm)
+[![Coverage Status](https://coveralls.io/repos/github/wernerschram/scasm/badge.svg)](https://coveralls.io/github/wernerschram/scasm)
+
 # Scasm
 Scasm is an assembler writen in scala. It currently includes an x86 assembler, with support for 8086, i386 and x64 instuctions, 
 and an ARM assembler with support for A32 instuctions. Neither implements the full set of instuctions. My initial goal is to
