@@ -76,7 +76,7 @@ object Boot extends App {
     Console.println(s"output to file $outputFilePath")
     out.flush()
 
-    //objdump -b binary -D test.com -m i8086 -M intel
+    //objdump -b binary -D /tmp/bootFlags-output/test.com -m i8086 -M intel
   }
 
 }

@@ -1,6 +1,7 @@
 package examples.assembler.arm
 
 import java.io.FileOutputStream
+import java.nio.file.{Files, Paths}
 
 import assembler._
 import assembler.ListExtensions._
@@ -58,8 +59,8 @@ object Boot extends App {
   def createFile(): Unit = {
     implicit val processorMode = ProcessorMode.A32
 
-    val putString: Label = Label.unique
-    val text: Label = Label.unique
+    val putString: Label = "PutString"
+    val text: Label = "Text"
 
     val page: Section = Section(
       // Disable UART0
@@ -113,7 +114,7 @@ object Boot extends App {
       Branch(putString, NotEqual) ::
       //
       // TODO: get R6th character from string into R5
-      Move.labelAddress(text, R7) ::
+//      Move.labelAddress(text, R7) ::
       LoadRegister(R5, R7, R6) ::
       StoreRegister(R5, R0, UART0.CR) ::
       Add(R6, 1.toByte, R6) ::
@@ -123,8 +124,13 @@ object Boot extends App {
       { implicit val label = text; EncodedString("Hello World!") } :: Nil
     )
 
-    val out = new FileOutputStream("c:\\temp\\test.arm")
-    page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
+    val path = Paths.get(System.getProperty("java.io.tmpdir"))
+    val outputPath = path.resolve("bootRpi-output")
+    Files.createDirectories(outputPath)
+    val outputFilePath = outputPath.resolve("test.arm")
+    val out = new FileOutputStream(outputFilePath.toFile)
+
+    page.content.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
     out.write(page.encodeByte()(page).toArray)
     out.flush()
   }
@@ -132,5 +138,5 @@ object Boot extends App {
   createFile()
 
   // To decompile the output download the gcc cross compiler for arm and execute:
-  //   arm-eabi-objdump -b binary -marm -D test.arm
+  //  arm-linux-gnueabi-objdump -b binary -D /tmp/bootRpi-output/test.arm -m arm
 }
