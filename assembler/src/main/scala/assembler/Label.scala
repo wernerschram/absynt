@@ -23,14 +23,18 @@ object Label {
 
 case class NoLabel private() extends Label {
   def matches(label: Label): Boolean = false
+
+  override def toString: String = ""
 }
 
 case class StringLabel private (value: String) extends Label {
-  override def toString: String = value
-
   def matches(label: Label): Boolean = this.equals(label)
+
+  override def toString: String = value
 }
 
 case class UniqueLabel private (id: Int) extends Label {
   def matches(label: Label): Boolean = this.equals(label)
+
+  override def toString: String = s"__$id"
 }
