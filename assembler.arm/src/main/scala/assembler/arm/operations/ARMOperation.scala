@@ -10,7 +10,7 @@ trait ARMOperation extends Encodable {
 
   override def size()(implicit page: Section) = 4
 
-  def encodeByte()(implicit page: Section): List[Byte] = encodeWord.encodeLittleEndian
+  def encodeByte()(implicit page: Section): Seq[Byte] = encodeWord.encodeLittleEndian
 
   def encodeWord()(implicit page: Section): Int = 0
 
