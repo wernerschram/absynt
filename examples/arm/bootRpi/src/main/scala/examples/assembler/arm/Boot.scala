@@ -61,8 +61,11 @@ object Boot extends App {
 
     val putString: Label = "PutString"
     val text: Label = "Text"
+    val targetLabel = Label.unique
 
     val page: Section = Section(
+      { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))} ::
+      Add.forRelativeLabel(R0, targetLabel, R1) ::
       Move.forConstant(4, R1) ::
       // Disable UART0
       Move.forConstant(UART0.Base, R0) ::

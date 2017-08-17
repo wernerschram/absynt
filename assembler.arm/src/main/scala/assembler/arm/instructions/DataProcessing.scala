@@ -80,6 +80,14 @@ object Add extends DataProcessing(0x04.toByte, "add") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
                  (implicit processorMode: ProcessorMode, label: Label): Encodable =
     forShifters(source1, Shifter.apply(source2), destination, condition)
+
+
+  def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
+              (implicit processorMode: ProcessorMode, label: Label): Encodable =
+    new ReferencingARMOperation(label, opcode, targetLabel, Always) {
+      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+        forConstant(source1, distance, destination, condition)
+    }
 }
 
 object And extends DataProcessing(0x00.toByte, "and") {
