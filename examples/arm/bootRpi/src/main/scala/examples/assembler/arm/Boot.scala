@@ -112,19 +112,21 @@ object Boot extends App {
       // Enable UART0, receive & transfer part of UART.
       Move.forConstant(0x7F1, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
+      //
+      // Put the string from label [text] on the serial line
+      Add.forRelativeLabel(PC, text, R7) ::
       Move(0.toByte, R6) ::
       { implicit val label = putString; LoadRegister(R4, R0, UART0.FR)} ::
-      Compare(R4, 0x20.toByte) ::
-      Branch(putString, NotEqual) ::
-      //
-      // TODO: get R6th character from string into R5
-      Add.forRelativeLabel(PC, text, R7) ::
       LoadRegister(R5, R7, R6) ::
       StoreRegister(R5, R0, UART0.CR) ::
       Add(R6, 1.toByte, R6) ::
       Compare(R6, 12.toByte) ::
       Branch(putString, NotEqual) ::
+      //
+      // Goal achieved.
       halt() ::
+      //
+      // Resources
       { implicit val label = text; EncodedString("Hello World!") } :: Nil
     )
 
