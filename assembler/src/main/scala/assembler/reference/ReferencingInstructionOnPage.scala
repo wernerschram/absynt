@@ -69,5 +69,5 @@ class ReferencingInstructionOnPage (
     _estimatedSize.get
   }
 
-  lazy val encodeByte: List[Byte] = thisOperation.encodeForDistance(forward, actualDistance)
+  lazy val encodeByte: Seq[Byte] = thisOperation.encodeForDistance(forward, actualDistance)
 }

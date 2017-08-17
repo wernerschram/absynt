@@ -40,7 +40,7 @@ object ListExtensions {
       }.toList
   }
 
-  implicit class ListToImmediate(value: List[Byte]) {
+  implicit class ListToImmediate(value: Seq[Byte]) {
     def decimalString: String = decimal.toString
 
     def bigEndianHexString : String = value.reverseMap("%02X" format _).mkString

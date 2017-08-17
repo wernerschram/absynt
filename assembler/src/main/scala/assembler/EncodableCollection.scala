@@ -7,6 +7,8 @@ class EncodableCollection private(val label: Label, val encodables: List[Encodab
   override def encodeByte()(implicit page: Section): List[Byte] = encodables.flatMap(_.encodeByte())
 
   override def size()(implicit page: Section): Int = encodables.map(_.size()).sum
+
+  override def toString: String = s"""${super.toString}${encodables.map(_.toString).mkString("; ")}"""
 }
 
 object EncodableCollection {

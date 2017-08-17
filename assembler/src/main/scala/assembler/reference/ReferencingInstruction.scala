@@ -17,7 +17,7 @@ trait ReferencingInstruction
   def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
     encodableForDistance(forward, distance).size
 
-  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): List[Byte] =
+  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Seq[Byte] =
     encodableForDistance(forward, distance).encodeByte
 
   private val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
@@ -35,5 +35,5 @@ trait ReferencingInstruction
 
   override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
-  override def encodeByte()(implicit page: Section): List[Byte] = getOrElseCreateInstruction.encodeByte
+  override def encodeByte()(implicit page: Section): Seq[Byte] = getOrElseCreateInstruction.encodeByte
 }

@@ -160,6 +160,7 @@ object Move {
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
     new RegisterEncoded[ByteRegister](label, register, 0xB0.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
+      assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
     }
 
@@ -168,6 +169,7 @@ object Move {
 
   private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](label, register, 0xB8.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
+      assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
     }
 
