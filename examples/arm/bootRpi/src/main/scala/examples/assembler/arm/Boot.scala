@@ -118,7 +118,7 @@ object Boot extends App {
       Branch(putString, NotEqual) ::
       //
       // TODO: get R6th character from string into R5
-      Move.forLabel(text, R7) ::
+      Add.forRelativeLabel(PC, text, R7) ::
       LoadRegister(R5, R7, R6) ::
       StoreRegister(R5, R0, UART0.CR) ::
       Add(R6, 1.toByte, R6) ::
