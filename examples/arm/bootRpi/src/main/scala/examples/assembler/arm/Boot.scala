@@ -46,11 +46,11 @@ object Boot extends App {
 
 
   object elf {
-    def magic: List[Byte] = 0x7F.toByte :: 0x45.toByte :: 0x4c.toByte :: 0x46.toByte :: Nil
+    def magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
 
     def `class`: List[Byte] = 0x01.toByte :: Nil // 32bit
 
-    def data: List[Byte] = 0x02.toByte :: Nil // big endian
+    def data: List[Byte] = 0x01.toByte :: Nil // big endian
 
     def version: List[Byte] = 0x01.toByte :: Nil
 
@@ -60,23 +60,98 @@ object Boot extends App {
 
     def eiPad: List[Byte] = List.fill(7)(0x00.toByte)
 
-    def eType: List[Byte] = 0x00.toByte :: 0x00.toByte :: Nil // ???
+    def eType: List[Byte] = 0x02.toByte :: 0x00.toByte :: Nil // ???
 
-    def eMachine: List[Byte] = 0x28.toByte :: 0x00.toByte :: Nil // ARM
+    def eMachine: List[Byte] = 0x89.toByte :: 0x00.toByte :: Nil // ARM
 
-    def eVersion: List[Byte] = 0x01.toByte :: 0x00.toByte :: Nil
+    def eVersion: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
 
-    def entry: List[Byte] = List.fill(8)(0x00.toByte)
-    def phoff: List[Byte] = List.fill(8)(0x00.toByte)
-    def shoff: List[Byte] = List.fill(8)(0x00.toByte)
+    def entry: List[Byte] = List.fill(1)(0x00.toByte) ::: 0x02.toByte :: 0xc0.toByte :: 0xce.toByte :: Nil
+    def phoff: List[Byte] = 0x34.toByte :: Nil ::: List.fill(3)(0x00.toByte)
+    def shoff: List[Byte] = 0x54.toByte :: Nil ::: List.fill(3)(0x00.toByte)
 
-    def flags: List[Byte] = List.fill(4)(0x00.toByte)
-    def ehSize: List[Byte] = 52.toByte :: 0x00.toByte :: Nil
-    def phEntSize: List[Byte] = List.fill(2)(0x00.toByte)
-    def phNum: List[Byte] = List.fill(2)(0x00.toByte)
-    def shEntSize: List[Byte] = List.fill(2)(0x00.toByte)
-    def shNum: List[Byte] = List.fill(2)(0x00.toByte)
-    def shstrndx: List[Byte] = List.fill(2)(0x00.toByte)
+    def flags: List[Byte] = 0x00.toByte :: 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+    def ehSize: List[Byte] = 0x34.toByte :: 0x00.toByte :: Nil
+    def phEntSize: List[Byte] = 0x20.toByte :: 0x00.toByte :: Nil
+    def phNum: List[Byte] = 0x01.toByte :: 0x00.toByte :: Nil
+    def shEntSize: List[Byte] = 0x28.toByte :: 0x00.toByte :: Nil
+    def shNum: List[Byte] = 0x03.toByte :: 0x00.toByte :: Nil
+    def shstrndx: List[Byte] = 0x02.toByte :: 0x00.toByte :: Nil
+
+    object programHeader {
+      def `type`: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def offset: List[Byte] = 0xcc.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def vaddr: List[Byte] = 0x00.toByte :: 0x1e.toByte :: 0xc0.toByte :: 0xce.toByte :: Nil
+      def paddr: List[Byte] = 0x00.toByte :: 0x1e.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def filesz: List[Byte] = 0xc8.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def memsz: List[Byte] = 0xc8.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def flags: List[Byte] = 0x05.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def allign: List[Byte] = 0x40.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+
+      def header: List[Byte] =
+        `type` :::
+        offset :::
+        vaddr :::
+        paddr :::
+        filesz :::
+        memsz :::
+        flags :::
+        allign
+    }
+
+    object textSectionHeader {
+      def name: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def `type`: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def flags: List[Byte] = 0x06.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def addr: List[Byte] = 0x00.toByte :: 0x1e.toByte :: 0xc0.toByte :: 0xce.toByte :: Nil
+      def offset: List[Byte] = 0xcc.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def filesz: List[Byte] = 0xc8.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def link: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def info: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def allign: List[Byte] = 0x40.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def entSize: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+
+      def header: List[Byte] =
+        name :::
+        `type` :::
+        flags :::
+        addr :::
+        offset :::
+        filesz :::
+        link :::
+        info :::
+        allign :::
+        entSize
+    }
+
+    object nullSection {
+      def header: List[Byte] = List.fill(40)(0x00.toByte)
+    }
+
+    object stringSectionHeader {
+      def name: List[Byte] = 0x07.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def `type`: List[Byte] = 0x03.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def flags: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def addr: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def offset: List[Byte] = 0x94.toByte :: 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def filesz: List[Byte] = 0x11.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def link: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def info: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def allign: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+      def entSize: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
+
+      def header: List[Byte] =
+        name :::
+        `type` :::
+        flags :::
+        addr :::
+        offset :::
+        filesz :::
+        link :::
+        info :::
+        allign :::
+        entSize
+    }
 
     def header: List[Byte] =
       magic :::
@@ -98,8 +173,13 @@ object Boot extends App {
       phNum :::
       shEntSize :::
       shNum :::
-      shstrndx
+      shstrndx :::
+      programHeader.header ::: //0x34
+      nullSection.header ::: // 0x54
+      textSectionHeader.header ::: //0x7c
+      stringSectionHeader.header //0xa4
   }
+
 
   private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
     val targetLabel = Label.unique
@@ -190,16 +270,22 @@ object Boot extends App {
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
     val outputPath = path.resolve("bootRpi-output")
     Files.createDirectories(outputPath)
-    val outputFilePath = outputPath.resolve("test.arm")
+    val outputFilePath = outputPath.resolve("test.elf")
     val out = new FileOutputStream(outputFilePath.toFile)
 
     page.content.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
-    out.write(page.encodeByte()(page).toArray)
+    out.write((
+      elf.header :::
+        page.encodeByte()(page) :::
+        0x00.toByte :: Nil :::
+        ".text".toCharArray.map(_.toByte).toList ::: 0x00.toByte :: Nil :::
+        ".shstrtab".toCharArray.map(_.toByte).toList ::: 0x00.toByte :: Nil
+      ).toArray)
     out.flush()
   }
 
   createFile()
 
   // To decompile the output download the gcc cross compiler for arm and execute:
-  //  arm-linux-gnueabi-objdump -b binary -D /tmp/bootRpi-output/test.arm -m arm
+  //  arm-linux-gnueabi-objdump -D /tmp/bootRpi-output/test.elf -m arm
 }
