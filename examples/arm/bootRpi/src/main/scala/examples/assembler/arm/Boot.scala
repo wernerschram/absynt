@@ -44,6 +44,63 @@ object Boot extends App {
     val TDR: Short = 0x8C
   }
 
+
+  object elf {
+    def magic: List[Byte] = 0x7F.toByte :: 0x45.toByte :: 0x4c.toByte :: 0x46.toByte :: Nil
+
+    def `class`: List[Byte] = 0x01.toByte :: Nil // 32bit
+
+    def data: List[Byte] = 0x02.toByte :: Nil // big endian
+
+    def version: List[Byte] = 0x01.toByte :: Nil
+
+    def osAbi: List[Byte] = 0x00.toByte :: Nil
+
+    def abiVersion: List[Byte] = 0x00.toByte :: Nil
+
+    def eiPad: List[Byte] = List.fill(7)(0x00.toByte)
+
+    def eType: List[Byte] = 0x00.toByte :: 0x00.toByte :: Nil // ???
+
+    def eMachine: List[Byte] = 0x28.toByte :: 0x00.toByte :: Nil // ARM
+
+    def eVersion: List[Byte] = 0x01.toByte :: 0x00.toByte :: Nil
+
+    def entry: List[Byte] = List.fill(8)(0x00.toByte)
+    def phoff: List[Byte] = List.fill(8)(0x00.toByte)
+    def shoff: List[Byte] = List.fill(8)(0x00.toByte)
+
+    def flags: List[Byte] = List.fill(4)(0x00.toByte)
+    def ehSize: List[Byte] = 52.toByte :: 0x00.toByte :: Nil
+    def phEntSize: List[Byte] = List.fill(2)(0x00.toByte)
+    def phNum: List[Byte] = List.fill(2)(0x00.toByte)
+    def shEntSize: List[Byte] = List.fill(2)(0x00.toByte)
+    def shNum: List[Byte] = List.fill(2)(0x00.toByte)
+    def shstrndx: List[Byte] = List.fill(2)(0x00.toByte)
+
+    def header: List[Byte] =
+      magic :::
+      `class` :::
+      data :::
+      version :::
+      osAbi :::
+      abiVersion :::
+      eiPad :::
+      eType :::
+      eMachine :::
+      eVersion :::
+      entry :::
+      phoff :::
+      shoff :::
+      flags:::
+      ehSize :::
+      phEntSize :::
+      phNum :::
+      shEntSize :::
+      shNum :::
+      shstrndx
+  }
+
   private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
     val targetLabel = Label.unique
 
