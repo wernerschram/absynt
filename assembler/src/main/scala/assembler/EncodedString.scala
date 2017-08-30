@@ -7,7 +7,7 @@ class EncodedString private(val string: String)(override val label: Label) exten
 
   def size()(implicit page: Section): Int = string.length()
 
-  override def toString: String = s"""${super.toString}SETS "$string""""
+  override def toString: String = s"""${labelPrefix}SETS "$string""""
 }
 
 object EncodedString {

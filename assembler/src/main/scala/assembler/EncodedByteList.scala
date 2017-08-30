@@ -10,7 +10,7 @@ trait EncodedByteList extends Encodable {
 
   def size()(implicit page: Section): Int = bytes.length
 
-  override def toString: String = s"""${super.toString}SETB "${bytes.bigEndianHexString}""""
+  override def toString: String = s"""${labelPrefix}SETB "${bytes.bigEndianHexString}""""
 }
 
 object EncodedByteList {

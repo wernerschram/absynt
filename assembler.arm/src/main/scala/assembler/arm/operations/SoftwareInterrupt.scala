@@ -8,5 +8,5 @@ class SoftwareInterrupt(val label: Label, override val opcode: String, interrupt
   extends ARMOperation() {
   override def encodeWord()(implicit page: Section): Int = (condition.value << 28) | 0x0f000000 | interrupt
 
-  override def toString = s"${super.toString} ${interrupt.toString}"
+  override def toString = s"$labelPrefix$mnemonicString ${interrupt.toString}"
 }

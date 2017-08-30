@@ -9,9 +9,11 @@ trait Encodable {
 
   def size()(implicit page: Section): Int
 
-  override def toString: String =
+  lazy val labelPrefix: String =
     label match {
       case _: NoLabel => ""
       case _ => s"$label: "
     }
+
+  override def toString: String = labelPrefix
 }

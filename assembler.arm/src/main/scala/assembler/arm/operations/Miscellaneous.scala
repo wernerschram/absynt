@@ -16,7 +16,7 @@ class Miscellaneous(val label: Label, val code: Byte, override val opcode: Strin
     result
   }
 
-  override def toString = s"${super.toString()} $value"
+  override def toString = s"$labelPrefix$mnemonicString $value"
 }
 
 sealed abstract class Effect(val iMod: Byte, val mnemonicExtension: String)
@@ -60,8 +60,8 @@ object InterruptDisableFlags extends Enumeration {
   }
 }
 
-class ProcessorState(val label: Label, val code: Byte, val opcode: String, val condition: Condition, iMod: Byte, mMod: Byte, iflags: Int,
-                     modeValue: Int, stringValue: String)
+class ProcessorState(val label: Label, val code: Byte, val opcode: String, val condition: Condition,
+                     iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, postFixString: String)
   extends Conditional {
 
   def this(label: Label, code: Byte, opcode: String, mode: ExecutionMode) =
@@ -81,5 +81,5 @@ class ProcessorState(val label: Label, val code: Byte, val opcode: String, val c
   override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
 
-  override def toString = s"${super.toString()}$stringValue"
+  override def toString = s"$labelPrefix$mnemonicString$postFixString"
 }

@@ -14,7 +14,7 @@ class MoveFromStatusRegister(val label: Label, override val opcode: String, sour
   override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12)
 
-  override def toString = s"${super.toString()} ${destination.toString}, ${source.toString}"
+  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}, ${source.toString}"
 }
 
 object Fields extends Enumeration {
@@ -45,5 +45,5 @@ class MoveToStatusRegister private(val label: Label, override val opcode: String
   override def encodeWord()(implicit page: Section): Int =
     super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | fields.toBitMask(0).toInt | sourceValue)
 
-  override def toString = s"${super.toString()} ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
+  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
 }

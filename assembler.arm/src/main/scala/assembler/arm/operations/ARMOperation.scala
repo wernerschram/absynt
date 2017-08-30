@@ -6,6 +6,7 @@ import assembler.sections.Section
 import assembler.Encodable
 
 trait ARMOperation extends Encodable {
+  self: Encodable =>
   val opcode: String
 
   override def size()(implicit page: Section) = 4
@@ -14,9 +15,11 @@ trait ARMOperation extends Encodable {
 
   def encodeWord()(implicit page: Section): Int = 0
 
-  override def toString: String = mnemonic.sortBy { part => part.order }.map { part => part.name }.mkString
+  override def toString: String = s"$labelPrefix$mnemonicString"
 
   def mnemonic: List[PartialName] = PartialName(opcode, 0) :: Nil
+
+  lazy val mnemonicString: String = mnemonic.sortBy { part => part.order }.map { part => part.name }.mkString
 }
 
 object ARMOperation {

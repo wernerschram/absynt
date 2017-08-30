@@ -161,7 +161,7 @@ class LoadStore(val label: Label, val opcode: String, val condition: Condition, 
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
   override def toString =
-    s"${super.toString()}${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
+    s"$labelPrefix$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
 
 }
 
@@ -176,5 +176,5 @@ class LoadStoreMiscelaneous(val label: Label, val opcode: String, val condition:
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
   override def toString =
-    s"${super.toString()}${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
+    s"$labelPrefix$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
 }

@@ -27,5 +27,5 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
     }
   }
 
-  override def toString = s"${super.toString()} $target"
+  override def toString = s"$labelPrefix$mnemonicString $target"
 }

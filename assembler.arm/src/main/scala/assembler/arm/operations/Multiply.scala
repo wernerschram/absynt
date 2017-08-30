@@ -16,7 +16,7 @@ class MultiplyOperation(val label: Label, val code: Byte, override val opcode: S
       (source.registerCode << 8) |
       multiplyValue.registerCode
 
-  override def toString = s"${super.toString()} ${destination.toString}, ${multiplyValue.toString}, ${source.toString}"
+  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}, ${multiplyValue.toString}, ${source.toString}"
 }
 
 class MultiplyWithRegisterOperation(label: Label, code: Byte, opcode: String, destination: GeneralRegister, source: GeneralRegister,

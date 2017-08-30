@@ -29,7 +29,7 @@ class LoadStoreMultiple(val label: Label, direction: LoadStoreMultipleDirection,
   def toRegisterBits(registers: List[GeneralRegister]): Int =
     registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
 
-  override def toString = s"${super.toString()}${addressingMode.mnemonicExtension} $baseRegisterString, $registerString"
+  override def toString = s"$labelPrefix$mnemonicString${addressingMode.mnemonicExtension} $baseRegisterString, $registerString"
 
   def baseRegisterString: String = baseRegister.toString()
 
@@ -63,5 +63,5 @@ class ReturnFromException(val label: Label, baseRegister: GeneralRegister, addre
       addressingMode.bitMask |
       (baseRegister.registerCode << 16)
 
-  override def toString = s"${super.toString()}${addressingMode.mnemonicExtension} $baseRegister${if (updateBase) "!" else ""}"
+  override def toString = s"$labelPrefix$mnemonicString${addressingMode.mnemonicExtension} $baseRegister${if (updateBase) "!" else ""}"
 }
