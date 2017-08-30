@@ -86,7 +86,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
               (implicit processorMode: ProcessorMode, label: Label): Encodable =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        forConstant(source1, distance, destination, condition)
+        forConstant(source1, distance - 8, destination, condition)
     }
 }
 
