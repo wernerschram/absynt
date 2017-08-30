@@ -56,7 +56,7 @@ trait X86Operation extends Encodable {
 
   def mnemonic: String
 
-  override def toString = s"$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
+  override def toString = s"$labelPrefix$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
 }
 
 object X86Operation {

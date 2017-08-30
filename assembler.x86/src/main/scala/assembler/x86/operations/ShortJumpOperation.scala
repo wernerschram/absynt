@@ -18,7 +18,7 @@ abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte],
 
   def encodableForShortPointer(pointer: NearPointerOperand)(implicit page: Section): Encodable
 
-  override def toString = s"$mnemonic $target"
+  override def toString = s"$labelPrefix$mnemonic $target"
 
   override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = shortJumpSize
 
