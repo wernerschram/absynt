@@ -15,8 +15,7 @@ import assembler.sections.Section
 object Boot extends App {
 
   object GPIO {
-    val Base = 0x20200000
-    //val Base = 0x101f1000
+    val Base = 0x3F200000
 
     val GPPUD: Short = 0x94.toShort
     val GPPUDCLK0: Short = 0x98.toShort
@@ -176,7 +175,7 @@ object Boot extends App {
 
     Move.forConstant(delay, register) ::
     List[Encodable](
-      { implicit val label = targetLabel; Subtract.setFlags(register, 2.toByte, register) },
+      { implicit val label = targetLabel; Subtract.setFlags(register, 1.toByte, register) },
       Branch(targetLabel, NotEqual)
     )
   }
@@ -194,11 +193,9 @@ object Boot extends App {
       Move.forConstant(UART0.Base, R0) ::
       Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
-      naiveDelay(150, R4) :::
       //
       // Disable pull up/down for all GPIO pins & delay for 150 cycles.
       Move.forConstant(GPIO.Base, R2) ::
-      //
       StoreRegister(R1, R2, GPIO.GPPUD) ::
       naiveDelay(150, R4) :::
       //
@@ -209,11 +206,9 @@ object Boot extends App {
       //
       // Write 0 to GPPUDCLK0 to make it take effect.
       StoreRegister(R1, R2, GPIO.GPPUDCLK0) ::
-      naiveDelay(150, R4) :::
       // Clear pending interrupts.
       Move.forConstant(0x7FF, R1) ::
       StoreRegister(R1, R0, UART0.ICR) ::
-      naiveDelay(150, R4) :::
       //
       // Set integer & fractional part of baud rate.
       // Divider = UART_CLOCK/(16 * Baud)
@@ -224,42 +219,41 @@ object Boot extends App {
       // Fractional part register = (.627 * 64) + 0.5 = 40.6 = ~40.
       Move.forConstant(1, R1) ::
       StoreRegister(R1, R0, UART0.IBRD) ::
-        naiveDelay(150, R4) :::
       //
       // Enable FIFO & 8 bit data transmissio (1 stop bit, no parity).
       Move.forConstant(40, R1) ::
       StoreRegister(R1, R0, UART0.FBRD) ::
-        naiveDelay(150, R4) :::
       //
       // Mask all interrupts.
       Move.forConstant(0x70, R1) ::
       StoreRegister(R1, R0, UART0.LCRH) ::
-        naiveDelay(150, R4) :::
-      Move.forConstant(0x7F1, R1) ::
+      //
+      Move.forConstant(0x7F2, R1) ::
       StoreRegister(R1, R0, UART0.IMSC) ::
-        naiveDelay(150, R4) :::
       //
       // Enable UART0, receive & transfer part of UART.
-      Move.forConstant(0x7F1, R1) ::
+      Move.forConstant(0x301, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
-        naiveDelay(150, R4) :::
       //
       // Put the string from label [text] on the serial line
       Add.forRelativeLabel(PC, text, R7) ::
-      Move(0.toByte, R6) ::
+      Move.forConstant(0.toByte, R6) ::
+        //
       { implicit val label = putString; LoadRegister(R4, R0, UART0.FR)} ::
-      LoadRegister(R5, R7, R6) ::
-      StoreRegister(R5, R0, UART0.CR) ::
-        naiveDelay(150, R4) :::
+      And.setFlags(R4, 0x20.toByte, R4) ::
+      Branch(putString, ZeroClear) ::
+      //
+      LoadRegister.byte(R5, R7, R6) ::
+      StoreRegister.byte(R5, R0, UART0.DR) ::
       Add(R6, 1.toByte, R6) ::
-      Compare(R6, 12.toByte) ::
+      Compare(R6, 15.toByte) ::
       Branch(putString, NotEqual) ::
       //
       // Goal achieved.
       halt() ::
       //
       // Resources
-      { implicit val label = text; EncodedString("Hello World!") } :: Nil
+      { implicit val label = text; EncodedString("Hello World!\r\n\0") } :: Nil
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
