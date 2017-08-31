@@ -280,4 +280,11 @@ object Boot extends App {
 
   // To decompile the output download the gcc cross compiler for arm and execute:
   //  arm-linux-gnueabi-objdump -D /tmp/bootRpi-output/test.elf -m arm
+  //
+  // To run the example on qemu:
+  // qemu-system-arm --kernel /tmp/bootRpi-output/test.raw -machine raspi2 -serial stdio
+  //
+  // architectures other that raspberry pi 2 could be supported by changing the GPIO
+  // and UART base addresses
+  //
 }
