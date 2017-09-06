@@ -128,7 +128,7 @@ object Boot extends App {
       halt() ::
       //
       // Resources
-      { implicit val label = text; EncodedString("Hello World!\r\n\0") } :: Nil
+      { implicit val label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil
     , 0x1000)
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))

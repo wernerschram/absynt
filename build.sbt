@@ -2,6 +2,8 @@ scalaVersion in ThisBuild := "2.12.0"
 
 lazy val root = project in file(".") aggregate(assembler, assemblerX86, assemblerARM, ARMBootRpiExample, X86BootFlagExample)
 
+scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
+
 addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.17")
 
 lazy val assembler = (project in file("assembler"))

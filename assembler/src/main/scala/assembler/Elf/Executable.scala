@@ -35,10 +35,12 @@ abstract class Elf[S <: Section:HasName](sections: List[S], val entryLabel: Labe
     (strings.head, 0) :: stringOffset(1, strings)
   }
 
-  def stringOffset(startOffset: Int, strings: List[String]): List[(String, Int)] = {
+  private def stringOffset(startOffset: Int, strings: List[String]): List[(String, Int)] = {
     strings match {
       case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
       case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
+      case neck :: Nil => (neck, startOffset) :: Nil
+      case Nil => Nil
     }
   }
 
