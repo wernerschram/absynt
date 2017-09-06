@@ -3,24 +3,22 @@ package assembler.Elf
 import assembler._
 import assembler.sections.Section
 
-abstract class Elf[S <: Section:HasName](sections: List[S], val entryLabel: Label) extends Application(sections) {
+abstract class Elf[S <: Section:HasName](val architecture: Architecture, sections: List[S], val entryLabel: Label) extends Application(sections) {
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
   val version: ElfVersion = ElfVersion.Original
 
-  implicit def endianness: Endianness
+  implicit def endianness: Endianness = architecture.endianness
 
-  def ABI: OSABI
   def elfType: ElfType
-  def machine: Machine
-  def `class`: ElfClass
+
   val programHeaderCount: Short = sections.size.toShort
   val sectionHeaderCount: Short = (sections.size + 2).toShort // program sections + Null section and Strings section
   val sectionNamesSectionHeaderIndex: Short = (sectionHeaderCount - 1).toShort // last section
 
   val dataOffset: Int =
-    `class`.headerSize +
-    programHeaderCount * `class`.programHeaderSize +
-    sectionHeaderCount * `class`.sectionHeaderSize
+    architecture.processorClass.headerSize +
+    programHeaderCount * architecture.processorClass.programHeaderSize +
+    sectionHeaderCount * architecture.processorClass.sectionHeaderSize
 
   def address(label: Label): Long =
     sections.filter(s => s.contains(label)).map(s => s.baseAddress + s.relativeAddress(label)).head
@@ -59,21 +57,21 @@ abstract class Elf[S <: Section:HasName](sections: List[S], val entryLabel: Labe
 
   def header: List[Byte] =
       magic :::
-      `class`.id ::
+      architecture.processorClass.id ::
       endianness.id ::
       version.id ::
-      ABI.encodeBytes :::
+      architecture.ABI.encodeBytes :::
       endianness.encode(elfType.id) :::
-      endianness.encode(machine.id) :::
+      endianness.encode(architecture.processor.id) :::
       endianness.encode(version.extended) :::
-      `class`.numberBytes(address(entryLabel)) :::
-      `class`.programHeaderOffsetBytes :::
-      `class`.sectionHeaderOffsetBytes(programHeaderCount) :::
-      endianness.encode(machine.flags) :::
-      endianness.encode(`class`.headerSize) :::
-      endianness.encode(`class`.programHeaderSize) :::
+      architecture.processorClass.numberBytes(address(entryLabel)) :::
+      architecture.processorClass.programHeaderOffsetBytes :::
+      architecture.processorClass.sectionHeaderOffsetBytes(programHeaderCount) :::
+      endianness.encode(architecture.processor.flags) :::
+      endianness.encode(architecture.processorClass.headerSize) :::
+      endianness.encode(architecture.processorClass.programHeaderSize) :::
       endianness.encode(programHeaderCount) :::
-      endianness.encode(`class`.sectionHeaderSize) :::
+      endianness.encode(architecture.processorClass.sectionHeaderSize) :::
       endianness.encode(sectionHeaderCount) :::
       endianness.encode(sectionNamesSectionHeaderIndex) :::
       programHeaders.flatMap(p => p.header) :::
@@ -81,18 +79,33 @@ abstract class Elf[S <: Section:HasName](sections: List[S], val entryLabel: Labe
       sections.flatMap(s => s.encodeByte()) :::
       stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)
 
- }
-
-class Executable[S <: Section:HasName](sections: List[S], entryLabel: Label) extends Elf(sections, entryLabel) {
-
-  implicit override def endianness: Endianness = Endianness.BigEndian
-  override def ABI: OSABI = OSABI.SystemV
-  override def elfType: ElfType = ElfType.Executable
-  override def machine: Machine = Machine.ARM
-  override def `class`: ElfClass = ElfClass._32Bit
 }
 
-abstract sealed case class ElfClass private(id: Byte) {
+trait Architecture {
+  def endianness: Endianness
+  def ABI: OSABI
+  def processor: Processor
+  def processorClass: ProcessorClass
+}
+
+object Architecture {
+  object RaspberryPi2 extends Architecture {
+    override val endianness: Endianness = Endianness.LittleEndian
+    override val ABI: OSABI = OSABI.SystemV
+    override val processor: Processor = Processor.ARM
+    override val processorClass: ProcessorClass = ProcessorClass._32Bit
+  }
+}
+
+class Executable[S <: Section:HasName] private(architecture: Architecture, sections: List[S], entryLabel: Label) extends Elf(architecture, sections, entryLabel) {
+  override def elfType: ElfType = ElfType.Executable
+}
+
+object Executable {
+  def apply[S <: Section:HasName](architecture: Architecture, sections: List[S], entryLabel: Label) = new Executable[S](architecture, sections, entryLabel)
+}
+
+abstract sealed case class ProcessorClass private(id: Byte) {
   def headerSize: Short
   def programHeaderSize: Short
   def sectionHeaderSize: Short
@@ -103,9 +116,9 @@ abstract sealed case class ElfClass private(id: Byte) {
   def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): List[Byte]
 }
 
-case object ElfClass {
+case object ProcessorClass {
 
-  object _32Bit extends ElfClass(0x01.toByte) {
+  object _32Bit extends ProcessorClass(0x01.toByte) {
     override val headerSize: Short = 0x34
     override val programHeaderSize: Short = 0x20
     override val sectionHeaderSize: Short = 0x28
@@ -116,7 +129,7 @@ case object ElfClass {
     override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): List[Byte] =
       endianness.encode(headerSize + headerCount * programHeaderSize)
   }
-  object _64Bit extends ElfClass(0x02.toByte) {
+  object _64Bit extends ProcessorClass(0x02.toByte) {
     override val headerSize: Short = 0x40
     override val programHeaderSize: Short = 0x38
     override val sectionHeaderSize: Short = 0x40
@@ -178,15 +191,15 @@ case object ElfType {
   object Core extends ElfType(0x04.toShort)
 }
 
-case class Machine private(id: Short, flags: Int)
+case class Processor private(id: Short, flags: Int)
 
-case object Machine {
-  object Undefined extends Machine(0x00.toShort, 0x00)
-  object SPARC extends Machine(0x02.toShort, 0x00)
-  object X86 extends Machine(0x03.toShort, 0x00)
-  object MIPS extends Machine(0x08.toShort, 0x00)
-  object PowerPC extends Machine(0x14.toShort, 0x00)
+case object Processor {
+  object Undefined extends Processor(0x00.toShort, 0x00)
+  object SPARC extends Processor(0x02.toShort, 0x00)
+  object X86 extends Processor(0x03.toShort, 0x00)
+  object MIPS extends Processor(0x08.toShort, 0x00)
+  object PowerPC extends Processor(0x14.toShort, 0x00)
   //...
-  object ARM extends Machine(0x28.toShort, 0x00)
-  object X86_64 extends Machine(0x3e.toShort, 0x00)
+  object ARM extends Processor(0x28.toShort, 0x00)
+  object X86_64 extends Processor(0x3e.toShort, 0x00)
 }

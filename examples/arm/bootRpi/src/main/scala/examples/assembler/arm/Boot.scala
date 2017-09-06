@@ -3,7 +3,7 @@ package examples.assembler.arm
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.Elf.{Executable, HasName}
+import assembler.Elf.{Architecture, Executable, HasName}
 import assembler._
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
@@ -145,7 +145,7 @@ object Boot extends App {
       override def name(x: Section): String = ".text"
     }
 
-    val exec = new Executable(page:: Nil, entry)
+    val exec = Executable(Architecture.RaspberryPi2, page :: Nil, entry)
     out.write(exec.header.toArray)
    out.flush()
   }

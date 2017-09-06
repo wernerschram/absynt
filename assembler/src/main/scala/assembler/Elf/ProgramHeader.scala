@@ -6,18 +6,18 @@ class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
   def `type`: ProgramType = ProgramType.Load
   def flags: Flags[ProgramFlag] = ProgramFlag.Execute | ProgramFlag.Read
   def alignBytes: Int = 0x40
-  def physicalAddressBytes: List[Byte] = elf.`class`.numberBytes(elf.getBaseAddress(section))
+  def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(elf.getBaseAddress(section))
 
-  def segmentFileOffset: List[Byte] = elf.`class`.numberBytes(elf.fileOffset(section))
-  def segmentMemoryOffset: List[Byte] = elf.`class`.numberBytes(elf.getBaseAddress(section))
-  def segmentFileSize: List[Byte] = elf.`class`.numberBytes(section.size)
+  def segmentFileOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.fileOffset(section))
+  def segmentMemoryOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.getBaseAddress(section))
+  def segmentFileSize: List[Byte] = elf.architecture.processorClass.numberBytes(section.size)
 
   def segmentMemorySize: List[Byte] = segmentFileSize
 
   implicit def endianness: Endianness = elf.endianness
 
-  def header: List[Byte] = elf.`class` match {
-    case ElfClass._32Bit =>
+  def header: List[Byte] = elf.architecture.processorClass match {
+    case ProcessorClass._32Bit =>
       elf.endianness.encode(`type`.id) :::
       segmentFileOffset :::
       segmentMemoryOffset :::
@@ -25,8 +25,8 @@ class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
       segmentFileSize :::
       segmentMemorySize :::
       elf.endianness.encode(flags.encode.toInt) :::
-      elf.`class`.numberBytes(alignBytes)
-    case ElfClass._64Bit =>
+      elf.architecture.processorClass.numberBytes(alignBytes)
+    case ProcessorClass._64Bit =>
       elf.endianness.encode(`type`.id) :::
       elf.endianness.encode(flags.encode.toInt) :::
       segmentFileOffset :::
@@ -34,7 +34,7 @@ class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
       physicalAddressBytes :::
       segmentFileSize :::
       segmentMemorySize :::
-      elf.`class`.numberBytes(alignBytes)
+      elf.architecture.processorClass.numberBytes(alignBytes)
   }
 }
 

@@ -21,14 +21,14 @@ abstract class SectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) {
   def header: List[Byte] = {
     elf.endianness.encode(nameReference) :::
     elf.endianness.encode(`type`.id) :::
-    elf.`class`.flagBytes(flags) :::
-    elf.`class`.numberBytes(sectionAddress) :::
-    elf.`class`.numberBytes(sectionFileOffset) :::
-    elf.`class`.numberBytes(segmentFileSize) :::
+    elf.architecture.processorClass.flagBytes(flags) :::
+    elf.architecture.processorClass.numberBytes(sectionAddress) :::
+    elf.architecture.processorClass.numberBytes(sectionFileOffset) :::
+    elf.architecture.processorClass.numberBytes(segmentFileSize) :::
     elf.endianness.encode(link) :::
     elf.endianness.encode(info) :::
-    elf.`class`.numberBytes(alignBytes) :::
-    elf.`class`.numberBytes(entrySize)
+    elf.architecture.processorClass.numberBytes(alignBytes) :::
+    elf.architecture.processorClass.numberBytes(entrySize)
   }
 }
 
@@ -60,7 +60,7 @@ class NullSectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) extends Se
 
   val alignBytes: Int = 0
   val entrySize: Int = 0
-  override def header: List[Byte] = List.fill(elf.`class`.sectionHeaderSize)(0.toByte)
+  override def header: List[Byte] = List.fill(elf.architecture.processorClass.sectionHeaderSize)(0.toByte)
 }
 
 object NullSectionHeader {
