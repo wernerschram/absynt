@@ -1,4 +1,4 @@
-package examples.assembler.arm
+package examples.assembler.arm.BootRpi
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}

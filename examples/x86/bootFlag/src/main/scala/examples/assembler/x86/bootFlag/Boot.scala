@@ -1,4 +1,4 @@
-package examples.assembler.bootFlag
+package examples.assembler.x86.bootFlag
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
