@@ -13,7 +13,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "a Move instruction" when {
     "in real mode" should {

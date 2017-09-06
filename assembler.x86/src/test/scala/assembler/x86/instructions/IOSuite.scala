@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class IOSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an Input instruction" when {
     "in real mode" should {

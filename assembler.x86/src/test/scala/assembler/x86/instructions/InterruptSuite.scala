@@ -8,7 +8,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class InterruptSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an Interrupt instruction" when {
 

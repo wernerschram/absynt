@@ -62,7 +62,7 @@ object Boot extends App {
       StoreString.Repeat(AL, DI) ::
 
       { implicit val label = Label.unique; Jump(label) } ::
-      Nil
+      Nil, 0
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
@@ -72,7 +72,7 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
 
     page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).hexString} $x") }
-    out.write(page.encodeByte()(page).toArray)
+    out.write(page.encodeByte().toArray)
     Console.println(s"output to file $outputFilePath")
     out.flush()
 

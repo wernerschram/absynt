@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ArithmeticSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   // ADC, ADD, AND, CMP, OR, SBC, SUB and XOR all inherits from BasicInteraction.
   // BasicInteraction is covered by the XOR tests, for the others there are some testcases to test the opcode.

@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class StackSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an Push instruction" when {
     "in real mode" should {
