@@ -5,23 +5,32 @@ import assembler.reference.ReferencingInstruction
 
 import scala.language.implicitConversions
 
-trait Section extends Encodable {
+trait Section {
   val content: List[Encodable]
-  def getRelativeAddress(encodable: Encodable): Int =
-    content.takeWhile(current => current != encodable).map(current => current.size()(this)).sum
+
+  val baseAddress: Int
+
+  type EncodableCondition = (Encodable)=>Boolean
+
+  def relativeAddress(label: Label): Int = relativeAddress((current: Encodable) => current.label == label)
+  def relativeAddress(encodable: Encodable): Int = relativeAddress((current: Encodable) => current == encodable)
+  def relativeAddress(condition: EncodableCondition): Int =
+    content.takeWhile(current => !condition(current)).map(current => current.size()(this)).sum
+
+  def contains(label: Label): Boolean = contains((current: Encodable) => current.label == label)
+  def contains(encodable: Encodable): Boolean = contains((current: Encodable) => current == encodable)
+  def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
   def intermediateEncodables(from: ReferencingInstruction): List[Encodable]
 
   def isForwardReference(from: ReferencingInstruction): Boolean
 
   def size: Int
-  def size()(implicit section: Section): Int = size
 
-  def encodeByte: List[Byte]
-  override def encodeByte()(implicit section: Section): List[Byte] = encodeByte
+  def encodeByte(): List[Byte]
 }
 
-class SimpleSection(val content: List[Encodable])(implicit val label: Label) extends Section {
+class SimpleSection(val content: List[Encodable], val baseAddress: Int)(implicit val label: Label) extends Section {
 
   def intermediateEncodables(from: ReferencingInstruction): List[Encodable] = {
     val trimLeft = content
@@ -49,15 +58,6 @@ class SimpleSection(val content: List[Encodable])(implicit val label: Label) ext
   lazy val size: Int = encodeByte.length
 }
 
-trait BaseAddress {
-  self: Section =>
-
-  val baseAddress: Int
-}
-
 object Section {
-  def apply(content: List[Encodable])(implicit label: Label): Section = new SimpleSection(content)
-  def apply(content: List[Encodable], sectionBaseAddress: Int)(implicit label: Label): Section = new SimpleSection(content) with BaseAddress {
-    val baseAddress: Int = sectionBaseAddress
-  }
+  def apply(content: List[Encodable], sectionBaseAddress: Int)(implicit label: Label): Section = new SimpleSection(content, sectionBaseAddress)
 }

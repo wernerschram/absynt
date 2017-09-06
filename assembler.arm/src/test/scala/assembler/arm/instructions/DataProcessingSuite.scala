@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an AddCarry instruction" when {
     "in a32 mode" should {
@@ -151,7 +151,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           instruction,
             EncodedByteList(List.fill(8)(0x00.toByte)),
-            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
         instruction.encodeByte()(p) should be(Hex.msb("e2801f01"))
       }
 
@@ -161,7 +161,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
         instruction.encodeByte()(p) should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
 
@@ -172,7 +172,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
-          instruction))
+          instruction), 0)
         instruction.encodeByte()(p) should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
 
@@ -309,7 +309,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           instruction,
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
         instruction.encodeByte()(p) should be(Hex.msb("e3a01f02"))
       }
 
@@ -319,7 +319,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
         instruction.encodeByte()(p) should be(Hex.msb("e3a01f02"))
       }
 
@@ -330,7 +330,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
-          instruction))
+          instruction), 0)
         instruction.encodeByte()(p) should be(Hex.msb("e3a01f01"))
       }
 

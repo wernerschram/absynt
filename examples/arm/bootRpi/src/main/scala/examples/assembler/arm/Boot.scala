@@ -3,6 +3,7 @@ package examples.assembler.arm
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
+import assembler.Elf.{Executable, HasName}
 import assembler._
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
@@ -44,140 +45,13 @@ object Boot extends App {
     val TDR: Short = 0x8C
   }
 
-
-  object elf {
-    def magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
-    def `class`: List[Byte] = 0x01.toByte :: Nil // 32bit
-    def data: List[Byte] = 0x01.toByte :: Nil // big endian
-    def version: List[Byte] = 0x01.toByte :: Nil
-    def osAbi: List[Byte] = 0x00.toByte :: Nil
-    def abiVersion: List[Byte] = 0x00.toByte :: Nil
-    def eiPad: List[Byte] = List.fill(7)(0x00.toByte)
-    def eType: List[Byte] = 0x02.toByte :: 0x00.toByte :: Nil // ???
-    def eMachine: List[Byte] = 0x89.toByte :: 0x00.toByte :: Nil // ARM
-    def eVersion: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-    def entry: List[Byte] = List.fill(1)(0x00.toByte) ::: 0x02.toByte :: 0xc0.toByte :: 0xce.toByte :: Nil
-    def phoff: List[Byte] = 0x34.toByte :: Nil ::: List.fill(3)(0x00.toByte)
-    def shoff: List[Byte] = 0x54.toByte :: Nil ::: List.fill(3)(0x00.toByte)
-    def flags: List[Byte] = 0x00.toByte :: 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-    def ehSize: List[Byte] = 0x34.toByte :: 0x00.toByte :: Nil
-    def phEntSize: List[Byte] = 0x20.toByte :: 0x00.toByte :: Nil
-    def phNum: List[Byte] = 0x01.toByte :: 0x00.toByte :: Nil
-    def shEntSize: List[Byte] = 0x28.toByte :: 0x00.toByte :: Nil
-    def shNum: List[Byte] = 0x03.toByte :: 0x00.toByte :: Nil
-    def shstrndx: List[Byte] = 0x02.toByte :: 0x00.toByte :: Nil
-
-    object programHeader {
-      def `type`: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def offset: List[Byte] = 0xcc.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def vaddr: List[Byte] = 0x00.toByte :: 0x1e.toByte :: 0xc0.toByte :: 0xce.toByte :: Nil
-      def paddr: List[Byte] = 0x00.toByte :: 0x1e.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def filesz: List[Byte] = 0xb0.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def memsz: List[Byte] = 0xb0.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def flags: List[Byte] = 0x05.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def allign: List[Byte] = 0x40.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-
-      def header: List[Byte] =
-        `type` :::
-        offset :::
-        vaddr :::
-        paddr :::
-        filesz :::
-        memsz :::
-        flags :::
-        allign
-    }
-
-    object nullSection {
-      def header: List[Byte] = List.fill(40)(0x00.toByte)
-    }
-
-    object textSectionHeader {
-      def name: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def `type`: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def flags: List[Byte] = 0x06.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def addr: List[Byte] = 0x00.toByte :: 0x1e.toByte :: 0xc0.toByte :: 0xce.toByte :: Nil
-      def offset: List[Byte] = 0xcc.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def filesz: List[Byte] = 0xb0.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def link: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def info: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def allign: List[Byte] = 0x40.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def entSize: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-
-      def header: List[Byte] =
-        name :::
-        `type` :::
-        flags :::
-        addr :::
-        offset :::
-        filesz :::
-        link :::
-        info :::
-        allign :::
-        entSize
-    }
-
-    object stringSectionHeader {
-      def name: List[Byte] = 0x07.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def `type`: List[Byte] = 0x03.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def flags: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def addr: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def offset: List[Byte] = 0x7c.toByte :: 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def filesz: List[Byte] = 0x11.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def link: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def info: List[Byte] = 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def allign: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-      def entSize: List[Byte] = 0x01.toByte :: 0x00.toByte :: 0x00.toByte :: 0x00.toByte :: Nil
-
-      def header: List[Byte] =
-        name :::
-        `type` :::
-        flags :::
-        addr :::
-        offset :::
-        filesz :::
-        link :::
-        info :::
-        allign :::
-        entSize
-    }
-
-    def header: List[Byte] =
-      magic :::
-      `class` :::
-      data :::
-      version :::
-      osAbi :::
-      abiVersion :::
-      eiPad :::
-      eType :::
-      eMachine :::
-      eVersion :::
-      entry :::
-      phoff :::
-      shoff :::
-      flags:::
-      ehSize :::
-      phEntSize :::
-      phNum :::
-      shEntSize :::
-      shNum :::
-      shstrndx :::
-      programHeader.header ::: //0x34
-      nullSection.header ::: // 0x54
-      textSectionHeader.header ::: //0x7c
-      stringSectionHeader.header //0xa4
-  }
-
-
   private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
-    List[Encodable](
-      { implicit val label = targetLabel; Subtract.setFlags(register, 1.toByte, register) },
-      Branch(targetLabel, NotEqual)
-    )
+    { implicit val label = targetLabel; Subtract.setFlags(register, 1.toByte, register) } ::
+    Branch(targetLabel, NotEqual) ::
+    Nil
   }
 
   private def halt()(implicit label: Label, processorMode: ProcessorMode) = { implicit val label = Label.unique; Branch(label) }
@@ -187,10 +61,11 @@ object Boot extends App {
 
     val putString: Label = "PutString"
     val text: Label = "Text"
+    val entry: Label = "Entry"
 
     val page: Section = Section(
       // Disable UART0
-      Move.forConstant(UART0.Base, R0) ::
+      { implicit val label = entry; Move.forConstant(UART0.Base, R0) } ::
       Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       //
@@ -254,7 +129,7 @@ object Boot extends App {
       //
       // Resources
       { implicit val label = text; EncodedString("Hello World!\r\n\0") } :: Nil
-    )
+    , 0x1000)
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
     val outputPath = path.resolve("bootRpi-output")
@@ -263,17 +138,16 @@ object Boot extends App {
     val rawFilePath = outputPath.resolve("test.raw")
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
-    raw.write(page.encodeByte()(page).toArray)
+    raw.write(page.encodeByte().toArray)
     println(s"size: ${page.size}")
     page.content.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
-    out.write((
-      elf.header :::
-        page.encodeByte()(page) :::
-        0x00.toByte :: Nil :::
-        ".text".toCharArray.map(_.toByte).toList ::: 0x00.toByte :: Nil :::
-        ".shstrtab".toCharArray.map(_.toByte).toList ::: 0x00.toByte :: Nil
-      ).toArray)
-    out.flush()
+    implicit object nameProvider extends HasName[Section] {
+      override def name(x: Section): String = ".text"
+    }
+
+    val exec = new Executable(page:: Nil, entry)
+    out.write(exec.header.toArray)
+   out.flush()
   }
 
   createFile()

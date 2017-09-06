@@ -39,7 +39,7 @@ class SectionSectionHeader[S <: Section: HasName](section: S)(implicit elf: Elf[
   val flags: Flags[SectionFlag] = SectionFlag.Alloc | SectionFlag.ExecutableInstruction
   val sectionAddress: Long = elf.getBaseAddress(section)
   val sectionFileOffset: Long = elf.fileOffset(section)
-  val segmentFileSize: Long = section.size()
+  val segmentFileSize: Long = section.size
   val link: Int = 0
   val info: Int = 0
 

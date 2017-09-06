@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MoveStatusRegisterSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {

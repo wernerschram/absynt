@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {
@@ -87,7 +87,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           LoadRegister(targetLabel, R1),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label =  targetLabel; EncodedString("Test")}))
+          { implicit val label =  targetLabel; EncodedString("Test")}), 0)
 
         p.encodeByte() should be(Hex.msb("e59f1000 00000000 74736554"))
       }
@@ -97,7 +97,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           { implicit val label =  targetLabel; EncodedString("Test")},
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            LoadRegister(targetLabel, R1, Condition.CarrySet)))
+            LoadRegister(targetLabel, R1, Condition.CarrySet)), 0)
 
         p.encodeByte() should be(Hex.msb("74736554 00000000 251F1010"))
       }

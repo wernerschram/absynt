@@ -10,7 +10,7 @@ class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
 
   def segmentFileOffset: List[Byte] = elf.`class`.numberBytes(elf.fileOffset(section))
   def segmentMemoryOffset: List[Byte] = elf.`class`.numberBytes(elf.getBaseAddress(section))
-  def segmentFileSize: List[Byte] = elf.`class`.numberBytes(section.size())
+  def segmentFileSize: List[Byte] = elf.`class`.numberBytes(section.size)
 
   def segmentMemorySize: List[Byte] = segmentFileSize
 
@@ -24,11 +24,11 @@ class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
       physicalAddressBytes :::
       segmentFileSize :::
       segmentMemorySize :::
-      elf.endianness.encode(flags.encode) :::
+      elf.endianness.encode(flags.encode.toInt) :::
       elf.`class`.numberBytes(alignBytes)
     case ElfClass._64Bit =>
       elf.endianness.encode(`type`.id) :::
-      elf.endianness.encode(flags.encode) :::
+      elf.endianness.encode(flags.encode.toInt) :::
       segmentFileOffset :::
       segmentMemoryOffset :::
       physicalAddressBytes :::
@@ -57,7 +57,7 @@ abstract class Flags[+FlagsType] {
 
   def |[T >: FlagsType](other: Flags[T]): Flags[FlagsType] =
     new Flags[FlagsType] {
-      override val encode: Long = this.encode | other.encode
+      override val encode: Long = Flags.this.encode | other.encode
     }
 }
 
@@ -68,8 +68,9 @@ object Flags {
 }
 
 case class ProgramFlag private(flag: Long) extends Flags[ProgramFlag] {
-  override val encode: Long = flag
+  override def encode: Long = flag
 }
+
 
 object ProgramFlag {
   object Execute extends ProgramFlag(0x01)

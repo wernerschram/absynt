@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class BranchSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable])
+  implicit val page: Section = Section(List.empty[Encodable], 0)
 
   "an Branch instruction" when {
     "in a32 mode" should {
@@ -37,7 +37,7 @@ class BranchSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
 
         p.encodeByte() should be(Hex.msb("EA000000 00000000 00000000"))
       }
@@ -47,7 +47,7 @@ class BranchSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel, Condition.LowerOrSame)))
+            Branch(targetLabel, Condition.LowerOrSame)), 0)
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
@@ -57,7 +57,7 @@ class BranchSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           EncodedByteList(List.fill(8)(0x00.toByte)),
           { implicit val label =  targetLabel; Branch(targetLabel)},
-          EncodedByteList(List.fill(8)(0x00.toByte))))
+          EncodedByteList(List.fill(8)(0x00.toByte))), 0)
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
       }
@@ -69,7 +69,7 @@ class BranchSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
 
         p.encodeByte() should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
       }
@@ -81,7 +81,7 @@ class BranchSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel)))
+            Branch(targetLabel)), 0)
 
         p.encodeByte() should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
@@ -116,7 +116,7 @@ class BranchSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           BranchLink(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
 
         p.encodeByte() should be(Hex.msb("EB000000 00000000 00000000"))
       }
@@ -153,7 +153,7 @@ class BranchSuite extends WordSpec with Matchers {
         val p = Section(List[Encodable](
           BranchLinkExchange(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+          { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
 
         p.encodeByte() should be(Hex.msb("FA000000 00000000 00000000"))
       }

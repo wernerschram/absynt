@@ -149,7 +149,7 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
               (implicit processorMode: ProcessorMode, label: Label): Encodable =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
       override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
-        forConstant(distance + page.getRelativeAddress(this), destination, condition)
+        forConstant(distance + page.relativeAddress(this), destination, condition)
     }
 }
 
