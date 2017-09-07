@@ -1,7 +1,9 @@
 package assembler.x86.instructions
 
-import assembler.Label
-import assembler.x86.ProcessorMode
+import assembler.reference.ReferencingInstruction
+import assembler.sections.Section
+import assembler.{Encodable, Label}
+import assembler.x86.{ParameterPosition, ProcessorMode}
 import assembler.x86.operands.memoryaccess.{MemoryAddress, MemoryLocation}
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
@@ -171,6 +173,42 @@ object Move {
     new RegisterEncoded[WideRegister](label, register, 0xB8.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
       assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
+    }
+
+  def forLabel(targetLabel: Label, register: WideRegister)
+              (implicit processorMode: ProcessorMode, myLabel: Label): Encodable =
+    new ReferencingInstruction {
+      override def target = targetLabel
+
+      def prefixBytes = register.getRexRequirements(ParameterPosition.OpcodeReg) match {
+        case Nil => 0
+        case _ => 1
+      }
+
+      def size: Int = (processorMode) match {
+          // prefixes + opcode + immediate
+        case (ProcessorMode.Real) => 0 + 1 + 2
+        case (ProcessorMode.Protected) => 0 + 1 + 4
+        case (ProcessorMode.Long) => prefixBytes + 1 + 8
+      }
+
+      override def minimumSize = size
+      override def maximumSize = size
+
+      def offset(forward: Boolean, distance: Int) = forward match {
+        case true => size + distance
+        case false => -distance
+      }
+
+      override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section) = (processorMode, register) match {
+          case (ProcessorMode.Real | ProcessorMode.Protected, _: GeneralPurposeRexRegister) => throw new AssertionError
+          case (ProcessorMode.Real, _) => Imm16ToR16(register, (page.baseAddress + page.relativeAddress(this) + offset(forward, distance)).toShort)
+          case (ProcessorMode.Protected, _: DoubleWordRegister) => Imm16ToR16(register, page.baseAddress + page.relativeAddress(this) + offset(forward, distance))
+          case (ProcessorMode.Long, _: QuadWordRegister) => Imm16ToR16(register, (page.baseAddress + page.relativeAddress(this) + offset(forward, distance)).toLong)
+          case _ => throw new AssertionError
+        }
+
+      override def label = myLabel
     }
 
   def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic

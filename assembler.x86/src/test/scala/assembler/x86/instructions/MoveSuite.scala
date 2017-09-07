@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.{Encodable, Hex}
+import assembler.{Encodable, EncodedByteList, Hex, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -310,6 +310,18 @@ class MoveSuite extends WordSpec with Matchers {
         Move(0x5555.toShort, BX).toString should be("mov bx, 21845")
       }
 
+      "correctly encode mov bx, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, AX)
+
+        val p = Section(List[Encodable](
+          move,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0)
+
+        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("B8 04 00")) }
+      }
+
       "correctly encode mov esi, 0x78563412" in {
         Move(0x78563412, ESI).encodeByte should be(Hex.lsb("66 BE 12 34 56 78"))
       }
@@ -370,6 +382,52 @@ class MoveSuite extends WordSpec with Matchers {
       "correctly represent mov [edx], ebp as a string" in {
         Move(EBP, RegisterMemoryLocation(EDX)).toString should be("mov [edx], ebp")
       }
+
+      "throw an AssertionError for mov r10d, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, R10D)
+
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(1)(0x00.toByte)),
+          move,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+
+
+        an[AssertionError] should be thrownBy {
+          move.encodeByte()(p)
+        }
+      }
+
+      "throw an AssertionError for mov r11, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, R11)
+
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(1)(0x00.toByte)),
+          move,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+
+
+        an[AssertionError] should be thrownBy {
+          move.encodeByte()(p)
+        }
+      }
+
+      "correctly encode mov ecx, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, ECX)
+
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(1)(0x00.toByte)),
+          move,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+
+        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("B9 07 01 00 00")) }
+      }
+
     }
 
     "in long mode" should {
@@ -519,7 +577,49 @@ class MoveSuite extends WordSpec with Matchers {
         Move(0x78563412, R14D).encodeByte should be(Hex.lsb("41 BE 12 34 56 78"))
       }
 
-      "correctly represent mov r14d, 2018915346 as a string" in {
+      "throw an AssertionError for mov ebx, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, EBX)
+
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(1)(0x00.toByte)),
+          move,
+            EncodedByteList(List.fill(1)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+
+
+        an[AssertionError] should be thrownBy {
+          move.encodeByte()(p)
+        }
+      }
+
+       "correctly encode mov r11, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, R11)
+
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(2)(0x00.toByte)),
+          move,
+            EncodedByteList(List.fill(2)(0x00.toByte)),
+            { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x10000)
+
+        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
+      }
+
+       "correctly encode mov rbx, [label]" in {
+        val targetLabel = Label.unique
+        val move = Move.forLabel(targetLabel, RBX)
+
+        val p = Section(List[Encodable](
+          EncodedByteList(List.fill(2)(0x00.toByte)),
+          { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))},
+          EncodedByteList(List.fill(2)(0x00.toByte)),
+          move), 0x3000000)
+
+        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
+      }
+
+     "correctly represent mov r14d, 2018915346 as a string" in {
         Move(0x78563412, R14D).toString should be("mov r14d, 2018915346")
       }
 
