@@ -15,14 +15,14 @@ object Architecture {
     override val processorClass: ProcessorClass = ProcessorClass._32Bit
   }
 
-  def X86() = new Architecture {
+  object X86 extends Architecture {
     override val endianness: Endianness = Endianness.LittleEndian
     override val ABI: OSABI = OSABI.SystemV
     override val processor: Processor = Processor.X86
     override val processorClass: ProcessorClass = ProcessorClass._32Bit
   }
 
-  def X86_64() = new Architecture {
+  object X86_64 extends Architecture {
     override val endianness: Endianness = Endianness.LittleEndian
     override val ABI: OSABI = OSABI.SystemV
     override val processor: Processor = Processor.X86_64
@@ -74,7 +74,7 @@ case object ProcessorClass {
     override def numberBytes(Number: Long)(implicit  endianness: Endianness): List[Byte] = endianness.encode(Number)
     override def programHeaderOffsetBytes(implicit endianness: Endianness): List[Byte] = endianness.encode(headerSize.toLong)
     override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): List[Byte] =
-      endianness.encode(headerSize + headerCount * programHeaderSize)
+      endianness.encode((headerSize + headerCount * programHeaderSize).toLong)
   }
 }
 
