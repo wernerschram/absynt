@@ -4,7 +4,7 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
 import assembler.Elf.{Architecture, Executable, HasName}
-import assembler.{Encodable, EncodedString, Label}
+import assembler.{Encodable, EncodedByteList, EncodedString, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -21,19 +21,20 @@ object HelloWorld extends App {
     val entry: Label = "Entry"
     val text: Label = "Text"
 
+    val targetLabel = Label.unique
     val page: Section = Section(
-      { implicit val label = entry; Move(0x04, EAX) } ::
       // use the write Syscall
+      { implicit val label = entry; Move(0x04, EAX) } ::
       Move(0x01, EBX) ::
-      Move(0x01, ECX) ::
-      Move(0x12, EDX) ::
+      Move.forLabel(text, ECX) ::
+      Move(12, EDX) ::
       Interrupt(0x80.toByte) ::
       // use the _exit Syscall
       Move(0x01, EAX) ::
       Move(0x00, EBX) ::
       Interrupt(0x80.toByte) ::
       { implicit val label = text; EncodedString("Hello World!\r\n\u0000") } ::
-      Nil, 0
+      Nil, 0x1000
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
