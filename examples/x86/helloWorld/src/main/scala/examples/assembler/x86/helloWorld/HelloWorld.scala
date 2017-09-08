@@ -4,7 +4,7 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
 import assembler.Elf.{Architecture, Executable, HasName}
-import assembler.{Encodable, EncodedByteList, EncodedString, Label}
+import assembler.{Encodable, EncodedString, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -21,8 +21,7 @@ object HelloWorld extends App {
     val entry: Label = "Entry"
     val text: Label = "Text"
 
-    val targetLabel = Label.unique
-    val page: Section = Section(
+    val section: Section = Section(
       // use the write Syscall
       { implicit val label = entry; Move(0x04, EAX) } ::
       Move(0x01, EBX) ::
@@ -37,6 +36,8 @@ object HelloWorld extends App {
       Nil, 0x1000
     )
 
+    val exec = Executable(Architecture.X86, section :: Nil, entry)
+
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
     val outputPath = path.resolve("x86HellowWorld-output")
     Files.createDirectories(outputPath)
@@ -48,16 +49,15 @@ object HelloWorld extends App {
     implicit object nameProvider extends HasName[Section] {
       override def name(x: Section): String = ".text"
     }
-    page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).hexString} $x") }
-    raw.write(page.encodeByte().toArray)
+    section.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(section).hexString} $x") }
+    raw.write(section.encodeByte().toArray)
     Console.println(s"output to file $outputFilePath")
-    val exec = Executable(Architecture.X86, page :: Nil, entry)
     out.write(exec.header.toArray)
     raw.flush()
     out.flush()
 
     //objdump -b binary -D /tmp/x86HellowWorld-output/test.raw -m x86_64 -M intel
-    //objdump -D /tmp/x86HellowWorld-output/test.elf
+    //objdump -D /tmp/x86HellowWorld-output/test.elf -M intel
   }
 
 }
