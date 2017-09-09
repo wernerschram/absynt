@@ -2,12 +2,12 @@ package assembler.x86.instructions
 
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
-import assembler.{Encodable, Hex}
+import assembler.{Resource, Hex}
 import org.scalatest.{Matchers, WordSpec}
 
 class InterruptFlagSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "a ClearInterruptFlag instruction" when {
 

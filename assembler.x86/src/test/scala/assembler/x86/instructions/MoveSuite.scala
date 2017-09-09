@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.{Encodable, EncodedByteList, Hex, Label}
+import assembler.{Resource, EncodedByteList, Hex, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -13,7 +13,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "a Move instruction" when {
     "in real mode" should {
@@ -314,12 +314,12 @@ class MoveSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, AX)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0)
 
-        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("B8 04 00")) }
+        withClue("Move") { move.getFinalState()(p).encodeByte should be(Hex.lsb("B8 04 00")) }
       }
 
       "correctly encode mov esi, 0x78563412" in {
@@ -387,7 +387,7 @@ class MoveSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, R10D)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -395,7 +395,7 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          move.encodeByte()(p)
+          move.getFinalState()(p).encodeByte
         }
       }
 
@@ -403,7 +403,7 @@ class MoveSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, R11)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -411,7 +411,7 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          move.encodeByte()(p)
+          move.getFinalState()(p).encodeByte
         }
       }
 
@@ -419,13 +419,13 @@ class MoveSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, ECX)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
 
-        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("B9 07 01 00 00")) }
+        withClue("Move") { move.getFinalState()(p).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
       }
 
     }
@@ -581,7 +581,7 @@ class MoveSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, EBX)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -589,7 +589,7 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          move.encodeByte()(p)
+          move.getFinalState()(p).encodeByte
         }
       }
 
@@ -597,26 +597,26 @@ class MoveSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, R11)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(2)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(2)(0x00.toByte)),
             { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x10000)
 
-        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
+        withClue("Move") { move.getFinalState()(p).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
       }
 
        "correctly encode mov rbx, [label]" in {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, RBX)
 
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(2)(0x00.toByte)),
           { implicit val label =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))},
           EncodedByteList(List.fill(2)(0x00.toByte)),
           move), 0x3000000)
 
-        withClue("Move") { move.encodeByte()(p) should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
+        withClue("Move") { move.getFinalState()(p).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
       }
 
      "correctly represent mov r14d, 2018915346 as a string" in {

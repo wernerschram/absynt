@@ -4,9 +4,8 @@ import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{FarPointer, MemoryLocation, NearPointer}
 import assembler.x86.operands.{FixedSizeOperand, ModRMEncodableOperand, ValueSize}
-import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static,
-                                 FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
-import assembler.{Encodable, Label}
+import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import assembler.{Resource, Encodable, Label}
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
@@ -15,10 +14,10 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
     Rel8(nearPointer)
   }
 
-  def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode): Encodable =
+  def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ShortJumpOperation(label, shortOpcode, mnemonic, targetLabel) {
 
-      def encodableForShortPointer(nearPointer: NearPointer)(implicit page: Section): Encodable = {
+      override def encodableForShortPointer(nearPointer: NearPointer)(implicit page: Section): Resource with Encodable = {
         assume(nearPointer.operandByteSize == ValueSize.Byte)
         Rel8(nearPointer)
       }
@@ -56,9 +55,9 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
 
   override def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new NearJumpOperation(label, shortOpcode, longOpcode, mnemonic, targetLabel) {
-      override def encodableForShortPointer(nearPointer: NearPointer)(implicit page: Section): Encodable = Rel8(nearPointer)
+      override def encodableForShortPointer(nearPointer: NearPointer)(implicit page: Section): Resource with Encodable = Rel8(nearPointer)
 
-      override def encodableForLongPointer(nearPointer: NearPointer)(implicit page: Section): Encodable = Rel16(nearPointer)
+      override def encodableForLongPointer(nearPointer: NearPointer)(implicit page: Section): Resource with Encodable = Rel16(nearPointer)
     }
 }
 

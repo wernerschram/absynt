@@ -155,8 +155,8 @@ object LoadStoreMiscellaneousOperation {
 class LoadStore(val label: Label, val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
                 offset: LoadStoreOffset, addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
   extends Conditional {
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() |
+  override def encodeWord: Int =
+    super.encodeWord |
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
@@ -170,8 +170,8 @@ class LoadStoreMiscelaneous(val label: Label, val opcode: String, val condition:
                             operation: LoadStoreMiscellaneousOperation.LoadStoreMiscellaneousOperation)
   extends Conditional {
 
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() |
+  override def encodeWord: Int =
+    super.encodeWord |
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 

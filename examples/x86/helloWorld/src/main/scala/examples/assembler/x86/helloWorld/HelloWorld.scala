@@ -4,7 +4,7 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
 import assembler.Elf.{Architecture, Executable, HasName}
-import assembler.{Encodable, EncodedString, Label}
+import assembler.{Resource, EncodedString, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -36,7 +36,6 @@ object HelloWorld extends App {
       Nil, 0x1000
     )
 
-    val exec = Executable(Architecture.X86, section :: Nil, entry)
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
     val outputPath = path.resolve("x86HellowWorld-output")
@@ -49,7 +48,8 @@ object HelloWorld extends App {
     implicit object nameProvider extends HasName[Section] {
       override def name(x: Section): String = ".text"
     }
-    section.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(section).hexString} $x") }
+    val exec = Executable(Architecture.X86, section :: Nil, entry)
+    section.finalContent.collect { case x: Resource => x }.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     raw.write(section.encodeByte().toArray)
     Console.println(s"output to file $outputFilePath")
     out.write(exec.header.toArray)

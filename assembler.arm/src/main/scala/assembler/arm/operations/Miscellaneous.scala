@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 
 class Miscellaneous(val label: Label, val code: Byte, override val opcode: String, value: Short, condition: Condition)
   extends ARMOperation {
-  override def encodeWord()(implicit page: Section): Int = {
+  override def encodeWord: Int = {
     val valuePart1: Byte = (value & 0x0f).toByte
     val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
     val extraCode: Int = 0x7
@@ -78,8 +78,8 @@ class ProcessorState(val label: Label, val code: Byte, val opcode: String, val c
       interruptDisableFlags.toBitMask(0).toInt << 6, mode.mode,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #$mode")
 
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
+  override def encodeWord: Int =
+    super.encodeWord | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
 
   override def toString = s"$labelPrefix$mnemonicString$postFixString"
 }

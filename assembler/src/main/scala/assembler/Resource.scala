@@ -1,13 +1,7 @@
 package assembler
 
-import assembler.sections.Section
-
-trait Encodable {
+trait Resource {
   def label: Label
-
-  def encodeByte()(implicit page: Section): Seq[Byte]
-
-  def size()(implicit page: Section): Int
 
   lazy val labelPrefix: String =
     label match {
@@ -16,4 +10,12 @@ trait Encodable {
     }
 
   override def toString: String = labelPrefix
+}
+
+trait Encodable {
+  self: Resource =>
+  def encodeByte: Seq[Byte]
+
+  def size: Int
+
 }

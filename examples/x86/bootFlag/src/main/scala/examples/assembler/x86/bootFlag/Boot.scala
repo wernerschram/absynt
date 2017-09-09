@@ -3,7 +3,7 @@ package examples.assembler.x86.bootFlag
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.{Encodable, Label}
+import assembler.{Resource, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -15,7 +15,7 @@ object Boot extends App {
 
   case class Color(r: Byte, g: Byte, b: Byte)
 
-  def setColor(col: Color)(implicit processorMode: ProcessorMode): List[Encodable] =
+  def setColor(col: Color)(implicit processorMode: ProcessorMode): List[Resource] =
         Move(0x3c9.toShort, DX) ::
         Move(col.r, AL) ::
         Output(AL, DX) ::
@@ -71,7 +71,7 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    page.content.collect { case x: Encodable => x }.foreach { x => Console.println(s"${x.encodeByte()(page).hexString} $x") }
+    page.finalContent.collect { case x: Resource => x }.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(page.encodeByte().toArray)
     Console.println(s"output to file $outputFilePath")
     out.flush()

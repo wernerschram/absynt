@@ -6,7 +6,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RightRotateImmediate, Shifter}
 import assembler.arm.operations._
 import assembler.sections.Section
-import assembler.{Encodable, EncodableCollection, Label}
+import assembler.{Resource, ResourceCollection, Encodable, Label}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -55,63 +55,63 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
 
 object AddCarry extends DataProcessing(0x05.toByte, "adc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
-      return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+      return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(apply(source1, shifters.head, destination, condition) ::
+    ResourceCollection(apply(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 }
 
 object Add extends DataProcessing(0x04.toByte, "add") {
   def forShifters(source1: GeneralRegister, shifters: List[RightRotateImmediate], destination: GeneralRegister,
-                  condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): Encodable = {
+    condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (shifters.isEmpty) {
       return if (label == Label.noLabel)
-        EncodableCollection(Nil)
+        ResourceCollection(Nil)
       else
-        EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+        ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    EncodableCollection(apply(source1, shifters.head, destination, condition) ::
+    ResourceCollection(apply(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable =
+    (implicit processorMode: ProcessorMode, label: Label): ResourceCollection =
     forShifters(source1, Shifter.apply(source2), destination, condition)
 
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label): Encodable =
+    (implicit processorMode: ProcessorMode, label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+      override def encodableForDistance(distance: Int)(implicit page: Section): ResourceCollection =
         forConstant(source1, distance - 8, destination, condition)
     }
 }
 
 object And extends DataProcessing(0x00.toByte, "and") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
-      return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+      return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(~source2)
-    EncodableCollection(BitClear(source1, shifters.head, destination, condition) ::
+    ResourceCollection(BitClear(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => BitClear(destination, value, destination, condition)))
   }
 }
 
 object BitClear extends DataProcessing(0x0E.toByte, "bic") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
-        EncodableCollection(Nil)
+        ResourceCollection(Nil)
       else
-        EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+        ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(BitClear(source1, shifters.head, destination, condition) ::
+    ResourceCollection(BitClear(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => BitClear(destination, value, destination, condition)))
   }
 }
@@ -122,33 +122,33 @@ object Compare extends DataProcessingNoDestination(0x0A.toByte, "cmp")
 
 object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
-        EncodableCollection(Nil)
+        ResourceCollection(Nil)
       else
-        EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+        ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(ExclusiveOr(source1, shifters.head, destination, condition) ::
+    ResourceCollection(ExclusiveOr(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => ExclusiveOr(destination, value, destination, condition)))
   }
 }
 
 object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
-      return EncodableCollection(apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+      return ResourceCollection(apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(apply(shifters.head, destination, condition) ::
+    ResourceCollection(apply(shifters.head, destination, condition) ::
       shifters.tail.map(value => Or(destination, value, destination, condition)))
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label): Encodable =
+              (implicit processorMode: ProcessorMode, label: Label) =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+      override def encodableForDistance(distance: Int)(implicit page: Section): Resource with Encodable =
         forConstant(distance + page.relativeAddress(this), destination, condition)
     }
 }
@@ -157,63 +157,63 @@ object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
 
 object Or extends DataProcessing(0x0C.toByte, "orr") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
-        EncodableCollection(Nil)
+        ResourceCollection(Nil)
       else
-        EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+        ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(apply(source1, shifters.head, destination, condition) ::
+    ResourceCollection(apply(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Or(destination, value, destination, condition)))
   }
 }
 
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
-      return EncodableCollection(ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+      return ResourceCollection(ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(ReverseSubtract(source1, shifters.head, destination, condition) ::
+    ResourceCollection(ReverseSubtract(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 }
 
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
-      return EncodableCollection(ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+      return ResourceCollection(ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) ::
+    ResourceCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 }
 
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
-      return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+      return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(SubtractCarry(source1, shifters.head, destination, condition) ::
+    ResourceCollection(SubtractCarry(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Subtract(destination, value, destination, condition)))
   }
 }
 
 object Subtract extends DataProcessing(0x02.toByte, "sub") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): Encodable = {
+                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
-        EncodableCollection(Nil)
+        ResourceCollection(Nil)
       else
-        EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
+        ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(Subtract(source1, shifters.head, destination, condition) ::
+    ResourceCollection(Subtract(source1, shifters.head, destination, condition) ::
       shifters.tail.map(value => Subtract(destination, value, destination, condition)))
   }
 }

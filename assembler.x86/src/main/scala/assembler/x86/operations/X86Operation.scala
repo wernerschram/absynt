@@ -1,18 +1,17 @@
 package assembler.x86.operations
 
-import assembler.sections.Section
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
-import assembler.{Encodable, Label}
+import assembler.{Resource, Encodable}
 
-trait X86Operation extends Encodable {
+trait X86Operation extends Resource with Encodable {
   val includeRexW: Boolean = true
 
   def operands: List[Operand]
 
-  override def size()(implicit page: Section): Int = encodeByte().length
+  override def size: Int = encodeByte.length
 
-  override def encodeByte()(implicit page: Section): List[Byte] = {
+  override def encodeByte: List[Byte] = {
     validate()
 
     optionalSegmentOverridePrefix :::

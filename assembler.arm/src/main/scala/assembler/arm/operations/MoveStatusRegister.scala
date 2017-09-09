@@ -11,8 +11,8 @@ import scala.language.implicitConversions
 class MoveFromStatusRegister(val label: Label, override val opcode: String, source: StatusRegister, destination: GeneralRegister,
                              override val condition: Condition)
   extends Conditional {
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12)
+  override def encodeWord: Int =
+    super.encodeWord | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12)
 
   override def toString = s"$labelPrefix$mnemonicString ${destination.toString}, ${source.toString}"
 }
@@ -42,8 +42,8 @@ class MoveToStatusRegister private(val label: Label, override val opcode: String
            condition: Condition) =
     this(label, opcode, destination, fields, condition, source.toString, source.encode)
 
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | 0x0120f000 | (destination.registerCode << 22 | fields.toBitMask(0).toInt | sourceValue)
+  override def encodeWord: Int =
+    super.encodeWord | 0x0120f000 | (destination.registerCode << 22 | fields.toBitMask(0).toInt | sourceValue)
 
   override def toString = s"$labelPrefix$mnemonicString ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
 }

@@ -1,18 +1,18 @@
 package assembler.reference
 
-import assembler.{Encodable, Label}
+import assembler.{Resource, Encodable, Label}
 import assembler.sections.Section
 
 import scala.collection.concurrent.TrieMap
 
 trait ReferencingInstruction
-    extends Encodable {
+    extends Resource {
   def target: Label
 
   def minimumSize: Int
   def maximumSize: Int
 
-  def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable
+  def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable
 
   def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
     encodableForDistance(forward, distance).size
@@ -33,7 +33,16 @@ trait ReferencingInstruction
   final private[reference] def estimatedSize(sizeAssumptions: Map[ReferencingInstruction, Int])(implicit page: Section): Int =
     getOrElseCreateInstruction.estimateSize(sizeAssumptions)
 
-  override def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
+  private def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
 
-  override def encodeByte()(implicit page: Section): Seq[Byte] = getOrElseCreateInstruction.encodeByte
+  private def encodeByte()(implicit page: Section): Seq[Byte] = getOrElseCreateInstruction.encodeByte
+
+  def getFinalState()(implicit page: Section): Resource with Encodable = new Resource with Encodable {
+
+    override def size: Int = ReferencingInstruction.this.size()
+
+    override def encodeByte: Seq[Byte] = ReferencingInstruction.this.encodeByte()
+
+    override def label = ReferencingInstruction.this.label
+  }
 }

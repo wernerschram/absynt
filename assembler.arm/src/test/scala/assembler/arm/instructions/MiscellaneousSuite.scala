@@ -3,12 +3,12 @@ package assembler.arm.instructions
 import assembler.arm.ProcessorMode
 import assembler.arm.operations.{Effect, ExecutionMode, InterruptDisableFlags}
 import assembler.sections.Section
-import assembler.{Encodable, Hex}
+import assembler.{Resource, Hex}
 import org.scalatest.{Matchers, WordSpec}
 
 class MiscellaneousSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "a Breakpoint instruction" when {
     "in a32 mode" should {

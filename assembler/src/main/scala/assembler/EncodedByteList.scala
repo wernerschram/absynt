@@ -1,14 +1,13 @@
 package assembler
 
-import assembler.sections.Section
 import assembler.ListExtensions._
 
-trait EncodedByteList extends Encodable {
+trait EncodedByteList extends Resource with Encodable {
   val bytes: List[Byte]
 
-  def encodeByte()(implicit page: Section): List[Byte] = bytes
+  def encodeByte: List[Byte] = bytes
 
-  def size()(implicit page: Section): Int = bytes.length
+  def size: Int = bytes.length
 
   override def toString: String = s"""${labelPrefix}SETB "${bytes.bigEndianHexString}""""
 }

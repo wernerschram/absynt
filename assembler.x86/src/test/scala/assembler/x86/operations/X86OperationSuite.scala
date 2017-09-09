@@ -1,13 +1,13 @@
 package assembler.x86.operations
 
-import assembler.{Encodable, Label}
+import assembler.{Resource, Label}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import org.scalatest.{Matchers, WordSpec}
 
 class X86OperationSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an X86 instruction" when {
     "in protected mode" should {
@@ -26,7 +26,7 @@ class X86OperationSuite extends WordSpec with Matchers {
 
       "return the size of the instruction" in {
         val instruction = new MyInstruction()
-        instruction.size() should be(1)
+        instruction.size should be(1)
       }
     }
   }

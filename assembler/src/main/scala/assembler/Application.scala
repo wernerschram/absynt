@@ -7,7 +7,7 @@ abstract class Application protected (val sections: List[Section]) {
 
   def getBaseAddress(section: Section): Int = section.baseAddress
 
-  def getAbsoluteAddress(encodable: Encodable): Long = {
+  def getAbsoluteAddress(encodable: Resource): Long = {
     val actual = orderedSections.filter(section => !section.content.contains(encodable)).head
     getBaseAddress(actual) + actual.relativeAddress(encodable)
   }

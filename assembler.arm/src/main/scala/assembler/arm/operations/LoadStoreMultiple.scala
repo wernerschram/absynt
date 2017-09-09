@@ -20,8 +20,8 @@ class LoadStoreMultiple(val label: Label, direction: LoadStoreMultipleDirection,
   assume(registers.nonEmpty)
   assume(baseRegister != GeneralRegister.R15)
 
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | 0x08000000 |
+  override def encodeWord: Int =
+    super.encodeWord | 0x08000000 |
       addressingMode.bitMask | direction.bitMask |
       (baseRegister.registerCode << 16) |
       toRegisterBits(registers)
@@ -38,8 +38,8 @@ class LoadStoreMultiple(val label: Label, direction: LoadStoreMultipleDirection,
 
 trait UpdateBase extends LoadStoreMultiple {
   self: LoadStoreMultiple =>
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | 0x00200000
+  override def encodeWord: Int =
+    super.encodeWord | 0x00200000
 
   override def baseRegisterString = s"${super.baseRegisterString}!"
 }
@@ -48,8 +48,8 @@ trait UserModeRegisters extends LoadStoreMultiple {
   self: LoadStoreMultiple =>
   assume(!(this.isInstanceOf[UpdateBase] && !registers.contains(GeneralRegister.R15)))
 
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | 0x00400000
+  override def encodeWord: Int =
+    super.encodeWord | 0x00400000
 
   override def registerString = s"${super.registerString}^"
 }
@@ -57,7 +57,7 @@ trait UserModeRegisters extends LoadStoreMultiple {
 class ReturnFromException(val label: Label, baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean,
                           val opcode: String)
   extends ARMOperation() {
-  override def encodeWord()(implicit page: Section): Int =
+  override def encodeWord: Int =
     0xf8100a00 |
       (if (updateBase) 0x00200000 else 0) |
       addressingMode.bitMask |

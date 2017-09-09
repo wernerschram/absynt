@@ -2,7 +2,7 @@ package assembler.x86.instructions
 
 import assembler.reference.ReferencingInstruction
 import assembler.sections.Section
-import assembler.{Encodable, Label}
+import assembler.{Resource, Label}
 import assembler.x86.{ParameterPosition, ProcessorMode}
 import assembler.x86.operands.memoryaccess.{MemoryAddress, MemoryLocation}
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
@@ -176,7 +176,7 @@ object Move {
     }
 
   def forLabel(targetLabel: Label, register: WideRegister)
-              (implicit processorMode: ProcessorMode, myLabel: Label): Encodable =
+              (implicit processorMode: ProcessorMode, myLabel: Label) =
     new ReferencingInstruction {
       override def target = targetLabel
 

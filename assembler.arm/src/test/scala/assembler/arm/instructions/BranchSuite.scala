@@ -4,12 +4,12 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.sections.Section
-import assembler.{Encodable, EncodedByteList, Hex, Label}
+import assembler.{Resource, EncodedByteList, Hex, Label}
 import org.scalatest.{Matchers, WordSpec}
 
 class BranchSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an Branch instruction" when {
     "in a32 mode" should {
@@ -34,7 +34,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
@@ -44,7 +44,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a backward branch to a labeled instruction" in {
         val targetLabel: Label = "Label"
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel, Condition.LowerOrSame)), 0)
@@ -54,7 +54,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a branch to self instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           EncodedByteList(List.fill(8)(0x00.toByte)),
           { implicit val label =  targetLabel; Branch(targetLabel)},
           EncodedByteList(List.fill(8)(0x00.toByte))), 0)
@@ -64,7 +64,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel),
@@ -76,7 +76,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           { implicit val label = targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel),
@@ -113,7 +113,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch-link to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           BranchLink(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
@@ -150,7 +150,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Encodable](
+        val p = Section(List[Resource](
           BranchLinkExchange(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)

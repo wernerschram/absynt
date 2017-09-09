@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Encodable, Label}
+import assembler.{Resource, Label}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
@@ -15,7 +15,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+      override def encodableForDistance(distance: Int)(implicit page: Section): BranchImmediate =
         Immediate(label, RelativeA32Pointer(distance - 8), Always)
     }
 
@@ -24,7 +24,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, condition) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+      override def encodableForDistance(distance: Int)(implicit page: Section): BranchImmediate =
         Immediate(label, RelativeA32Pointer(distance - 8), condition)
     }
 }
@@ -46,7 +46,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Unpredictable) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): Encodable =
+      override def encodableForDistance(distance: Int)(implicit page: Section): BranchImmediate =
         Immediate(label, RelativeThumbPointer(distance - 8), Unpredictable)
     }
 }

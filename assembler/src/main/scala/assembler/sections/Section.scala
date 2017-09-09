@@ -6,22 +6,31 @@ import assembler.reference.ReferencingInstruction
 import scala.language.implicitConversions
 
 trait Section {
-  val content: List[Encodable]
+  val content: List[Resource]
+
+  val finalContent: List[Resource with Encodable] = content.map {
+    case f: Resource with Encodable => f
+    case r: ReferencingInstruction => r.getFinalState()(this)
+  }
 
   val baseAddress: Int
 
-  type EncodableCondition = (Encodable)=>Boolean
+  type EncodableCondition = (Resource)=>Boolean
 
-  def relativeAddress(label: Label): Int = relativeAddress((current: Encodable) => current.label == label)
-  def relativeAddress(encodable: Encodable): Int = relativeAddress((current: Encodable) => current == encodable)
+  def relativeAddress(label: Label): Int = relativeAddress((current: Resource) => current.label == label)
+  def relativeAddress(encodable: Resource): Int = relativeAddress((current: Resource) => current == encodable)
   def relativeAddress(condition: EncodableCondition): Int =
-    content.takeWhile(current => !condition(current)).map(current => current.size()(this)).sum
+  content.takeWhile(current => !condition(current)).map {
+    case f: Resource with Encodable => f
+    case r: ReferencingInstruction => r.getFinalState()(this)
+  }.map(current => current.size).sum
+//    finalContent.takeWhile(current => !condition(current)).map(current => current.size).sum
 
-  def contains(label: Label): Boolean = contains((current: Encodable) => current.label == label)
-  def contains(encodable: Encodable): Boolean = contains((current: Encodable) => current == encodable)
+  def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
+  def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def intermediateEncodables(from: ReferencingInstruction): List[Encodable]
+  def intermediateEncodables(from: ReferencingInstruction): List[Resource]
 
   def isForwardReference(from: ReferencingInstruction): Boolean
 
@@ -30,9 +39,9 @@ trait Section {
   def encodeByte(): List[Byte]
 }
 
-class SimpleSection(val content: List[Encodable], val baseAddress: Int)(implicit val label: Label) extends Section {
+class SimpleSection(val content: List[Resource], val baseAddress: Int)(implicit val label: Label) extends Section {
 
-  def intermediateEncodables(from: ReferencingInstruction): List[Encodable] = {
+  def intermediateEncodables(from: ReferencingInstruction): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
@@ -53,11 +62,11 @@ class SimpleSection(val content: List[Encodable], val baseAddress: Int)(implicit
     !firstInstruction.label.matches(from.target)
   }
 
-  lazy val encodeByte: List[Byte] = content.flatMap { x => x.encodeByte()(this) }
+  lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 
   lazy val size: Int = encodeByte.length
 }
 
 object Section {
-  def apply(content: List[Encodable], sectionBaseAddress: Int)(implicit label: Label): Section = new SimpleSection(content, sectionBaseAddress)
+  def apply(content: List[Resource], sectionBaseAddress: Int)(implicit label: Label): Section = new SimpleSection(content, sectionBaseAddress)
 }

@@ -10,10 +10,10 @@ class SectionSuite extends WordSpec with Matchers {
     override def minimumSize: Int = 5
     override def maximumSize: Int = 5
 
-    override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Encodable = new Encodable {
-      override def encodeByte()(implicit page: Section): List[Byte] = 0x01.toByte :: Nil
+    override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable = new Resource with Encodable {
+      override def encodeByte: List[Byte] = 0x01.toByte :: Nil
       override def label: Label = NoLabel()
-      override def size()(implicit page: Section): Int = 5
+      override def size: Int = 5
     }
   }
 
@@ -26,7 +26,7 @@ class SectionSuite extends WordSpec with Matchers {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           reference,
           intermediate,
           target), 0)
@@ -40,7 +40,7 @@ class SectionSuite extends WordSpec with Matchers {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           target,
           intermediate,
           reference), 0)
@@ -56,7 +56,7 @@ class SectionSuite extends WordSpec with Matchers {
         val prefix = EncodedByteList(List.fill(2)(0))
         val postfix = EncodedByteList(List.fill(3)(0))
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           prefix,
           reference,
           postfix), 0)
@@ -72,7 +72,7 @@ class SectionSuite extends WordSpec with Matchers {
         val reference = new MyReferencingInstruction(label)
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           reference,
           target), 0)
 
@@ -84,7 +84,7 @@ class SectionSuite extends WordSpec with Matchers {
         val reference = new MyReferencingInstruction(label)
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           target,
           reference), 0)
 
@@ -95,7 +95,7 @@ class SectionSuite extends WordSpec with Matchers {
     "asked to encode itself" should {
 
       "be able to encode itself" in {
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)), 0)
 
@@ -111,7 +111,7 @@ class SectionSuite extends WordSpec with Matchers {
         val one = EncodedByteList(List.fill(oneSize)(1))
         val two = EncodedByteList(List.fill(twoSize)(2))
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           one,
           two), 0)
 
@@ -126,7 +126,7 @@ class SectionSuite extends WordSpec with Matchers {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Encodable](
+        val section = Section(List[Resource](
           intermediate,
           target), 0)
 

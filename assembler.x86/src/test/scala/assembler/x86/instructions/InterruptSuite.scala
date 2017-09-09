@@ -3,12 +3,12 @@ package assembler.x86.instructions
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
-import assembler.{Encodable, Hex}
+import assembler.{Resource, Hex}
 import org.scalatest.{Matchers, WordSpec}
 
 class InterruptSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an Interrupt instruction" when {
 
@@ -38,7 +38,7 @@ class InterruptSuite extends WordSpec with Matchers {
 
       "throw an AssertionError for INT 0x0001" in {
         an [AssertionError] should be thrownBy {
-          Interrupt(0x01.toShort).encodeByte()
+          Interrupt(0x01.toShort).encodeByte
         }
       }
     }

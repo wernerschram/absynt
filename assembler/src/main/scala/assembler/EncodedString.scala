@@ -1,11 +1,9 @@
 package assembler
 
-import assembler.sections.Section
+class EncodedString private(val string: String)(override val label: Label) extends Resource with Encodable {
+  def encodeByte: List[Byte] = string.getBytes.toList
 
-class EncodedString private(val string: String)(override val label: Label) extends Encodable {
-  def encodeByte()(implicit page: Section): List[Byte] = string.getBytes.toList
-
-  def size()(implicit page: Section): Int = string.length()
+  def size: Int = string.length()
 
   override def toString: String = s"""${labelPrefix}SETS "$string""""
 }

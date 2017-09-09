@@ -1,8 +1,7 @@
 package assembler.reference
 
-import assembler.Encodable
+import assembler.{Resource, Encodable, Label}
 import assembler.sections.Section
-import assembler.Label
 
 class ReferencingInstructionOnPage (
   private val thisOperation: ReferencingInstruction,
@@ -12,26 +11,25 @@ class ReferencingInstructionOnPage (
 
   private val intermediateInstructions = section.intermediateEncodables(thisOperation)
 
-  private lazy val independentIntermediates: Seq[Encodable] = intermediateInstructions.filter {
-    case _: ReferencingInstruction => false
-    case _ => true
+  private lazy val independentIntermediates: Seq[Resource with Encodable] = intermediateInstructions.collect {
+    case e: Resource with Encodable => e
   }
 
-  private lazy val dependentIntermediates = intermediateInstructions.filter {
-    case _: ReferencingInstruction => true
-    case _ => false
-  }.map { i => i.asInstanceOf[ReferencingInstruction] }
+  private lazy val dependentIntermediates = intermediateInstructions.collect {
+    // TODO: only works as long as there is only FinalState and ReferencingInstruction
+    case e: ReferencingInstruction => e
+  }
 
   private lazy val independentDistance =
     independentIntermediates.map { instruction => instruction.size }.sum
 
   private def minimumDistance = independentDistance + dependentIntermediates.map(instruction =>
-    if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum
+    if (instruction.isEstimated) instruction.getFinalState().size else instruction.minimumSize).sum
 
   private def maximumDistance = independentDistance + dependentIntermediates.map(instruction =>
-    if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum
+    if (instruction.isEstimated) instruction.getFinalState().size else instruction.maximumSize).sum
 
-  lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
+  lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.getFinalState().size }.sum
 
   def minimumEstimatedSize: Int = thisOperation.getSizeForDistance(forward, minimumDistance)
   def maximumEstimatedSize: Int = thisOperation.getSizeForDistance(forward, maximumDistance)

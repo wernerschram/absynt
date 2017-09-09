@@ -2,24 +2,24 @@ package assembler.arm.operations
 
 import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
-import assembler.sections.Section
-import assembler.Encodable
+import assembler.{Resource, Encodable}
 
-trait ARMOperation extends Encodable {
-  self: Encodable =>
+trait NamedOperation extends Resource {
   val opcode: String
-
-  override def size()(implicit page: Section) = 4
-
-  def encodeByte()(implicit page: Section): Seq[Byte] = encodeWord.encodeLittleEndian
-
-  def encodeWord()(implicit page: Section): Int = 0
-
-  override def toString: String = s"$labelPrefix$mnemonicString"
 
   def mnemonic: List[PartialName] = PartialName(opcode, 0) :: Nil
 
   lazy val mnemonicString: String = mnemonic.sortBy { part => part.order }.map { part => part.name }.mkString
+
+  override def toString: String = s"$labelPrefix$mnemonicString"
+}
+
+trait ARMOperation extends NamedOperation with Encodable {
+  override def size = 4
+
+  override def encodeByte: Seq[Byte] = encodeWord.encodeLittleEndian
+
+  def encodeWord: Int = 0
 }
 
 object ARMOperation {
@@ -28,13 +28,13 @@ object ARMOperation {
 
 case class PartialName(name: String, order: Int)
 
-trait Conditional extends ARMOperation {
-  self: ARMOperation =>
-
+trait NamedConditional extends NamedOperation {
   val condition: Condition
 
   override def mnemonic: List[PartialName] = PartialName(condition.mnemonicExtension, 3) :: super.mnemonic
+}
 
-  override def encodeWord()(implicit page: Section): Int =
-    super.encodeWord() | (condition.value << 28)
+trait Conditional extends ARMOperation with NamedConditional {
+  override def encodeWord: Int =
+    super.encodeWord | (condition.value << 28)
 }

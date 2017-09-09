@@ -45,7 +45,7 @@ object Boot extends App {
     val TDR: Short = 0x8C
   }
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Encodable] = {
+  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Resource] = {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
@@ -140,7 +140,7 @@ object Boot extends App {
     val raw = new FileOutputStream(rawFilePath.toFile)
     raw.write(page.encodeByte().toArray)
     println(s"size: ${page.size}")
-    page.content.foreach { x => Console.println(s"${x.encodeByte()(page).bigEndianHexString} $x") }
+    page.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
     implicit object nameProvider extends HasName[Section] {
       override def name(x: Section): String = ".text"
     }

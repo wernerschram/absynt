@@ -4,12 +4,12 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operations.UpdateMode
 import assembler.sections.Section
-import assembler.{Encodable, Hex}
+import assembler.{Resource, Hex}
 import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreMultipleSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "a LoadMultiple instruction" when {
     "in a32 mode" should {

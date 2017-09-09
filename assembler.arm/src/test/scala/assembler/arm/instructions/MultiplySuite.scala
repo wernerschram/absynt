@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Encodable, Hex}
+import assembler.{Resource, Hex}
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MultiplySuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Encodable], 0)
+  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an MultiplyAccumulate instruction" when {
     "in a32 mode" should {
