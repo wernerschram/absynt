@@ -22,7 +22,7 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
 
   def encodableForLongPointer(pointer: NearPointerOperand)(implicit page: Section): Resource with Encodable
 
-  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
+  override def sizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
     if (forward) {
       if (distance <= forwardShortLongBoundary)
         shortJumpSize

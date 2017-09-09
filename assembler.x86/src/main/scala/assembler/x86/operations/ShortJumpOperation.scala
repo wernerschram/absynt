@@ -20,7 +20,7 @@ abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte],
 
   override def toString = s"$labelPrefix$mnemonic $target"
 
-  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = shortJumpSize
+  override def sizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = shortJumpSize
 
   override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable = {
     assume(distance > (Byte.MinValue + shortJumpSize))

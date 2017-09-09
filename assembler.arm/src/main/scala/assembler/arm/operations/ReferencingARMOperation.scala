@@ -17,9 +17,9 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
 
   def encodableForDistance(distance: Int)(implicit page: Section): Resource with Encodable
 
-  override def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = instructionSize
+  override def sizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int = instructionSize
 
-  def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable = {
+  override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable = {
     if (forward) {
       encodableForDistance(distance + instructionSize)
     } else {

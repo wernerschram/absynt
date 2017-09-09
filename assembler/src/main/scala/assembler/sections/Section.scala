@@ -10,7 +10,7 @@ trait Section {
 
   val finalContent: List[Resource with Encodable] = content.map {
     case f: Resource with Encodable => f
-    case r: ReferencingInstruction => r.getFinalState()(this)
+    case r: ReferencingInstruction => r.toOnPageState()(this)
   }
 
   val baseAddress: Int
@@ -22,7 +22,7 @@ trait Section {
   def relativeAddress(condition: EncodableCondition): Int =
   content.takeWhile(current => !condition(current)).map {
     case f: Resource with Encodable => f
-    case r: ReferencingInstruction => r.getFinalState()(this)
+    case r: ReferencingInstruction => r.toOnPageState()(this)
   }.map(current => current.size).sum
 //    finalContent.takeWhile(current => !condition(current)).map(current => current.size).sum
 

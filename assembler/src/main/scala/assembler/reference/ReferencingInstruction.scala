@@ -14,19 +14,14 @@ trait ReferencingInstruction
 
   def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable
 
-  def getSizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
+  def sizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
     encodableForDistance(forward, distance).size
-
-  def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Seq[Byte] =
-    encodableForDistance(forward, distance).encodeByte
 
   private val pageMap = new TrieMap[Section, ReferencingInstructionInSection]
 
-  def getFinalState()(implicit page: Section): ReferencingInstructionInSection =
-    pageMap.getOrElseUpdate(page, new ReferencingInstructionInSection(this, target, label)(page))
+  def toOnPageState()(implicit page: Section): ReferencingInstructionInSection =
+    pageMap.getOrElseUpdate(page, new ReferencingInstructionInSection(this, target, label, minimumSize, maximumSize,
+      encodableForDistance, sizeForDistance)(page))
 
-  final private[reference] def isEstimated()(implicit page: Section): Boolean = getFinalState.isEstimated
-
-  final private[reference] def estimatedSize(sizeAssumptions: Map[ReferencingInstruction, Int])(implicit page: Section): Int =
-    getFinalState.estimateSize(sizeAssumptions)
 }
+
