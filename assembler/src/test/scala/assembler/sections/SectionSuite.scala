@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{ReferencingInstruction, ReferencingInstructionOnPage}
+import assembler.reference.{ReferencingInstruction, ReferencingInstructionInSection}
 import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers {

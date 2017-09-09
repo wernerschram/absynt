@@ -3,9 +3,9 @@ package assembler.reference
 import assembler.{Resource, Encodable, Label}
 import assembler.sections.Section
 
-class ReferencingInstructionOnPage (
+class ReferencingInstructionInSection (
   private val thisOperation: ReferencingInstruction,
-  private val destination: Label)(implicit section: Section) {
+  private val destination: Label, val label: Label)(implicit section: Section) extends Resource with Encodable {
 
   val forward: Boolean = section.isForwardReference(thisOperation)
 

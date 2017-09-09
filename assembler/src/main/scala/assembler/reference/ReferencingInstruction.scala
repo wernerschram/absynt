@@ -20,29 +20,13 @@ trait ReferencingInstruction
   def encodeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Seq[Byte] =
     encodableForDistance(forward, distance).encodeByte
 
-  private val pageMap = new TrieMap[Section, ReferencingInstructionOnPage]
+  private val pageMap = new TrieMap[Section, ReferencingInstructionInSection]
 
-  private def getOrElseCreateInstruction()(implicit page: Section): ReferencingInstructionOnPage =
-    pageMap.getOrElseUpdate(page, new ReferencingInstructionOnPage(this, target)(page))
+  def getFinalState()(implicit page: Section): ReferencingInstructionInSection =
+    pageMap.getOrElseUpdate(page, new ReferencingInstructionInSection(this, target, label)(page))
 
-  final private[reference] def minimumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.minimumEstimatedSize
-  final private[reference] def maximumEstimatedSize()(implicit page: Section): Int = getOrElseCreateInstruction.maximumEstimatedSize
-
-  final private[reference] def isEstimated()(implicit page: Section): Boolean = getOrElseCreateInstruction.isEstimated
+  final private[reference] def isEstimated()(implicit page: Section): Boolean = getFinalState.isEstimated
 
   final private[reference] def estimatedSize(sizeAssumptions: Map[ReferencingInstruction, Int])(implicit page: Section): Int =
-    getOrElseCreateInstruction.estimateSize(sizeAssumptions)
-
-  private def size()(implicit page: Section): Int = getOrElseCreateInstruction().size
-
-  private def encodeByte()(implicit page: Section): Seq[Byte] = getOrElseCreateInstruction.encodeByte
-
-  def getFinalState()(implicit page: Section): Resource with Encodable = new Resource with Encodable {
-
-    override def size: Int = ReferencingInstruction.this.size()
-
-    override def encodeByte: Seq[Byte] = ReferencingInstruction.this.encodeByte()
-
-    override def label = ReferencingInstruction.this.label
-  }
+    getFinalState.estimateSize(sizeAssumptions)
 }
