@@ -19,9 +19,9 @@ trait ReferencingInstruction
 
   private val pageMap = new TrieMap[Section, ReferencingInstructionInSection]
 
-  def toOnPageState()(implicit page: Section): ReferencingInstructionInSection =
-    pageMap.getOrElseUpdate(page, new ReferencingInstructionInSection(this, target, label, minimumSize, maximumSize,
-      encodableForDistance, sizeForDistance)(page))
+  def toOnPageState()(section: Section): ReferencingInstructionInSection =
+    pageMap.getOrElseUpdate(section, new ReferencingInstructionInSection(target, label, minimumSize, maximumSize,
+      encodableForDistance(_, _)(section), sizeForDistance(_, _)(section), section.isForwardReference(this), section.intermediateEncodables(this))(section))
 
 }
 

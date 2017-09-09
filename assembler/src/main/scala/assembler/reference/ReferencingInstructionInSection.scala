@@ -4,21 +4,18 @@ import assembler.{Resource, Encodable, Label}
 import assembler.sections.Section
 
 class ReferencingInstructionInSection (
-  private val thisOperation: ReferencingInstruction,
   private val destination: Label, val label: Label,
   val minimumSize: Int, val maximumSize: Int,
   val encodableForDistance: (Boolean, Int)=> Resource with Encodable,
-  val sizeForDistance: (Boolean, Int)=> Int
+  val sizeForDistance: (Boolean, Int)=> Int,
+  val forward: Boolean,
+  val intermediateInstructions: Seq[Resource]
   )(implicit section: Section) extends Resource with Encodable {
-
-  val forward: Boolean = section.isForwardReference(thisOperation)
 
   def encodeForDistance(forward: Boolean, distance: Int): Seq[Byte] =
     encodableForDistance(forward, distance).encodeByte
 
   def toFinalState = encodableForDistance(forward, actualDistance)
-
-  private val intermediateInstructions = section.intermediateEncodables(thisOperation)
 
   private lazy val independentIntermediates: Seq[Resource with Encodable] = intermediateInstructions.collect {
     case e: Resource with Encodable => e
@@ -26,7 +23,7 @@ class ReferencingInstructionInSection (
 
   private lazy val dependentIntermediates = intermediateInstructions.collect {
     // TODO: only works as long as there is only FinalState and ReferencingInstruction
-    case e: ReferencingInstruction => e.toOnPageState()
+    case e: ReferencingInstruction => e.toOnPageState()(section)
     case e: ReferencingInstructionInSection => e
   }
 
@@ -41,8 +38,8 @@ class ReferencingInstructionInSection (
 
   lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
-  def minimumEstimatedSize: Int = thisOperation.encodableForDistance(forward, minimumDistance).size
-  def maximumEstimatedSize: Int = thisOperation.encodableForDistance(forward, maximumDistance).size
+  def minimumEstimatedSize: Int = encodableForDistance(forward, minimumDistance).size
+  def maximumEstimatedSize: Int = encodableForDistance(forward, maximumDistance).size
 
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize.isDefined
