@@ -12,16 +12,19 @@ trait ReferencingInstruction
   def minimumSize: Int
   def maximumSize: Int
 
-  def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable
+  def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Resource with Encodable
 
-  def sizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
-    encodableForDistance(forward, distance).size
+  def sizeForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Int =
+    encodableForDistance(distance)(forward).size
 
   private val pageMap = new TrieMap[Section, ReferencingInstructionInSection]
 
-  def toOnPageState()(section: Section): ReferencingInstructionInSection =
-    pageMap.getOrElseUpdate(section, new ReferencingInstructionInSection(target, label, minimumSize, maximumSize,
-      encodableForDistance(_, _)(section), sizeForDistance(_, _)(section), section.isForwardReference(this), section.intermediateEncodables(this))(section))
+  def toOnPageState()(section: Section): ReferencingInstructionInSection = {
+    val forward = section.isForwardReference(this)
 
+    pageMap.getOrElseUpdate(section, new ReferencingInstructionInSection(target, label, minimumSize, maximumSize,
+      encodableForDistance(_)(forward)(section), sizeForDistance(_)(forward)(section),
+      section.intermediateEncodables(this))(section))
+  }
 }
 

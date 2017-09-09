@@ -22,7 +22,7 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
 
   def encodableForLongPointer(pointer: NearPointerOperand)(implicit page: Section): Resource with Encodable
 
-  override def sizeForDistance(forward: Boolean, distance: Int)(implicit page: Section): Int =
+  override def sizeForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Int =
     if (forward) {
       if (distance <= forwardShortLongBoundary)
         shortJumpSize
@@ -35,7 +35,7 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
         longJumpSize
     }
 
-  override def encodableForDistance(forward: Boolean, distance: Int)(implicit page: Section): Resource with Encodable = {
+  override def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Resource with Encodable = {
     if (forward) {
       if (distance <= forwardShortLongBoundary) {
         encodableForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))

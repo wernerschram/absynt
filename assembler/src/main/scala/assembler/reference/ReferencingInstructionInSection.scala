@@ -6,16 +6,15 @@ import assembler.sections.Section
 class ReferencingInstructionInSection (
   private val destination: Label, val label: Label,
   val minimumSize: Int, val maximumSize: Int,
-  val encodableForDistance: (Boolean, Int)=> Resource with Encodable,
-  val sizeForDistance: (Boolean, Int)=> Int,
-  val forward: Boolean,
+  val encodableForDistance: (Int)=> Resource with Encodable,
+  val sizeForDistance: (Int)=> Int,
   val intermediateInstructions: Seq[Resource]
   )(implicit section: Section) extends Resource with Encodable {
 
-  def encodeForDistance(forward: Boolean, distance: Int): Seq[Byte] =
-    encodableForDistance(forward, distance).encodeByte
+  def encodeForDistance(distance: Int): Seq[Byte] =
+    encodableForDistance(distance).encodeByte
 
-  def toFinalState = encodableForDistance(forward, actualDistance)
+  def toFinalState = encodableForDistance(actualDistance)
 
   private lazy val independentIntermediates: Seq[Resource with Encodable] = intermediateInstructions.collect {
     case e: Resource with Encodable => e
@@ -38,8 +37,8 @@ class ReferencingInstructionInSection (
 
   lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
-  def minimumEstimatedSize: Int = encodableForDistance(forward, minimumDistance).size
-  def maximumEstimatedSize: Int = encodableForDistance(forward, maximumDistance).size
+  def minimumEstimatedSize: Int = encodableForDistance(minimumDistance).size
+  def maximumEstimatedSize: Int = encodableForDistance(maximumDistance).size
 
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize.isDefined
@@ -58,7 +57,7 @@ class ReferencingInstructionInSection (
     var newAssumption = minimumEstimatedSize
     while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
-      newAssumption = sizeForDistance(forward, predictedDistance(sizeAssumptions + (this -> assumption.get)))
+      newAssumption = sizeForDistance(predictedDistance(sizeAssumptions + (this -> assumption.get)))
     }
     newAssumption
   }
@@ -74,5 +73,5 @@ class ReferencingInstructionInSection (
     _estimatedSize.get
   }
 
-  lazy val encodeByte: Seq[Byte] = encodeForDistance(forward, actualDistance)
+  lazy val encodeByte: Seq[Byte] = encodeForDistance(actualDistance)
 }
