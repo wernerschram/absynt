@@ -5,7 +5,7 @@ import assembler.sections.Section
 
 class ReferencingInstructionInSection (
   private val destination: Label, val label: Label,
-  val minimumSize: Int, val maximumSize: Int,
+  override val minimumSize: Int, override val maximumSize: Int,
   val encodableForDistance: (Int)=> Resource with Encodable,
   val sizeForDistance: (Int)=> Int,
   val intermediateInstructions: Seq[Resource]
