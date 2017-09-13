@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
 import assembler.ListExtensions.ByteEncoder
-import assembler.reference.ReferencingInstruction
+import assembler.reference.RelativeReference
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
@@ -9,7 +9,7 @@ import assembler.{Resource, Encodable, Label}
 
 abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
                                  (implicit processorMode: ProcessorMode)
-  extends Resource with ReferencingInstruction {
+  extends Resource with RelativeReference {
 
   val shortJumpSize: Int = shortOpcode.length + 1
 

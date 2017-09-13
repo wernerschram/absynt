@@ -3,7 +3,7 @@ package assembler.reference
 import assembler.{Resource, Encodable, Label}
 import assembler.sections.Section
 
-class ReferencingInstructionInSection (
+class RelativeReferenceInSection (
   private val destination: Label, val label: Label,
   override val minimumSize: Int, override val maximumSize: Int,
   val encodableForDistance: (Int)=> Resource with Encodable,
@@ -22,7 +22,7 @@ class ReferencingInstructionInSection (
 
   private lazy val dependentIntermediates = intermediateInstructions.collect {
     // TODO: only works as long as there is only FinalState and ReferencingInstruction
-    case e: ReferencingInstruction => e.toOnPageState(section)
+    case e: RelativeReference => e.toOnPageState(section)
   }
 
   private lazy val independentDistance =
@@ -42,7 +42,7 @@ class ReferencingInstructionInSection (
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def predictedDistance(sizeAssumptions: Map[ReferencingInstructionInSection, Int]) = independentDistance +
+  private def predictedDistance(sizeAssumptions: Map[RelativeReferenceInSection, Int]) = independentDistance +
     dependentIntermediates.map { instruction =>
       if (sizeAssumptions.contains(instruction))
         sizeAssumptions(instruction)
@@ -51,7 +51,7 @@ class ReferencingInstructionInSection (
     }
     .sum
 
-  def estimateSize(sizeAssumptions: Map[ReferencingInstructionInSection, Int]): Int = {
+  def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection, Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
     while (assumption.isEmpty || assumption.get < newAssumption) {

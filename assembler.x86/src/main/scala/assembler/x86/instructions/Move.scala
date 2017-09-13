@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.reference.ReferencingInstruction
+import assembler.reference.RelativeReference
 import assembler.sections.Section
 import assembler.{Resource, Label}
 import assembler.x86.{ParameterPosition, ProcessorMode}
@@ -177,7 +177,7 @@ object Move {
 
   def forLabel(targetLabel: Label, register: WideRegister)
               (implicit processorMode: ProcessorMode, myLabel: Label) =
-    new ReferencingInstruction {
+    new RelativeReference {
       override def target = targetLabel
 
       def prefixBytes = register.getRexRequirements(ParameterPosition.OpcodeReg) match {

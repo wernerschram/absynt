@@ -1,12 +1,12 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{ReferencingInstruction, ReferencingInstructionInSection}
+import assembler.reference.{RelativeReference, RelativeReferenceInSection}
 import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers {
 
-  class MyReferencingInstruction(override val target: Label)(implicit val label: Label) extends ReferencingInstruction {
+  class MyRelativeReference(override val target: Label)(implicit val label: Label) extends RelativeReference {
     override def minimumSize: Int = 5
     override def maximumSize: Int = 5
 
@@ -22,7 +22,7 @@ class SectionSuite extends WordSpec with Matchers {
 
       "provide the intermediate instructions between a relative instruction and a label" in {
         val label = Label.unique
-        val reference = new MyReferencingInstruction(label)
+        val reference = new MyRelativeReference(label)
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
@@ -36,7 +36,7 @@ class SectionSuite extends WordSpec with Matchers {
 
       "provide the intermediate instructions between a label and a relative instruction" in {
         val label = Label.unique
-        val reference = new MyReferencingInstruction(label)
+        val reference = new MyRelativeReference(label)
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
@@ -51,7 +51,7 @@ class SectionSuite extends WordSpec with Matchers {
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
         val reference = {
-          implicit val label: UniqueLabel = targetLabel; new MyReferencingInstruction(label)
+          implicit val label: UniqueLabel = targetLabel; new MyRelativeReference(label)
         }
         val prefix = EncodedByteList(List.fill(2)(0))
         val postfix = EncodedByteList(List.fill(3)(0))
@@ -69,7 +69,7 @@ class SectionSuite extends WordSpec with Matchers {
 
       "know when a indirect reference is a forward reference" in {
         val label = Label.unique
-        val reference = new MyReferencingInstruction(label)
+        val reference = new MyRelativeReference(label)
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
         val section = Section(List[Resource](
@@ -81,7 +81,7 @@ class SectionSuite extends WordSpec with Matchers {
 
       "know when a indirect reference is a backward reference" in {
         val label = Label.unique
-        val reference = new MyReferencingInstruction(label)
+        val reference = new MyRelativeReference(label)
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
         val section = Section(List[Resource](

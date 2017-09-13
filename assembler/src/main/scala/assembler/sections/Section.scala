@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{ReferencingInstruction, ReferencingInstructionInSection}
+import assembler.reference.{RelativeReference, RelativeReferenceInSection}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -19,7 +19,7 @@ trait Section {
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def intermediateEncodables(from: ReferencingInstruction): List[Resource] = {
+  def intermediateEncodables(from: RelativeReference): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
@@ -35,7 +35,7 @@ trait Section {
       trimLeft.head :: trimRight
   }
 
-  def isForwardReference(from: ReferencingInstruction): Boolean = {
+  def isForwardReference(from: RelativeReference): Boolean = {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     !firstInstruction.label.matches(from.target)
   }
@@ -66,7 +66,7 @@ object Section {
   private def nextContent(previousSection: Section): List[Resource] = {
 
     val newContent: List[Resource] = previousSection.content.map {
-      case referencing: ReferencingInstruction => referencing.toOnPageState(previousSection)
+      case referencing: RelativeReference => referencing.toOnPageState(previousSection)
       case resource: Resource => resource
     }
     newContent
