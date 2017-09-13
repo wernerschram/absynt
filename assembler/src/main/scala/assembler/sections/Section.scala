@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{RelativeReference, RelativeReferenceInSection}
+import assembler.reference.{AbsoluteReference, RelativeReference, RelativeReferenceInSection}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -18,6 +18,9 @@ trait Section {
   def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
+
+  def precedingResources(target: Label): List[Resource] =
+    content.takeWhile(x => !x.label.matches(target))
 
   def intermediateEncodables(from: RelativeReference): List[Resource] = {
     val trimLeft = content
@@ -67,6 +70,7 @@ object Section {
 
     val newContent: List[Resource] = previousSection.content.map {
       case referencing: RelativeReference => referencing.toOnPageState(previousSection)
+      case absolute: AbsoluteReference => absolute.toInSectionState(previousSection)
       case resource: Resource => resource
     }
     newContent
