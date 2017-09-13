@@ -3,7 +3,7 @@ package examples.assembler.x86.helloWorld
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.Elf.{Architecture, Executable, HasName}
+import assembler.Elf.{Architecture, Executable}
 import assembler.{Resource, EncodedString, Label}
 import assembler.ListExtensions._
 import assembler.sections.Section
@@ -45,12 +45,10 @@ object HelloWorld extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
 
-    implicit object nameProvider extends HasName[Section] {
-      override def name(x: Section): String = ".text"
-    }
     val exec = Executable(Architecture.X86, section :: Nil, entry)
-    section.finalContent.collect { case x: Resource => x }.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
-    raw.write(section.encodeByte().toArray)
+    val finalSection = Section.encodable(section)
+    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
+    raw.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
     out.write(exec.header.toArray)
     raw.flush()

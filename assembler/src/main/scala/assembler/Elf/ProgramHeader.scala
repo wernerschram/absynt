@@ -1,8 +1,9 @@
 package assembler.Elf
 
-import assembler.sections.Section
+import assembler.Encodable
+import assembler.sections.{LastIteration, Section}
 
-class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
+class ProgramHeader(section: Section with LastIteration)(implicit elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
   def flags: Flags[ProgramFlag] = ProgramFlag.Execute | ProgramFlag.Read
   def alignBytes: Int = 0x40
@@ -39,7 +40,7 @@ class ProgramHeader(section: Section)(implicit elf: Elf[_]) {
 }
 
 object ProgramHeader {
-  def apply(section: Section)(implicit elf: Elf[_]): ProgramHeader = new ProgramHeader(section)
+  def apply(section: Section with LastIteration)(implicit elf: Elf): ProgramHeader = new ProgramHeader(section)
 }
 abstract case class ProgramType private(id: Int)
 

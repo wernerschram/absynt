@@ -3,7 +3,7 @@ package examples.assembler.arm.BootRpi
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.Elf.{Architecture, Executable, HasName}
+import assembler.Elf.{Architecture, Executable}
 import assembler._
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
@@ -63,7 +63,7 @@ object Boot extends App {
     val text: Label = "Text"
     val entry: Label = "Entry"
 
-    val page: Section = Section(
+    val section: Section = Section(
       // Disable UART0
       { implicit val label = entry; Move.forConstant(UART0.Base, R0) } ::
       Move.forConstant(0, R1) ::
@@ -138,14 +138,13 @@ object Boot extends App {
     val rawFilePath = outputPath.resolve("test.raw")
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
-    raw.write(page.encodeByte().toArray)
-    println(s"size: ${page.size}")
-    page.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
-    implicit object nameProvider extends HasName[Section] {
-      override def name(x: Section): String = ".text"
-    }
 
-    val exec = Executable(Architecture.RaspberryPi2, page :: Nil, entry)
+    val finalSection = Section.encodable(section)
+    raw.write(finalSection.encodeByte.toArray)
+    println(s"size: ${finalSection.size}")
+    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
+
+    val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry)
     out.write(exec.header.toArray)
    out.flush()
   }

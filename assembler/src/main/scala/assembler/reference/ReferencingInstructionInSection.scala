@@ -22,8 +22,7 @@ class ReferencingInstructionInSection (
 
   private lazy val dependentIntermediates = intermediateInstructions.collect {
     // TODO: only works as long as there is only FinalState and ReferencingInstruction
-    case e: ReferencingInstruction => e.toOnPageState()(section)
-    case e: ReferencingInstructionInSection => e
+    case e: ReferencingInstruction => e.toOnPageState(section)
   }
 
   private lazy val independentDistance =

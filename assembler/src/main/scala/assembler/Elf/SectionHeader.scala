@@ -1,8 +1,8 @@
 package assembler.Elf
 
-import assembler.sections.Section
+import assembler.sections.{LastIteration, Section}
 
-abstract class SectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) {
+abstract class SectionHeader()(implicit elf: Elf) {
 
   def nameReference: Int
   def `type`: SectionType
@@ -32,9 +32,9 @@ abstract class SectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) {
   }
 }
 
-class SectionSectionHeader[S <: Section: HasName](section: S)(implicit elf: Elf[S]) extends SectionHeader[S] {
+class SectionSectionHeader(section: Section with LastIteration)(implicit elf: Elf) extends SectionHeader {
 
-  val nameReference: Int = elf.stringMap(implicitly[HasName[S]].name(section))
+  val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
   val flags: Flags[SectionFlag] = SectionFlag.Alloc | SectionFlag.ExecutableInstruction
   val sectionAddress: Long = elf.getBaseAddress(section)
@@ -48,7 +48,7 @@ class SectionSectionHeader[S <: Section: HasName](section: S)(implicit elf: Elf[
   val entrySize: Int = 0x0
 }
 
-class NullSectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) extends SectionHeader[S] {
+class NullSectionHeader()(implicit elf: Elf) extends SectionHeader {
   val nameReference: Int = 0
   val `type`: SectionType = SectionType.Null
   val flags: Flags[SectionFlag] = Flags.None
@@ -64,10 +64,11 @@ class NullSectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) extends Se
 }
 
 object NullSectionHeader {
-  def apply[S <: Section:HasName]()(implicit elf: Elf[S]): NullSectionHeader[S] = new NullSectionHeader[S]
+  def apply()(implicit elf: Elf): NullSectionHeader =
+    new NullSectionHeader
 }
 
-class StringSectionHeader[S <: Section:HasName]()(implicit elf: Elf[S]) extends SectionHeader[S] {
+class StringSectionHeader()(implicit elf: Elf) extends SectionHeader {
 
   val nameReference: Int = elf.stringMap(".shstrtab")
   val `type`: SectionType = SectionType.StringTable

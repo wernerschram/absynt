@@ -3,7 +3,7 @@ package assembler.Elf
 import assembler._
 import assembler.sections.Section
 
-abstract class Elf[S <: Section:HasName](val architecture: Architecture, sections: List[S], val entryLabel: Label) extends Application(sections) {
+abstract class Elf(val architecture: Architecture, sections: List[Section], val entryLabel: Label) extends Application(sections) {
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
   val version: ElfVersion = ElfVersion.Original
 
@@ -21,13 +21,13 @@ abstract class Elf[S <: Section:HasName](val architecture: Architecture, section
     sectionHeaderCount * architecture.processorClass.sectionHeaderSize
 
   def address(label: Label): Long =
-    sections.filter(s => s.contains(label)).map(s => s.baseAddress + s.relativeAddress(label)).head
+    orderedSections.filter(s => s.contains(label)).map(s => s.baseAddress + s.relativeAddress(label)).head
 
   def fileOffset(section: Section): Long =
-    dataOffset + sections.takeWhile(s => s != section).map(s => s.size).sum
+    dataOffset + orderedSections.takeWhile(s => s != section).map(s => s.size).sum
 
   def stringTableOffset: Long =
-    dataOffset + sections.map(s => s.size).sum
+    dataOffset + orderedSections.map(s => s.size).sum
 
   def stringOffset(strings: List[String]): List[(String, Int)] = {
     (strings.head, 0) :: stringOffset(1, strings)
@@ -43,17 +43,17 @@ abstract class Elf[S <: Section:HasName](val architecture: Architecture, section
   }
 
   val stringMap: Map[String, Int] =
-    stringOffset(("" :: sections.map(s => implicitly[HasName[S]].name(s)) ::: ".shstrtab" :: Nil )
+    stringOffset(("" :: sections.map(s => s.name) ::: ".shstrtab" :: Nil )
        .distinct).toMap
 
-  implicit val executable: Elf[S] = this
+  implicit val executable: Elf = this
 
   val programHeaders: List[ProgramHeader] =
-    sections.map(s => ProgramHeader(s))
-  val sectionHeaders: List[SectionHeader[S]] =
-    NullSectionHeader[S]() ::
-    sections.map(s => new SectionSectionHeader[S](s)) :::
-    new StringSectionHeader[S]() :: Nil
+    orderedSections.map(s => ProgramHeader(s))
+  val sectionHeaders: List[SectionHeader] =
+    NullSectionHeader() ::
+    orderedSections.map(s => new SectionSectionHeader(s)) :::
+    new StringSectionHeader() :: Nil
 
   def header: List[Byte] =
       magic :::
@@ -76,17 +76,19 @@ abstract class Elf[S <: Section:HasName](val architecture: Architecture, section
       endianness.encode(sectionNamesSectionHeaderIndex) :::
       programHeaders.flatMap(p => p.header) :::
       sectionHeaders.flatMap(s => s.header) :::
-      sections.flatMap(s => s.encodeByte()) :::
+      orderedSections.flatMap(s => s.encodeByte) :::
       stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)
 
 }
 
-class Executable[S <: Section:HasName] private(architecture: Architecture, sections: List[S], entryLabel: Label) extends Elf(architecture, sections, entryLabel) {
+class Executable private(architecture: Architecture, sections: List[Section], entryLabel: Label)
+  extends Elf(architecture, sections, entryLabel) {
   override def elfType: ElfType = ElfType.Executable
 }
 
 object Executable {
-  def apply[S <: Section:HasName](architecture: Architecture, sections: List[S], entryLabel: Label) = new Executable[S](architecture, sections, entryLabel)
+  def apply(architecture: Architecture, sections: List[Section], entryLabel: Label) =
+    new Executable(architecture, sections, entryLabel)
 }
 
 case class ElfVersion private(id: Byte, extended: Int)

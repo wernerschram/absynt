@@ -200,14 +200,16 @@ object Move {
         case false => -distance
       }
 
-      override def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section) = (processorMode, register) match {
+      override def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section) =
+        ???
+  /*    (processorMode, register) match {
           case (ProcessorMode.Real | ProcessorMode.Protected, _: GeneralPurposeRexRegister) => throw new AssertionError
           case (ProcessorMode.Real, _) => Imm16ToR16(register, (page.baseAddress + page.relativeAddress(this) + offset(forward, distance)).toShort)
           case (ProcessorMode.Protected, _: DoubleWordRegister) => Imm16ToR16(register, page.baseAddress + page.relativeAddress(this) + offset(forward, distance))
           case (ProcessorMode.Long, _: QuadWordRegister) => Imm16ToR16(register, (page.baseAddress + page.relativeAddress(this) + offset(forward, distance)).toLong)
           case _ => throw new AssertionError
-        }
-
+       }
+*/
       override def label = myLabel
     }
 

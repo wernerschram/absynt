@@ -1,6 +1,6 @@
 package assembler.reference
 
-import assembler.{Resource, Encodable, Label}
+import assembler.{Encodable, Label, Resource}
 import assembler.sections.Section
 
 import scala.collection.concurrent.TrieMap
@@ -19,7 +19,7 @@ trait ReferencingInstruction
 
   private val pageMap = new TrieMap[Section, ReferencingInstructionInSection]
 
-  def toOnPageState()(section: Section): ReferencingInstructionInSection = {
+  def toOnPageState(section: Section): ReferencingInstructionInSection = {
     val forward = section.isForwardReference(this)
 
     pageMap.getOrElseUpdate(section, new ReferencingInstructionInSection(target, label, minimumSize, maximumSize,

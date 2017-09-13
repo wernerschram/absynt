@@ -33,7 +33,7 @@ object Boot extends App {
     val middleColor = Color(63, 63, 63)
     val bottomColor = Color(0, 0, 63)
 
-    val page: Section = Section(
+    val section: Section = Section(
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
       //
@@ -71,8 +71,9 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    page.finalContent.collect { case x: Resource => x }.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
-    out.write(page.encodeByte().toArray)
+    val finalSection = Section.encodable(section)
+    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
+    out.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
     out.flush()
 

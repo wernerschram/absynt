@@ -12,7 +12,7 @@ trait Resource {
   override def toString: String = labelPrefix
 }
 
-trait Encodable {
+trait Encodable extends Resource {
   self: Resource =>
   def encodeByte: Seq[Byte]
 

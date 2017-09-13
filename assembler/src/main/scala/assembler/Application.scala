@@ -1,9 +1,9 @@
 package assembler
 
-import assembler.sections.{Section}
+import assembler.sections.{LastIteration, Section}
 
 abstract class Application protected (val sections: List[Section]) {
-  lazy val orderedSections: List[Section] = sections // TODO: fix naive assumption
+  lazy val orderedSections: List[Section with LastIteration] = sections.map(s=>Section.encodable(s)) // TODO: fix naive assumption
 
   def getBaseAddress(section: Section): Int = section.baseAddress
 
