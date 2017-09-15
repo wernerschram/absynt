@@ -1,6 +1,6 @@
 package assembler.arm.instructions
 
-import assembler.{Resource, EncodedByteList, Hex, Label}
+import assembler._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
@@ -303,27 +303,27 @@ class DataProcessingSuite extends WordSpec with Matchers {
         Move.setFlags(R1, R2, Condition.CarrySet).toString should be("movscs r2, r1")
       }
 
-      "correctly encode a move of a labeled address to a register" ignore {
+      "correctly encode a move of a labeled address to a register" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(List[Resource](
           instruction,
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        instruction.toOnPageState(p).encodeByte should be(Hex.msb("e3a01f02"))
+        instruction.toInSectionState(p).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
-      "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" ignore {
+      "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        instruction.toOnPageState(p).encodeByte should be(Hex.msb("e3a01f02"))
+        instruction.toInSectionState(p).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
-      "correctly encode a move of a labeled address to a register when the target is before the move instruction" ignore {
+      "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(List[Resource](
@@ -331,7 +331,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction), 0)
-        instruction.toOnPageState(p).encodeByte should be(Hex.msb("e3a01f01"))
+        instruction.toInSectionState(p).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 
     }

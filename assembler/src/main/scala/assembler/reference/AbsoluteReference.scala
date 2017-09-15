@@ -12,8 +12,8 @@ trait AbsoluteReference
   def encodableForPosition(position: Int): Resource with Encodable
 
   def toInSectionState(section: Section) = {
-    val newMinimum = section.content.map(instruction => instruction.minimumSize).sum
-    val newMaximum = section.content.map(instruction => instruction.maximumSize).sum
+    val newMinimum = section.baseAddress + section.precedingResources(target).map(instruction => instruction.minimumSize).sum
+    val newMaximum = section.baseAddress + section.precedingResources(target).map(instruction => instruction.maximumSize).sum
     if (newMinimum == newMaximum)
       encodableForPosition(newMinimum)
     else
@@ -32,3 +32,19 @@ trait AbsoluteReference
   }
 }
 
+object AbsoluteReference {
+  def apply(targetLabel: Label, initialMinimumSize: Int, initialMaximumSize: Int, thisLabel: Label,
+    encodableFactory: (Int)=>Resource with Encodable) =
+    new AbsoluteReference {
+
+    override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
+
+    override def target: Label = targetLabel
+
+    override def label: Label = thisLabel
+
+    override def minimumSize: Int = initialMinimumSize
+
+    override def maximumSize: Int = initialMaximumSize
+  }
+}

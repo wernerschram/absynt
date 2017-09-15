@@ -5,8 +5,9 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RightRotateImmediate, Shifter}
 import assembler.arm.operations._
+import assembler.reference.AbsoluteReference
 import assembler.sections.Section
-import assembler.{Resource, ResourceCollection, Encodable, Label}
+import assembler.{Encodable, Label, Resource, ResourceCollection}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -135,9 +136,10 @@ object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
   }
 }
 
-object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
+object
+Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+    (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -146,12 +148,8 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label) =
-    new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): Resource with Encodable =
-        ???
-//        forConstant(distance + page.relativeAddress(this), destination, condition)
-    }
+    (implicit processorMode: ProcessorMode, label: Label) =
+    AbsoluteReference(targetLabel, 4, 4, label, (position) => forConstant(position, destination, condition))
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
