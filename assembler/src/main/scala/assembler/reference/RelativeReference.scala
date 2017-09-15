@@ -9,9 +9,9 @@ trait RelativeReference
     extends Resource {
   def target: Label
 
-  def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Resource with Encodable
+  def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable
 
-  def sizeForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Int =
+  def sizeForDistance(distance: Int)(forward: Boolean): Int =
     encodableForDistance(distance)(forward).size
 
   private val pageMap = new TrieMap[Section, RelativeReferenceInSection]
@@ -20,7 +20,7 @@ trait RelativeReference
     val forward = section.isForwardReference(this)
 
     pageMap.getOrElseUpdate(section, new RelativeReferenceInSection(target, label, minimumSize, maximumSize,
-      encodableForDistance(_)(forward)(section), sizeForDistance(_)(forward)(section),
+      encodableForDistance(_)(forward), sizeForDistance(_)(forward),
       section.intermediateEncodables(this))(section))
   }
 }

@@ -1,12 +1,11 @@
 package assembler.arm.instructions
 
-import assembler.{Resource, Label}
+import assembler.Label
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RelativeA32Pointer, RelativeThumbPointer}
 import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
-import assembler.sections.Section
 
 class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)
@@ -15,7 +14,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): BranchImmediate =
+      override def encodableForDistance(distance: Int): BranchImmediate =
         Immediate(label, RelativeA32Pointer(distance - 8), Always)
     }
 
@@ -24,7 +23,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, condition) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): BranchImmediate =
+      override def encodableForDistance(distance: Int): BranchImmediate =
         Immediate(label, RelativeA32Pointer(distance - 8), condition)
     }
 }
@@ -46,7 +45,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Unpredictable) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): BranchImmediate =
+      override def encodableForDistance(distance: Int): BranchImmediate =
         Immediate(label, RelativeThumbPointer(distance - 8), Unpredictable)
     }
 }

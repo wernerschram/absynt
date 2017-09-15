@@ -6,8 +6,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{RightRotateImmediate, Shifter}
 import assembler.arm.operations._
 import assembler.reference.AbsoluteReference
-import assembler.sections.Section
-import assembler.{Encodable, Label, Resource, ResourceCollection}
+import assembler.{Label, ResourceCollection}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -86,7 +85,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
     (implicit processorMode: ProcessorMode, label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int)(implicit page: Section): ResourceCollection =
+      override def encodableForDistance(distance: Int): ResourceCollection =
         forConstant(source1, distance - 8, destination, condition)
     }
 }

@@ -2,7 +2,6 @@ package assembler.x86.operations
 
 import assembler.{Resource, Encodable, Label}
 import assembler.ListExtensions._
-import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
 
@@ -20,9 +19,9 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
 
   override val maximumSize: Int = longJumpSize
 
-  def encodableForLongPointer(pointer: NearPointerOperand)(implicit page: Section): Resource with Encodable
+  def encodableForLongPointer(pointer: NearPointerOperand): Resource with Encodable
 
-  override def sizeForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Int =
+  override def sizeForDistance(distance: Int)(forward: Boolean): Int =
     if (forward) {
       if (distance <= forwardShortLongBoundary)
         shortJumpSize
@@ -35,7 +34,7 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
         longJumpSize
     }
 
-  override def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Resource with Encodable = {
+  override def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable = {
     if (forward) {
       if (distance <= forwardShortLongBoundary) {
         encodableForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))

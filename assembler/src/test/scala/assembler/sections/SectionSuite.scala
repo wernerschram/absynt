@@ -10,7 +10,7 @@ class SectionSuite extends WordSpec with Matchers {
     override def minimumSize: Int = 5
     override def maximumSize: Int = 5
 
-    override def encodableForDistance(distance: Int)(forward: Boolean)(implicit page: Section): Resource with Encodable = new Resource with Encodable {
+    override def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable = new Resource with Encodable {
       override def encodeByte: List[Byte] = 0x01.toByte :: Nil
       override def label: Label = NoLabel()
       override def size: Int = 5
