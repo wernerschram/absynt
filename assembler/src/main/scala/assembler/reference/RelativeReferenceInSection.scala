@@ -16,25 +16,31 @@ class RelativeReferenceInSection (
 
   def toFinalState = encodableForDistance(actualDistance)
 
-  private lazy val independentIntermediates: Seq[Resource with Encodable] = intermediateInstructions.collect {
-    case e: Resource with Encodable => e
+  private lazy val (
+    dependentReferences: Seq[RelativeReference],
+    dependentResources: Seq[Resource]) =
+  intermediateInstructions.partition {
+     case _: RelativeReference => true
+     case _ => false
   }
 
-  private lazy val dependentIntermediates = intermediateInstructions.collect {
-    // TODO: only works as long as there is only FinalState and ReferencingInstruction
-    case e: RelativeReference => e.toOnPageState(section)
+  private lazy val dependentReferencesInSection = dependentReferences.map{ _.toOnPageState(section) }
+
+  private lazy val independentMinimumDistance: Int = dependentResources.map { _.minimumSize }.sum
+  private lazy val independentMaximumDistance: Int = dependentResources.map { _.maximumSize }.sum
+
+  private def minimumDistance = independentMinimumDistance +
+    dependentReferencesInSection.map(instruction =>
+      if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum
+
+  private def maximumDistance = independentMaximumDistance +
+    dependentReferencesInSection.map(instruction =>
+      if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum
+
+  lazy val actualDistance: Int = {
+    assert(independentMinimumDistance == independentMaximumDistance)
+    independentMinimumDistance + dependentReferencesInSection.map { _.size }.sum
   }
-
-  private lazy val independentDistance =
-    independentIntermediates.map { instruction => instruction.size }.sum
-
-  private def minimumDistance = independentDistance + dependentIntermediates.map(instruction =>
-    if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum
-
-  private def maximumDistance = independentDistance + dependentIntermediates.map(instruction =>
-    if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum
-
-  lazy val actualDistance: Int = independentDistance + dependentIntermediates.map { instruction => instruction.size }.sum
 
   def minimumEstimatedSize: Int = encodableForDistance(minimumDistance).size
   def maximumEstimatedSize: Int = encodableForDistance(maximumDistance).size
@@ -42,14 +48,16 @@ class RelativeReferenceInSection (
   private var _estimatedSize: Option[Int] = None
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def predictedDistance(sizeAssumptions: Map[RelativeReferenceInSection, Int]) = independentDistance +
-    dependentIntermediates.map { instruction =>
-      if (sizeAssumptions.contains(instruction))
-        sizeAssumptions(instruction)
-      else
-        instruction.estimateSize(sizeAssumptions)
-    }
-    .sum
+  private def predictedDistance(sizeAssumptions: Map[RelativeReferenceInSection, Int]) = {
+    assert(independentMinimumDistance == independentMaximumDistance)
+    independentMinimumDistance +
+      dependentReferencesInSection.map { instruction =>
+        if (sizeAssumptions.contains(instruction))
+          sizeAssumptions(instruction)
+        else
+          instruction.estimateSize(sizeAssumptions)
+      }.sum
+  }
 
   def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection, Int]): Int = {
     var assumption: Option[Int] = None
