@@ -21,13 +21,13 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     sectionHeaderCount * architecture.processorClass.sectionHeaderSize
 
   def address(label: Label): Long =
-    orderedSections.filter(s => s.contains(label)).map(s => s.baseAddress + s.relativeAddress(label)).head
+    encodableSections.filter(s => s.contains(label)).map(s => s.baseAddress + s.relativeAddress(label)).head
 
   def fileOffset(section: Section): Long =
-    dataOffset + orderedSections.takeWhile(s => s != section).map(s => s.size).sum
+    dataOffset + encodableSections.takeWhile(s => s != section).map(s => s.size).sum
 
   def stringTableOffset: Long =
-    dataOffset + orderedSections.map(s => s.size).sum
+    dataOffset + encodableSections.map(s => s.size).sum
 
   def stringOffset(strings: List[String]): List[(String, Int)] = {
     (strings.head, 0) :: stringOffset(1, strings)
@@ -49,10 +49,10 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   implicit val executable: Elf = this
 
   val programHeaders: List[ProgramHeader] =
-    orderedSections.map(s => ProgramHeader(s))
+    encodableSections.map(s => ProgramHeader(s))
   val sectionHeaders: List[SectionHeader] =
     NullSectionHeader() ::
-    orderedSections.map(s => new SectionSectionHeader(s)) :::
+    encodableSections.map(s => new SectionSectionHeader(s)) :::
     new StringSectionHeader() :: Nil
 
   override def encodeByte: List[Byte] =
@@ -76,7 +76,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
       endianness.encode(sectionNamesSectionHeaderIndex) :::
       programHeaders.flatMap(p => p.header) :::
       sectionHeaders.flatMap(s => s.header) :::
-      orderedSections.flatMap(s => s.encodeByte) :::
+      encodableSections.flatMap(s => s.encodeByte) :::
       stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)
 }
 
