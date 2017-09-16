@@ -145,7 +145,7 @@ object Boot extends App {
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
 
     val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry)
-    out.write(exec.header.toArray)
+    out.write(exec.encodeByte.toArray)
    out.flush()
   }
 

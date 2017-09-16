@@ -1,16 +1,15 @@
 package assembler.Elf
 
-import assembler.Encodable
 import assembler.sections.{LastIteration, Section}
 
 class ProgramHeader(section: Section with LastIteration)(implicit elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
   def flags: Flags[ProgramFlag] = ProgramFlag.Execute | ProgramFlag.Read
   def alignBytes: Int = 0x40
-  def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(elf.getBaseAddress(section))
+  def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
 
   def segmentFileOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.fileOffset(section))
-  def segmentMemoryOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.getBaseAddress(section))
+  def segmentMemoryOffset: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
   def segmentFileSize: List[Byte] = elf.architecture.processorClass.numberBytes(section.size)
 
   def segmentMemorySize: List[Byte] = segmentFileSize

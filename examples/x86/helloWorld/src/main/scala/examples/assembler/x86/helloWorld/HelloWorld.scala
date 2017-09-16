@@ -50,7 +50,7 @@ object HelloWorld extends App {
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     raw.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
-    out.write(exec.header.toArray)
+    out.write(exec.encodeByte.toArray)
     raw.flush()
     out.flush()
 

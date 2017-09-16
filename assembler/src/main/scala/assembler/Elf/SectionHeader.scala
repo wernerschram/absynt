@@ -37,7 +37,7 @@ class SectionSectionHeader(section: Section with LastIteration)(implicit elf: El
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
   val flags: Flags[SectionFlag] = SectionFlag.Alloc | SectionFlag.ExecutableInstruction
-  val sectionAddress: Long = elf.getBaseAddress(section)
+  val sectionAddress: Long = section.baseAddress
   val sectionFileOffset: Long = elf.fileOffset(section)
   val segmentFileSize: Long = section.size
   val link: Int = 0

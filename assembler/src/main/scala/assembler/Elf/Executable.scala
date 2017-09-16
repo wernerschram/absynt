@@ -55,7 +55,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     orderedSections.map(s => new SectionSectionHeader(s)) :::
     new StringSectionHeader() :: Nil
 
-  def header: List[Byte] =
+  override def encodeByte: List[Byte] =
       magic :::
       architecture.processorClass.id ::
       endianness.id ::
@@ -78,7 +78,6 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
       sectionHeaders.flatMap(s => s.header) :::
       orderedSections.flatMap(s => s.encodeByte) :::
       stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)
-
 }
 
 class Executable private(architecture: Architecture, sections: List[Section], entryLabel: Label)
@@ -96,7 +95,6 @@ case class ElfVersion private(id: Byte, extended: Int)
 case object ElfVersion {
   object Original extends ElfVersion(0x01.toByte, 0x01)
 }
-
 
 case class ElfType private(id: Short)
 
