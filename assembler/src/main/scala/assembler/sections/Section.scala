@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{AbsoluteReference, RelativeReference, RelativeReferenceInSection}
+import assembler.reference.{AbsoluteReference, RelativeReference}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -42,6 +42,24 @@ trait Section {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     !firstInstruction.label.matches(from.target)
   }
+  private def nextContent: List[Resource] = {
+    val newContent: List[Resource] = content.map {
+      case referencing: RelativeReference => referencing.toOnPageState(this)
+      case absolute: AbsoluteReference => absolute.toInSectionState(this)
+      case resource: Resource => resource
+    }
+    newContent
+  }
+
+  @tailrec
+  final def encodable: Section with LastIteration = {
+    val newContent = nextContent
+    if (newContent.forall { case _: Encodable => true; case _ => false }) {
+      Section.lastIteration(newContent.map(r => r.asInstanceOf[Resource with Encodable]), baseAddress)
+   } else {
+      Section(newContent, baseAddress).encodable
+    }
+  }
 }
 
 trait LastIteration {
@@ -66,31 +84,11 @@ object Section {
       override val baseAddress: Int = base
     }
 
-  private def nextContent(previousSection: Section): List[Resource] = {
-
-    val newContent: List[Resource] = previousSection.content.map {
-      case referencing: RelativeReference => referencing.toOnPageState(previousSection)
-      case absolute: AbsoluteReference => absolute.toInSectionState(previousSection)
-      case resource: Resource => resource
+  def lastIteration(encodables: List[Resource with Encodable], base: Int): Section with LastIteration =
+    new Section with LastIteration {
+      override val finalContent: List[Resource with Encodable] = encodables
+      override val content: List[Resource] = finalContent
+      override val baseAddress: Int = base
     }
-    newContent
-  }
-
-  @tailrec
-  def encodable(section: Section): Section with LastIteration = {
-    val newContent = nextContent(section)
-    if (newContent.forall { case _: Encodable => true; case _ => false }) {
-      new Section with LastIteration {
-        override val finalContent: List[Resource with Encodable] = newContent.map(r => r.asInstanceOf[Resource with Encodable])
-        override val content: List[Resource] = finalContent
-        override val baseAddress: Int = section.baseAddress
-      }
-    } else {
-      encodable(new Section {
-        override val content: List[Resource] = newContent
-        override val baseAddress: Int = section.baseAddress
-      })
-    }
-  }
 }
 

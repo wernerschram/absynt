@@ -71,7 +71,7 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val finalSection = Section.encodable(section)
+    val finalSection = section.encodable
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")

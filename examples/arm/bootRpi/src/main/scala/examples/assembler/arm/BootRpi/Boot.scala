@@ -139,7 +139,7 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
 
-    val finalSection = Section.encodable(section)
+    val finalSection = section.encodable
     raw.write(finalSection.encodeByte.toArray)
     println(s"size: ${finalSection.size}")
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }

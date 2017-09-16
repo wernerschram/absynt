@@ -99,7 +99,7 @@ class SectionSuite extends WordSpec with Matchers {
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)), 0)
 
-        Section.encodable(section).encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
+        section.encodable.encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
       }
     }
 
@@ -115,7 +115,7 @@ class SectionSuite extends WordSpec with Matchers {
           one,
           two), 0)
 
-        Section.encodable(section).size should be(oneSize + twoSize)
+        section.encodable.size should be(oneSize + twoSize)
       }
     }
 
@@ -130,7 +130,7 @@ class SectionSuite extends WordSpec with Matchers {
           intermediate,
           target), 0)
 
-        Section.encodable(section).relativeAddress(target) should be(5)
+        section.encodable.relativeAddress(target) should be(5)
       }
     }
   }
