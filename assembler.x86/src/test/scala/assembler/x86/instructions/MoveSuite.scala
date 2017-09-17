@@ -8,9 +8,12 @@ import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler._
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
-class MoveSuite extends WordSpec with Matchers {
+class MoveSuite extends WordSpec with Matchers with MockFactory {
+
+  val application: Application = mock[Application]
 
   "a Move instruction" when {
     "in real mode" should {
@@ -316,7 +319,7 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0)
 
-        withClue("Move") { p.encodable.finalContent.head.encodeByte should be(Hex.lsb("B8 04 00")) }
+        withClue("Move") { p.encodable(application).finalContent.head.encodeByte should be(Hex.lsb("B8 04 00")) }
       }
 
       "correctly encode mov esi, 0x78563412" in {
@@ -392,7 +395,7 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          p.encodable.finalContent(1).encodeByte
+          p.encodable(application).finalContent(1).encodeByte
         }
       }
 
@@ -407,7 +410,7 @@ class MoveSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
 
         an[AssertionError] should be thrownBy {
-          p.encodable.finalContent(1).encodeByte
+          p.encodable(application).finalContent(1).encodeByte
         }
       }
 
@@ -421,7 +424,7 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
 
-        withClue("Move") { p.encodable.finalContent(1).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
+        withClue("Move") { p.encodable(application).finalContent(1).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
       }
 
     }
@@ -585,7 +588,7 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          p.encodable.finalContent(1).encodeByte
+          p.encodable(application).finalContent(1).encodeByte
         }
       }
 
@@ -599,7 +602,7 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(2)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x10000)
 
-        withClue("Move") { p.encodable.finalContent(1).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
+        withClue("Move") { p.encodable(application).finalContent(1).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
       }
 
        "correctly encode mov rbx, [label]" in {
@@ -612,7 +615,7 @@ class MoveSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(2)(0x00.toByte)),
           move), 0x3000000)
 
-        withClue("Move") { p.encodable.finalContent(3).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
+        withClue("Move") { p.encodable(application).finalContent(3).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
       }
 
      "correctly represent mov r14d, 2018915346 as a string" in {

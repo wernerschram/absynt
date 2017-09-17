@@ -1,10 +1,11 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{RelativeReference, RelativeReferenceInSection}
+import assembler.reference.RelativeReference
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
-class SectionSuite extends WordSpec with Matchers {
+class SectionSuite extends WordSpec with Matchers with MockFactory {
 
   class MyRelativeReference(override val target: Label)(implicit val label: Label) extends RelativeReference {
     override def minimumSize: Int = 5
@@ -16,6 +17,8 @@ class SectionSuite extends WordSpec with Matchers {
       override def size: Int = 5
     }
   }
+
+  val application: Application = mock[Application]
 
   "a Section" when {
     "queried for immediate instructions" should {
@@ -99,7 +102,7 @@ class SectionSuite extends WordSpec with Matchers {
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)), 0)
 
-        section.encodable.encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
+        section.encodable(application).encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
       }
     }
 
@@ -115,7 +118,7 @@ class SectionSuite extends WordSpec with Matchers {
           one,
           two), 0)
 
-        section.encodable.size should be(oneSize + twoSize)
+        section.encodable(application).size should be(oneSize + twoSize)
       }
     }
 
@@ -130,7 +133,7 @@ class SectionSuite extends WordSpec with Matchers {
           intermediate,
           target), 0)
 
-        section.encodable.relativeAddress(target) should be(5)
+        section.encodable(application).relativeAddress(target) should be(5)
       }
     }
   }

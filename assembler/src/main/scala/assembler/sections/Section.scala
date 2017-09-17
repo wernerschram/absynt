@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.reference.{AbsoluteReference, CurrentSection, OtherSection, RelativeReference}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -42,22 +42,33 @@ trait Section {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     !firstInstruction.label.matches(from.target)
   }
-  private def nextContent: List[Resource] = {
+
+  private def nextContent(currentApplication: Application): List[Resource] = {
     val newContent: List[Resource] = content.map {
-      case referencing: RelativeReference => referencing.toInSectionState(this)
-      case absolute: AbsoluteReference => absolute.toInSectionState(this)
-      case resource: Resource => resource
+      case referencing: RelativeReference =>
+        referencing.toInSectionState(this)
+
+      case absolute: AbsoluteReference with OtherSection =>
+        val targetSection = currentApplication.sections.find(_.name == absolute.sectionName)
+        assume(targetSection.isDefined)
+        absolute.toInSectionState(targetSection.get)
+
+      case absolute: AbsoluteReference with CurrentSection =>
+        absolute.toInSectionState(this)
+
+      case resource =>
+        resource
     }
     newContent
   }
 
   @tailrec
-  final def encodable: Section with LastIteration = {
-    val newContent = nextContent
+  final def encodable(currentApplication: Application): Section with LastIteration = {
+    val newContent = nextContent(currentApplication)
     if (newContent.forall { case _: Encodable => true; case _ => false }) {
       Section.lastIteration(newContent.map(r => r.asInstanceOf[Resource with Encodable]), baseAddress)
    } else {
-      Section(newContent, baseAddress).encodable
+      Section(newContent, baseAddress).encodable(currentApplication)
     }
   }
 }

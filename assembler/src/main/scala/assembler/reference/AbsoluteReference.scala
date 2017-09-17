@@ -3,9 +3,7 @@ package assembler.reference
 import assembler.sections.Section
 import assembler.{Encodable, Label, Resource}
 
-import scala.collection.concurrent.TrieMap
-
-trait AbsoluteReference
+sealed trait AbsoluteReference
     extends Resource {
   def target: Label
 
@@ -32,19 +30,39 @@ trait AbsoluteReference
   }
 }
 
+trait CurrentSection {
+  self: AbsoluteReference =>
+}
+
+trait OtherSection {
+  self: AbsoluteReference =>
+  val sectionName: String
+}
+
 object AbsoluteReference {
   def apply(targetLabel: Label, initialMinimumSize: Int, initialMaximumSize: Int, thisLabel: Label,
     encodableFactory: (Int)=>Resource with Encodable) =
-    new AbsoluteReference {
+    new AbsoluteReference with CurrentSection {
+      override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
 
-    override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
+      override def target: Label = targetLabel
+      override def label: Label = thisLabel
 
-    override def target: Label = targetLabel
+      override def minimumSize: Int = initialMinimumSize
+      override def maximumSize: Int = initialMaximumSize
+    }
 
-    override def label: Label = thisLabel
+  def apply(targetSection: String, targetLabel: Label, initialMinimumSize: Int, initialMaximumSize: Int, thisLabel: Label,
+    encodableFactory: (Int)=>Resource with Encodable) =
+    new AbsoluteReference with OtherSection {
+      override val sectionName: String = targetSection
 
-    override def minimumSize: Int = initialMinimumSize
+      override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
 
-    override def maximumSize: Int = initialMaximumSize
-  }
+      override def target: Label = targetLabel
+      override def label: Label = thisLabel
+
+      override def minimumSize: Int = initialMinimumSize
+      override def maximumSize: Int = initialMaximumSize
+    }
 }

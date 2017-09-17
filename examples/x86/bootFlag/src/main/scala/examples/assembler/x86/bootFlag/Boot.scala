@@ -3,7 +3,7 @@ package examples.assembler.x86.bootFlag
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.{Label, Resource, UniqueLabel}
+import assembler.{Application, Label, Resource, UniqueLabel}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -71,7 +71,11 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val finalSection = section.encodable
+    val app = new Application(section :: Nil) {
+      override def encodeByte: List[Byte] = ???
+    }
+
+    val finalSection = section.encodable(app)
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
