@@ -1,7 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.{Resource, Hex}
-import assembler.sections.Section
+import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
@@ -9,8 +8,6 @@ import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper
 import org.scalatest.{Matchers, WordSpec}
 
 class StoreStringSuite extends WordSpec with Matchers {
-
-  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an StoreString instruction" when {
     "in real mode" should {

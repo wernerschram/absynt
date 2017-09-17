@@ -10,8 +10,6 @@ import org.scalatest.{Matchers, WordSpec}
 
 class DataProcessingSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Resource], 0)
-
   "an AddCarry instruction" when {
     "in a32 mode" should {
 
@@ -152,7 +150,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             EncodedByteList(List.fill(8)(0x00.toByte)),
             { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        instruction.toOnPageState(p).encodeByte should be(Hex.msb("e2801f01"))
+        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801f01"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the instruction is not at position 0" in {
@@ -162,7 +160,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        instruction.toOnPageState(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
+        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the target is before the instruction" in {
@@ -173,7 +171,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           { implicit val label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction), 0)
-        instruction.toOnPageState(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
+        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
 
     }

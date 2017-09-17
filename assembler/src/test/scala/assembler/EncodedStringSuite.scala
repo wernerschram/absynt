@@ -6,8 +6,6 @@ import assembler.sections.Section
 
 class EncodedStringSuite extends WordSpec with Matchers {
 
-  implicit val page: Section = Section(List.empty[Resource], 0)
-
   "an Encoded String" should {
     "correctly encode \"Test\"" in {
       val value = EncodedString("Test")

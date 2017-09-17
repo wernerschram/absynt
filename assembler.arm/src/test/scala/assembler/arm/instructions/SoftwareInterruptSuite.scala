@@ -1,14 +1,10 @@
 package assembler.arm.instructions
 
-import assembler.{Resource, Hex}
+import assembler.Hex
 import assembler.arm.ProcessorMode
-import assembler.arm.operations.ARMOperation
-import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class SoftwareInterruptSuite extends WordSpec with Matchers {
-
-  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "a SoftwareInterrupt instruction" when {
     "in a32 mode" should {

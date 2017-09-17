@@ -1,16 +1,14 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operands.registers.GeneralRegister._
+import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operations._
 import assembler.sections.Section
-import assembler.{Resource, EncodedByteList, EncodedString, Hex, Label}
+import assembler._
 import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
-
-  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {

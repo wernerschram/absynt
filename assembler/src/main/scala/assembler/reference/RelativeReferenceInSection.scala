@@ -24,7 +24,7 @@ class RelativeReferenceInSection (
      case _ => false
   }
 
-  private lazy val dependentReferencesInSection = dependentReferences.map{ _.toOnPageState(section) }
+  private lazy val dependentReferencesInSection = dependentReferences.map{ _.toInSectionState(section) }
 
   private lazy val independentMinimumDistance: Int = dependentResources.map { _.minimumSize }.sum
   private lazy val independentMaximumDistance: Int = dependentResources.map { _.maximumSize }.sum

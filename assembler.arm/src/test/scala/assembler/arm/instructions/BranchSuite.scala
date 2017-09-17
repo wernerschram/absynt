@@ -4,12 +4,10 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.sections.Section
-import assembler.{Resource, EncodedByteList, Hex, Label}
+import assembler.{EncodedByteList, Hex, Label, Resource}
 import org.scalatest.{Matchers, WordSpec}
 
 class BranchSuite extends WordSpec with Matchers {
-
-  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "an Branch instruction" when {
     "in a32 mode" should {

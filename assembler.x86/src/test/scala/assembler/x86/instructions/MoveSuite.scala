@@ -1,6 +1,5 @@
 package assembler.x86.instructions
 
-import assembler.{EncodedByteList, Hex, Label, Resource}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -8,11 +7,10 @@ import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
+import assembler.{EncodedByteList, Hex, Label, Resource}
 import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {
-
-  implicit val page: Section = Section(List.empty[Resource], 0)
 
   "a Move instruction" when {
     "in real mode" should {

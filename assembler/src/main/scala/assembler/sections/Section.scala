@@ -44,7 +44,7 @@ trait Section {
   }
   private def nextContent: List[Resource] = {
     val newContent: List[Resource] = content.map {
-      case referencing: RelativeReference => referencing.toOnPageState(this)
+      case referencing: RelativeReference => referencing.toInSectionState(this)
       case absolute: AbsoluteReference => absolute.toInSectionState(this)
       case resource: Resource => resource
     }
