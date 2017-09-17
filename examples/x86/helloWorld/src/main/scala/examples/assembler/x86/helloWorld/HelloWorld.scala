@@ -23,7 +23,7 @@ object HelloWorld extends App {
 
     val section: Section = Section(
       // use the write Syscall
-      { implicit val label = entry; Move(0x04, EAX) } ::
+      { implicit val label: Label = entry; Move(0x04, EAX) } ::
       Move(0x01, EBX) ::
       Move.forLabel(text, ECX) ::
       Move(12, EDX) ::
@@ -32,7 +32,7 @@ object HelloWorld extends App {
       Move(0x01, EAX) ::
       Move(0x00, EBX) ::
       Interrupt(0x80.toByte) ::
-      { implicit val label = text; EncodedString("Hello World!\r\n\u0000") } ::
+      { implicit val label: Label = text; EncodedString("Hello World!\r\n\u0000") } ::
       Nil, 0x1000
     )
 

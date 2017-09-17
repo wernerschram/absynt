@@ -11,7 +11,7 @@ class IOSuite extends WordSpec with Matchers {
   "an Input instruction" when {
     "in real mode" should {
 
-      implicit val processorMode = ProcessorMode.Real
+      implicit val processorMode: ProcessorMode = ProcessorMode.Real
 
       "correctly encode in al, 0x10" in {
         Input(0x10.toByte, AL).encodeByte should be(Hex.lsb("E4 10"))
@@ -66,7 +66,7 @@ class IOSuite extends WordSpec with Matchers {
       }
     }
     "in protected mode" should {
-      implicit val processorMode = ProcessorMode.Protected
+      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
 
       "correctly encode in al, 0x10" in {
         Input(0x10.toByte, AL).encodeByte should be(Hex.lsb("E4 10"))
@@ -91,7 +91,7 @@ class IOSuite extends WordSpec with Matchers {
     }
     "in long mode" should {
 
-      implicit val processorMode = ProcessorMode.Long
+      implicit val processorMode: ProcessorMode = ProcessorMode.Long
 
       "correctly encode in al, 0x10" in {
         Input(0x10.toByte, AL).encodeByte should be(Hex.lsb("E4 10"))
@@ -124,7 +124,7 @@ class IOSuite extends WordSpec with Matchers {
   "an Output instruction" when {
     "in real mode" should {
 
-      implicit val processorMode = ProcessorMode.Real
+      implicit val processorMode: ProcessorMode = ProcessorMode.Real
 
       "correctly encode out 0x10, al" in {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))
@@ -179,7 +179,7 @@ class IOSuite extends WordSpec with Matchers {
       }
     }
     "in protected mode" should {
-      implicit val processorMode = ProcessorMode.Protected
+      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
 
       "correctly encode out 0x10, al" in {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))
@@ -204,7 +204,7 @@ class IOSuite extends WordSpec with Matchers {
     }
     "in long mode" should {
 
-      implicit val processorMode = ProcessorMode.Long
+      implicit val processorMode: ProcessorMode = ProcessorMode.Long
 
       "correctly encode out 0x10, al" in {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))

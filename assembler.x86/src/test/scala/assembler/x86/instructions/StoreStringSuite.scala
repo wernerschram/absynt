@@ -12,7 +12,7 @@ class StoreStringSuite extends WordSpec with Matchers {
   "an StoreString instruction" when {
     "in real mode" should {
 
-      implicit val processorMode = ProcessorMode.Real
+      implicit val processorMode: ProcessorMode = ProcessorMode.Real
 
       "correctly encode stos [di], al" in {
         StoreString(AL, DI).encodeByte should be(Hex.lsb("AA"))
@@ -66,7 +66,7 @@ class StoreStringSuite extends WordSpec with Matchers {
 
     "in protected mode" should {
 
-      implicit val processorMode = ProcessorMode.Protected
+      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
 
       "correctly encode stos [edi], al" in {
         StoreString(AL, EDI).encodeByte should be(Hex.lsb("AA"))
@@ -84,7 +84,7 @@ class StoreStringSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode = ProcessorMode.Long
+      implicit val processorMode: ProcessorMode = ProcessorMode.Long
     }
   }
 }

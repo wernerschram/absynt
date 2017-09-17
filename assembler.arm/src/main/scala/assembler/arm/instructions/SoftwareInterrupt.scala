@@ -8,7 +8,7 @@ import assembler.arm.operations.{SoftwareInterrupt => SoftwareInterruptOpcode}
 object SoftwareInterrupt {
   val opcode: String = "swi"
 
-  def apply(interrupt: Int, condition: Condition = Always)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(interrupt: Int, condition: Condition = Always)(implicit label: Label, processorMode: ProcessorMode): SoftwareInterruptOpcode =
     Immed(label, interrupt, condition)
 
   private def Immed(label: Label, interrupt: Int, condition: Condition) =

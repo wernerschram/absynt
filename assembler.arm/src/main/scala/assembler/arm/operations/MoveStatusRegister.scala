@@ -4,6 +4,7 @@ import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.RightRotateImmediate
 import assembler.arm.operands.registers._
+import assembler.arm.operations
 import assembler.sections.Section
 
 import scala.language.implicitConversions
@@ -20,10 +21,10 @@ class MoveFromStatusRegister(val label: Label, override val opcode: String, sour
 object Fields extends Enumeration {
   type Fields = Value
 
-  val control = Value(16, "c")
-  val extension = Value(17, "x")
-  val status = Value(18, "s")
-  val flags = Value(19, "f")
+  val control: Value = Value(16, "c")
+  val extension: Value = Value(17, "x")
+  val status: Value = Value(18, "s")
+  val flags: Value = Value(19, "f")
 
   implicit def fieldsToString(set: ValueSet): String = {
     set.foldRight("")((a, b) => a + b).reverse

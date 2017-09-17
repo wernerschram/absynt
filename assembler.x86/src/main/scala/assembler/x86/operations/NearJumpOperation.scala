@@ -9,7 +9,7 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
                                 (implicit processorMode: ProcessorMode)
   extends ShortJumpOperation(label, shortOpcode, mnemonic, target) {
 
-  val forwardShortLongBoundary = Byte.MaxValue
+  val forwardShortLongBoundary: Byte = Byte.MaxValue
   val backwardShortLongBoundary: Int = (-Byte.MinValue) - shortJumpSize
 
   val longJumpSize: Int = processorMode match {

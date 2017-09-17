@@ -9,7 +9,7 @@ import assembler.arm.operations.{MultiplyOperation, MultiplyWithRegisterOperatio
 class MultiplyWithRegister(val code: Byte, val opcode: String) {
 
   def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister,
-            condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label) =
+            condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): MultiplyWithRegisterOperation =
     RegRegAndRegToReg(label, destination, source, multiplyValue, addValue, condition)
 
   private def RegRegAndRegToReg(label: Label, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,
@@ -17,7 +17,7 @@ class MultiplyWithRegister(val code: Byte, val opcode: String) {
     new MultiplyWithRegisterOperation(label, code, opcode, destination, source, multiplyValue, addValue, condition)
 
   def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister,
-               condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label) =
+               condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): MultiplyWithRegisterOperation with SetFlags =
     RegRegAndRegToRegFlags(label, destination, source, multiplyValue, addValue, condition)
 
   private def RegRegAndRegToRegFlags(label: Label, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,
@@ -27,14 +27,14 @@ class MultiplyWithRegister(val code: Byte, val opcode: String) {
 
 class Multiply(val code: Byte, val opcode: String) {
   def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label) =
+           (implicit processorMode: ProcessorMode, label: Label): MultiplyOperation =
     RegAndRegToReg(label, destination, source, multiplyValue, condition)
 
   private def RegAndRegToReg(label: Label, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition) =
     new MultiplyOperation(label, code, opcode, destination, source, multiplyValue, condition)
 
   def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label) =
+              (implicit processorMode: ProcessorMode, label: Label): MultiplyOperation with SetFlags =
     RegAndRegToRegFlags(label, destination, source, multiplyValue, condition)
 
   private def RegAndRegToRegFlags(label: Label, destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,

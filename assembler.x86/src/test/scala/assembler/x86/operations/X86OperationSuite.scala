@@ -2,6 +2,7 @@ package assembler.x86.operations
 
 import assembler.Label
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.Operand
 import org.scalatest.{Matchers, WordSpec}
 
 class X86OperationSuite extends WordSpec with Matchers {
@@ -14,7 +15,7 @@ class X86OperationSuite extends WordSpec with Matchers {
 
         override def mnemonic = "mis"
 
-        override def operands = Nil
+        override def operands: List[Operand] = Nil
 
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
 

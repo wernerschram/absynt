@@ -10,7 +10,7 @@ class MiscellaneousSuite extends WordSpec with Matchers {
   "a Breakpoint instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode = ProcessorMode.A32
+      implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode bkpt 0x00cc" in {
         Breakpoint(0xf15.toShort).encodeByte should be(Hex.msb("e120f175"))
@@ -25,7 +25,7 @@ class MiscellaneousSuite extends WordSpec with Matchers {
   "a Change Processor State instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode = ProcessorMode.A32
+      implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode cpsie , #31" in {
         ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.none, ExecutionMode.System).encodeByte should be(Hex.msb("f10a001f"))

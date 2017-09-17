@@ -49,15 +49,15 @@ object Boot extends App {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
-    { implicit val label = targetLabel; Subtract.setFlags(register, 1.toByte, register) } ::
+    { implicit val label: UniqueLabel = targetLabel; Subtract.setFlags(register, 1.toByte, register) } ::
     Branch(targetLabel, NotEqual) ::
     Nil
   }
 
-  private def halt()(implicit label: Label, processorMode: ProcessorMode) = { implicit val label = Label.unique; Branch(label) }
+  private def halt()(implicit label: Label, processorMode: ProcessorMode) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
 
   def createFile(): Unit = {
-    implicit val processorMode = ProcessorMode.A32
+    implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
     val putString: Label = "PutString"
     val text: Label = "Text"
@@ -65,7 +65,7 @@ object Boot extends App {
 
     val section: Section = Section(
       // Disable UART0
-      { implicit val label = entry; Move.forConstant(UART0.Base, R0) } ::
+      { implicit val label: Label = entry; Move.forConstant(UART0.Base, R0) } ::
       Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       //
@@ -114,7 +114,7 @@ object Boot extends App {
       Add.forRelativeLabel(PC, text, R7) ::
       Move.forConstant(0.toByte, R6) ::
         //
-      { implicit val label = putString; LoadRegister(R4, R0, UART0.FR)} ::
+      { implicit val label: Label = putString; LoadRegister(R4, R0, UART0.FR)} ::
       And.setFlags(R4, 0x20.toByte, R4) ::
       Branch(putString, ZeroClear) ::
       //
@@ -128,7 +128,7 @@ object Boot extends App {
       halt() ::
       //
       // Resources
-      { implicit val label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil
+      { implicit val label: Label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil
     , 0x1000)
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))

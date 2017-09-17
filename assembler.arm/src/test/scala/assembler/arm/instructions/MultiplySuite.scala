@@ -11,7 +11,7 @@ class MultiplySuite extends WordSpec with Matchers {
   "an MultiplyAccumulate instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode = ProcessorMode.A32
+      implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode mlagt r1, r3, r2, r4" in {
         MultiplyAccumulate(R1, R2, R3, R4, Condition.SignedGreaterThan).encodeByte should be(Hex.msb("c0214293"))
@@ -30,7 +30,7 @@ class MultiplySuite extends WordSpec with Matchers {
   "an Multiply instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode = ProcessorMode.A32
+      implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode mulgt r1, r3, r2" in {
         Multiply(R1, R2, R3, Condition.SignedGreaterThan).encodeByte should be(Hex.msb("c0010293"))

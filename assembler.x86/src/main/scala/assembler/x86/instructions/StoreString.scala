@@ -8,7 +8,7 @@ import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.operations.{Repeated, ReversedOperands, Static}
 
 object StoreString {
-  implicit val mnemonic = "stos"
+  implicit val mnemonic: String = "stos"
 
   def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
            (implicit label: Label, processorMode: ProcessorMode): Static with ReversedOperands =
@@ -21,7 +21,7 @@ object StoreString {
     new Static(label, 0xAA.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands: List[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
-      override def operandSize: Byte.type = Register.AL.operandByteSize
+      override def operandSize: OperandSize = Register.AL.operandByteSize
 
       override def addressSize: OperandSize = destination.addressSize
     }
@@ -40,7 +40,7 @@ object StoreString {
     new Static(label, 0xAA.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands: List[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
-      override def operandSize: Byte.type = Register.AL.operandByteSize
+      override def operandSize: OperandSize = Register.AL.operandByteSize
 
       override def addressSize: OperandSize = destination.addressSize
     }

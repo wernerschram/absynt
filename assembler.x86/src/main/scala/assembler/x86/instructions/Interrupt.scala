@@ -6,7 +6,7 @@ import assembler.x86.operands.{ImmediateValue, Operand, ValueSize}
 import assembler.x86.operations.{Immediate, Static}
 
 object Interrupt {
-  implicit val opcode = "int"
+  implicit val opcode: String = "int"
 
   def apply(immediate: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode): Static = immediate.value.head match {
     case 3 => Static()

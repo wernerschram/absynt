@@ -11,7 +11,7 @@ trait AbsoluteReference
 
   def encodableForPosition(position: Int): Resource with Encodable
 
-  def toInSectionState(section: Section) = {
+  def toInSectionState(section: Section): Resource = {
     val newMinimum = section.baseAddress + section.precedingResources(target).map(instruction => instruction.minimumSize).sum
     val newMaximum = section.baseAddress + section.precedingResources(target).map(instruction => instruction.maximumSize).sum
     if (newMinimum == newMaximum)

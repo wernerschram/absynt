@@ -13,7 +13,7 @@ class StackSuite extends WordSpec with Matchers {
   "an Push instruction" when {
     "in real mode" should {
 
-      implicit val processorMode = ProcessorMode.Real
+      implicit val processorMode: ProcessorMode = ProcessorMode.Real
 
       "throw an AssertionError for push BYTE PTR [bp]" in {
         an[AssertionError] should be thrownBy {
@@ -58,7 +58,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in protected mode" should {
 
-      implicit val processorMode = ProcessorMode.Protected
+      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
 
       "correctly encode push eax" in {
         Push(EAX).encodeByte should be(0x50.toByte :: Nil)
@@ -93,7 +93,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode = ProcessorMode.Long
+      implicit val processorMode: ProcessorMode = ProcessorMode.Long
 
       "correctly encode push QWORD PTR [rax]" in {
         Push(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
@@ -135,7 +135,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in real mode" should {
 
-      implicit val processorMode = ProcessorMode.Real
+      implicit val processorMode: ProcessorMode = ProcessorMode.Real
 
       "correctly encode pusha" in {
         PushAll().encodeByte should be(Hex.lsb("60"))
@@ -144,7 +144,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode = ProcessorMode.Long
+      implicit val processorMode: ProcessorMode = ProcessorMode.Long
 
       "throw an AssertionError for pusha" in {
         an[AssertionError] should be thrownBy {
@@ -157,7 +157,7 @@ class StackSuite extends WordSpec with Matchers {
   "an PushFlags instruction" when {
     "in long mode" should {
 
-      implicit val processorMode = ProcessorMode.Long
+      implicit val processorMode: ProcessorMode = ProcessorMode.Long
 
       "correctly encode pushf" in {
         PushFlags().encodeByte should be(Hex.lsb("9C"))

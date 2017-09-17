@@ -29,7 +29,7 @@ class Branch(code: Byte, val opcode: String) {
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit label: Label, processorMode: ProcessorMode): BranchRegister =
     Register(label, destination, condition)
 
   private def Register(label: Label, destination: GeneralRegister, condition: Condition = Always) =
@@ -37,7 +37,7 @@ class BranchExchange(registerCode: Byte, val opcode: String) {
 }
 
 class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String) extends BranchExchange(registerCode, opcode) {
-  def apply(destination: RelativeThumbPointer)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(destination: RelativeThumbPointer)(implicit label: Label, processorMode: ProcessorMode): BranchImmediate =
     Immediate(label, destination, Unpredictable)
 
   private def Immediate(label: Label, destination: RelativeThumbPointer, condition: Condition = Always) =

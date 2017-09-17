@@ -79,7 +79,7 @@ sealed trait SIBBaseRegister extends ModRMEncodableOperand with FixedSizeOperand
 }
 
 sealed trait ByteRegister extends GeneralPurposeRegister {
-  override val operandByteSize = ValueSize.Byte
+  override val operandByteSize: OperandSize = ValueSize.Byte
 }
 
 sealed trait LowByteRegister extends ByteRegister {
@@ -95,19 +95,19 @@ sealed trait HighByteRegister extends ByteRegister {
 sealed trait WideRegister extends GeneralPurposeRegister
 
 sealed trait WordRegister extends WideRegister {
-  override val operandByteSize = ValueSize.Word
+  override val operandByteSize: OperandSize = ValueSize.Word
 
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
 }
 
 sealed trait DoubleWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
-  override val operandByteSize = ValueSize.DoubleWord
+  override val operandByteSize: OperandSize = ValueSize.DoubleWord
 
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
 }
 
 sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
-  override val operandByteSize = ValueSize.QuadWord
+  override val operandByteSize: OperandSize = ValueSize.QuadWord
 
   override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
 }
@@ -166,7 +166,7 @@ object Register {
   }
 
   final case object DI extends DestinationIndex with WordRegister with RealModeIndexRegister {
-    override val defaultSegment = Register.ES
+    override val defaultSegment: SegmentRegister = Register.ES
     override val indexCode: Byte = 0x05.toByte
   }
 
@@ -178,7 +178,7 @@ object Register {
   case object ESP extends SourcePointer with DoubleWordRegister
   case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister
   case object ESI extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
-    override val defaultSegment = Register.ES
+    override val defaultSegment: SegmentRegister = Register.ES
   }
   case object EDI extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
 
@@ -190,7 +190,7 @@ object Register {
   case object RSP extends SourcePointer with QuadWordRegister
   case object RBP extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
   case object RSI extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
-    override val defaultSegment = Register.ES
+    override val defaultSegment: SegmentRegister = Register.ES
   }
   case object RDI extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
 

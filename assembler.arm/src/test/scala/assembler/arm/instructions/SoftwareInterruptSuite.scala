@@ -9,7 +9,7 @@ class SoftwareInterruptSuite extends WordSpec with Matchers {
   "a SoftwareInterrupt instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode = ProcessorMode.A32
+      implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode swi 10" in {
         SoftwareInterrupt(10).encodeByte should be(Hex.msb("ef00000a"))

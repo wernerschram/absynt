@@ -14,11 +14,6 @@ sealed abstract class GeneralRegister(val registerCode: Byte) extends Register(s
 }
 
 object GeneralRegister {
-
-  val SP = R13
-  val LR = R14
-  val PC = R15
-
   case object R0 extends GeneralRegister(0x00)
   case object R1 extends GeneralRegister(0x01)
   case object R2 extends GeneralRegister(0x02)
@@ -35,6 +30,10 @@ object GeneralRegister {
   case object R13 extends GeneralRegister(0x0d)
   case object R14 extends GeneralRegister(0x0e)
   case object R15 extends GeneralRegister(0x0f)
+
+  val SP: GeneralRegister = R13
+  val LR: GeneralRegister = R14
+  val PC: GeneralRegister = R15
 }
 
 sealed abstract class StatusRegister(val registerCode: Byte, mnemonic: String) extends Register(mnemonic) {

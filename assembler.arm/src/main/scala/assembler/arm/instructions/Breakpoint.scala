@@ -9,7 +9,7 @@ object Breakpoint {
   val code: Byte = 0x09
   val opcode: String = "bkpt"
 
-  def apply(value: Short, condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label) =
+  def apply(value: Short, condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): Miscellaneous =
     Immed(label, value, condition)
 
   private def Immed(label: Label, value: Short, condition: Condition) = new Miscellaneous(label, code, opcode, value, condition)

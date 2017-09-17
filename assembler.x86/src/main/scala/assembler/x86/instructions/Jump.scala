@@ -62,7 +62,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
 
 object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-  def apply(operand: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(operand: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic =
     RM16(operand)
 
   private def RM16(operand: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
@@ -91,10 +91,12 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   object Far {
-    def apply(farPointer: FarPointer)(implicit label: Label, processorMode: ProcessorMode) =
+    def apply(farPointer: FarPointer)(implicit label: Label, processorMode: ProcessorMode): Static with FarPointerOperation {
+      def pointer: FarPointer
+    } =
       Ptr1616(farPointer)
 
-    def apply(pointer: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
+    def apply(pointer: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic =
       M1616(pointer)
   }
 

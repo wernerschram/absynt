@@ -20,12 +20,12 @@ class LoadStoreRegister(
 
   def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset,
             addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Always)
-           (implicit label: Label, processorMode: ProcessorMode) =
+           (implicit label: Label, processorMode: ProcessorMode): LoadStore =
     ImmedWord(label, condition, register, baseRegister, offset, addressingType)
 
   def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset,
            addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Always)
-          (implicit label: Label, processorMode: ProcessorMode) =
+          (implicit label: Label, processorMode: ProcessorMode): LoadStore =
     ImmedByte(label, condition, register, baseRegister, offset, addressingType)
 
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode) =
@@ -44,11 +44,11 @@ class LoadStoreRegister(
 
   object UserMode {
     def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Always)
-             (implicit label: Label, processorMode: ProcessorMode) =
+             (implicit label: Label, processorMode: ProcessorMode): LoadStore =
       ImmedWord(label, condition, register, baseRegister, offset, LoadStoreAddressingTypeUser.PostIndexedUser)
 
     def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Always)
-            (implicit label: Label, processorMode: ProcessorMode) =
+            (implicit label: Label, processorMode: ProcessorMode): LoadStore =
       ImmedByte(label, condition, register, baseRegister, offset, LoadStoreAddressingTypeUser.PostIndexedUser)
   }
 }
@@ -76,22 +76,22 @@ object LoadRegister extends LoadStoreRegister(LoadStoreOperation.LoadWord, LoadS
 
   def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
                  addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                (implicit label: Label, processorMode: ProcessorMode) =
+                (implicit label: Label, processorMode: ProcessorMode): LoadStoreMiscelaneous =
     ImmedDoubleWord(label, condition, register, baseRegister, offset, addressingType)
 
   def signedByte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
                  addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                (implicit label: Label, processorMode: ProcessorMode) =
+                (implicit label: Label, processorMode: ProcessorMode): LoadStoreMiscelaneous =
     ImmedSignedByte(label, condition, register, baseRegister, offset, addressingType)
 
   def unsignedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
                        addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                      (implicit label: Label, processorMode: ProcessorMode) =
+                      (implicit label: Label, processorMode: ProcessorMode): LoadStoreMiscelaneous =
     ImmedUnsignedHalfWord(label, condition, register, baseRegister, offset, addressingType)
 
   def signedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
                      addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                    (implicit label: Label, processorMode: ProcessorMode) =
+                    (implicit label: Label, processorMode: ProcessorMode): LoadStoreMiscelaneous =
     ImmedSignedHalfWord(label, condition, register, baseRegister, offset, addressingType)
 }
 
@@ -108,11 +108,11 @@ object StoreRegister extends LoadStoreRegister(LoadStoreOperation.StoreWord, Loa
 
   def halfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
                addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-              (implicit label: Label, processorMode: ProcessorMode) =
+              (implicit label: Label, processorMode: ProcessorMode): LoadStoreMiscelaneous =
     ImmedHalfWord(label, condition, register, baseRegister, offset, addressingType)
 
   def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset,
                  addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                (implicit label: Label, processorMode: ProcessorMode) =
+                (implicit label: Label, processorMode: ProcessorMode): LoadStoreMiscelaneous =
     ImmedDoubleWord(label, condition, register, baseRegister, offset, addressingType)
 }

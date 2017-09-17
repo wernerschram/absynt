@@ -1,24 +1,23 @@
 package assembler.x86.instructions
 
-import assembler.reference.{AbsoluteReference, RelativeReference}
-import assembler.sections.Section
-import assembler.{Encodable, Label, Resource}
-import assembler.x86.{ParameterPosition, ProcessorMode}
+import assembler.reference.AbsoluteReference
 import assembler.x86.operands.memoryaccess.{MemoryAddress, MemoryLocation}
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
+import assembler.x86.{ParameterPosition, ProcessorMode}
+import assembler.{Encodable, Label, Resource}
 
 object Move {
 
-  implicit val mnemonic = "mov"
+  implicit val mnemonic: String = "mov"
 
-  def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit label: Label, processorMode: ProcessorMode): ModSegmentRMStatic with ReversedOperands =
     RM16ToSReg(destination, source)
 
   private def RM16ToSReg(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
     new ModSegmentRMStatic(label, operand1, operand2, 0x8E.toByte :: Nil, mnemonic) with ReversedOperands
 
-  def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModSegmentRMStatic =
     SRegToRM16(source, destination)
 
   private def SRegToRM16(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
@@ -47,7 +46,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.Byte
+      override def operandSize: OperandSize = ValueSize.Byte
     }
 
   def apply(source: WideRegister, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): X86Operation =
@@ -74,7 +73,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.Word
+      override def operandSize: OperandSize = ValueSize.Word
     }
 
   private def EAXToMOffs32(memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
@@ -83,7 +82,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.DoubleWord
+      override def operandSize: OperandSize = ValueSize.DoubleWord
     }
 
   private def RAXToMOffs64(memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
@@ -92,7 +91,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.QuadWord
+      override def operandSize: OperandSize = ValueSize.QuadWord
     }
 
   def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode): ReversedOperands =
@@ -112,7 +111,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.Byte
+      override def operandSize: OperandSize = ValueSize.Byte
     }
 
   def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): ReversedOperands =
@@ -136,7 +135,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.Word
+      override def operandSize: OperandSize = ValueSize.Word
     }
 
   private def MOffs32ToEAX(memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
@@ -145,7 +144,7 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.DoubleWord
+      override def operandSize: OperandSize = ValueSize.DoubleWord
     }
 
   private def MOffs64ToRAX(memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
@@ -154,10 +153,12 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize = ValueSize.QuadWord
+      override def operandSize: OperandSize = ValueSize.QuadWord
     }
 
-  def apply(source: ImmediateValue, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(source: ImmediateValue, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate with ReversedOperands {
+    def immediate: ImmediateValue
+  } =
     Imm8ToR8(destination, source)
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
@@ -166,7 +167,9 @@ object Move {
       override def immediate: ImmediateValue = immediateValue
     }
 
-  def apply(source: ImmediateValue, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode) =
+  def apply(source: ImmediateValue, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[WideRegister] with Immediate with ReversedOperands {
+    def immediate: ImmediateValue
+  } =
     Imm16ToR16(destination, source)
 
   private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =

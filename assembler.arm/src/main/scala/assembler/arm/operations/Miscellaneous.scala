@@ -2,7 +2,6 @@ package assembler.arm.operations
 
 import assembler.Label
 import assembler.arm.operands.Condition._
-import assembler.sections.Section
 
 import scala.language.implicitConversions
 
@@ -47,11 +46,11 @@ object ExecutionMode {
 object InterruptDisableFlags extends Enumeration {
   type InterruptDisableFlags = Value
 
-  val fastInterrupt = Value(0, "f")
-  val normalInterrupt = Value(1, "i")
-  val impreciseDataAbort = Value(2, "a")
+  val fastInterrupt: Value = Value(0, "f")
+  val normalInterrupt: Value = Value(1, "i")
+  val impreciseDataAbort: Value = Value(2, "a")
 
-  val none: _root_.assembler.arm.operations.InterruptDisableFlags.ValueSet = ValueSet.empty
+  val none: ValueSet = ValueSet.empty
 
   implicit def valueToSet(value: Value): ValueSet = ValueSet(value)
 

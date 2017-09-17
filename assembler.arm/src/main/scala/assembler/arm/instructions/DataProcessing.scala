@@ -10,7 +10,7 @@ import assembler.{Label, ResourceCollection}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label) =
+           (implicit processorMode: ProcessorMode, label: Label): DataProcessingOperation =
     RegAndShifterToReg(label, source1, source2, destination, condition)
 
   private def RegAndShifterToReg(label: Label, source1: GeneralRegister, source2: Shifter, destination: GeneralRegister,
@@ -18,7 +18,7 @@ class DataProcessing(val code: Byte, val opcode: String) {
     new DataProcessingOperation(label, opcode, code, condition, source1, source2, destination)
 
   def setFlags(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label) =
+              (implicit processorMode: ProcessorMode, label: Label): DataProcessingOperation with SetFlags =
     RegAndShifterToRegFlags(label, source1, source2, destination, condition)
 
   private def RegAndShifterToRegFlags(label: Label, source1: GeneralRegister, source2: Shifter, destination: GeneralRegister,
@@ -28,7 +28,7 @@ class DataProcessing(val code: Byte, val opcode: String) {
 
 class DataProcessingNoDestination(val code: Byte, val opcode: String) {
   def apply(register1: GeneralRegister, source2: Shifter, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label) =
+           (implicit processorMode: ProcessorMode, label: Label): DataProcessingNoDestinationInstruction =
     RegAndShifter(label, register1, source2, condition)
 
   private def RegAndShifter(label: Label, register1: GeneralRegister, operand2: Shifter, condition: Condition) =
@@ -37,7 +37,7 @@ class DataProcessingNoDestination(val code: Byte, val opcode: String) {
 
 class DataProcessingNoRegister(val code: Byte, val opcode: String) {
   def apply(source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label) =
+           (implicit processorMode: ProcessorMode, label: Label): DataProcessingNoRegisterInstruction =
     ShifterToReg(label, source2, destination, condition)
 
   private def ShifterToReg(label: Label, operand2: Shifter, destination: GeneralRegister, condition: Condition) = {
@@ -45,7 +45,7 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
   }
 
   def setFlags(source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label) =
+              (implicit processorMode: ProcessorMode, label: Label): DataProcessingNoRegisterInstruction with SetFlags =
     ShifterToRegFlags(label, source2, destination, condition)
 
   private def ShifterToRegFlags(label: Label, operand2: Shifter, destination: GeneralRegister, condition: Condition) = {

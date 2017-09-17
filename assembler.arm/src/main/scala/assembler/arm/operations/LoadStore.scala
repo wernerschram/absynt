@@ -4,7 +4,6 @@ import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{ImmediateShiftValue, ShiftRegisterWithShift}
-import assembler.sections.Section
 
 import scala.language.implicitConversions
 
@@ -57,7 +56,7 @@ abstract sealed class LoadStoreOffset private(val updateDirection: UpdateDirecti
 }
 
 object LoadStoreOffset {
-  implicit def apply(offset: Short, updateDirection: UpdateDirection.UpdateDirection) =
+  implicit def apply(offset: Short, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
       override val encode: Int = 0x04000000 | offset | updateDirection.bitMask
 
@@ -71,7 +70,7 @@ object LoadStoreOffset {
   else
     apply((-offset).toShort, UpdateDirection.Decrement)
 
-  implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) =
+  implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
       override val encode: Int = 0x06000000 | offsetRegister.registerCode | updateDirection.bitMask
 
@@ -80,7 +79,7 @@ object LoadStoreOffset {
 
   implicit def apply(offsetRegister: GeneralRegister): LoadStoreOffset = apply(offsetRegister, UpdateDirection.Increment)
 
-  implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection) =
+  implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
       override val encode: Int = 0x06000000 | offset.encode | updateDirection.bitMask
 

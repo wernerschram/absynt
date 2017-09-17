@@ -3,7 +3,7 @@ package examples.assembler.x86.bootFlag
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.{Resource, Label}
+import assembler.{Label, Resource, UniqueLabel}
 import assembler.ListExtensions._
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
@@ -27,7 +27,7 @@ object Boot extends App {
 
   def createFile(): Unit = {
 
-    implicit val processorMode = ProcessorMode.Real
+    implicit val processorMode: ProcessorMode = ProcessorMode.Real
 
     val topColor = Color(63, 0, 0)
     val middleColor = Color(63, 63, 63)
@@ -61,7 +61,7 @@ object Boot extends App {
       Move((320*67).toShort, CX) ::
       StoreString.Repeat(AL, DI) ::
 
-      { implicit val label = Label.unique; Jump(label) } ::
+      { implicit val label: UniqueLabel = Label.unique; Jump(label) } ::
       Nil, 0
     )
 

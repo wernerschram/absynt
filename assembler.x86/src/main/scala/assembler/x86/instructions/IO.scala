@@ -7,7 +7,7 @@ import assembler.x86.operands._
 import assembler.x86.operations.{Immediate, ReversedOperands, Static}
 
 object Input {
-  implicit val opcode = "in"
+  implicit val opcode: String = "in"
 
   def apply(immediate: ImmediateValue, destination: AccumulatorRegister)(implicit label: Label, processorMode: ProcessorMode): Static
     with Immediate with ReversedOperands = {
@@ -56,24 +56,24 @@ object Input {
   private def DXToAL()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0xEC.toByte :: Nil, opcode) {
     override def operands: List[GeneralPurposeRegister with Product with Serializable] = Register.DX :: Register.AL :: Nil
 
-    override def operandSize: Byte.type = Register.AL.operandByteSize
+    override def operandSize: OperandSize = Register.AL.operandByteSize
   }
 
   private def DXToAX()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0xED.toByte :: Nil, opcode) {
     override def operands: List[WordRegister with Product with Serializable] = Register.DX :: Register.AX :: Nil
 
-    override def operandSize: Word.type = Register.AX.operandByteSize
+    override def operandSize: OperandSize = Register.AX.operandByteSize
   }
 
   private def DXToEAX()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0xED.toByte :: Nil, opcode) {
     override def operands: List[WideRegister with Product with Serializable] = Register.DX :: Register.EAX :: Nil
 
-    override def operandSize: DoubleWord.type = Register.EAX.operandByteSize
+    override def operandSize: OperandSize = Register.EAX.operandByteSize
   }
 }
 
 object Output {
-  implicit val opcode = "out"
+  implicit val opcode: String = "out"
 
   def apply(destination: AccumulatorRegister, immediate: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode): Static with Immediate = {
     assume(immediate.operandByteSize == ValueSize.Byte)
@@ -122,20 +122,20 @@ object Output {
     new Static(label, 0xEE.toByte :: Nil, opcode) with ReversedOperands {
       override def operands: List[GeneralPurposeRegister with Product with Serializable] = Register.DX :: Register.AL :: Nil
 
-      override def operandSize: Byte.type = Register.AL.operandByteSize
+      override def operandSize: OperandSize = Register.AL.operandByteSize
     }
 
   private def AXToDX()(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xEF.toByte :: Nil, opcode) with ReversedOperands {
       override def operands: List[WordRegister with Product with Serializable] = Register.DX :: Register.AX :: Nil
 
-      override def operandSize: Word.type = Register.AX.operandByteSize
+      override def operandSize: OperandSize = Register.AX.operandByteSize
     }
 
   private def EAXToDX()(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xEF.toByte :: Nil, opcode) with ReversedOperands {
       override def operands: List[WideRegister with Product with Serializable] = Register.DX :: Register.EAX :: Nil
 
-      override def operandSize: DoubleWord.type = Register.EAX.operandByteSize
+      override def operandSize: OperandSize = Register.EAX.operandByteSize
     }
 }

@@ -11,8 +11,8 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
   override val defaultSegment: SegmentRegister = index.defaultSIBSegment
-  val baseCode = base.SIBBaseCode
-  val indexCode = index.SIBIndexCode
+  val baseCode: Byte = base.SIBBaseCode
+  val indexCode: Byte = index.SIBIndexCode
 
   override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: getSIB :: displacement
 
