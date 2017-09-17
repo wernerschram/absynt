@@ -156,9 +156,7 @@ object Move {
       override def operandSize: OperandSize = ValueSize.QuadWord
     }
 
-  def apply(source: ImmediateValue, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate with ReversedOperands {
-    def immediate: ImmediateValue
-  } =
+  def apply(source: ImmediateValue, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate with ReversedOperands =
     Imm8ToR8(destination, source)
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
@@ -167,9 +165,7 @@ object Move {
       override def immediate: ImmediateValue = immediateValue
     }
 
-  def apply(source: ImmediateValue, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[WideRegister] with Immediate with ReversedOperands {
-    def immediate: ImmediateValue
-  } =
+  def apply(source: ImmediateValue, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[WideRegister] with Immediate with ReversedOperands =
     Imm16ToR16(destination, source)
 
   private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =

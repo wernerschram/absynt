@@ -8,9 +8,7 @@ import assembler.x86.operations.{Immediate, ModRMStatic, RegisterEncoded, Static
 object Push {
   implicit val opcode: String = "push"
 
-  def apply(register: WideRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[WideRegister] {
-    def validate(): Unit
-  } =
+  def apply(register: WideRegister)(implicit label: Label, processorMode: ProcessorMode): RegisterEncoded[WideRegister] =
     R16(register)
 
   private def R16(register: WideRegister)(implicit label: Label, processorMode: ProcessorMode) =
@@ -25,9 +23,7 @@ object Push {
       }
     }
 
-  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic {
-    def validate(): Unit
-  } =
+  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic =
     RM16(operand)
 
   private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit label: Label, processorMode: ProcessorMode) =
@@ -83,9 +79,7 @@ object Push {
 object PushAll {
   implicit val opcode: String = "pusha"
 
-  def apply()(implicit label: Label, processorMode: ProcessorMode): Static {
-    def validate(): Unit
-  } = Static()
+  def apply()(implicit label: Label, processorMode: ProcessorMode): Static = Static()
 
   private def Static()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0x60.toByte :: Nil, opcode) {
     override def validate(): Unit = {

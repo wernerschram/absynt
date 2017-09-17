@@ -236,7 +236,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
       implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode strd r1, [r2, -r1]" in {
-        StoreRegister.doubleWord(R1, R2, LoadStoreMiscelaneousOffset(R1, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e10210f1"))
+        StoreRegister.doubleWord(R1, R2, LoadStoreMiscellaneousOffset(R1, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e10210f1"))
       }
     }
   }

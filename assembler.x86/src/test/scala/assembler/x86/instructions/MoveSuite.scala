@@ -316,7 +316,7 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0)
 
-        withClue("Move") { p.encodable.finalContent(0).encodeByte should be(Hex.lsb("B8 04 00")) }
+        withClue("Move") { p.encodable.finalContent.head.encodeByte should be(Hex.lsb("B8 04 00")) }
       }
 
       "correctly encode mov esi, 0x78563412" in {

@@ -13,7 +13,7 @@ abstract sealed class LoadStoreAddressingType(pBit: Boolean, wBit: Boolean, val 
   final def formatParameters(baseRegister: GeneralRegister, offset: LoadStoreOffset): String =
     formatParameters(baseRegister, offset.toString)
 
-  final def formatParameters(baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset): String =
+  final def formatParameters(baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset): String =
     formatParameters(baseRegister, offset.toString)
 
   protected def formatParameters(baseRegister: GeneralRegister, offset: String): String
@@ -89,31 +89,31 @@ object LoadStoreOffset {
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue]): LoadStoreOffset = apply(offset, UpdateDirection.Increment)
 }
 
-abstract sealed class LoadStoreMiscelaneousOffset private(val updateDirection: UpdateDirection.UpdateDirection) {
+abstract sealed class LoadStoreMiscellaneousOffset private(val updateDirection: UpdateDirection.UpdateDirection) {
   def encode: Int
 }
 
-object LoadStoreMiscelaneousOffset {
+object LoadStoreMiscellaneousOffset {
   def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection) =
-    new LoadStoreMiscelaneousOffset(updateDirection) {
+    new LoadStoreMiscellaneousOffset(updateDirection) {
       override val encode: Int = 0x00400090 | updateDirection.bitMask | ((offset & 0xf0) << 4) | (offset & 0x0f)
 
       override def toString: String = s"#${updateDirection.sign}$offset"
     }
 
-  implicit def apply(offset: Byte): LoadStoreMiscelaneousOffset = if (offset >= 0)
+  implicit def apply(offset: Byte): LoadStoreMiscellaneousOffset = if (offset >= 0)
     apply(offset, UpdateDirection.Increment)
   else
     apply((-offset).toByte, UpdateDirection.Decrement)
 
   def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) =
-    new LoadStoreMiscelaneousOffset(updateDirection) {
+    new LoadStoreMiscellaneousOffset(updateDirection) {
       override val encode: Int = 0x00000090 | offsetRegister.registerCode | updateDirection.bitMask
 
       override def toString: String = s"${updateDirection.sign}$offsetRegister"
     }
 
-  implicit def apply(offsetRegister: GeneralRegister): LoadStoreMiscelaneousOffset = apply(offsetRegister, UpdateDirection.Increment)
+  implicit def apply(offsetRegister: GeneralRegister): LoadStoreMiscellaneousOffset = apply(offsetRegister, UpdateDirection.Increment)
 }
 
 object UpdateDirection {
@@ -165,7 +165,7 @@ class LoadStore(val label: Label, val opcode: String, val condition: Condition, 
 }
 
 class LoadStoreMiscelaneous(val label: Label, val opcode: String, val condition: Condition, register: GeneralRegister,
-                            baseRegister: GeneralRegister, offset: LoadStoreMiscelaneousOffset, addressingType: LoadStoreAddressingType,
+                            baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType,
                             operation: LoadStoreMiscellaneousOperation.LoadStoreMiscellaneousOperation)
   extends Conditional {
 
