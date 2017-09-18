@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.{Application, Label, Resource, UniqueLabel}
 import assembler.ListExtensions._
-import assembler.sections.Section
+import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
@@ -33,7 +33,7 @@ object Boot extends App {
     val middleColor = Color(63, 63, 63)
     val bottomColor = Color(0, 0, 63)
 
-    val section: Section = Section(
+    val section: Section = Section(SectionType.Text, ".text",
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
       //

@@ -1,7 +1,7 @@
 package assembler.x86.instructions
 
 import assembler.ListExtensions._
-import assembler.sections.Section
+import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ImmediateValue._
@@ -314,7 +314,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, AX)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0)
@@ -387,7 +387,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, R10D)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -403,7 +403,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, R11)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -418,7 +418,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, ECX)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -580,7 +580,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, EBX)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
@@ -596,7 +596,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, R11)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(2)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(2)(0x00.toByte)),
@@ -609,7 +609,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, RBX)
 
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(2)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))},
           EncodedByteList(List.fill(2)(0x00.toByte)),

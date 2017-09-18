@@ -3,7 +3,7 @@ package assembler.arm.instructions
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.sections.Section
+import assembler.sections.{Section, SectionType}
 import assembler._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
@@ -34,7 +34,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
@@ -44,7 +44,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a backward branch to a labeled instruction" in {
         val targetLabel: Label = "Label"
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: Label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel, Condition.LowerOrSame)), 0)
@@ -54,7 +54,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a branch to self instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(8)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)},
           EncodedByteList(List.fill(8)(0x00.toByte))), 0)
@@ -64,7 +64,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel),
@@ -76,7 +76,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel),
@@ -113,7 +113,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch-link to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           BranchLink(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
@@ -150,7 +150,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val targetLabel = Label.unique
-        val p = Section(List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           BranchLinkExchange(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)

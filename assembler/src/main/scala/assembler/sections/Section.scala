@@ -9,7 +9,9 @@ import scala.language.implicitConversions
 trait Section {
   val content: List[Resource]
 
-  val name=".text"
+  def name: String
+
+  def sectionType: SectionType
 
   val baseAddress: Int
 
@@ -66,9 +68,9 @@ trait Section {
   final def encodable(currentApplication: Application): Section with LastIteration = {
     val newContent = nextContent(currentApplication)
     if (newContent.forall { case _: Encodable => true; case _ => false }) {
-      Section.lastIteration(newContent.map(r => r.asInstanceOf[Resource with Encodable]), baseAddress)
+      Section.lastIteration(sectionType, name, newContent.map(r => r.asInstanceOf[Resource with Encodable]), baseAddress)
    } else {
-      Section(newContent, baseAddress).encodable(currentApplication)
+      Section(sectionType, name, newContent, baseAddress).encodable(currentApplication)
     }
   }
 }
@@ -89,17 +91,28 @@ trait LastIteration {
 }
 
 object Section {
-  def apply(resources: List[Resource], base: Int): Section =
+  def apply(`type`: SectionType, sectionName: String, resources: List[Resource], base: Int): Section =
     new Section {
+      override val name: String = sectionName
+      override val sectionType = `type`
       override val content: List[Resource] = resources
       override val baseAddress: Int = base
     }
 
-  def lastIteration(encodables: List[Resource with Encodable], base: Int): Section with LastIteration =
+  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], base: Int): Section with LastIteration =
     new Section with LastIteration {
+      override val name: String = sectionName
+      override val sectionType = `type`
       override val finalContent: List[Resource with Encodable] = encodables
       override val content: List[Resource] = finalContent
       override val baseAddress: Int = base
     }
+}
+
+sealed abstract class SectionType private(defaultName: String)
+
+object SectionType {
+  object Text extends SectionType(".text")
+  object Data extends SectionType(".data")
 }
 

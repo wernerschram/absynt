@@ -21,7 +21,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
           intermediate,
           target), 0)
@@ -37,7 +37,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           target,
           intermediate,
           reference), 0)
@@ -53,7 +53,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val prefix = EncodedByteList(List.fill(2)(0))
         val postfix = EncodedByteList(List.fill(3)(0))
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           prefix,
           reference,
           postfix), 0)
@@ -71,7 +71,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
           target), 0)
 
@@ -85,7 +85,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           target,
           reference), 0)
 
@@ -96,7 +96,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     "asked to encode itself" should {
 
       "be able to encode itself" in {
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)), 0)
 
@@ -112,7 +112,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val one = EncodedByteList(List.fill(oneSize)(1))
         val two = EncodedByteList(List.fill(twoSize)(2))
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           one,
           two), 0)
 
@@ -127,7 +127,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section(List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           intermediate,
           target), 0)
 

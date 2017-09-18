@@ -2,10 +2,9 @@ package assembler.Elf
 
 import assembler.sections.{LastIteration, Section}
 
-class ProgramHeader(section: Section with LastIteration)(implicit elf: Elf) {
+class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag])(implicit elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
-  def flags: Flags[ProgramFlag] = ProgramFlag.Execute | ProgramFlag.Read
-  def alignBytes: Int = 0x40
+  def alignBytes: Int = 0x20
   def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
 
   def segmentFileOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.fileOffset(section))
@@ -39,8 +38,14 @@ class ProgramHeader(section: Section with LastIteration)(implicit elf: Elf) {
 }
 
 object ProgramHeader {
-  def apply(section: Section with LastIteration)(implicit elf: Elf): ProgramHeader = new ProgramHeader(section)
+  def apply(section: Section with LastIteration)(implicit elf: Elf): ProgramHeader = section.sectionType match {
+    case assembler.sections.SectionType.Text =>
+      new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read)
+    case assembler.sections.SectionType.Data =>
+      new ProgramHeader(section, ProgramFlag.Read | ProgramFlag.Write)
+  }
 }
+
 abstract case class ProgramType private(id: Int)
 
 object ProgramType {

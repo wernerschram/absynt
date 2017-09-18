@@ -36,14 +36,20 @@ class SectionSectionHeader(section: Section with LastIteration)(implicit elf: El
 
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
-  val flags: Flags[SectionFlag] = SectionFlag.Alloc | SectionFlag.ExecutableInstruction
+  val flags: Flags[SectionFlag] =
+    section.sectionType match {
+      case assembler.sections.SectionType.Text =>
+        SectionFlag.Alloc | SectionFlag.ExecutableInstruction
+      case assembler.sections.SectionType.Data =>
+        SectionFlag.Alloc | SectionFlag.Write
+    }
   val sectionAddress: Long = section.baseAddress
   val sectionFileOffset: Long = elf.fileOffset(section)
   val segmentFileSize: Long = section.size
   val link: Int = 0
   val info: Int = 0
 
-  val alignBytes: Int = 0x40
+  val alignBytes: Int = 0x20
 
   val entrySize: Int = 0x0
 }
@@ -75,7 +81,7 @@ class StringSectionHeader()(implicit elf: Elf) extends SectionHeader {
   val flags: Flags[SectionFlag] = Flags.None
   val sectionAddress: Long = 0
   val sectionFileOffset: Long = elf.stringTableOffset
-  val segmentFileSize: Long = elf.stringMap.keys.map(k => k.length + 1).sum // + 1 because they are null terminated
+  val segmentFileSize: Long = elf.stringMap.keys.toList.map(k => k.length + 1).sum // + 1 because they are null terminated
   val link: Int = 0
   val info: Int = 0
 
