@@ -1,10 +1,10 @@
-package assembler.Elf
+package assembler.output.Elf
 
 import assembler.sections.{LastIteration, Section}
 
 class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag])(implicit elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
-  def alignBytes: Int = 0x20
+  def alignBytes: Int = 0x01
   def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
 
   def segmentFileOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.fileOffset(section))

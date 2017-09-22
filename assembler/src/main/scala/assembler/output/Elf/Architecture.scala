@@ -1,4 +1,4 @@
-package assembler.Elf
+package assembler.output.Elf
 
 trait Architecture {
   def endianness: Endianness

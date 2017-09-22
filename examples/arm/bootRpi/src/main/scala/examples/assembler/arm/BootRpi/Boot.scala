@@ -3,7 +3,7 @@ package examples.assembler.arm.BootRpi
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.Elf.{Architecture, Executable}
+import assembler.output.Elf.{Architecture, Executable}
 import assembler._
 import assembler.ListExtensions._
 import assembler.arm.ProcessorMode
@@ -11,7 +11,8 @@ import assembler.arm.instructions._
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.sections.Section
+import assembler.output.raw.Raw
+import assembler.sections.{Section, SectionType}
 
 object Boot extends App {
 
@@ -139,18 +140,14 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
 
-    val app = new Application(section :: Nil) {
-      override def encodeByte: List[Byte] = ???
-    }
-
-    val finalSection = section.encodable(app)
-    raw.write(finalSection.encodeByte.toArray)
-    println(s"size: ${finalSection.size}")
-    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
-
     val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry)
+
+    raw.write(exec.encodableSections.head.encodeByte.toArray)
+    println(s"size: ${exec.encodableSections.head.size}")
+    exec.encodableSections.head.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
+
     out.write(exec.encodeByte.toArray)
-   out.flush()
+    out.flush()
   }
 
   createFile()

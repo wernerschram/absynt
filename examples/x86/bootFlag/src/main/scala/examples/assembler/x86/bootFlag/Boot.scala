@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.{Application, Label, Resource, UniqueLabel}
 import assembler.ListExtensions._
+import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
@@ -71,13 +72,9 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val app = new Application(section :: Nil) {
-      override def encodeByte: List[Byte] = ???
-    }
-
-    val finalSection = section.encodable(app)
-    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
-    out.write(finalSection.encodeByte.toArray)
+    val executable: Raw = Raw(section)
+    executable.encodableSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
+    out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
     out.flush()
 

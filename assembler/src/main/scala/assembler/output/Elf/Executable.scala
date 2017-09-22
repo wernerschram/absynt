@@ -1,4 +1,4 @@
-package assembler.Elf
+package assembler.output.Elf
 
 import assembler._
 import assembler.sections.Section
@@ -26,11 +26,20 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   def fileOffset(section: Section): Long =
     dataOffset + encodableSections.takeWhile(s => s != section).map(s => s.size).sum
 
+  def memoryAddress(section: Section): Long = ???
+
+  def memoryOffset(section: Section): Long = ???
+
   def stringTableOffset: Long =
     dataOffset + encodableSections.map(s => s.size).sum
 
   def stringOffset(strings: List[String]): List[(String, Int)] = {
     (strings.head, 0) :: stringOffset(1, strings)
+  }
+
+  override def getAbsoluteAddress(encodable: Resource) = {
+    val actual = encodableSections.filter(section => !section.content.contains(encodable)).head
+    actual.baseAddress + actual.relativeAddress(encodable)
   }
 
   private def stringOffset(startOffset: Int, strings: List[String]): List[(String, Int)] = {
@@ -83,6 +92,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
 class Executable private(architecture: Architecture, sections: List[Section], entryLabel: Label)
   extends Elf(architecture, sections, entryLabel) {
   override def elfType: ElfType = ElfType.Executable
+
 }
 
 object Executable {

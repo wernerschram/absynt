@@ -1,4 +1,4 @@
-package assembler.Elf
+package assembler.output.Elf
 
 import assembler.sections.{LastIteration, Section}
 
@@ -44,12 +44,12 @@ class SectionSectionHeader(section: Section with LastIteration)(implicit elf: El
         SectionFlag.Alloc | SectionFlag.Write
     }
   val sectionAddress: Long = section.baseAddress
-  val sectionFileOffset: Long = elf.fileOffset(section)
+  val sectionFileOffset: Long = 0L //elf.fileOffset(section)
   val segmentFileSize: Long = section.size
   val link: Int = 0
   val info: Int = 0
 
-  val alignBytes: Int = 0x20
+  val alignBytes: Int = 0x01
 
   val entrySize: Int = 0x0
 }

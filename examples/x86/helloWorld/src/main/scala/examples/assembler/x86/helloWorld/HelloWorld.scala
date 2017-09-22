@@ -3,7 +3,7 @@ package examples.assembler.x86.helloWorld
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.Elf.{Architecture, Executable}
+import assembler.output.Elf.{Architecture, Executable}
 import assembler.{EncodedString, Label, Resource}
 import assembler.ListExtensions._
 import assembler.sections.{Section, SectionType}
@@ -32,12 +32,12 @@ object HelloWorld extends App {
       Move(0x01, EAX) ::
       Move(0x00, EBX) ::
       Interrupt(0x80.toByte) ::
-      Nil, 0x400000
+      Nil, 0x08048000
     )
 
     val data: Section = Section(SectionType.Data, ".data",
     { implicit val label: Label = hello; EncodedString("Hello World!\r\n\u0000") } ::
-      Nil, 0x600000
+      Nil, 0x08049022
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
