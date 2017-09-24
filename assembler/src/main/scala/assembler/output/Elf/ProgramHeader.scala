@@ -2,7 +2,7 @@ package assembler.output.Elf
 
 import assembler.sections.{LastIteration, Section}
 
-class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag])(implicit elf: Elf) {
+class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
   def alignBytes: Int = 0x01
   def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
@@ -15,7 +15,7 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
 
   implicit def endianness: Endianness = elf.endianness
 
-  def header: List[Byte] = elf.architecture.processorClass match {
+  def encodeByte: List[Byte] = elf.architecture.processorClass match {
     case ProcessorClass._32Bit =>
       elf.endianness.encode(`type`.id) :::
       segmentFileOffset :::
@@ -38,11 +38,11 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
 }
 
 object ProgramHeader {
-  def apply(section: Section with LastIteration)(implicit elf: Elf): ProgramHeader = section.sectionType match {
+  def apply(section: Section with LastIteration, elf: Elf): ProgramHeader = section.sectionType match {
     case assembler.sections.SectionType.Text =>
-      new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read)
+      new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)
     case assembler.sections.SectionType.Data =>
-      new ProgramHeader(section, ProgramFlag.Read | ProgramFlag.Write)
+      new ProgramHeader(section, ProgramFlag.Read | ProgramFlag.Write, elf)
   }
 }
 

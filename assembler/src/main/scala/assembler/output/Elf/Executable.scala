@@ -11,58 +11,61 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
 
   def elfType: ElfType
 
-  val programHeaderCount: Short = sections.size.toShort
-  val sectionHeaderCount: Short = (sections.size + 2).toShort // program sections + Null section and Strings section
-  val sectionNamesSectionHeaderIndex: Short = (sectionHeaderCount - 1).toShort // last section
-
-  val dataOffset: Int =
-    architecture.processorClass.headerSize +
-    programHeaderCount * architecture.processorClass.programHeaderSize +
-    sectionHeaderCount * architecture.processorClass.sectionHeaderSize
-
-  def address(label: Label): Long =
-    encodableSections.filter(s => s.contains(label)).map(s => s.baseAddress + s.relativeAddress(label)).head
-
-  def fileOffset(section: Section): Long =
-    dataOffset + encodableSections.takeWhile(s => s != section).map(s => s.size).sum
-
-  def memoryAddress(section: Section): Long = ???
-
-  def memoryOffset(section: Section): Long = ???
-
-  def stringTableOffset: Long =
-    dataOffset + encodableSections.map(s => s.size).sum
-
-  def stringOffset(strings: List[String]): List[(String, Int)] = {
-    (strings.head, 0) :: stringOffset(1, strings)
-  }
-
-  override def getAbsoluteAddress(encodable: Resource) = {
-    val actual = encodableSections.filter(section => !section.content.contains(encodable)).head
-    actual.baseAddress + actual.relativeAddress(encodable)
-  }
-
-  private def stringOffset(startOffset: Int, strings: List[String]): List[(String, Int)] = {
-    strings match {
-      case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
-      case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
-      case neck :: Nil => (neck, startOffset) :: Nil
-      case Nil => Nil
-    }
-  }
-
   val stringMap: Map[String, Int] =
     stringOffset(("" :: sections.map(s => s.name) ::: ".shstrtab" :: Nil )
        .distinct).toMap
 
-  implicit val executable: Elf = this
-
   val programHeaders: List[ProgramHeader] =
-    encodableSections.map(s => ProgramHeader(s))
+    encodableSections.map(s => ProgramHeader(s, this))
+
   val sectionHeaders: List[SectionHeader] =
-    NullSectionHeader() ::
-    encodableSections.map(s => new SectionSectionHeader(s)) :::
-    new StringSectionHeader() :: Nil
+    NullSectionHeader(this) ::
+    encodableSections.map(s => new SectionSectionHeader(s, this)) :::
+    new StringSectionHeader(this) :: Nil
+
+  val sectionNamesSectionHeaderIndex: Int = sectionHeaders.size - 1 // last section
+
+  val programHeadersSize: Long = programHeaders.size * architecture.processorClass.programHeaderSize
+  val sectionsSize: Long = encodableSections.map(s => s.size).sum
+  val stringTableSize: Int = stringMap.keys.toList.map(k => k.length + 1).sum // + 1 because they are null terminated
+
+  val programHeaderOffset: Long =
+    architecture.processorClass.headerSize
+
+  val dataOffset: Long =
+    programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
+
+  def fileOffset(section: Section): Long =
+    dataOffset + encodableSections.takeWhile(s => s != section).map(s => s.size).sum
+
+  val stringTableOffset: Long =
+    dataOffset + sectionsSize
+
+  val sectionHeaderOffset: Long =
+    stringTableOffset + stringTableSize
+
+  def memoryAddress(section: Section): Long = section.baseAddress
+
+  def memoryOffset(section: Section): Long = 0
+
+  override def getAbsoluteAddress(encodable: Resource): Long = {
+    encodableSections.filter(s=> s.contains(encodable))
+      .map(s => memoryAddress(s) + s.relativeAddress(encodable)).head
+  }
+
+  override def getAbsoluteAddress(label: Label): Long =
+    encodableSections.filter(s => s.contains(label))
+      .map(s => memoryAddress(s) + s.relativeAddress(label)).head
+
+  def stringOffset(strings: List[String]): List[(String, Int)] =
+    (strings.head, 0) :: stringOffset(1, strings)
+
+  private def stringOffset(startOffset: Int, strings: List[String]): List[(String, Int)] = strings match {
+    case Nil => Nil
+    case head :: Nil => (head, startOffset) :: Nil
+    case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
+    case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
+  }
 
   override def encodeByte: List[Byte] =
       magic :::
@@ -73,20 +76,20 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
       endianness.encode(elfType.id) :::
       endianness.encode(architecture.processor.id) :::
       endianness.encode(version.extended) :::
-      architecture.processorClass.numberBytes(address(entryLabel)) :::
-      architecture.processorClass.programHeaderOffsetBytes :::
-      architecture.processorClass.sectionHeaderOffsetBytes(programHeaderCount) :::
+      architecture.processorClass.numberBytes(getAbsoluteAddress(entryLabel)) :::
+      architecture.processorClass.numberBytes(programHeaderOffset) :::
+      architecture.processorClass.numberBytes(sectionHeaderOffset) :::
       endianness.encode(architecture.processor.flags) :::
       endianness.encode(architecture.processorClass.headerSize) :::
       endianness.encode(architecture.processorClass.programHeaderSize) :::
-      endianness.encode(programHeaderCount) :::
+      endianness.encode(programHeaders.size.toShort) :::
       endianness.encode(architecture.processorClass.sectionHeaderSize) :::
-      endianness.encode(sectionHeaderCount) :::
-      endianness.encode(sectionNamesSectionHeaderIndex) :::
-      programHeaders.flatMap(p => p.header) :::
-      sectionHeaders.flatMap(s => s.header) :::
+      endianness.encode(sectionHeaders.size.toShort) :::
+      endianness.encode(sectionNamesSectionHeaderIndex.toShort) :::
+      programHeaders.flatMap(p => p.encodeByte) :::
       encodableSections.flatMap(s => s.encodeByte) :::
-      stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)
+      stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
+      sectionHeaders.flatMap(s => s.encodeByte)
 }
 
 class Executable private(architecture: Architecture, sections: List[Section], entryLabel: Label)

@@ -1,17 +1,18 @@
 package assembler.output.raw
 
-import assembler.{Application, Resource}
-import assembler.sections.Section
+import assembler.{Application, Label, Resource}
+import assembler.sections.{LastIteration, Section}
 
 class Raw(section: Section) extends Application(section :: Nil) {
 
-  def encodableSection = section.encodable(this)
+  def encodableSection: Section with LastIteration = section.encodable(this)
 
   val baseAddress = 0x100
 
-  override def encodeByte = encodableSection.encodeByte
+  override def encodeByte: List[Byte] = encodableSection.encodeByte
 
-  override def getAbsoluteAddress(encodable: Resource) = encodableSection.relativeAddress(encodable) + baseAddress
+  override def getAbsoluteAddress(encodable: Resource): Long = encodableSection.relativeAddress(encodable) + baseAddress
+  override def getAbsoluteAddress(label: Label): Long = encodableSection.relativeAddress(label) + baseAddress
 }
 
 object Raw {
