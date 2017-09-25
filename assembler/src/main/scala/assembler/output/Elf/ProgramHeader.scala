@@ -4,36 +4,34 @@ import assembler.sections.{LastIteration, Section}
 
 class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
-  def alignBytes: Int = 0x01
-  def physicalAddressBytes: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
 
-  def segmentFileOffset: List[Byte] = elf.architecture.processorClass.numberBytes(elf.fileOffset(section))
-  def segmentMemoryOffset: List[Byte] = elf.architecture.processorClass.numberBytes(section.baseAddress)
-  def segmentFileSize: List[Byte] = elf.architecture.processorClass.numberBytes(section.size)
-
-  def segmentMemorySize: List[Byte] = segmentFileSize
+  def physicalAddress: Long = segmentMemoryOffset
+  def segmentFileOffset: Long = elf.fileOffset(section)
+  def segmentMemoryOffset: Long = elf.memoryAddress(section)
+  def segmentFileSize: Long = section.size
+  def segmentMemorySize: Long = segmentFileSize
 
   implicit def endianness: Endianness = elf.endianness
 
   def encodeByte: List[Byte] = elf.architecture.processorClass match {
     case ProcessorClass._32Bit =>
       elf.endianness.encode(`type`.id) :::
-      segmentFileOffset :::
-      segmentMemoryOffset :::
-      physicalAddressBytes :::
-      segmentFileSize :::
-      segmentMemorySize :::
+      elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
+      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
+      elf.architecture.processorClass.numberBytes(physicalAddress) :::
+      elf.architecture.processorClass.numberBytes(segmentFileSize) :::
+      elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
       elf.endianness.encode(flags.encode.toInt) :::
-      elf.architecture.processorClass.numberBytes(alignBytes)
+      elf.architecture.processorClass.numberBytes(elf.fileAlignment)
     case ProcessorClass._64Bit =>
       elf.endianness.encode(`type`.id) :::
       elf.endianness.encode(flags.encode.toInt) :::
-      segmentFileOffset :::
-      segmentMemoryOffset :::
-      physicalAddressBytes :::
-      segmentFileSize :::
-      segmentMemorySize :::
-      elf.architecture.processorClass.numberBytes(alignBytes)
+      elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
+      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
+      elf.architecture.processorClass.numberBytes(physicalAddress) :::
+      elf.architecture.processorClass.numberBytes(segmentFileSize) :::
+      elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
+      elf.architecture.processorClass.numberBytes(elf.fileAlignment)
   }
 }
 
@@ -75,7 +73,6 @@ object Flags {
 case class ProgramFlag private(flag: Long) extends Flags[ProgramFlag] {
   override def encode: Long = flag
 }
-
 
 object ProgramFlag {
   object Execute extends ProgramFlag(0x01)
