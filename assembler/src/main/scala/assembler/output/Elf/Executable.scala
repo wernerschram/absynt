@@ -11,6 +11,8 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
 
   def elfType: ElfType
 
+  val fileAlignment: Int = 0x1000
+
   val stringMap: Map[String, Int] =
     stringOffset(("" :: sections.map(s => s.name) ::: ".shstrtab" :: Nil )
        .distinct).toMap
@@ -18,7 +20,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val programHeaders: List[ProgramHeader] =
     encodableSections.map(s => ProgramHeader(s, this))
 
-  val sectionHeaders: List[SectionHeader] =
+  def sectionHeaders: List[SectionHeader] =
     NullSectionHeader(this) ::
     encodableSections.map(s => new SectionSectionHeader(s, this)) :::
     new StringSectionHeader(this) :: Nil
@@ -44,7 +46,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  def memoryAddress(section: Section): Long = section.baseAddress
+  def memoryAddress(section: Section): Long = section.baseAddress + (fileOffset(section) % fileAlignment)
 
   def memoryOffset(section: Section): Long = 0
 
