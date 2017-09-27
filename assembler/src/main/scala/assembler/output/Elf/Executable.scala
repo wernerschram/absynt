@@ -4,7 +4,9 @@ import assembler._
 import assembler.sections.{LastIteration, Section}
 
 abstract class Elf(val architecture: Architecture, sections: List[Section], val entryLabel: Label) extends Application(sections) {
+
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
+
   val version: ElfVersion = ElfVersion.Original
 
   implicit def endianness: Endianness = architecture.endianness
@@ -14,8 +16,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val fileAlignment: Int = 0x1000
 
   val stringMap: Map[String, Int] =
-    stringOffset(("" :: sections.map(s => s.name) ::: ".shstrtab" :: Nil )
-       .distinct).toMap
+    stringOffset(("" :: sections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
 
   val programHeaders: List[ProgramHeader] =
     encodableSections.map(s => ProgramHeader(s, this))
@@ -25,10 +26,8 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     encodableSections.map(s => new SectionSectionHeader(s, this)) :::
     new StringSectionHeader(this) :: Nil
 
-  val sectionNamesSectionHeaderIndex: Int = sectionHeaders.size - 1 // last section
+  val stringSectionHeaderIndex: Int = sectionHeaders.size - 1 // last section
 
-  val programHeadersSize: Long = programHeaders.size * architecture.processorClass.programHeaderSize
-  val sectionsSize: Long = encodableSections.map(s => s.size).sum
   val stringTableSize: Int = stringMap.keys.toList.map(k => k.length + 1).sum // + 1 because they are null terminated
 
   val programHeaderOffset: Long =
@@ -87,28 +86,28 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val alignedSectionData: List[List[Byte]] = encodableSections.map(s => alignSectionData(sectionOffset(s), s))
 
   override def encodeByte: List[Byte] =
-      magic :::
-      architecture.processorClass.id ::
-      endianness.id ::
-      version.id ::
-      architecture.ABI.encodeBytes :::
-      endianness.encode(elfType.id) :::
-      endianness.encode(architecture.processor.id) :::
-      endianness.encode(version.extended) :::
-      architecture.processorClass.numberBytes(getAbsoluteAddress(entryLabel)) :::
-      architecture.processorClass.numberBytes(programHeaderOffset) :::
-      architecture.processorClass.numberBytes(sectionHeaderOffset) :::
-      endianness.encode(architecture.processor.flags) :::
-      endianness.encode(architecture.processorClass.headerSize) :::
-      endianness.encode(architecture.processorClass.programHeaderSize) :::
-      endianness.encode(programHeaders.size.toShort) :::
-      endianness.encode(architecture.processorClass.sectionHeaderSize) :::
-      endianness.encode(sectionHeaders.size.toShort) :::
-      endianness.encode(sectionNamesSectionHeaderIndex.toShort) :::
-      programHeaders.flatMap(p => p.encodeByte) :::
-      alignedSectionData.flatten :::
-      stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
-      sectionHeaders.flatMap(s => s.encodeByte)
+    magic :::
+    architecture.processorClass.id ::
+    endianness.id ::
+    version.id ::
+    architecture.ABI.encodeBytes :::
+    endianness.encode(elfType.id) :::
+    endianness.encode(architecture.processor.id) :::
+    endianness.encode(version.extended) :::
+    architecture.processorClass.numberBytes(getAbsoluteAddress(entryLabel)) :::
+    architecture.processorClass.numberBytes(programHeaderOffset) :::
+    architecture.processorClass.numberBytes(sectionHeaderOffset) :::
+    endianness.encode(architecture.processor.flags) :::
+    endianness.encode(architecture.processorClass.headerSize) :::
+    endianness.encode(architecture.processorClass.programHeaderSize) :::
+    endianness.encode(programHeaders.size.toShort) :::
+    endianness.encode(architecture.processorClass.sectionHeaderSize) :::
+    endianness.encode(sectionHeaders.size.toShort) :::
+    endianness.encode(stringSectionHeaderIndex.toShort) :::
+    programHeaders.flatMap(p => p.encodeByte) :::
+    alignedSectionData.flatten :::
+    stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
+    sectionHeaders.flatMap(s => s.encodeByte)
 }
 
 class Executable private(architecture: Architecture, sections: List[Section], entryLabel: Label)

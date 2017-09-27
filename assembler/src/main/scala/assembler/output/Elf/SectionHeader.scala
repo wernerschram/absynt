@@ -45,17 +45,6 @@ class SectionSectionHeader(section: Section with LastIteration, elf: Elf) extend
     }
   val sectionAddress: Long = elf.memoryAddress(section)
   val sectionFileOffset: Long = elf.alignedSectionOffset(section)
- /*
-       sh_addr   If this section appears in the memory image of a process,
-                 this member holds the address at which the section's first
-                 byte should reside.  Otherwise, the member contains zero.
-
-       sh_offset This member's value holds the byte offset from the begin‐
-                 ning of the file to the first byte in the section.  One
-                 section type, SHT_NOBITS, occupies no space in the file,
-                 and its sh_offset member locates the conceptual placement
-                 in the file.
-  */
 
   val segmentFileSize: Long = section.size
   val link: Int = 0
@@ -88,7 +77,7 @@ object NullSectionHeader {
 
 class StringSectionHeader(elf: Elf) extends SectionHeader(elf) {
 
-  val nameReference: Int = elf.stringMap(".shstrtab")
+  val nameReference: Int = elf.stringMap(StringSectionHeader.name)
   val `type`: SectionType = SectionType.StringTable
   val flags: Flags[SectionFlag] = Flags.None
   val sectionAddress: Long = 0
@@ -102,6 +91,11 @@ class StringSectionHeader(elf: Elf) extends SectionHeader(elf) {
   val entrySize: Int = 0x01
 }
 
+object StringSectionHeader {
+  val name = ".shstrtab"
+  def apply(elf: Elf): StringSectionHeader = new StringSectionHeader(elf)
+}
+
 abstract case class SectionType private(id: Int)
 
 object SectionType {
@@ -111,7 +105,6 @@ object SectionType {
   object StringTable extends SectionType(3)
   //...
 }
-
 
 case class SectionFlag private(flag: Int) extends Flags[SectionFlag] {
   override val encode: Long = flag
