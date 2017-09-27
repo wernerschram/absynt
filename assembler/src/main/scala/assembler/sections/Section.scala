@@ -15,6 +15,8 @@ trait Section {
 
   val baseAddress: Int
 
+  val alignment: Int
+
   type EncodableCondition = (Resource)=>Boolean
 
   def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
@@ -93,16 +95,18 @@ trait LastIteration {
 object Section {
   def apply(`type`: SectionType, sectionName: String, resources: List[Resource], base: Int): Section =
     new Section {
+      val alignment: Int = 16
       override val name: String = sectionName
-      override val sectionType = `type`
+      override val sectionType: SectionType = `type`
       override val content: List[Resource] = resources
       override val baseAddress: Int = base
     }
 
   def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], base: Int): Section with LastIteration =
     new Section with LastIteration {
+      val alignment: Int = 16
       override val name: String = sectionName
-      override val sectionType = `type`
+      override val sectionType: SectionType = `type`
       override val finalContent: List[Resource with Encodable] = encodables
       override val content: List[Resource] = finalContent
       override val baseAddress: Int = base

@@ -1,7 +1,7 @@
 package assembler.output.Elf
 
 import assembler._
-import assembler.sections.Section
+import assembler.sections.{LastIteration, Section}
 
 abstract class Elf(val architecture: Architecture, sections: List[Section], val entryLabel: Label) extends Application(sections) {
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
@@ -34,26 +34,33 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val programHeaderOffset: Long =
     architecture.processorClass.headerSize
 
-  val dataOffset: Long =
+  private val dataOffset: Long =
     programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
 
-  def fileOffset(section: Section): Long =
-    dataOffset + encodableSections.takeWhile(s => s != section).map(s => s.size).sum
+  def sectionOffset(section: Section): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
+      (dataOffset, nextSection) => align(dataOffset, nextSection.alignment) + nextSection.size
+    }
+
+  def alignedSectionOffset(section: Section): Long = align(sectionOffset(section), section.alignment)
+
+  private def align(value: Long, alignment: Int): Long = if (value % alignment == 0)
+    value
+  else
+    value + alignment - value % alignment
 
   val stringTableOffset: Long =
-    dataOffset + sectionsSize
+    alignedSectionOffset(encodableSections.last) + encodableSections.last.size
 
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  def memoryAddress(section: Section): Long = section.baseAddress + (fileOffset(section) % fileAlignment)
+  def memoryAddress(section: Section): Long = section.baseAddress + (alignedSectionOffset(section) % fileAlignment)
 
   def memoryOffset(section: Section): Long = 0
 
-  override def getAbsoluteAddress(encodable: Resource): Long = {
+  override def getAbsoluteAddress(encodable: Resource): Long =
     encodableSections.filter(s=> s.contains(encodable))
       .map(s => memoryAddress(s) + s.relativeAddress(encodable)).head
-  }
 
   override def getAbsoluteAddress(label: Label): Long =
     encodableSections.filter(s => s.contains(label))
@@ -68,6 +75,16 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
     case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
   }
+
+  private def alignSectionData(offset: Long, section: Section with LastIteration): List[Byte] = {
+    val prefix: List[Byte] = if (offset % section.alignment != 0)
+      List.fill(section.alignment - offset.toInt % section.alignment)(0)
+    else
+      Nil
+    prefix ::: section.encodeByte
+  }
+
+  val alignedSectionData: List[List[Byte]] = encodableSections.map(s => alignSectionData(sectionOffset(s), s))
 
   override def encodeByte: List[Byte] =
       magic :::
@@ -89,7 +106,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
       endianness.encode(sectionHeaders.size.toShort) :::
       endianness.encode(sectionNamesSectionHeaderIndex.toShort) :::
       programHeaders.flatMap(p => p.encodeByte) :::
-      encodableSections.flatMap(s => s.encodeByte) :::
+      alignedSectionData.flatten :::
       stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
       sectionHeaders.flatMap(s => s.encodeByte)
 }

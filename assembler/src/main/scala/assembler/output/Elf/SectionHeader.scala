@@ -44,7 +44,7 @@ class SectionSectionHeader(section: Section with LastIteration, elf: Elf) extend
         SectionFlag.Alloc | SectionFlag.Write
     }
   val sectionAddress: Long = elf.memoryAddress(section)
-  val sectionFileOffset: Long = elf.fileOffset(section)
+  val sectionFileOffset: Long = elf.alignedSectionOffset(section)
  /*
        sh_addr   If this section appears in the memory image of a process,
                  this member holds the address at which the section's first
@@ -61,7 +61,7 @@ class SectionSectionHeader(section: Section with LastIteration, elf: Elf) extend
   val link: Int = 0
   val info: Int = 0
 
-  val alignBytes: Int = 0x01
+  val alignBytes: Int = section.alignment
 
   val entrySize: Int = 0x0
 }
