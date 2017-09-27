@@ -53,7 +53,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  def memoryAddress(section: Section): Long = section.baseAddress + (alignedSectionOffset(section) % fileAlignment)
+  def memoryAddress(section: Section): Long = section.baseAddress //+ (alignedSectionOffset(section) % fileAlignment)
 
   def memoryOffset(section: Section): Long = 0
 
@@ -64,6 +64,14 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   override def getAbsoluteAddress(label: Label): Long =
     encodableSections.filter(s => s.contains(label))
       .map(s => memoryAddress(s) + s.relativeAddress(label)).head
+
+  override def getAbsoluteMinimumAddress(label: Label): Long =
+    sections.filter(s => s.contains(label))
+      .map(s => memoryAddress(s) + s.minimumRelativeAddress(label)).head
+
+  override def getAbsoluteMaximumAddress(label: Label): Long =
+    sections.filter(s => s.contains(label))
+      .map(s => memoryAddress(s) + s.maximumRelativeAddress(label)).head
 
   def stringOffset(strings: List[String]): List[(String, Int)] =
     (strings.head, 0) :: stringOffset(1, strings)

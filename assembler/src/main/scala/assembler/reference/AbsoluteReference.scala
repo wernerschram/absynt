@@ -1,7 +1,6 @@
 package assembler.reference
 
-import assembler.sections.Section
-import assembler.{Encodable, Label, Resource}
+import assembler.{Application, Encodable, Label, Resource}
 
 sealed trait AbsoluteReference
     extends Resource {
@@ -9,11 +8,11 @@ sealed trait AbsoluteReference
 
   def encodableForPosition(position: Int): Resource with Encodable
 
-  def toInSectionState(section: Section): Resource = {
-    val newMinimum = section.baseAddress + section.precedingResources(target).map(instruction => instruction.minimumSize).sum
-    val newMaximum = section.baseAddress + section.precedingResources(target).map(instruction => instruction.maximumSize).sum
+  def toInSectionState(application: Application): Resource = {
+    val newMinimum = application.getAbsoluteMinimumAddress(target)
+    val newMaximum = application.getAbsoluteMaximumAddress(target)
     if (newMinimum == newMaximum)
-      encodableForPosition(newMinimum)
+      encodableForPosition(newMinimum.toInt)
     else
       new AbsoluteReference {
         override def encodableForPosition(position: Int): Resource with Encodable =
@@ -23,9 +22,9 @@ sealed trait AbsoluteReference
 
         override def label: Label = AbsoluteReference.this.label
 
-        override def minimumSize: Int = encodableForPosition(newMinimum).size
+        override def minimumSize: Int = encodableForPosition(newMinimum.toInt).size
 
-        override def maximumSize: Int = encodableForPosition(newMaximum).size
+        override def maximumSize: Int = encodableForPosition(newMaximum.toInt).size
       }
   }
 }

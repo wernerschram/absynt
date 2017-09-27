@@ -34,12 +34,12 @@ object HelloWorld extends App {
       Move(0x01, EAX) ::
       Move(0x00, EBX) ::
       Interrupt(0x80.toByte) ::
-      Nil, 0x08048000
+      Nil, 0x08048080
     )
 
     val data: Section = Section(SectionType.Data, ".data",
     { implicit val label: Label = hello; EncodedString("Hi World\n") } ::
-      Nil, 0x08049000
+      Nil, 0x080490b0
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))

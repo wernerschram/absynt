@@ -13,6 +13,10 @@ class Raw(section: Section) extends Application(section :: Nil) {
 
   override def getAbsoluteAddress(encodable: Resource): Long = encodableSection.relativeAddress(encodable) + baseAddress
   override def getAbsoluteAddress(label: Label): Long = encodableSection.relativeAddress(label) + baseAddress
+
+  override def getAbsoluteMinimumAddress(label: Label): Long = section.minimumRelativeAddress(label) + baseAddress
+
+  override def getAbsoluteMaximumAddress(label: Label): Long = section.maximumRelativeAddress(label) + baseAddress
 }
 
 object Raw {

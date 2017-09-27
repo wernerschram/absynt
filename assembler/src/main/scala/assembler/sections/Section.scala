@@ -23,6 +23,16 @@ trait Section {
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
+  def minimumRelativeAddress(label: Label): Int = minimumRelativeAddress((current: Resource) => current.label == label)
+  def minimumRelativeAddress(encodable: Resource): Int = minimumRelativeAddress((current: Resource) => current == encodable)
+  def minimumRelativeAddress(condition: EncodableCondition): Int =
+    content.takeWhile(current => !condition(current)).map(current => current.minimumSize).sum
+
+  def maximumRelativeAddress(label: Label): Int = maximumRelativeAddress((current: Resource) => current.label == label)
+  def maximumRelativeAddress(encodable: Resource): Int = maximumRelativeAddress((current: Resource) => current == encodable)
+  def maximumRelativeAddress(condition: EncodableCondition): Int =
+    content.takeWhile(current => !condition(current)).map(current => current.maximumSize).sum
+
   def precedingResources(target: Label): List[Resource] =
     content.takeWhile(x => !x.label.matches(target))
 
@@ -55,10 +65,10 @@ trait Section {
       case absolute: AbsoluteReference with OtherSection =>
         val targetSection = currentApplication.sections.find(_.name == absolute.sectionName)
         assume(targetSection.isDefined)
-        absolute.toInSectionState(targetSection.get)
+        absolute.toInSectionState(currentApplication)
 
       case absolute: AbsoluteReference with CurrentSection =>
-        absolute.toInSectionState(this)
+        absolute.toInSectionState(currentApplication)
 
       case resource =>
         resource

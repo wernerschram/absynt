@@ -8,5 +8,8 @@ abstract class Application protected (val sections: List[Section]) {
   def getAbsoluteAddress(encodable: Resource): Long
   def getAbsoluteAddress(label: Label): Long
 
+  def getAbsoluteMinimumAddress(label: Label): Long
+  def getAbsoluteMaximumAddress(label: Label): Long
+
   def encodeByte: List[Byte]
 }
