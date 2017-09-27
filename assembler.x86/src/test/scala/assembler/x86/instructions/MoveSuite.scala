@@ -160,8 +160,6 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         Move(RegisterMemoryLocation(BP.combinedIndex(SI)), CL).encodeByte should be(Hex.lsb("8A 0A"))
       }
 
-      //8a 0a                   mov    cl,BYTE PTR [bp+si]
-
       "correctly represent mov cl, [bp+si] as a string" in {
         Move(RegisterMemoryLocation(BP.combinedIndex(SI)), CL).toString should be("mov cl, [bp+si]")
       }
@@ -346,6 +344,8 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         Move(0x5656.toShort, RegisterMemoryLocation(BX, 0x10.toByte.encodeLittleEndian)).toString should be("mov [bx+16], 22102")
       }
 
+      // TODO: SIB instructions are not allowed in real mode: These should throw an exception or just not be allowed
+
       "correctly encode mov [eax+ebx*2+0x11111111], 0x99999999" in {
         Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111.encodeLittleEndian, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
       }
@@ -382,6 +382,8 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
       "correctly represent mov [edx], ebp as a string" in {
         Move(EBP, RegisterMemoryLocation(EDX)).toString should be("mov [edx], ebp")
       }
+
+      // TODO: mov [ebp], ebp is not allowed in protected/long mode
 
       "throw an AssertionError for mov r10d, [label]" in {
         val targetLabel = Label.unique
