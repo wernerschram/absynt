@@ -29,33 +29,10 @@ sealed trait AbsoluteReference
   }
 }
 
-trait CurrentSection {
-  self: AbsoluteReference =>
-}
-
-trait OtherSection {
-  self: AbsoluteReference =>
-  val sectionName: String
-}
-
 object AbsoluteReference {
   def apply(targetLabel: Label, initialMinimumSize: Int, initialMaximumSize: Int, thisLabel: Label,
     encodableFactory: (Int)=>Resource with Encodable) =
-    new AbsoluteReference with CurrentSection {
-      override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
-
-      override def target: Label = targetLabel
-      override def label: Label = thisLabel
-
-      override def minimumSize: Int = initialMinimumSize
-      override def maximumSize: Int = initialMaximumSize
-    }
-
-  def apply(targetSection: String, targetLabel: Label, initialMinimumSize: Int, initialMaximumSize: Int, thisLabel: Label,
-    encodableFactory: (Int)=>Resource with Encodable) =
-    new AbsoluteReference with OtherSection {
-      override val sectionName: String = targetSection
-
+    new AbsoluteReference {
       override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
 
       override def target: Label = targetLabel

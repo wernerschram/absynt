@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{AbsoluteReference, CurrentSection, OtherSection, RelativeReference}
+import assembler.reference.{AbsoluteReference, RelativeReference}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -62,12 +62,7 @@ trait Section {
       case referencing: RelativeReference =>
         referencing.toInSectionState(this)
 
-      case absolute: AbsoluteReference with OtherSection =>
-//        val targetSection = currentApplication.sections.find(_.name == absolute.sectionName)
-//        assume(targetSection.isDefined)
-        absolute.toInSectionState(currentApplication)
-
-      case absolute: AbsoluteReference with CurrentSection =>
+      case absolute: AbsoluteReference =>
         absolute.toInSectionState(currentApplication)
 
       case resource =>
