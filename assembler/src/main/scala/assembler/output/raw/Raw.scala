@@ -8,14 +8,9 @@ class Raw(section: Section, val baseAddress: Int) extends Application(section ::
   def encodableSection: Section with LastIteration = section.encodable(this)
 
 
+  override def memoryAddress(section: Section): Long = baseAddress
+
   override def encodeByte: List[Byte] = encodableSection.encodeByte
-
-  override def getAbsoluteAddress(encodable: Resource): Long = encodableSection.relativeAddress(encodable) + baseAddress
-  override def getAbsoluteAddress(label: Label): Long = encodableSection.relativeAddress(label) + baseAddress
-
-  override def getAbsoluteMinimumAddress(label: Label): Long = section.minimumRelativeAddress(label) + baseAddress
-
-  override def getAbsoluteMaximumAddress(label: Label): Long = section.maximumRelativeAddress(label) + baseAddress
 }
 
 object Raw {
