@@ -5,6 +5,7 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands.{Condition, Shifter}
+import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 
@@ -308,7 +309,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        instruction.toInSectionState(p).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+        val app = Raw(p, 0)
+        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
@@ -318,7 +320,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        instruction.toInSectionState(p).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+        val app = Raw(p, 0)
+        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
@@ -329,7 +332,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction), 0)
-        instruction.toInSectionState(p).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
+        val app = Raw(p, 0)
+        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 
     }

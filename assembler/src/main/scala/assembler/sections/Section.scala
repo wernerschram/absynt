@@ -63,8 +63,8 @@ trait Section {
         referencing.toInSectionState(this)
 
       case absolute: AbsoluteReference with OtherSection =>
-        val targetSection = currentApplication.sections.find(_.name == absolute.sectionName)
-        assume(targetSection.isDefined)
+//        val targetSection = currentApplication.sections.find(_.name == absolute.sectionName)
+//        assume(targetSection.isDefined)
         absolute.toInSectionState(currentApplication)
 
       case absolute: AbsoluteReference with CurrentSection =>
