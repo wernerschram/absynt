@@ -1,9 +1,9 @@
 package assembler
 
-trait Address {
-  def add(offset: Offset): Address
+trait Address[OffsetType <: Offset] {
+  def add(offset: OffsetType): Address[OffsetType]
 
-  def +  (that: Offset): Address = this add that
+  def +  (that: OffsetType): Address[OffsetType] = this add that
 }
 
 trait Offset
