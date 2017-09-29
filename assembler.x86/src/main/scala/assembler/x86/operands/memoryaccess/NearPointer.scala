@@ -1,20 +1,23 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.Address
-import assembler.ListExtensions._
-import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize, ValueSize}
+import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize}
 
-class NearPointer private(val offset: List[Byte]) extends Operand with Address[X86Offset] with FixedSizeOperand {
-  assume(List(1, 2, 4).contains(offset.length))
-  val operandByteSize: OperandSize = ValueSize.sizeOfValue(offset.length)
+sealed class NearPointer(val offset: X86Offset) extends Operand with Address[X86Offset] with FixedSizeOperand {
+  val operandByteSize: OperandSize = offset.size
 
-  override def toString = s"0x${offset.bigEndianHexString}"
+  override def toString: String = offset.toString
 
-  def encodeBytes = offset
+  def encodeBytes: List[Byte] = offset.encodeByte
 
-  override def add(offset: X86Offset) = ???
+  override def add(offset: X86Offset): Nothing = ???
 }
 
-object NearPointer {
-  def apply(displacement: List[Byte]) = new NearPointer(displacement)
+object ShortPointer {
+  def apply(offset: Byte) = new NearPointer(ShortOffset(offset))
+}
+
+object LongPointer {
+  def apply(offset: Short) = new NearPointer(RealModeLongOffset(offset))
+  def apply(offset: Int) = new NearPointer(ProtectedModeLongOffset(offset))
 }

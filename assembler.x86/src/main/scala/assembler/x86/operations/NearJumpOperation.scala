@@ -1,9 +1,9 @@
 package assembler.x86.operations
 
-import assembler.{Resource, Encodable, Label}
+import assembler.{Encodable, Label, Resource}
 import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, NearPointer => NearPointerOperand}
 
 abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
@@ -37,22 +37,22 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
   override def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable = {
     if (forward) {
       if (distance <= forwardShortLongBoundary) {
-        encodableForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
+        encodableForShortPointer(ShortPointer(distance.toByte))
       } else {
         if (processorMode == ProcessorMode.Real) {
-          encodableForLongPointer(NearPointerOperand(distance.toShort.encodeLittleEndian))
+          encodableForLongPointer(LongPointer(distance.toShort))
         } else {
-          encodableForLongPointer(NearPointerOperand(distance.encodeLittleEndian))
+          encodableForLongPointer(LongPointer(distance))
         }
       }
     } else {
       if (distance <= backwardShortLongBoundary) {
-        encodableForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
+        encodableForShortPointer(ShortPointer((-distance - shortJumpSize).toByte))
       } else {
         if (processorMode == ProcessorMode.Real) {
-          encodableForLongPointer(NearPointerOperand((-distance - longJumpSize).toShort.encodeLittleEndian))
+          encodableForLongPointer(LongPointer((-distance - longJumpSize).toShort))
         } else {
-          encodableForLongPointer(NearPointerOperand((-distance - longJumpSize).encodeLittleEndian))
+          encodableForLongPointer(LongPointer(-distance - longJumpSize))
         }
       }
     }

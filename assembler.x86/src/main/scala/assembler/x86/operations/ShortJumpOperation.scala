@@ -3,8 +3,8 @@ package assembler.x86.operations
 import assembler.ListExtensions.ByteEncoder
 import assembler.reference.RelativeReference
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
-import assembler.{Resource, Encodable, Label}
+import assembler.x86.operands.memoryaccess.{ShortPointer, NearPointer => NearPointerOperand}
+import assembler.{Encodable, Label, Resource}
 
 abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
                                  (implicit processorMode: ProcessorMode)
@@ -25,9 +25,9 @@ abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte],
     assume(distance > (Byte.MinValue + shortJumpSize))
     assume(distance < Byte.MaxValue)
     if (forward) {
-      encodableForShortPointer(NearPointerOperand(distance.toByte.encodeLittleEndian))
+      encodableForShortPointer(ShortPointer(distance.toByte))
     } else {
-      encodableForShortPointer(NearPointerOperand((-distance - shortJumpSize).toByte.encodeLittleEndian))
+      encodableForShortPointer(ShortPointer((-distance - shortJumpSize).toByte))
     }
   }
 }
