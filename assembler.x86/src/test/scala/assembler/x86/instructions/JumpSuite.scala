@@ -131,23 +131,17 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(new FarPointer(0x1000.toShort.encodeLittleEndian, 0x2000.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("EA 00 20 00 10"))
+        Jump.Far(new FarPointer(0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("EA 00 20 00 10"))
       }
       "correctly represent jmp FAR 0x1000:0x2000 as a string" in {
-        Jump.Far(new FarPointer(0x1000.toShort.encodeLittleEndian, 0x2000.toShort.encodeLittleEndian)).toString should be("jmp FAR 0x1000:0x2000")
-      }
-
-      "throw an AssertionError for jmp 0x10:0x10" in {
-        an[AssertionError] should be thrownBy {
-          Jump.Far(new FarPointer(0x10.toByte.encodeLittleEndian, 0x10.toByte.encodeLittleEndian))
-        }
+        Jump.Far(new FarPointer(0x1000.toShort, 0x2000.toShort)).toString should be("jmp FAR 0x1000:0x2000")
       }
 
       "correctly encode jmp FAR 0x0030:0x200010" in {
-        Jump.Far(new FarPointer(0x30.toShort.encodeLittleEndian, 0x200010.encodeLittleEndian)).encodeByte should be(Hex.lsb("66 EA 10 00 20 00 30 00"))
+        Jump.Far(new FarPointer(0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("66 EA 10 00 20 00 30 00"))
       }
       "correctly represent jmp FAR 0x0030:0x200010 as a string" in {
-        Jump.Far(new FarPointer(0x30.toShort.encodeLittleEndian, 0x200010.encodeLittleEndian)).toString should be("jmp FAR 0x0030:0x00200010")
+        Jump.Far(new FarPointer(0x30.toShort, 0x200010)).toString should be("jmp FAR 0x0030:0x00200010")
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
@@ -532,11 +526,11 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(new FarPointer(0x1000.toShort.encodeLittleEndian, 0x2000.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
+        Jump.Far(new FarPointer(0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
       }
 
       "correctly encode jmp FAR 0x30:0x200010" in {
-        Jump.Far(new FarPointer(0x30.toShort.encodeLittleEndian, 0x200010.encodeLittleEndian)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
+        Jump.Far(new FarPointer(0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
@@ -678,11 +672,11 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(new FarPointer(0x1000.toShort.encodeLittleEndian, 0x2000.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
+        Jump.Far(new FarPointer(0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
       }
 
       "correctly encode jmp FAR 0x30:0x200010" in {
-        Jump.Far(new FarPointer(0x30.toShort.encodeLittleEndian, 0x200010.encodeLittleEndian)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
+        Jump.Far(new FarPointer(0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {

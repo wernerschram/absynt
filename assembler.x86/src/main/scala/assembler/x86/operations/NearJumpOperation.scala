@@ -3,7 +3,7 @@ package assembler.x86.operations
 import assembler.{Encodable, Label, Resource}
 import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.{LongPointer, ProtectedModeLongOffset, RealModeLongOffset, ShortOffset, ShortPointer, NearPointer => NearPointerOperand}
 
 abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)

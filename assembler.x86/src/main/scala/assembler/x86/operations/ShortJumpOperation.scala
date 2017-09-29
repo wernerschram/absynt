@@ -1,9 +1,9 @@
 package assembler.x86.operations
 
-import assembler.ListExtensions.ByteEncoder
 import assembler.reference.RelativeReference
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{ShortPointer, NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.{ShortOffset, ShortPointer, NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.X86Offset._
 import assembler.{Encodable, Label, Resource}
 
 abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)

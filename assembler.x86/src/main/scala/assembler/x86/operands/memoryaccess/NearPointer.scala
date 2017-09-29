@@ -14,10 +14,9 @@ sealed class NearPointer(val offset: X86Offset) extends Operand with Address[X86
 }
 
 object ShortPointer {
-  def apply(offset: Byte) = new NearPointer(ShortOffset(offset))
+  def apply(offset: ShortOffset) = new NearPointer(offset)
 }
 
 object LongPointer {
-  def apply(offset: Short) = new NearPointer(RealModeLongOffset(offset))
-  def apply(offset: Int) = new NearPointer(ProtectedModeLongOffset(offset))
+  def apply(offset: LongOffset) = new NearPointer(offset)
 }
