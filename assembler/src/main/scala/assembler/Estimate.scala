@@ -1,8 +1,8 @@
 package assembler
 
-sealed trait Approximate
+sealed trait Estimate
 
-sealed trait LowerBounded[V] extends Approximate {
+sealed trait LowerBounded[V] extends Estimate {
   def minimum: V
 }
 
@@ -13,7 +13,7 @@ object LowerBounded {
 }
 
 
-sealed trait UpperBounded[V] extends Approximate {
+sealed trait UpperBounded[V] extends Estimate {
   def maximum: V
 }
 
@@ -32,7 +32,7 @@ object Bounded {
   }
 }
 
-trait Actual[V] extends Approximate {
+trait Actual[V] extends Estimate {
   def value: V
 }
 
