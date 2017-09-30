@@ -1,47 +1,44 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{FarPointer, MemoryLocation, NearPointer}
+import assembler.x86.operands.memoryaccess.{FarPointer, MemoryLocation, NearPointer, X86Offset}
 import assembler.x86.operands.{FixedSizeOperand, ModRMEncodableOperand, ValueSize}
 import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
-import assembler.{Resource, Encodable, Label}
+import assembler.{Encodable, Label, Resource}
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 
-  def apply(nearPointer: NearPointer)(implicit label: Label, processorMode: ProcessorMode): Static with NearPointerOperation = {
-    assume(nearPointer.operandByteSize == ValueSize.Byte)
-    Rel8(nearPointer)
-  }
+  def apply(nearPointer: NearPointer[_])(implicit label: Label, processorMode: ProcessorMode):
+    Static with NearPointerOperation[_] = nearPointer.offset match {
+      case p: X86Offset.ShortOffset => Rel8(nearPointer.asInstanceOf[NearPointer[X86Offset.ShortOffset]])
+      case _ => throw new AssertionError
+    }
 
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ShortJumpOperation(label, shortOpcode, mnemonic, targetLabel) {
 
-      override def encodableForShortPointer(nearPointer: NearPointer): Resource with Encodable = {
-        assume(nearPointer.operandByteSize == ValueSize.Byte)
+      override def encodableForShortPointer(nearPointer: NearPointer[X86Offset.ShortOffset]): Resource with Encodable =
         Rel8(nearPointer)
-      }
     }
 
-  protected def Rel8(nearPointer: NearPointer)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, shortOpcode, mnemonic) with NearPointerOperation {
-      override val pointer: NearPointer = nearPointer
+  protected def Rel8(nearPointer: NearPointer[X86Offset.ShortOffset])(implicit label: Label, processorMode: ProcessorMode) =
+    new Static(label, shortOpcode, mnemonic) with NearPointerOperation[X86Offset.ShortOffset] {
+      override val pointer: NearPointer[X86Offset.ShortOffset] = nearPointer
     }
 }
 
 abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: List[Byte], mnemonic: String)
   extends ShortRelativeJump(shortOpcode, mnemonic) {
 
-  override def apply(nearPointer: NearPointer)(implicit label: Label, processorMode: ProcessorMode): Static with NearPointerOperation =
-    nearPointer.operandByteSize match {
-      case ValueSize.Byte =>
-        super.apply(nearPointer)
-      case _ =>
-        Rel16(nearPointer)
+  override def apply(nearPointer: NearPointer[_])(implicit label: Label, processorMode: ProcessorMode):
+  Static with NearPointerOperation[_] = nearPointer.offset match {
+      case p: X86Offset.ShortOffset => Rel8(nearPointer.asInstanceOf[NearPointer[X86Offset.ShortOffset]])
+      case _ => Rel16(nearPointer)
     }
 
-  private def Rel16(nearPointer: NearPointer)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, longOpcode, mnemonic) with NearPointerOperation {
-      override val pointer: NearPointer = nearPointer
+  private def Rel16[OffsetType](nearPointer: NearPointer[OffsetType])(implicit label: Label, processorMode: ProcessorMode) =
+    new Static(label, longOpcode, mnemonic) with NearPointerOperation[OffsetType] {
+      override val pointer: NearPointer[OffsetType] = nearPointer
 
       override def validate(): Unit = {
         super.validate()
@@ -54,9 +51,10 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
 
   override def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new NearJumpOperation(label, shortOpcode, longOpcode, mnemonic, targetLabel) {
-      override def encodableForShortPointer(nearPointer: NearPointer): Resource with Encodable = Rel8(nearPointer)
+      override def encodableForShortPointer(nearPointer: NearPointer[X86Offset.ShortOffset]): Resource with Encodable = Rel8(nearPointer)
 
-      override def encodableForLongPointer(nearPointer: NearPointer): Resource with Encodable = Rel16(nearPointer)
+      override def encodableForRealLongPointer(nearPointer: NearPointer[X86Offset.RealLongOffset]): Resource with Encodable = Rel16(nearPointer)
+      override def encodableForProtectedLongPointer(nearPointer: NearPointer[X86Offset.ProtectedLongOffset]): Resource with Encodable = Rel16(nearPointer)
     }
 }
 
@@ -76,9 +74,9 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
       })
     }
 
-  private def Ptr1616(farPointer: FarPointer)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, 0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
-      override def pointer: FarPointer = farPointer
+  private def Ptr1616[OffsetType](farPointer: FarPointer[OffsetType])(implicit label: Label, processorMode: ProcessorMode) =
+    new Static(label, 0xEA.toByte :: Nil, mnemonic) with FarPointerOperation[OffsetType] {
+      override def pointer: FarPointer[OffsetType] = farPointer
     }
 
   private def M1616(operand: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
@@ -91,7 +89,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   object Far {
-    def apply(farPointer: FarPointer)(implicit label: Label, processorMode: ProcessorMode): Static with FarPointerOperation =
+    def apply[OffsetType](farPointer: FarPointer[OffsetType])(implicit label: Label, processorMode: ProcessorMode): Static with FarPointerOperation[OffsetType] =
       Ptr1616(farPointer)
 
     def apply(pointer: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic =

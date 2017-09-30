@@ -1,9 +1,8 @@
 package assembler.x86.operations
 
-import assembler.{Encodable, Label, Resource}
-import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{LongPointer, ProtectedModeLongOffset, RealModeLongOffset, ShortOffset, ShortPointer, NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
+import assembler.{Encodable, Label, Resource}
 
 abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
@@ -19,7 +18,8 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
 
   override val maximumSize: Int = longJumpSize
 
-  def encodableForLongPointer(pointer: NearPointerOperand): Resource with Encodable
+  def encodableForRealLongPointer(pointer: NearPointerOperand[X86Offset.RealLongOffset]): Resource with Encodable
+  def encodableForProtectedLongPointer(pointer: NearPointerOperand[X86Offset.ProtectedLongOffset]): Resource with Encodable
 
   override def sizeForDistance(distance: Int)(forward: Boolean): Int =
     if (forward) {
@@ -37,22 +37,22 @@ abstract class NearJumpOperation(label: Label, shortOpcode: List[Byte], longOpco
   override def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable = {
     if (forward) {
       if (distance <= forwardShortLongBoundary) {
-        encodableForShortPointer(ShortPointer(distance.toByte))
+        encodableForShortPointer(ShortPointer(distance.asInstanceOf[X86Offset.ShortOffset]))
       } else {
         if (processorMode == ProcessorMode.Real) {
-          encodableForLongPointer(LongPointer(distance.toShort))
+          encodableForRealLongPointer(LongPointer(distance.asInstanceOf[X86Offset.RealLongOffset]))
         } else {
-          encodableForLongPointer(LongPointer(distance))
+          encodableForProtectedLongPointer(LongPointer(distance.asInstanceOf[X86Offset.ProtectedLongOffset]))
         }
       }
     } else {
       if (distance <= backwardShortLongBoundary) {
-        encodableForShortPointer(ShortPointer((-distance - shortJumpSize).toByte))
+        encodableForShortPointer(ShortPointer((-distance - shortJumpSize).asInstanceOf[X86Offset.ShortOffset]))
       } else {
         if (processorMode == ProcessorMode.Real) {
-          encodableForLongPointer(LongPointer((-distance - longJumpSize).toShort))
+          encodableForRealLongPointer(LongPointer((-distance - longJumpSize).asInstanceOf[X86Offset.RealLongOffset]))
         } else {
-          encodableForLongPointer(LongPointer(-distance - longJumpSize))
+          encodableForProtectedLongPointer(LongPointer((-distance - longJumpSize).asInstanceOf[X86Offset.ProtectedLongOffset]))
         }
       }
     }

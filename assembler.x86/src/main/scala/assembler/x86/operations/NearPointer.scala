@@ -3,10 +3,10 @@ package assembler.x86.operations
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
 import assembler.x86.operands.{Operand, OperandSize}
 
-trait NearPointer extends X86Operation {
+trait NearPointer[OffsetType] extends X86Operation {
 
   self: X86Operation =>
-  def pointer: NearPointerType
+  def pointer: NearPointerType[OffsetType]
 
   abstract override def operands: List[Operand] = super.operands ::: pointer :: Nil
 
@@ -18,5 +18,5 @@ trait NearPointer extends X86Operation {
   }
 
   abstract override def encodeByte: List[Byte] =
-    super.encodeByte ::: pointer.offset.encodeByte
+    super.encodeByte ::: pointer.encodeBytes
 }

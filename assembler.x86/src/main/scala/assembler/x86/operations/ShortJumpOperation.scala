@@ -2,8 +2,7 @@ package assembler.x86.operations
 
 import assembler.reference.RelativeReference
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.memoryaccess.{ShortOffset, ShortPointer, NearPointer => NearPointerOperand}
-import assembler.x86.operands.memoryaccess.X86Offset._
+import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 import assembler.{Encodable, Label, Resource}
 
 abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
@@ -15,7 +14,7 @@ abstract class ShortJumpOperation(val label: Label, val shortOpcode: List[Byte],
   override val minimumSize: Int = shortJumpSize
   override val maximumSize: Int = shortJumpSize
 
-  def encodableForShortPointer(pointer: NearPointerOperand): Resource with Encodable
+  def encodableForShortPointer(pointer: NearPointerOperand[X86Offset.ShortOffset]): Resource with Encodable
 
   override def toString = s"$labelPrefix$mnemonic $target"
 

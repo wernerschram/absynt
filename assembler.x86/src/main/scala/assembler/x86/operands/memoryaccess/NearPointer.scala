@@ -1,22 +1,41 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.Address
-import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize}
+import assembler.ListExtensions._
+import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize, ValueSize}
 
-sealed class NearPointer(val offset: X86Offset) extends Operand with Address[X86Offset] with FixedSizeOperand {
-  val operandByteSize: OperandSize = offset.size
+sealed abstract class NearPointer[OffsetType:Numeric](val offset: OffsetType)
+  extends Address[OffsetType] with Operand with FixedSizeOperand {
+  val operandByteSize: OperandSize
 
-  override def toString: String = offset.toString
+  def encodeOffset: List[Byte]
 
-  def encodeBytes: List[Byte] = offset.encodeByte
+  override def toString: String = s"0x${encodeOffset.bigEndianHexString}"
 
-  override def add(offset: X86Offset): Nothing = ???
+  def encodeBytes: List[Byte] = encodeOffset
+
+  override def add(that: OffsetType): NearPointer[OffsetType] =
+    new NearPointer[OffsetType](implicitly[Numeric[OffsetType]].plus(that, offset)) {
+      override def encodeOffset: List[Byte] = NearPointer.this.encodeOffset
+      override val operandByteSize: OperandSize = NearPointer.this.operandByteSize
+    }
 }
 
 object ShortPointer {
-  def apply(offset: ShortOffset) = new NearPointer(offset)
+  def apply(offset: X86Offset.ShortOffset) = new NearPointer(offset) {
+    override val operandByteSize: ValueSize = ValueSize.Byte
+    override def encodeOffset: List[Byte] = offset.encodeLittleEndian
+  }
 }
 
 object LongPointer {
-  def apply(offset: LongOffset) = new NearPointer(offset)
+  def apply(offset: X86Offset.RealLongOffset) = new NearPointer(offset) {
+    override val operandByteSize: ValueSize = ValueSize.Word
+    override def encodeOffset: List[Byte] = offset.encodeLittleEndian
+  }
+
+  def apply(offset: X86Offset.ProtectedLongOffset) = new NearPointer(offset) {
+    override val operandByteSize: ValueSize = ValueSize.DoubleWord
+    override def encodeOffset: List[Byte] = offset.encodeLittleEndian
+  }
 }
