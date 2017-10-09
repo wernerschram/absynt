@@ -2,40 +2,33 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.Address
 import assembler.ListExtensions._
+import assembler.x86.ProcessorModeWithOffset
 import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize, ValueSize}
 
-sealed abstract class NearPointer[OffsetType:Numeric](val offset: OffsetType)
+sealed abstract class NearPointer[OffsetType <: X86Offset : ProcessorModeWithOffset](val offset: OffsetType)
   extends Address[OffsetType] with Operand with FixedSizeOperand {
   val operandByteSize: OperandSize
 
-  def encodeOffset: List[Byte]
 
-  override def toString: String = s"0x${encodeOffset.bigEndianHexString}"
+  def encodeBytes: List[Byte]
 
-  def encodeBytes: List[Byte] = encodeOffset
-
-  override def add(that: OffsetType): NearPointer[OffsetType] =
-    new NearPointer[OffsetType](implicitly[Numeric[OffsetType]].plus(that, offset)) {
-      override def encodeOffset: List[Byte] = NearPointer.this.encodeOffset
-      override val operandByteSize: OperandSize = NearPointer.this.operandByteSize
-    }
+  override def add(that: OffsetType): NearPointer[OffsetType]
 }
 
 object ShortPointer {
-  def apply(offset: X86Offset.ShortOffset) = new NearPointer(offset) {
-    override val operandByteSize: ValueSize = ValueSize.Byte
-    override def encodeOffset: List[Byte] = offset.encodeLittleEndian
+  def apply[OffsetType <: X86Offset : ProcessorModeWithOffset](offset: OffsetType): NearPointer[OffsetType] = new NearPointer[OffsetType](offset) {
+    val operandByteSize: ValueSize = ValueSize.Byte
+    override def encodeBytes: List[Byte] = offset.encodeShort
+    override def toString: String = s"0x${offset.encodeShort.bigEndianHexString}"
+    override def add(that: OffsetType): NearPointer[OffsetType] = apply(that + offset)
   }
 }
 
 object LongPointer {
-  def apply(offset: X86Offset.RealLongOffset) = new NearPointer(offset) {
-    override val operandByteSize: ValueSize = ValueSize.Word
-    override def encodeOffset: List[Byte] = offset.encodeLittleEndian
-  }
-
-  def apply(offset: X86Offset.ProtectedLongOffset) = new NearPointer(offset) {
-    override val operandByteSize: ValueSize = ValueSize.DoubleWord
-    override def encodeOffset: List[Byte] = offset.encodeLittleEndian
+  def apply[OffsetType <: X86Offset : ProcessorModeWithOffset](offset: OffsetType): NearPointer[OffsetType] = new NearPointer(offset) {
+    val operandByteSize: OperandSize = offset.operandByteSize
+    override def encodeBytes: List[Byte] = offset.encode
+    override def toString: String = s"0x${offset.encode.bigEndianHexString}"
+    override def add(that: OffsetType): NearPointer[OffsetType] = apply(that + offset)
   }
 }

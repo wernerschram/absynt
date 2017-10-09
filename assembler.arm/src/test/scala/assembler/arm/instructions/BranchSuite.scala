@@ -1,7 +1,7 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.Condition
+import assembler.arm.operands.{ArmOffset, Condition}
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.sections.{Section, SectionType}
 import assembler._
@@ -17,19 +17,19 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode b +0x3e8" in {
-        Branch(0x3e8).encodeByte should be(Hex.msb("ea0000fa"))
+        Branch(ArmOffset(0x3e8)).encodeByte should be(Hex.msb("ea0000fa"))
       }
 
       "correctly encode beq +0x1111110" in {
-        Branch(0x1111110, Condition.Equal).encodeByte should be(Hex.msb("0a444444"))
+        Branch(ArmOffset(0x1111110), Condition.Equal).encodeByte should be(Hex.msb("0a444444"))
       }
 
       "correctly encode blt -0x08" in {
-        Branch(-0x08, Condition.SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
+        Branch(ArmOffset(-0x08), Condition.SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
       }
 
       "correctly represent blt -0x08 as a string" in {
-        Branch(-0x08, Condition.SignedLessThan).toString should be("blt -8")
+        Branch(ArmOffset(-0x08), Condition.SignedLessThan).toString should be("blt 0x00000000")
       }
 
       "correctly encode a forward branch to a labeled instruction" in {
@@ -104,11 +104,11 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode bleq 0x1111118" in {
-        BranchLink(0x1111110, Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
+        BranchLink(ArmOffset(0x1111110), Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
       }
 
-      "correctly represent bleq 0x1111118 as a string" in {
-        BranchLink(0x1111110, Condition.Equal).toString should be("bleq 17895696")
+      "correctly represent bleq 0x01111118 as a string" in {
+        BranchLink(ArmOffset(0x1111110), Condition.Equal).toString should be("bleq 0x01111118")
       }
 
       "correctly encode a forward branch-link to a labeled instruction" in {
@@ -129,19 +129,19 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       implicit val processorMode: ProcessorMode = ProcessorMode.A32
 
       "correctly encode blx 0x123c" in {
-        BranchLinkExchange(0x1234).encodeByte should be(Hex.msb("fa00048d"))
+        BranchLinkExchange(ArmOffset(0x1234)).encodeByte should be(Hex.msb("fa00048d"))
       }
 
       "correctly represent blx 0x123c as a string" in {
-        BranchLinkExchange(0x1234).toString should be("blx 4660")
+        BranchLinkExchange(ArmOffset(0x1234)).toString should be("blx 0x0000123C")
       }
 
       "correctly encode blx 0x123d" in {
-        BranchLinkExchange(0x1235).encodeByte should be(Hex.msb("fb00048d"))
+        BranchLinkExchange(ArmOffset(0x1235)).encodeByte should be(Hex.msb("fb00048d"))
       }
 
-      "correctly represent blx 0x123d as a string" in {
-        BranchLinkExchange(0x1235).toString should be("blx 4661")
+      "correctly represent blx 0x123D as a string" in {
+        BranchLinkExchange(ArmOffset(0x1235)).toString should be("blx 0x0000123D")
       }
 
       "correctly encode blx r12" in {

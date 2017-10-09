@@ -28,7 +28,7 @@ object Boot extends App {
 
   def createFile(): Unit = {
 
-    implicit val processorMode: ProcessorMode = ProcessorMode.Real
+    import ProcessorMode.Real._
 
     val topColor = Color(63, 0, 0)
     val middleColor = Color(63, 63, 63)

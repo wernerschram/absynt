@@ -1,9 +1,9 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
+import assembler.x86.operands.memoryaccess.{X86Offset, NearPointer => NearPointerType}
 import assembler.x86.operands.{Operand, OperandSize}
 
-trait NearPointer[OffsetType] extends X86Operation {
+trait NearPointer[OffsetType <: X86Offset] extends X86Operation {
 
   self: X86Operation =>
   def pointer: NearPointerType[OffsetType]

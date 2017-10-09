@@ -1,40 +1,53 @@
 package assembler.arm.operands
 
-import assembler.Address
+import assembler.{Address, Offset}
+import assembler.ListExtensions._
 
 import scala.language.implicitConversions
 
-object ArmOffset {
-  type offset = Int
+sealed class ArmOffset private(val offset: Int) extends Offset {
+
+  override def toString: String = s"0x${offset.encodeBigEndian.hexString}"
+
+  def add(that: ArmOffset): ArmOffset = ArmOffset(offset + that.offset)
+  def +(that: ArmOffset): ArmOffset = add(that)
 }
 
-sealed class RelativePointer(val offset: ArmOffset.offset) extends Address[ArmOffset.offset] with Operand {
-  //offset should be between 3221225472 and -3221225473
-  assume(((offset & 0xC0000000) == 0) || ((offset & 0xC0000000) == 0xC0000000))
+object ArmOffset {
+  def apply(offset: Int) = new ArmOffset(offset)
+}
 
-  def encode: Int = (offset >> 2) & 0xFFFFFF
+sealed abstract class RelativePointer(val offset: ArmOffset) extends Address[ArmOffset] with Operand {
+  //offset should be between 3221225472 and -3221225473
+  assume(((offset.offset & 0xC0000000) == 0) || ((offset.offset & 0xC0000000) == 0xC0000000))
+
+  def encode: Int = (offset.offset >> 2) & 0xFFFFFF
 
   override def toString: String = offset.toString
-
-  override def add(that: ArmOffset.offset) = RelativeA32Pointer(offset + that)
 }
 
-class RelativeA32Pointer private(displacement: ArmOffset.offset) extends RelativePointer(displacement) {
+class RelativeA32Pointer private(offset: ArmOffset) extends RelativePointer(offset) {
   //offset should be divisible by 4
-  assume((displacement & 0x00000003) == 0)
+  assume((offset.offset & 0x00000003) == 0)
+
+    override def add(that: ArmOffset) = RelativeA32Pointer(offset + that)
 }
 
-class RelativeThumbPointer private(displacement: ArmOffset.offset) extends RelativePointer(displacement) {
+class RelativeThumbPointer private(offset: ArmOffset) extends RelativePointer(offset) {
   //offset should be divisible by 4
-  assume((displacement & 0x00000002) == 0)
+  // FIXME: this should be assume((offset.offset & 0x00000001) == 0)
+  // the test for this is also wrong.
+  assume((offset.offset & 0x00000002) == 0)
 
-  override def encode: Int = super.encode | ((displacement & 1) << 24)
+  override def add(that: ArmOffset) = RelativeThumbPointer(offset + that)
+
+  override def encode: Int = super.encode | ((offset.offset & 1) << 24)
 }
 
 object RelativeA32Pointer {
-  implicit def apply(displacement: ArmOffset.offset): RelativeA32Pointer = new RelativeA32Pointer(displacement)
+  implicit def apply(offset: ArmOffset): RelativeA32Pointer = new RelativeA32Pointer(offset)
 }
 
 object RelativeThumbPointer {
-  implicit def apply(displacement: ArmOffset.offset): RelativeThumbPointer = new RelativeThumbPointer(displacement)
+  implicit def apply(offset: ArmOffset): RelativeThumbPointer = new RelativeThumbPointer(offset)
 }

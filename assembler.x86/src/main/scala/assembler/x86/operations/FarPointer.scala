@@ -1,9 +1,9 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType}
+import assembler.x86.operands.memoryaccess.{X86Offset, FarPointer => FarPointerType}
 import assembler.x86.operands.{FarPointerSize, Operand}
 
-trait FarPointer[OffsetType] extends X86Operation {
+trait FarPointer[OffsetType <: X86Offset] extends X86Operation {
 
   self: X86Operation =>
   def pointer: FarPointerType[OffsetType]

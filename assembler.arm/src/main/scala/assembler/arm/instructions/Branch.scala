@@ -4,7 +4,7 @@ import assembler.Label
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operands.{RelativeA32Pointer, RelativeThumbPointer}
+import assembler.arm.operands.{ArmOffset, RelativeA32Pointer, RelativeThumbPointer}
 import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
 
 class Branch(code: Byte, val opcode: String) {
@@ -15,7 +15,7 @@ class Branch(code: Byte, val opcode: String) {
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
       override def encodableForDistance(distance: Int): BranchImmediate =
-        Immediate(label, RelativeA32Pointer(distance - 8), Always)
+        Immediate(label, RelativeA32Pointer(ArmOffset(distance - 8)), Always)
     }
 
   private def Immediate(label: Label, destination: RelativeA32Pointer, condition: Condition = Always) =
@@ -24,7 +24,7 @@ class Branch(code: Byte, val opcode: String) {
   def apply(targetLabel: Label, condition: Condition)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, condition) {
       override def encodableForDistance(distance: Int): BranchImmediate =
-        Immediate(label, RelativeA32Pointer(distance - 8), condition)
+        Immediate(label, RelativeA32Pointer(ArmOffset(distance - 8)), condition)
     }
 }
 
@@ -46,7 +46,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
   def apply(targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode) =
     new ReferencingARMOperation(label, opcode, targetLabel, Unpredictable) {
       override def encodableForDistance(distance: Int): BranchImmediate =
-        Immediate(label, RelativeThumbPointer(distance - 8), Unpredictable)
+        Immediate(label, RelativeThumbPointer(ArmOffset(distance - 8)), Unpredictable)
     }
 }
 
