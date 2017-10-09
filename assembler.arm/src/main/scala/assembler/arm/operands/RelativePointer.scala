@@ -34,14 +34,12 @@ class RelativeA32Pointer private(offset: ArmOffset) extends RelativePointer(offs
 }
 
 class RelativeThumbPointer private(offset: ArmOffset) extends RelativePointer(offset) {
-  //offset should be divisible by 4
-  // FIXME: this should be assume((offset.offset & 0x00000001) == 0)
-  // the test for this is also wrong.
-  assume((offset.offset & 0x00000002) == 0)
+  //offset should be divisible by 2
+  assume((offset.offset & 0x00000001) == 0)
 
   override def add(that: ArmOffset) = RelativeThumbPointer(offset + that)
 
-  override def encode: Int = super.encode | ((offset.offset & 1) << 24)
+  override def encode: Int = super.encode | ((offset.offset & 2) << 23)
 }
 
 object RelativeA32Pointer {
