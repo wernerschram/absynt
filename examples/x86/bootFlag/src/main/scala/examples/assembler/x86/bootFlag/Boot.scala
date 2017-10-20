@@ -3,13 +3,14 @@ package examples.assembler.x86.bootFlag
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.{Application, Label, Resource, UniqueLabel}
 import assembler.ListExtensions._
 import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
+import assembler.x86.operands.memoryaccess.{FarPointer, LongPointer, RealOffset}
+import assembler.{EncodedByteList, Label, Resource, UniqueLabel}
 
 object Boot extends App {
   createFile()
@@ -34,7 +35,16 @@ object Boot extends App {
     val middleColor = Color(63, 63, 63)
     val bottomColor = Color(0, 0, 63)
 
-    val section: Section = Section(SectionType.Text, ".text",
+    val targetLabel = Label.unique
+    val section: Section[RealOffset] = Section[RealOffset](SectionType.Text, ".text",
+
+
+      JumpIfCountZero(targetLabel) ::
+        Interrupt(0x03) ::
+      { implicit val label: UniqueLabel = targetLabel; Interrupt(0x04.toByte)} ::
+
+
+
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
       //
@@ -63,7 +73,7 @@ object Boot extends App {
       StoreString.Repeat(AL, DI) ::
 
       { implicit val label: UniqueLabel = Label.unique; Jump(label) } ::
-      Nil, 0
+      Nil
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
@@ -72,7 +82,7 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val executable: Raw = Raw(section)
+    val executable = Raw[RealOffset, FarPointer[RealOffset]](section, FarPointer(0.toShort, offset(0)))
     executable.encodableSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")

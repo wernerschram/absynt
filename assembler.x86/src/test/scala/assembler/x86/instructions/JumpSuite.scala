@@ -5,14 +5,17 @@ import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
-class JumpSuite extends WordSpec with Matchers {
+class JumpSuite extends WordSpec with Matchers with MockFactory {
 
   "an Jump instruction" when {
+
     "in real mode" should {
 
       import ProcessorMode.Real._
+      val zeroAddress: Address[RealOffset] = LongPointer[RealOffset](offset(0))
 
       "correctly encode jmp 0x10" in { Jump(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
       "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
@@ -170,7 +173,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
             EncodedByteList(List.fill(1)(0x00)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("EB 01")) }
       }
@@ -187,7 +190,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
           EncodedByteList(List.fill(1)(0x00)),
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}), 0)
+          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
 
         jump.toInSectionState(p).size should be(2)
@@ -202,7 +205,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
             EncodedByteList(List.fill(1)(0x00)),
-            jump), 0)
+            jump))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("EB FC")) }
       }
@@ -214,7 +217,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
             EncodedByteList(List.fill(1)(0x00)),
-            jump), 0)
+            jump))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E3 FC")) }
       }
@@ -226,7 +229,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
             EncodedByteList(List.fill(256)(0x00)),
-            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 00 01")) }
       }
@@ -238,7 +241,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
             EncodedByteList(List.fill(256)(0x00)),
-            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
         an[AssertionError] should be thrownBy { jump.toInSectionState(p).encodeByte }
       }
@@ -250,7 +253,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
             EncodedByteList(List.fill(256)(0x00)),
-            jump), 0)
+            jump))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 FC FE")) }
       }
@@ -266,7 +269,7 @@ class JumpSuite extends WordSpec with Matchers {
             jump2,
             EncodedByteList(List.fill(1)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))},
-            jump1), 0)
+            jump1))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB F9")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 01")) }
@@ -283,7 +286,7 @@ class JumpSuite extends WordSpec with Matchers {
             jump2,
             EncodedByteList(List.fill(122)(0x00)),
             { implicit val label: UniqueLabel = label2; EncodedByteList(List.fill(1)(0x00))},
-            jump1), 0)
+            jump1))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB 80")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7A")) }
@@ -301,7 +304,7 @@ class JumpSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(123)(0x00)),
             jump1,
             EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB 80")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7F")) }
@@ -319,7 +322,7 @@ class JumpSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(123)(0x00)),
             jump1,
             EncodedByteList(List.fill(3)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7E FF")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
@@ -337,7 +340,7 @@ class JumpSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(123)(0x00)),
             jump1,
             EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7D FF")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 80 00")) }
@@ -360,7 +363,7 @@ class JumpSuite extends WordSpec with Matchers {
             jump1,
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
-            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB 80")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7F")) }
@@ -384,7 +387,7 @@ class JumpSuite extends WordSpec with Matchers {
             jump1,
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(63)(0x00))},
-            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7D FF")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
@@ -408,7 +411,7 @@ class JumpSuite extends WordSpec with Matchers {
             jump1,
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
-            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7C FF")) }
         withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
@@ -419,6 +422,7 @@ class JumpSuite extends WordSpec with Matchers {
     "in protected mode" should {
 
       import ProcessorMode.Protected._
+      val zeroAddress: Address[ProtectedOffset] = LongPointer[ProtectedOffset](offset(0))
 
       "correctly encode jmp 0x10" in { Jump(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
       "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
@@ -541,7 +545,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
             EncodedByteList(List.fill(1)(0x00)),
-            jump), 0)
+            jump))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("EB FC")) }
       }
@@ -553,7 +557,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
             EncodedByteList(List.fill(256)(0x00)),
-            jump), 0)
+            jump))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 FA FE FF FF")) }
       }
@@ -565,7 +569,7 @@ class JumpSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
             EncodedByteList(List.fill(256)(0x00)),
-            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}), 0)
+            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
         withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 00 01 00 00")) }
       }

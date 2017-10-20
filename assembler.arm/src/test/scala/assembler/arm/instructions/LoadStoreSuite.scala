@@ -2,20 +2,20 @@ package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{Condition, Shifter}
+import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, Shifter}
 import assembler.arm.operations._
 import assembler.sections.{Section, SectionType}
 import assembler._
+import assembler.output.raw.Raw
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
 
-  val application: Application = mock[Application]
   "an LoadRegister instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldr r1, [r2, #10]" in {
         LoadRegister(R1, R2, 10.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e592100a"))
@@ -86,8 +86,9 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
         val p = Section(SectionType.Text, ".test", List[Resource](
           LoadRegister(targetLabel, R1),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}), 0)
+          { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}))
 
+        val application = Raw(p, RelativeA32Pointer(ArmOffset(0)))
         p.encodable(application).encodeByte should be(Hex.msb("e59f1000 00000000 74736554"))
       }
 
@@ -96,8 +97,9 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")},
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            LoadRegister(targetLabel, R1, Condition.CarrySet)), 0)
+            LoadRegister(targetLabel, R1, Condition.CarrySet)))
 
+        val application = Raw(p, RelativeA32Pointer(ArmOffset(0)))
         p.encodable(application).encodeByte should be(Hex.msb("74736554 00000000 251F1010"))
       }
     }
@@ -106,7 +108,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.byte instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrb r1, [r2, #70]" in {
         LoadRegister.byte(R1, R2, 70.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e5d21046"))
@@ -121,7 +123,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.doubleWord instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrd r1, [r2], #-40" in {
         LoadRegister.doubleWord(R1, R2, (-40).toByte, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e04212d8"))
@@ -136,7 +138,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.signedByte instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrsb r1, [r2, #50]!" in {
         LoadRegister.signedByte(R1, R2, 50.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e1f213d2"))
@@ -151,7 +153,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.unsignedHalfWord instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrh r1, [r2, #-60]!" in {
         LoadRegister.unsignedHalfWord(R1, R2, (-60).toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e17213bc"))
@@ -166,7 +168,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.signedHalfWord instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrsh r1, [r2, r3]" in {
         LoadRegister.signedHalfWord(R1, R2, R3, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e19210f3"))
@@ -181,7 +183,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.UserMode instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrt r1, [r2], #130" in {
         LoadRegister.UserMode(R1, R2, 130.toShort).encodeByte should be(Hex.msb("e4b21082"))
@@ -204,7 +206,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an LoadRegister.UserMode.byte instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode ldrbt r1, [r2], #150" in {
         LoadRegister.UserMode.byte(R1, R2, 150.toShort).encodeByte should be(Hex.msb("e4f21096"))
@@ -223,7 +225,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an StoreRegister instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode str r1, [r2, #10]" in {
         StoreRegister(R1, R2, 10.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e582100a"))
@@ -234,7 +236,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an StoreRegister.halfWord instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode strd r1, [r2, -r1]" in {
         StoreRegister.doubleWord(R1, R2, LoadStoreMiscellaneousOffset(R1, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e10210f1"))
@@ -245,7 +247,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
   "an StoreRegister.halfWord instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode strh r1, [r2, #40]!" in {
         StoreRegister.halfWord(R1, R2, 40.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e1e212b8"))

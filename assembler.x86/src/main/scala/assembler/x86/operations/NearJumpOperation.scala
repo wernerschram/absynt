@@ -1,52 +1,33 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.memoryaccess.{LongPointer, X86Offset, NearPointer => NearPointerOperand, ShortPointer}
-import assembler.x86.{ProcessorMode, ProcessorModeWithOffset}
-import assembler.{Encodable, Label, Resource}
+import assembler.x86.{ProcessorMode, X86OffsetFactory}
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
+import assembler.{Encodable, Label, OffsetDirection, Resource}
 
-abstract class NearJumpOperation[OffsetType <: X86Offset](label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
-                                (implicit processorMode: ProcessorModeWithOffset[OffsetType])
+abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
+                                (implicit processorMode: ProcessorMode)
   extends ShortJumpOperation[OffsetType](label, shortOpcode, mnemonic, target) {
 
   val forwardShortLongBoundary: Byte = Byte.MaxValue
   val backwardShortLongBoundary: Int = (-Byte.MinValue) - shortJumpSize
 
-  val longJumpSize: Int = if (processorMode == ProcessorMode.Real) {
-    longOpcode.length + 2
-  } else {
-    longOpcode.length + 4
-  }
+  val longJumpSize: Int = longOpcode.length + (if (processorMode == ProcessorMode.Real) 2 else 4)
 
   override val maximumSize: Int = longJumpSize
 
   def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
-  override def sizeForDistance(distance: Int)(forward: Boolean): Int =
-    if (forward) {
-      if (distance <= forwardShortLongBoundary)
-        shortJumpSize
-      else
-        longJumpSize
-    } else {
-      if (distance <= backwardShortLongBoundary)
-        shortJumpSize
-      else
-        longJumpSize
-    }
+  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = offsetDirection match {
+    case OffsetDirection.Backward if distance <= backwardShortLongBoundary => shortJumpSize
+    case OffsetDirection.Forward if distance <= forwardShortLongBoundary => shortJumpSize
+    case OffsetDirection.None => shortJumpSize
+    case _ => longJumpSize
+  }
 
-  override def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable = {
-    if (forward) {
-      if (distance <= forwardShortLongBoundary) {
-        encodableForShortPointer(ShortPointer(implicitly[ProcessorModeWithOffset[OffsetType]].offset(distance)))
-      } else {
-        encodableForLongPointer(LongPointer(implicitly[ProcessorModeWithOffset[OffsetType]].offset(distance)))
-      }
-    } else {
-      if (distance <= backwardShortLongBoundary) {
-        encodableForShortPointer(ShortPointer(implicitly[ProcessorModeWithOffset[OffsetType]].offset(-distance - shortJumpSize)))
-      } else {
-        encodableForLongPointer(LongPointer(implicitly[ProcessorModeWithOffset[OffsetType]].offset(-distance - longJumpSize)))
-      }
-    }
+  override def encodableForOffset(offset: OffsetType): Resource with Encodable = {
+    if (offset.isShort(shortJumpSize))
+      encodableForShortPointer(ShortPointer(offset))
+    else
+      encodableForLongPointer(LongPointer(offset))
   }
 }

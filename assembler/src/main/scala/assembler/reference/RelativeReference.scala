@@ -1,27 +1,25 @@
 package assembler.reference
 
-import assembler.{Encodable, Label, Resource}
+import assembler._
 import assembler.sections.Section
 
 import scala.collection.concurrent.TrieMap
 
-trait RelativeReference
+trait RelativeReference[OffsetType<:Offset]
     extends Resource {
   def target: Label
 
-  def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable
+  def encodableForOffset(offset: OffsetType): Resource with Encodable
 
-  def sizeForDistance(distance: Int)(forward: Boolean): Int =
-    encodableForDistance(distance)(forward).size
+  def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int
 
-  private val sectionMap = new TrieMap[Section, RelativeReferenceInSection]
+  private val sectionMap = new TrieMap[Section[OffsetType], RelativeReferenceInSection[OffsetType]]
 
-  def toInSectionState(section: Section): RelativeReferenceInSection = {
-    val forward = section.isForwardReference(this)
+  implicit def offsetFactory: PositionalOffsetFactory[OffsetType]
 
-    sectionMap.getOrElseUpdate(section, new RelativeReferenceInSection(target, label, minimumSize, maximumSize,
-      encodableForDistance(_)(forward), sizeForDistance(_)(forward),
-      section.intermediateEncodables(this))(section))
-  }
+  def toInSectionState(section: Section[OffsetType]): RelativeReferenceInSection[OffsetType] =
+    sectionMap.getOrElseUpdate(section, new RelativeReferenceInSection[OffsetType](target, label, minimumSize, maximumSize,
+      encodableForOffset, sizeForDistance,
+      section.intermediateEncodables(this), section.offsetDirection(this))(section, offsetFactory))
 }
 

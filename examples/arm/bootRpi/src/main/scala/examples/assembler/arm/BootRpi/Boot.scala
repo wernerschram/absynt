@@ -3,15 +3,15 @@ package examples.assembler.arm.BootRpi
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.output.Elf.{Architecture, Executable}
-import assembler._
 import assembler.ListExtensions._
-import assembler.arm.ProcessorMode
+import assembler._
 import assembler.arm.instructions._
+import assembler.arm.operands.ArmOffset
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.output.raw.Raw
+import assembler.arm.{ArmOffsetFactory, ProcessorMode}
+import assembler.output.Elf.{Architecture, Executable}
 import assembler.sections.{Section, SectionType}
 
 object Boot extends App {
@@ -46,7 +46,7 @@ object Boot extends App {
     val TDR: Short = 0x8C
   }
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, processorMode: ProcessorMode): List[Resource] = {
+  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): List[Resource] = {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
@@ -55,19 +55,26 @@ object Boot extends App {
     Nil
   }
 
-  private def halt()(implicit label: Label, processorMode: ProcessorMode) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
+  private def halt()(implicit label: Label, armOffsetFactory: ArmOffsetFactory) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
 
   def createFile(): Unit = {
-    implicit val processorMode: ProcessorMode = ProcessorMode.A32
+    import ProcessorMode.A32._
 
     val putString: Label = "PutString"
     val text: Label = "Text"
     val entry: Label = "Entry"
 
-    val section: Section = Section(SectionType.Text, ".text",
+    val targetLabel = Label.unique
+    val section: Section[ArmOffset] = Section(SectionType.Text, ".text",
+
+      BranchLinkExchange(targetLabel) ::
+      EncodedByteList(List.fill(4)(0x00.toByte)) ::
+      { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))} ::
+
+//          { implicit val label: UniqueLabel = Label.unique; LoadRegister(label, R1, Condition.CarrySet)} ::
       // Disable UART0
       { implicit val label: Label = entry; Move.forConstant(UART0.Base, R0) } ::
-      Move.forConstant(0, R1) ::
+/*      Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       //
       // Disable pull up/down for all GPIO pins & delay for 150 cycles.
@@ -126,11 +133,10 @@ object Boot extends App {
       Branch(putString, NotEqual) ::
       //
       // Goal achieved.
-      halt() ::
+      halt() :: */
       //
       // Resources
-      { implicit val label: Label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil
-    , 0x1000)
+      { implicit val label: Label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil)
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
     val outputPath = path.resolve("bootRpi-output")
@@ -153,6 +159,7 @@ object Boot extends App {
   createFile()
 
   // To decompile the output download the gcc cross compiler for arm and execute:
+  //  arm-linux-gnueabi-objdump -b binary -D /tmp/bootRpi-output/test.raw -m arm
   //  arm-linux-gnueabi-objdump -D /tmp/bootRpi-output/test.elf -m arm
   //
   // To run the example on qemu:

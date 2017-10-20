@@ -1,16 +1,16 @@
 package assembler.arm.instructions
 
-import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operands.{RightRotateImmediate, Shifter}
+import assembler.arm.operands.{ArmOffset, RelativeA32Pointer, RightRotateImmediate, Shifter}
 import assembler.arm.operations._
+import assembler.arm.{ArmOffsetFactory, ProcessorMode}
 import assembler.reference.AbsoluteReference
-import assembler.{Label, ResourceCollection}
+import assembler.{Encodable, Label, Resource, ResourceCollection}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label): DataProcessingOperation =
+           (implicit armOffsetFactory: ArmOffsetFactory, label: Label): DataProcessingOperation =
     RegAndShifterToReg(label, source1, source2, destination, condition)
 
   private def RegAndShifterToReg(label: Label, source1: GeneralRegister, source2: Shifter, destination: GeneralRegister,
@@ -18,7 +18,7 @@ class DataProcessing(val code: Byte, val opcode: String) {
     new DataProcessingOperation(label, opcode, code, condition, source1, source2, destination)
 
   def setFlags(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label): DataProcessingOperation with SetFlags =
+              (implicit armOffsetFactory: ArmOffsetFactory, label: Label): DataProcessingOperation with SetFlags =
     RegAndShifterToRegFlags(label, source1, source2, destination, condition)
 
   private def RegAndShifterToRegFlags(label: Label, source1: GeneralRegister, source2: Shifter, destination: GeneralRegister,
@@ -28,7 +28,7 @@ class DataProcessing(val code: Byte, val opcode: String) {
 
 class DataProcessingNoDestination(val code: Byte, val opcode: String) {
   def apply(register1: GeneralRegister, source2: Shifter, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label): DataProcessingNoDestinationInstruction =
+           (implicit armOffsetFactory: ArmOffsetFactory, label: Label): DataProcessingNoDestinationInstruction =
     RegAndShifter(label, register1, source2, condition)
 
   private def RegAndShifter(label: Label, register1: GeneralRegister, operand2: Shifter, condition: Condition) =
@@ -37,7 +37,7 @@ class DataProcessingNoDestination(val code: Byte, val opcode: String) {
 
 class DataProcessingNoRegister(val code: Byte, val opcode: String) {
   def apply(source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-           (implicit processorMode: ProcessorMode, label: Label): DataProcessingNoRegisterInstruction =
+           (implicit armOffsetFactory: ArmOffsetFactory, label: Label): DataProcessingNoRegisterInstruction =
     ShifterToReg(label, source2, destination, condition)
 
   private def ShifterToReg(label: Label, operand2: Shifter, destination: GeneralRegister, condition: Condition) = {
@@ -45,7 +45,7 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
   }
 
   def setFlags(source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode, label: Label): DataProcessingNoRegisterInstruction with SetFlags =
+              (implicit armOffsetFactory: ArmOffsetFactory, label: Label): DataProcessingNoRegisterInstruction with SetFlags =
     ShifterToRegFlags(label, source2, destination, condition)
 
   private def ShifterToRegFlags(label: Label, operand2: Shifter, destination: GeneralRegister, condition: Condition) = {
@@ -55,7 +55,7 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
 
 object AddCarry extends DataProcessing(0x05.toByte, "adc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -66,7 +66,7 @@ object AddCarry extends DataProcessing(0x05.toByte, "adc") {
 
 object Add extends DataProcessing(0x04.toByte, "add") {
   def forShifters(source1: GeneralRegister, shifters: List[RightRotateImmediate], destination: GeneralRegister,
-    condition: Condition = Always)(implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+    condition: Condition = Always)(implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (shifters.isEmpty) {
       return if (label == Label.noLabel)
         ResourceCollection(Nil)
@@ -78,21 +78,21 @@ object Add extends DataProcessing(0x04.toByte, "add") {
   }
 
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-    (implicit processorMode: ProcessorMode, label: Label): ResourceCollection =
+    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection =
     forShifters(source1, Shifter.apply(source2), destination, condition)
 
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit processorMode: ProcessorMode, label: Label): ReferencingARMOperation =
+    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int): ResourceCollection =
-        forConstant(source1, distance - 8, destination, condition)
+      override def encodableForOffset(offset: ArmOffset): ResourceCollection =
+        forConstant(source1, offset.offset, destination, condition)
     }
 }
 
 object And extends DataProcessing(0x00.toByte, "and") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(~source2)
@@ -103,7 +103,7 @@ object And extends DataProcessing(0x00.toByte, "and") {
 
 object BitClear extends DataProcessing(0x0E.toByte, "bic") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
         ResourceCollection(Nil)
@@ -122,7 +122,7 @@ object Compare extends DataProcessingNoDestination(0x0A.toByte, "cmp")
 
 object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
         ResourceCollection(Nil)
@@ -138,7 +138,7 @@ object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
 object
 Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always)
-    (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -147,15 +147,22 @@ Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit processorMode: ProcessorMode, label: Label) =
-    AbsoluteReference(targetLabel, 4, 4, label, (position) => forConstant(position, destination, condition))
+    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset, RelativeA32Pointer] {
+    def encodableForAddress(position: RelativeA32Pointer): Resource with Encodable
+
+    def maximumSize: Int
+
+    def minimumSize: Int
+  } =
+    AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, 4, 4, label, (position: RelativeA32Pointer) =>
+      forConstant(position.toLong.toInt, destination, condition))
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
 
 object Or extends DataProcessing(0x0C.toByte, "orr") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
         ResourceCollection(Nil)
@@ -170,7 +177,7 @@ object Or extends DataProcessing(0x0C.toByte, "orr") {
 
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -181,7 +188,7 @@ object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
 
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -192,7 +199,7 @@ object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
 
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
@@ -203,7 +210,7 @@ object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
 
 object Subtract extends DataProcessing(0x02.toByte, "sub") {
   def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always)
-                 (implicit processorMode: ProcessorMode, label: Label): ResourceCollection = {
+                 (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0) {
       return if (label == Label.noLabel)
         ResourceCollection(Nil)

@@ -1,70 +1,75 @@
 package assembler.reference
 
-import assembler.{Resource, Encodable, Label}
+import assembler._
 import assembler.sections.Section
 
-class RelativeReferenceInSection (
+class RelativeReferenceInSection[OffsetType<:Offset] (
   private val destination: Label, val label: Label,
   override val minimumSize: Int, override val maximumSize: Int,
-  val encodableForDistance: (Int)=> Resource with Encodable,
-  val sizeForDistance: (Int)=> Int,
-  val intermediateInstructions: Seq[Resource]
-  )(implicit section: Section) extends Resource with Encodable {
+  val encodableForOffset: (OffsetType)=> Resource with Encodable,
+  val sizeForDistance: (OffsetDirection, Long)=> Int,
+  val intermediateInstructions: Seq[Resource],
+  val offsetDirection: OffsetDirection
+  )(implicit section: Section[OffsetType],
+  positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
 
-  def encodeForDistance(distance: Int): Seq[Byte] =
-    encodableForDistance(distance).encodeByte
+  def encodeForDistance(offset: OffsetType): Seq[Byte] =
+    encodableForOffset(offset).encodeByte
 
-  def toFinalState = encodableForDistance(actualDistance)
+  def toFinalState = encodableForOffset(actualOffset)
 
   private lazy val (
-    dependentReferences: Seq[RelativeReference],
+    dependentReferences: Seq[RelativeReference[OffsetType]],
     dependentResources: Seq[Resource]) =
   intermediateInstructions.partition {
-     case _: RelativeReference => true
+     case _: RelativeReference[OffsetType] => true
      case _ => false
   }
 
   private lazy val dependentReferencesInSection = dependentReferences.map{ _.toInSectionState(section) }
 
-  private lazy val independentMinimumDistance: Int = dependentResources.map { _.minimumSize }.sum
-  private lazy val independentMaximumDistance: Int = dependentResources.map { _.maximumSize }.sum
+  private lazy val independentMinimumDistance: Long = dependentResources.map { _.minimumSize }.sum
+  private lazy val independentMaximumDistance: Long = dependentResources.map { _.maximumSize }.sum
 
-  private def minimumDistance = independentMinimumDistance +
+  private def minimumDistance: Long =
     dependentReferencesInSection.map(instruction =>
-      if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum
+      if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum +
+      independentMinimumDistance
 
-  private def maximumDistance = independentMaximumDistance +
+  private def maximumDistance: Long =
     dependentReferencesInSection.map(instruction =>
-      if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum
+      if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum +
+      independentMaximumDistance
 
-  lazy val actualDistance: Int = {
+  lazy val actualOffset: OffsetType = {
     assert(independentMinimumDistance == independentMaximumDistance)
-    independentMinimumDistance + dependentReferencesInSection.map { _.size }.sum
+    val distance = dependentReferencesInSection.map { _.size }.sum + independentMinimumDistance
+    positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
   }
 
-  def minimumEstimatedSize: Int = encodableForDistance(minimumDistance).size
-  def maximumEstimatedSize: Int = encodableForDistance(maximumDistance).size
+  def minimumEstimatedSize: Int = sizeForDistance(offsetDirection, minimumDistance)
+  def maximumEstimatedSize: Int = sizeForDistance(offsetDirection, maximumDistance)
 
   private var _estimatedSize: Option[Int] = None
+
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def predictedDistance(sizeAssumptions: Map[RelativeReferenceInSection, Int]) = {
+  private def predictedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
     assert(independentMinimumDistance == independentMaximumDistance)
-    independentMinimumDistance +
-      dependentReferencesInSection.map { instruction =>
+    dependentReferencesInSection.map { instruction =>
         if (sizeAssumptions.contains(instruction))
           sizeAssumptions(instruction)
         else
           instruction.estimateSize(sizeAssumptions)
-      }.sum
+      }.sum + independentMinimumDistance
   }
 
-  def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection, Int]): Int = {
+  def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
     var assumption: Option[Int] = None
     var newAssumption = minimumEstimatedSize
     while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
-      newAssumption = sizeForDistance(predictedDistance(sizeAssumptions + (this -> assumption.get)))
+      newAssumption = sizeForDistance(offsetDirection, predictedOffset(sizeAssumptions + (this -> assumption.get)))
     }
     newAssumption
   }
@@ -80,5 +85,5 @@ class RelativeReferenceInSection (
     _estimatedSize.get
   }
 
-  lazy val encodeByte: Seq[Byte] = encodeForDistance(actualDistance)
+  lazy val encodeByte: Seq[Byte] = encodeForDistance(actualOffset)
 }

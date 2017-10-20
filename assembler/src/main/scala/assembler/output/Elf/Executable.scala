@@ -3,7 +3,11 @@ package assembler.output.Elf
 import assembler._
 import assembler.sections.{LastIteration, Section}
 
-abstract class Elf(val architecture: Architecture, sections: List[Section], val entryLabel: Label) extends Application(sections) {
+abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
+  val architecture: Architecture,
+  sections: List[Section[OffsetType]],
+  val entryLabel: Label)
+  (implicit addressFactory: AddressFactory[OffsetType, AddressType]) extends Application[OffsetType, AddressType](sections) {
 
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
 
@@ -18,10 +22,10 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val stringMap: Map[String, Int] =
     stringOffset(("" :: sections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
 
-  val programHeaders: List[ProgramHeader] =
+  val programHeaders: List[ProgramHeader[OffsetType, AddressType]] =
     encodableSections.map(s => ProgramHeader(s, this))
 
-  def sectionHeaders: List[SectionHeader] =
+  def sectionHeaders: List[SectionHeader[OffsetType, AddressType]] =
     NullSectionHeader(this) ::
     encodableSections.map(s => new SectionSectionHeader(s, this)) :::
     new StringSectionHeader(this) :: Nil
@@ -36,11 +40,11 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   private val dataOffset: Long =
     programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
 
-  def sectionOffset(section: Section): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
+  def sectionOffset(section: Section[OffsetType]): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
       (dataOffset, nextSection) => align(dataOffset, nextSection.alignment) + nextSection.size
     }
 
-  def alignedSectionOffset(section: Section): Long = align(sectionOffset(section), section.alignment)
+  def alignedSectionOffset(section: Section[OffsetType]): Long = align(sectionOffset(section), section.alignment)
 
   private def align(value: Long, alignment: Int): Long = if (value % alignment == 0)
     value
@@ -53,7 +57,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  def memoryAddress(section: Section): Long = section.baseAddress //+ (alignedSectionOffset(section) % fileAlignment)
+  def memoryAddress(section: Section[OffsetType]): AddressType = addressFactory.zero //+ (alignedSectionOffset(section) % fileAlignment)
 
   def stringOffset(strings: List[String]): List[(String, Int)] =
     (strings.head, 0) :: stringOffset(1, strings)
@@ -65,7 +69,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
   }
 
-  private def alignSectionData(offset: Long, section: Section with LastIteration): List[Byte] = {
+  private def alignSectionData(offset: Long, section: Section[OffsetType] with LastIteration[OffsetType]): List[Byte] = {
     val prefix: List[Byte] = if (offset % section.alignment != 0)
       List.fill(section.alignment - offset.toInt % section.alignment)(0)
     else
@@ -84,7 +88,7 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     endianness.encode(elfType.id) :::
     endianness.encode(architecture.processor.id) :::
     endianness.encode(version.extended) :::
-    architecture.processorClass.numberBytes(getAbsoluteAddress(entryLabel)) :::
+    architecture.processorClass.numberBytes(getAbsoluteAddress(entryLabel).toLong) :::
     architecture.processorClass.numberBytes(programHeaderOffset) :::
     architecture.processorClass.numberBytes(sectionHeaderOffset) :::
     endianness.encode(architecture.processor.flags) :::
@@ -100,14 +104,18 @@ abstract class Elf(val architecture: Architecture, sections: List[Section], val 
     sectionHeaders.flatMap(s => s.encodeByte)
 }
 
-class Executable private(architecture: Architecture, sections: List[Section], entryLabel: Label)
-  extends Elf(architecture, sections, entryLabel) {
+class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
+  architecture: Architecture,
+  sections: List[Section[OffsetType]],
+  entryLabel: Label)
+  (implicit addressFactory: AddressFactory[OffsetType, AddressType])
+  extends Elf[OffsetType, AddressType](architecture, sections, entryLabel) {
   override def elfType: ElfType = ElfType.Executable
 
 }
 
 object Executable {
-  def apply(architecture: Architecture, sections: List[Section], entryLabel: Label) =
+  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](architecture: Architecture, sections: List[Section[OffsetType]], entryLabel: Label)(implicit addressFactory: AddressFactory[OffsetType, AddressType]) =
     new Executable(architecture, sections, entryLabel)
 }
 

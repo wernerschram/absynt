@@ -1,44 +1,37 @@
 package assembler.reference
 
-import assembler.{Application, Encodable, Label, Resource}
+import assembler._
 
-sealed trait AbsoluteReference
+sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, override val label: Label)
     extends Resource {
-  def target: Label
 
-  def encodableForPosition(position: Int): Resource with Encodable
+  def encodableForAddress(position: AddressType): Resource with Encodable
 
-  def toInSectionState(application: Application): Resource = {
-    val newMinimum = application.getAbsoluteMinimumAddress(target)
-    val newMaximum = application.getAbsoluteMaximumAddress(target)
+  def toInSectionState(application: Application[OffsetType, AddressType]): Resource = {
+    val newMinimum: AddressType = application.getAbsoluteMinimumAddress(target)
+    val newMaximum: AddressType = application.getAbsoluteMaximumAddress(target)
     if (newMinimum == newMaximum)
-      encodableForPosition(newMinimum.toInt)
+      encodableForAddress(newMinimum)
     else
-      new AbsoluteReference {
-        override def encodableForPosition(position: Int): Resource with Encodable =
-          AbsoluteReference.this.encodableForPosition(position)
+      new AbsoluteReference[OffsetType, AddressType](target, label) {
+        override def encodableForAddress(position: AddressType): Resource with Encodable =
+          AbsoluteReference.this.encodableForAddress(position)
 
-        override def target: Label = AbsoluteReference.this.target
+        override def minimumSize: Int = encodableForAddress(newMinimum).size
 
-        override def label: Label = AbsoluteReference.this.label
-
-        override def minimumSize: Int = encodableForPosition(newMinimum.toInt).size
-
-        override def maximumSize: Int = encodableForPosition(newMaximum.toInt).size
+        override def maximumSize: Int = encodableForAddress(newMaximum).size
       }
   }
 }
 
 object AbsoluteReference {
-  def apply(targetLabel: Label, initialMinimumSize: Int, initialMaximumSize: Int, thisLabel: Label,
-    encodableFactory: (Int)=>Resource with Encodable) =
-    new AbsoluteReference {
-      override def encodableForPosition(position: Int): Resource with Encodable = encodableFactory(position)
-
-      override def target: Label = targetLabel
-      override def label: Label = thisLabel
+  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, initialMinimumSize: Int, initialMaximumSize: Int, label: Label,
+    encodableFactory: (AddressType)=>Resource with Encodable) =
+    new AbsoluteReference[OffsetType, AddressType](target, label) {
+      override def encodableForAddress(position: AddressType): Resource with Encodable = encodableFactory(position)
 
       override def minimumSize: Int = initialMinimumSize
       override def maximumSize: Int = initialMaximumSize
+
     }
 }

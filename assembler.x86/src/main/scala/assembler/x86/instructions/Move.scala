@@ -1,11 +1,11 @@
 package assembler.x86.instructions
 
 import assembler.reference.AbsoluteReference
-import assembler.x86.operands.memoryaccess.{MemoryAddress, MemoryLocation}
+import assembler.x86.operands.memoryaccess.{FarPointer, MemoryAddress, MemoryLocation, X86Offset}
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 import assembler.x86.{ParameterPosition, ProcessorMode}
-import assembler.{Encodable, Label, Resource}
+import assembler._
 
 object Move {
 
@@ -174,8 +174,8 @@ object Move {
       override def immediate: ImmediateValue = immediateValue
     }
 
-  def forLabel(targetLabel: Label, register: WideRegister)
-              (implicit processorMode: ProcessorMode, label: Label): AbsoluteReference = {
+  def forLabel[OffsetType<:X86Offset](targetLabel: Label, register: WideRegister)
+              (implicit processorMode: ProcessorMode, label: Label): AbsoluteReference[OffsetType, FarPointer[OffsetType]] = {
     val prefixBytes = if (register.getRexRequirements(ParameterPosition.OpcodeReg).isEmpty) 0 else 1
 
     val size = processorMode match {
@@ -184,21 +184,21 @@ object Move {
       case (ProcessorMode.Protected) => 0 + 1 + 4
       case (ProcessorMode.Long) => prefixBytes + 1 + 8
     }
-    val encodableForPosition: (Int) => Resource with Encodable = (position) =>
+    val encodableForPosition: (FarPointer[OffsetType]) => Resource with Encodable = (position) =>
       (processorMode, register) match {
           case (ProcessorMode.Real | ProcessorMode.Protected, _: GeneralPurposeRexRegister) =>
             throw new AssertionError
           case (ProcessorMode.Real, _) =>
-            Imm16ToR16(register, position.toShort)
+            Imm16ToR16(register, position.toLong.toShort)
           case (ProcessorMode.Protected, _: DoubleWordRegister) =>
-            Imm16ToR16(register, position)
+            Imm16ToR16(register, position.toLong.toInt)
           case (ProcessorMode.Long, _: QuadWordRegister) =>
             Imm16ToR16(register, position.toLong)
           case _ =>
             throw new AssertionError
        }
 
-    AbsoluteReference(targetLabel, size, size, label, encodableForPosition)
+    AbsoluteReference[OffsetType, FarPointer[OffsetType]](targetLabel, size, size, label, encodableForPosition)
   }
 
   def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic

@@ -1,13 +1,12 @@
 package assembler.x86.operations
 
 import assembler.reference.RelativeReference
-import assembler.x86.ProcessorModeWithOffset
 import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
-import assembler.{Encodable, Label, Resource}
+import assembler._
+import assembler.x86.X86OffsetFactory
 
-abstract class ShortJumpOperation[OffsetType <: X86Offset](val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
-                                 (implicit processorMode: ProcessorModeWithOffset[OffsetType])
-  extends Resource with RelativeReference {
+abstract class ShortJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
+  extends Resource with RelativeReference[OffsetType] {
 
   val shortJumpSize: Int = shortOpcode.length + 1
 
@@ -18,15 +17,12 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset](val label: Label, val
 
   override def toString = s"$labelPrefix$mnemonic $target"
 
-  override def sizeForDistance(distance: Int)(forward: Boolean): Int = shortJumpSize
+  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = shortJumpSize
 
-  override def encodableForDistance(distance: Int)(forward: Boolean): Resource with Encodable = {
-    val offset = if (forward) {
-      implicitly[ProcessorModeWithOffset[OffsetType]].offset(distance)
-    } else {
-      implicitly[ProcessorModeWithOffset[OffsetType]].offset(-distance - shortJumpSize)
-    }
-    assume(offset.isShort)
+  override def encodableForOffset(offset: OffsetType): Resource with Encodable = {
+    assume(offset.isShort(shortJumpSize))
     encodableForShortPointer(ShortPointer(offset))
   }
+
+  override implicit def offsetFactory: PositionalOffsetFactory[OffsetType] = implicitly[X86OffsetFactory[OffsetType]].positionalOffsetFactory()
 }

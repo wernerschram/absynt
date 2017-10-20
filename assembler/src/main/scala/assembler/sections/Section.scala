@@ -6,16 +6,16 @@ import assembler.reference.{AbsoluteReference, RelativeReference}
 import scala.annotation.tailrec
 import scala.language.implicitConversions
 
-trait Section {
+abstract class Section[OffsetType<:Offset:OffsetFactory] {
   val content: List[Resource]
 
   def name: String
 
   def sectionType: SectionType
 
-  val baseAddress: Int
-
   val alignment: Int
+
+  protected def offset(value: Long): OffsetType = implicitly[OffsetFactory[OffsetType]].offset(value)
 
   type EncodableCondition = (Resource)=>Boolean
 
@@ -23,20 +23,26 @@ trait Section {
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def minimumRelativeAddress(label: Label): Int = minimumRelativeAddress((current: Resource) => current.label == label)
-  def minimumRelativeAddress(encodable: Resource): Int = minimumRelativeAddress((current: Resource) => current == encodable)
-  def minimumRelativeAddress(condition: EncodableCondition): Int =
-    content.takeWhile(current => !condition(current)).map(current => current.minimumSize).sum
+  def minimumOffset(label: Label): OffsetType = minimumOffset((current: Resource) => current.label == label)
+  def minimumOffset(encodable: Resource): OffsetType = minimumOffset((current: Resource) => current == encodable)
+  def minimumOffset(condition: EncodableCondition): OffsetType =
+    offset(content.takeWhile(current => !condition(current)).map(current => current.minimumSize).sum)
 
-  def maximumRelativeAddress(label: Label): Int = maximumRelativeAddress((current: Resource) => current.label == label)
-  def maximumRelativeAddress(encodable: Resource): Int = maximumRelativeAddress((current: Resource) => current == encodable)
-  def maximumRelativeAddress(condition: EncodableCondition): Int =
-    content.takeWhile(current => !condition(current)).map(current => current.maximumSize).sum
+  def maximumOffset(label: Label): OffsetType = maximumOffset((current: Resource) => current.label == label)
+  def maximumOffset(encodable: Resource): OffsetType = maximumOffset((current: Resource) => current == encodable)
+  def maximumOffset(condition: EncodableCondition): OffsetType =
+    offset(content.takeWhile(current => !condition(current)).map(current => current.maximumSize).sum)
 
   def precedingResources(target: Label): List[Resource] =
     content.takeWhile(x => !x.label.matches(target))
 
-  def intermediateEncodables(from: RelativeReference): List[Resource] = {
+
+  /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
+    *
+    * @param from
+    * @return
+    */
+  def intermediateEncodables(from: RelativeReference[OffsetType]): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
@@ -52,17 +58,23 @@ trait Section {
       trimLeft.head :: trimRight
   }
 
-  def isForwardReference(from: RelativeReference): Boolean = {
+  def offsetDirection(from: RelativeReference[OffsetType]): OffsetDirection = {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
-    !firstInstruction.label.matches(from.target)
+    if (firstInstruction.label.matches(from.target))
+      if (firstInstruction==from)
+        OffsetDirection.None
+      else
+        OffsetDirection.Backward
+    else
+      OffsetDirection.Forward
   }
 
-  private def nextContent(currentApplication: Application): List[Resource] = {
+  private def nextContent[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): List[Resource] = {
     val newContent: List[Resource] = content.map {
-      case referencing: RelativeReference =>
+      case referencing: RelativeReference[OffsetType] =>
         referencing.toInSectionState(this)
 
-      case absolute: AbsoluteReference =>
+      case absolute: AbsoluteReference[OffsetType, AddressType] =>
         absolute.toInSectionState(currentApplication)
 
       case resource =>
@@ -72,25 +84,25 @@ trait Section {
   }
 
   @tailrec
-  final def encodable(currentApplication: Application): Section with LastIteration = {
+  final def encodable[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): Section[OffsetType] with LastIteration[OffsetType] = {
     val newContent = nextContent(currentApplication)
     if (newContent.forall { case _: Encodable => true; case _ => false }) {
-      Section.lastIteration(sectionType, name, newContent.map(r => r.asInstanceOf[Resource with Encodable]), baseAddress)
+      Section.lastIteration(sectionType, name, newContent.map(r => r.asInstanceOf[Resource with Encodable]))
    } else {
-      Section(sectionType, name, newContent, baseAddress).encodable(currentApplication)
+      Section(sectionType, name, newContent).encodable(currentApplication)
     }
   }
 }
 
-trait LastIteration {
-  iteration: Section =>
+trait LastIteration[OffsetType<:Offset] {
+  iteration: Section[OffsetType] =>
 
   val finalContent: List[Resource with Encodable]
 
-  def relativeAddress(label: Label): Int = relativeAddress((current: Resource) => current.label == label)
-  def relativeAddress(encodable: Resource): Int = relativeAddress((current: Resource) => current == encodable)
-  def relativeAddress(condition: EncodableCondition): Int =
-    finalContent.takeWhile(current => !condition(current)).map(current => current.size).sum
+  def offset(label: Label): OffsetType = offset((current: Resource) => current.label == label)
+  def offset(encodable: Resource): OffsetType = offset((current: Resource) => current == encodable)
+  def offset(condition: EncodableCondition): OffsetType =
+    iteration.offset(finalContent.takeWhile(current => !condition(current)).map(current => current.size).sum)
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 
@@ -98,23 +110,22 @@ trait LastIteration {
 }
 
 object Section {
-  def apply(`type`: SectionType, sectionName: String, resources: List[Resource], base: Int): Section =
-    new Section {
+  def apply[OffsetType<:Offset:OffsetFactory](`type`: SectionType, sectionName: String, resources: List[Resource]): Section[OffsetType] =
+    new Section[OffsetType] {
       val alignment: Int = 16
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val content: List[Resource] = resources
-      override val baseAddress: Int = base
     }
 
-  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], base: Int): Section with LastIteration =
-    new Section with LastIteration {
+  def lastIteration[OffsetType<:Offset:OffsetFactory](`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
+  Section[OffsetType] with LastIteration[OffsetType] =
+    new Section[OffsetType] with LastIteration[OffsetType] {
       val alignment: Int = 16
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val finalContent: List[Resource with Encodable] = encodables
       override val content: List[Resource] = finalContent
-      override val baseAddress: Int = base
     }
 }
 

@@ -4,7 +4,7 @@ import assembler._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{Condition, Shifter}
+import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, Shifter}
 import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
@@ -14,7 +14,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "an AddCarry instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode adc r2, r0, r1" in {
         AddCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0a02001"))
@@ -123,7 +123,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "an Add instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode add r2, r0, rr" in {
         Add(R0, R1, R2).encodeByte should be(Hex.msb("e0802001"))
@@ -147,31 +147,31 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly encode an add of a register and a labeled relative address to a register" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
           instruction,
             EncodedByteList(List.fill(8)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
         instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801f01"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
         instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the target is before the instruction" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
-          instruction), 0)
+          instruction))
         instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
 
@@ -181,7 +181,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "an And instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode and r2, r0, r1" in {
         And(R0, R1, R2).encodeByte should be(Hex.msb("e0002001"))
@@ -223,7 +223,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "an BitClear instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode bic r2, r0, r1" in {
         BitClear(R0, R1, R2).encodeByte should be(Hex.msb("e1c02001"))
@@ -248,7 +248,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a CompareNegative instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode cmn r0, r1" in {
         CompareNegative(R0, R1).encodeByte should be(Hex.msb("e1700001"))
@@ -263,7 +263,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a Compare instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode cmp r2, r0, r1" in {
         Compare(R0, R1).encodeByte should be(Hex.msb("e1500001"))
@@ -278,7 +278,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a Move instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode mov r2, r1" in {
         Move(R1, R2).encodeByte should be(Hex.msb("e1a02001"))
@@ -305,34 +305,34 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly encode a move of a labeled address to a register" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
           instruction,
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        val app = Raw(p, 0)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
         instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}), 0)
-        val app = Raw(p, 0)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
         instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
-          instruction), 0)
-        val app = Raw(p, 0)
+          instruction))
+        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
         instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 
@@ -342,7 +342,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "an ExclusiveOr instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode eor r4, r5, r9 lsl #2" in {
         ExclusiveOr(R5, Shifter.LogicalLeftShift(R9, 2.toByte), R4).encodeByte should be(Hex.msb("e0254109"))
@@ -368,7 +368,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a MoveNot instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode mvn r2, r1" in {
         MoveNot(R1, R2).encodeByte should be(Hex.msb("e1e02001"))
@@ -383,7 +383,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "an Or instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode orr r2, r0, r1" in {
         Or(R0, R1, R2).encodeByte should be(Hex.msb("e1802001"))
@@ -410,7 +410,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a ReverseSubtract instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode rsb r2, r0, r1" in {
         ReverseSubtract(R0, R1, R2).encodeByte should be(Hex.msb("e0602001"))
@@ -437,7 +437,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a ReverseSubtractCarry instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode rsc r2, r0, r1" in {
         ReverseSubtractCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0e02001"))
@@ -466,7 +466,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a SubtractCarry instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode sbc r2, r0, r1" in {
         SubtractCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0c02001"))
@@ -494,7 +494,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a Subtract instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode sub r2, r0, r1" in {
         Subtract(R0, R1, R2).encodeByte should be(Hex.msb("e0402001"))
@@ -521,7 +521,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a TestEquivalence instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode teq r0, r1" in {
         TestEquivalence(R0, R1).encodeByte should be(Hex.msb("e1300001"))
@@ -537,7 +537,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
   "a Test instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode tst r2, r0, r1" in {
         Test(R0, R1).encodeByte should be(Hex.msb("e1100001"))

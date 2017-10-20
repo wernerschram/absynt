@@ -9,15 +9,15 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler._
 import assembler.output.raw.Raw
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
-class MoveSuite extends WordSpec with Matchers with MockFactory {
+class MoveSuite extends WordSpec with Matchers {
 
   "a Move instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
+      val zeroAddress: FarPointer[RealOffset] = FarPointer(0, offset(0))
 
       "correctly encode mov bh, al" in {
         Move(AL, BH).encodeByte should be(Hex.lsb("88 C7"))
@@ -314,9 +314,9 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         val p = Section(SectionType.Text, ".test", List[Resource](
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
-        val app = Raw(p, 0)
+        val app = Raw(p, zeroAddress)
         withClue("Move") { p.encodable(app).finalContent.head.encodeByte should be(Hex.lsb("B8 04 00")) }
       }
 
@@ -344,7 +344,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
         Move(0x5656.toShort, RegisterMemoryLocation(BX, 0x10.toByte.encodeLittleEndian)).toString should be("mov [bx+16], 22102")
       }
 
-      // TODO: SIB instructions are not allowed in real mode: These should throw an exception or just not be allowed
+      // FIXME: SIB instructions are not allowed in real mode: These should throw an exception or just not be allowed
 
       "correctly encode mov [eax+ebx*2+0x11111111], 0x99999999" in {
         Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111.encodeLittleEndian, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
@@ -357,7 +357,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
 
     "in protected mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
+      import ProcessorMode.Protected._
 
       "correctly encode mov [0xDEADBEEF], eax" in {
         Move(EAX, MemoryAddress(0xDEADBEEF.encodeLittleEndian)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
@@ -393,11 +393,11 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
 
         an[AssertionError] should be thrownBy {
-          val app = Raw(p, 0x100)
+          val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
           p.encodable(app).finalContent(1).encodeByte
         }
       }
@@ -410,10 +410,10 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
         an[AssertionError] should be thrownBy {
-          val app = Raw(p, 0x100)
+          val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
           p.encodable(app).finalContent(1).encodeByte
         }
       }
@@ -426,9 +426,9 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
-        val app = Raw(p, 0x100)
+        val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
         withClue("Move") { p.encodable(app).finalContent(1).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
       }
 
@@ -436,7 +436,7 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
 
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "throw an AssertionError for mov bh, r8l" in {
         an[AssertionError] should be thrownBy {
@@ -589,11 +589,11 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(1)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x100)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
 
         an[AssertionError] should be thrownBy {
-          val app = Raw(p, 0x100)
+          val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
           p.encodable(app).finalContent(1).encodeByte
         }
       }
@@ -606,9 +606,9 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(2)(0x00.toByte)),
           move,
             EncodedByteList(List.fill(2)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}), 0x10000)
+            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
-        val app = Raw(p, 0x10000)
+        val app = Raw(p, FarPointer(0.toShort, offset(0x10000)))
         withClue("Move") { p.encodable(app).finalContent(1).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
       }
 
@@ -620,9 +620,9 @@ class MoveSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(2)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))},
           EncodedByteList(List.fill(2)(0x00.toByte)),
-          move), 0x3000000)
+          move))
 
-         val app = Raw(p, 0x3000000)
+         val app = Raw(p, FarPointer(0.toShort, offset(0x3000000)))
         withClue("Move") { p.encodable(app).finalContent(3).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
       }
 
