@@ -20,11 +20,11 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
 
   def getAbsoluteMinimumAddress(label: Label): AddressType =
     sections.filter(s => s.contains(label))
-      .map(s => addressFactory.add(memoryAddress(s), s.minimumOffset(label))).head
+      .map(s => addressFactory.add(memoryAddress(s), s.estimatedOffset(label).tempMinimum)).head
 
   def getAbsoluteMaximumAddress(label: Label): AddressType =
     sections.filter(s => s.contains(label))
-      .map(s => addressFactory.add(memoryAddress(s), s.maximumOffset(label))).head
+      .map(s => addressFactory.add(memoryAddress(s), s.estimatedOffset(label).tempMaximum)).head
 
   def encodeByte: List[Byte]
 }

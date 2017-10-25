@@ -23,15 +23,13 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def minimumOffset(label: Label): OffsetType = minimumOffset((current: Resource) => current.label == label)
-  def minimumOffset(encodable: Resource): OffsetType = minimumOffset((current: Resource) => current == encodable)
-  def minimumOffset(condition: EncodableCondition): OffsetType =
-    offset(content.takeWhile(current => !condition(current)).map(current => current.minimumSize).sum)
+  def estimatedOffset(label: Label): Estimate[OffsetType] =
+    content.takeWhile(current => current.label != label)
+      .map(e=>Estimate(e.minimumSize, e.maximumSize)).reduce(Estimate.reduceInner[Int](_ + _)).map(offset(_))
 
-  def maximumOffset(label: Label): OffsetType = maximumOffset((current: Resource) => current.label == label)
-  def maximumOffset(encodable: Resource): OffsetType = maximumOffset((current: Resource) => current == encodable)
-  def maximumOffset(condition: EncodableCondition): OffsetType =
-    offset(content.takeWhile(current => !condition(current)).map(current => current.maximumSize).sum)
+   def estimatedOffset(encodable: Resource): Estimate[OffsetType] =
+    content.takeWhile(current => current != encodable)
+      .map(e=>Estimate(e.minimumSize, e.maximumSize)).reduce(Estimate.reduceInner[Int](_ + _)).map(offset(_))
 
   def precedingResources(target: Label): List[Resource] =
     content.takeWhile(x => !x.label.matches(target))
@@ -99,10 +97,8 @@ trait LastIteration[OffsetType<:Offset] {
 
   val finalContent: List[Resource with Encodable]
 
-  def offset(label: Label): OffsetType = offset((current: Resource) => current.label == label)
-  def offset(encodable: Resource): OffsetType = offset((current: Resource) => current == encodable)
-  def offset(condition: EncodableCondition): OffsetType =
-    iteration.offset(finalContent.takeWhile(current => !condition(current)).map(current => current.size).sum)
+  def offset(label: Label): OffsetType = estimatedOffset(label).tempMinimum
+  def offset(encodable: Resource): OffsetType = estimatedOffset(encodable).tempMaximum
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 
