@@ -1,43 +1,31 @@
 package assembler
 
-sealed trait Estimate
+sealed trait Estimate[+V]
 
-sealed trait LowerBounded[V] extends Estimate {
-  def minimum: V
-}
+object Estimate {
+  def apply[V](minimum: V, maximum: V): Estimate[V] = {
+    if (minimum == maximum)
+      Actual(minimum)
+    else
+      Bounded(minimum, maximum)
+  }
 
-object LowerBounded {
-  def apply[V](minimumValue: V): LowerBounded[V] = new LowerBounded[V]() {
-    override val minimum: V = minimumValue
+  private def reduceInnerBounded[V](operation: (V, V) => V)(bounded1: Bounded[V], value: Estimate[V]): Estimate[V] = value match {
+    case bounded2: Bounded[V] => Bounded(operation(bounded1.minimum, bounded2.minimum), operation(bounded1.maximum, bounded2.maximum))
+    case actual2: Actual[V] => Bounded(operation(bounded1.minimum, actual2.value), operation(bounded1.maximum, actual2.value))
+    case _ => Unknown
+  }
+
+  def reduceInner[V](operation: (V, V) => V)(estimate1: Estimate[V], estimate2: Estimate[V]): Estimate[V] = (estimate1, estimate2) match {
+    case (bounded1: Bounded[V], _) => reduceInnerBounded(operation)(bounded1, estimate2)
+    case (_, bounded2: Bounded[V]) => reduceInnerBounded(operation)(bounded2, estimate1)
+    case (actual1: Actual[V], actual2: Actual[V]) => Actual(operation(actual1.value, actual2.value))
+    case (_, _) => Unknown
   }
 }
 
+case class Bounded[V](minimum: V, maximum: V) extends Estimate[V]
 
-sealed trait UpperBounded[V] extends Estimate {
-  def maximum: V
-}
+case class Actual[V](value: V) extends Estimate[V]
 
-object UpperBounded {
-  def apply[V](maximumValue: V): UpperBounded[V] = new UpperBounded[V]() {
-    override val maximum: V = maximumValue
-  }
-}
-
-sealed trait Bounded[V] extends LowerBounded[V] with UpperBounded[V]
-
-object Bounded {
-  def apply[V](minimumValue: V, maximumValue: V): Bounded[V] = new Bounded[V]() {
-    override val minimum: V = minimumValue
-    override val maximum: V = maximumValue
-  }
-}
-
-trait Actual[V] extends Estimate {
-  def value: V
-}
-
-object Actual {
-  def apply[V](actualValue: V): Actual[V] = new Actual[V] {
-    override val value: V = actualValue
-  }
-}
+case object Unknown extends Estimate[Nothing]

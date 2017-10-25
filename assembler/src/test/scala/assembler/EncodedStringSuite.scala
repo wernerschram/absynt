@@ -2,7 +2,6 @@ package assembler
 
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
-import assembler.sections.Section
 
 class EncodedStringSuite extends WordSpec with Matchers {
 
