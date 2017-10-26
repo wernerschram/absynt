@@ -18,13 +18,9 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
 
   def memoryAddress(section: Section[OffsetType]): AddressType
 
-  def getAbsoluteMinimumAddress(label: Label): AddressType =
+  def estimateAbsoluteAddress(label: Label): Estimate[AddressType] =
     sections.filter(s => s.contains(label))
-      .map(s => addressFactory.add(memoryAddress(s), s.estimatedOffset(label).tempMinimum)).head
-
-  def getAbsoluteMaximumAddress(label: Label): AddressType =
-    sections.filter(s => s.contains(label))
-      .map(s => addressFactory.add(memoryAddress(s), s.estimatedOffset(label).tempMaximum)).head
+      .map(s => s.estimatedOffset(label).map(v => addressFactory.add(memoryAddress(s), v))).head
 
   def encodeByte: List[Byte]
 }

@@ -8,19 +8,18 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Ad
   def encodableForAddress(position: AddressType): Resource with Encodable
 
   def toInSectionState(application: Application[OffsetType, AddressType]): Resource = {
-    val newMinimum: AddressType = application.getAbsoluteMinimumAddress(target)
-    val newMaximum: AddressType = application.getAbsoluteMaximumAddress(target)
-    if (newMinimum == newMaximum)
-      encodableForAddress(newMinimum)
-    else
-      new AbsoluteReference[OffsetType, AddressType](target, label) {
+    val newEstimate: Estimate[AddressType] = application.estimateAbsoluteAddress(target)
+    newEstimate match {
+      case actual: Actual[AddressType] => encodableForAddress(actual.value)
+      case bounded: Bounded[AddressType] => new AbsoluteReference[OffsetType, AddressType](target, label) {
         override def encodableForAddress(position: AddressType): Resource with Encodable =
           AbsoluteReference.this.encodableForAddress(position)
 
-        override def minimumSize: Int = encodableForAddress(newMinimum).size
+        override def minimumSize: Int = encodableForAddress(bounded.minimum).size
 
-        override def maximumSize: Int = encodableForAddress(newMaximum).size
+        override def maximumSize: Int = encodableForAddress(bounded.maximum).size
       }
+    }
   }
 }
 
