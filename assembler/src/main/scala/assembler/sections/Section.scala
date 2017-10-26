@@ -16,7 +16,6 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
   val alignment: Int
 
   protected def offset(value: Long): OffsetType = implicitly[OffsetFactory[OffsetType]].offset(value)
-
   type EncodableCondition = (Resource)=>Boolean
 
   def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
@@ -25,11 +24,11 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
 
   def estimatedOffset(label: Label): Estimate[OffsetType] =
     content.takeWhile(current => current.label != label)
-      .map(e=>Estimate(e.minimumSize, e.maximumSize)).reduce(Estimate.reduceInner[Int](_ + _)).map(offset(_))
+      .map(e => Estimate(e.minimumSize, e.maximumSize)).estimateSum.map(offset(_))
 
-   def estimatedOffset(encodable: Resource): Estimate[OffsetType] =
+  def estimatedOffset(encodable: Resource): Estimate[OffsetType] =
     content.takeWhile(current => current != encodable)
-      .map(e=>Estimate(e.minimumSize, e.maximumSize)).reduce(Estimate.reduceInner[Int](_ + _)).map(offset(_))
+      .map(e => Estimate(e.minimumSize, e.maximumSize)).estimateSum.map(offset(_))
 
   def precedingResources(target: Label): List[Resource] =
     content.takeWhile(x => !x.label.matches(target))
