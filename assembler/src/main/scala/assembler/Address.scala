@@ -17,6 +17,14 @@ trait Offset {
   def direction: OffsetDirection
 }
 
+object Offset {
+   implicit class EstimateListExtension[V<:Offset:OffsetFactory](l: Seq[Estimate[V]]) {
+    def estimateSum: Estimate[V] =
+      l.reduceOption(Estimate.reduceInner[V](implicitly[OffsetFactory[V]].add))
+        .getOrElse(Actual[V](implicitly[OffsetFactory[V]].offset(0)))
+  }
+}
+
 trait AddressFactory[OffsetType <: Offset, AddressType<:Address[OffsetType]] {
   def zero: AddressType
   def add(address: AddressType, offset: OffsetType): AddressType
@@ -39,4 +47,3 @@ trait OffsetFactory[OffsetType] {
 trait PositionalOffsetFactory[OffsetType] extends OffsetFactory[OffsetType] {
   def offset(instructionSize: Int, offsetDirection: OffsetDirection, offsetValue: Long): OffsetType
 }
-

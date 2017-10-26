@@ -26,26 +26,32 @@ class EstimateSuite extends WordSpec with Matchers {
 
       "return the sum of minima and maxima for a set of bounded values" in {
         val estimates: List[Estimate[Int]] = List(Bounded(1, 1), Bounded(2, 2), Bounded(1, 3))
-        val result = estimates.reduce(Estimate.reduceInner[Int](_ + _))
+        val result = estimates.estimateSum
         result shouldBe Bounded(4, 6)
       }
 
       "return the sum of values for a set of Actual values" in {
         val estimates: List[Estimate[Int]] = List(Actual(5), Actual(2), Actual(3))
-        val result = estimates.reduce(Estimate.reduceInner[Int](_ + _))
+        val result = estimates.estimateSum
         result shouldBe Actual(10)
       }
 
       "return the sum of actual values added to the Bounded minima and maxima for a set of mixed Actual and Bounded values" in {
         val estimates: List[Estimate[Int]] = List(Actual(5), Bounded(2, 5), Actual(3), Bounded(4, 7))
-        val result = estimates.reduce(Estimate.reduceInner[Int](_ + _))
+        val result = estimates.estimateSum
         result shouldBe Bounded(14, 20)
       }
 
       "return Unknown for a set of values that contains an Unknown" in {
         val estimates: List[Estimate[Int]] = List(Actual(5), Unknown, Actual(3), Bounded(1, 4))
-        val result = estimates.reduce(Estimate.reduceInner[Int](_ + _))
+        val result = estimates.estimateSum
         result shouldBe Unknown
+      }
+
+      "return 0 for an empty list" in {
+        val estimates: List[Estimate[Int]] = List.empty[Estimate[Int]]
+        val result = estimates.estimateSum
+        result shouldBe Actual(0)
       }
     }
   }

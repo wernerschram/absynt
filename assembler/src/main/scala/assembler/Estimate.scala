@@ -28,6 +28,13 @@ object Estimate {
     case (actual1: Actual[V], actual2: Actual[V]) => Actual(operation(actual1.value, actual2.value))
     case (_, _) => Unknown
   }
+
+  implicit class EstimateListExtension[V:Numeric](l: Seq[Estimate[V]]) {
+    def estimateSum: Estimate[V] =
+      l.reduceOption(Estimate.reduceInner(implicitly[Numeric[V]].plus))
+        .getOrElse(Actual(implicitly[Numeric[V]].zero))
+  }
+
 }
 
 case class Bounded[V](minimum: V, maximum: V) extends Estimate[V] {
