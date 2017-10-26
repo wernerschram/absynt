@@ -19,6 +19,7 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Ad
 
         override def maximumSize: Int = encodableForAddress(bounded.maximum).size
       }
+      case _ => throw new AssertionError()
     }
   }
 }

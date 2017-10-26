@@ -28,45 +28,51 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
 
   private lazy val dependentReferencesInSection = dependentReferences.map{ _.toInSectionState(section) }
 
-  private lazy val independentMinimumDistance: Long = dependentResources.map { _.minimumSize }.sum
-  private lazy val independentMaximumDistance: Long = dependentResources.map { _.maximumSize }.sum
+  import Estimate._
+  private lazy val independentEstimatedDistance: Estimate[Long] =
+    dependentResources
+      .map { v => Estimate[Long](v.minimumSize, v.maximumSize) }.estimateSum
 
-  private def minimumDistance: Long =
+  private def estimatedDistance: Estimate[Long] = Estimate(
     dependentReferencesInSection.map(instruction =>
       if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum +
-      independentMinimumDistance
-
-  private def maximumDistance: Long =
+        independentEstimatedDistance.tempMinimum,
     dependentReferencesInSection.map(instruction =>
       if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum +
-      independentMaximumDistance
+        independentEstimatedDistance.tempMaximum
+ )
 
   lazy val actualOffset: OffsetType = {
-    assert(independentMinimumDistance == independentMaximumDistance)
-    val distance = dependentReferencesInSection.map { _.size }.sum + independentMinimumDistance
-    positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
+    independentEstimatedDistance match {
+      case a: Actual[Long] =>
+        val distance = dependentReferencesInSection.map { _.size }.sum + a.value
+        positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
+      case _ => throw new AssertionError()
+    }
   }
 
-  def minimumEstimatedSize: Int = sizeForDistance(offsetDirection, minimumDistance)
-  def maximumEstimatedSize: Int = sizeForDistance(offsetDirection, maximumDistance)
+  def estimatedSize: Estimate[Int] = estimatedDistance.map(e => sizeForDistance(offsetDirection, e))
 
   private var _estimatedSize: Option[Int] = None
 
   def isEstimated: Boolean = _estimatedSize.isDefined
 
   private def predictedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
-    assert(independentMinimumDistance == independentMaximumDistance)
-    dependentReferencesInSection.map { instruction =>
-        if (sizeAssumptions.contains(instruction))
-          sizeAssumptions(instruction)
-        else
-          instruction.estimateSize(sizeAssumptions)
-      }.sum + independentMinimumDistance
+    independentEstimatedDistance match {
+      case a: Actual[Long] =>
+        dependentReferencesInSection.map { (instruction) =>
+          if (sizeAssumptions.contains(instruction))
+            sizeAssumptions(instruction)
+          else
+            instruction.estimateSize(sizeAssumptions)
+        }.sum + a.value
+      case _ => throw new AssertionError()
+    }
   }
 
   def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
     var assumption: Option[Int] = None
-    var newAssumption = minimumEstimatedSize
+    var newAssumption = estimatedSize.tempMinimum
     while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
       newAssumption = sizeForDistance(offsetDirection, predictedOffset(sizeAssumptions + (this -> assumption.get)))
@@ -76,10 +82,9 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
 
   def size: Int = {
     if (_estimatedSize.isEmpty) {
-      if (minimumEstimatedSize == maximumEstimatedSize) {
-        _estimatedSize = Some(minimumEstimatedSize)
-      } else {
-        _estimatedSize = Some(estimateSize(collection.immutable.HashMap()))
+      estimatedSize match {
+        case actual: Actual[Int] => _estimatedSize = Some(actual.value)
+        case _ => _estimatedSize = Some(estimateSize(collection.immutable.HashMap()))
       }
     }
     _estimatedSize.get
