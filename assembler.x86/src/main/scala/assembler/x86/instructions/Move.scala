@@ -198,7 +198,7 @@ object Move {
             throw new AssertionError
        }
 
-    AbsoluteReference[OffsetType, FarPointer[OffsetType]](targetLabel, size, size, label, encodableForPosition)
+    AbsoluteReference[OffsetType, FarPointer[OffsetType]](targetLabel, Actual(size), label, encodableForPosition)
   }
 
   def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic

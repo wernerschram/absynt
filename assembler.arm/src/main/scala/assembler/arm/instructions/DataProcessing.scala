@@ -6,7 +6,7 @@ import assembler.arm.operands.{ArmOffset, RelativeA32Pointer, RightRotateImmedia
 import assembler.arm.operations._
 import assembler.arm.{ArmOffsetFactory, ProcessorMode}
 import assembler.reference.AbsoluteReference
-import assembler.{Encodable, Label, Resource, ResourceCollection}
+import assembler._
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -148,7 +148,7 @@ Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
     (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset, RelativeA32Pointer] =
-    AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, 4, 4, label, (position: RelativeA32Pointer) =>
+    AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, Actual(4), label, (position: RelativeA32Pointer) =>
       forConstant(position.toLong.toInt, destination, condition))
 }
 

@@ -23,11 +23,11 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Ad
 }
 
 object AbsoluteReference {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, initialMinimumSize: Int, initialMaximumSize: Int, label: Label,
+  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, initialEstimatedSize: Estimate[Int], label: Label,
     encodableFactory: (AddressType)=>Resource with Encodable) =
     new AbsoluteReference[OffsetType, AddressType](target, label) {
       override def encodableForAddress(position: AddressType): Resource with Encodable = encodableFactory(position)
 
-      override def estimateSize: Estimate[Int] = Estimate(initialMinimumSize, initialMaximumSize)
+      override def estimateSize: Estimate[Int] = initialEstimatedSize
     }
 }
