@@ -15,9 +15,7 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Ad
         override def encodableForAddress(position: AddressType): Resource with Encodable =
           AbsoluteReference.this.encodableForAddress(position)
 
-        override def minimumSize: Int = encodableForAddress(bounded.minimum).size
-
-        override def maximumSize: Int = encodableForAddress(bounded.maximum).size
+        override def estimateSize: Estimate[Int] = bounded.map(encodableForAddress(_).size)
       }
       case _ => throw new AssertionError()
     }
@@ -30,8 +28,6 @@ object AbsoluteReference {
     new AbsoluteReference[OffsetType, AddressType](target, label) {
       override def encodableForAddress(position: AddressType): Resource with Encodable = encodableFactory(position)
 
-      override def minimumSize: Int = initialMinimumSize
-      override def maximumSize: Int = initialMaximumSize
-
+      override def estimateSize: Estimate[Int] = Estimate(initialMinimumSize, initialMaximumSize)
     }
 }

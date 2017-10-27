@@ -24,11 +24,11 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
 
   def estimatedOffset(label: Label): Estimate[OffsetType] =
     content.takeWhile(current => current.label != label)
-      .map(e => Estimate(e.minimumSize, e.maximumSize)).estimateSum.map(offset(_))
+      .map(_.estimateSize).estimateSum.map(offset(_))
 
   def estimatedOffset(encodable: Resource): Estimate[OffsetType] =
     content.takeWhile(current => current != encodable)
-      .map(e => Estimate(e.minimumSize, e.maximumSize)).estimateSum.map(offset(_))
+      .map(_.estimateSize).estimateSum.map(offset(_))
 
   def precedingResources(target: Label): List[Resource] =
     content.takeWhile(x => !x.label.matches(target))

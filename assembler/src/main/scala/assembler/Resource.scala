@@ -3,8 +3,7 @@ package assembler
 trait Resource {
   def label: Label
 
-  def minimumSize: Int
-  def maximumSize: Int
+  def estimateSize: Estimate[Int]
 
   lazy val labelPrefix: String =
     label match {
@@ -19,8 +18,7 @@ trait Encodable extends Resource {
   self: Resource =>
   def encodeByte: Seq[Byte]
 
-  override def minimumSize: Int = size
-  override def maximumSize: Int = size
+  override def estimateSize: Estimate[Int] = Actual(size)
 
   def size: Int
 

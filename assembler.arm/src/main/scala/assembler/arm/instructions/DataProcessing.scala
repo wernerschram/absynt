@@ -147,13 +147,7 @@ Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset, RelativeA32Pointer] {
-    def encodableForAddress(position: RelativeA32Pointer): Resource with Encodable
-
-    def maximumSize: Int
-
-    def minimumSize: Int
-  } =
+    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset, RelativeA32Pointer] =
     AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, 4, 4, label, (position: RelativeA32Pointer) =>
       forConstant(position.toLong.toInt, destination, condition))
 }

@@ -12,8 +12,8 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
   extends RelativeReference[ArmOffset] with NamedConditional {
 
   val instructionSize = 4
-  override val minimumSize: Int = instructionSize
-  override val maximumSize: Int = instructionSize
+
+  override def estimateSize: Estimate[Int] = Actual(instructionSize)
 
   override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = instructionSize
 

@@ -10,8 +10,7 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](val
 
   val shortJumpSize: Int = shortOpcode.length + 1
 
-  override val minimumSize: Int = shortJumpSize
-  override val maximumSize: Int = shortJumpSize
+  override def estimateSize: Estimate[Int] = Actual(shortJumpSize)
 
   def encodableForShortPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 

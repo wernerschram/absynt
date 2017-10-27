@@ -18,7 +18,7 @@ trait RelativeReference[OffsetType<:Offset]
   implicit def offsetFactory: PositionalOffsetFactory[OffsetType]
 
   def toInSectionState(section: Section[OffsetType]): RelativeReferenceInSection[OffsetType] =
-    sectionMap.getOrElseUpdate(section, new RelativeReferenceInSection[OffsetType](target, label, minimumSize, maximumSize,
+    sectionMap.getOrElseUpdate(section, new RelativeReferenceInSection[OffsetType](target, label, estimateSize,
       encodableForOffset, sizeForDistance,
       section.intermediateEncodables(this), section.offsetDirection(this))(section, offsetFactory))
 }

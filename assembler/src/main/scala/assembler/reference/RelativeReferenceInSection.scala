@@ -5,7 +5,7 @@ import assembler.sections.Section
 
 class RelativeReferenceInSection[OffsetType<:Offset] (
   private val destination: Label, val label: Label,
-  override val minimumSize: Int, override val maximumSize: Int,
+  override val estimateSize: Estimate[Int],
   val encodableForOffset: (OffsetType)=> Resource with Encodable,
   val sizeForDistance: (OffsetDirection, Long)=> Int,
   val intermediateInstructions: Seq[Resource],
@@ -28,23 +28,17 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
 
   private lazy val dependentReferencesInSection = dependentReferences.map{ _.toInSectionState(section) }
 
-  import Estimate._
-  private lazy val independentEstimatedDistance: Estimate[Long] =
+  private lazy val independentEstimatedDistance: Estimate[Int] =
     dependentResources
-      .map { v => Estimate[Long](v.minimumSize, v.maximumSize) }.estimateSum
+      .map { v => v.estimateSize }.estimateSum
 
-  private def estimatedDistance: Estimate[Long] = Estimate(
-    dependentReferencesInSection.map(instruction =>
-      if (instruction.isEstimated) instruction.size else instruction.minimumSize).sum +
-        independentEstimatedDistance.tempMinimum,
-    dependentReferencesInSection.map(instruction =>
-      if (instruction.isEstimated) instruction.size else instruction.maximumSize).sum +
-        independentEstimatedDistance.tempMaximum
- )
+  private def estimatedDistance: Estimate[Int] =
+   (dependentReferencesInSection.map(instruction =>
+      if (instruction.isEstimated) Actual(instruction.size) else instruction.estimateSize) :+ independentEstimatedDistance).estimateSum
 
   lazy val actualOffset: OffsetType = {
     independentEstimatedDistance match {
-      case a: Actual[Long] =>
+      case a: Actual[Int] =>
         val distance = dependentReferencesInSection.map { _.size }.sum + a.value
         positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
       case _ => throw new AssertionError()
@@ -59,7 +53,7 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
 
   private def predictedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
     independentEstimatedDistance match {
-      case a: Actual[Long] =>
+      case a: Actual[Int] =>
         dependentReferencesInSection.map { (instruction) =>
           if (sizeAssumptions.contains(instruction))
             sizeAssumptions(instruction)
