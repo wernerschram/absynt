@@ -65,8 +65,9 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
   }
 
   def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
+    assert(estimateSize.isInstanceOf[Bounded[Int]])
     var assumption: Option[Int] = None
-    var newAssumption = estimatedSize.tempMinimum
+    var newAssumption = estimatedSize.asInstanceOf[Bounded[Int]].minimum
     while (assumption.isEmpty || assumption.get < newAssumption) {
       assumption = Some(newAssumption)
       newAssumption = sizeForDistance(offsetDirection, predictedOffset(sizeAssumptions + (this -> assumption.get)))

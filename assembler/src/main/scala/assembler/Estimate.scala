@@ -1,10 +1,6 @@
 package assembler
 
-import scala.runtime.Nothing$
-
 sealed trait Estimate[+V] {
-  def tempMinimum: V
-  def tempMaximum: V
   def map[T](operation: (V) => T): Estimate[T]
 }
 
@@ -38,19 +34,13 @@ object Estimate {
 }
 
 case class Bounded[V](minimum: V, maximum: V) extends Estimate[V] {
-  val tempMinimum: V = minimum
-  val tempMaximum: V = maximum
   def map[T](operation: (V) => T): Estimate[T] = Bounded(operation(minimum), operation(maximum))
 }
 
 case class Actual[V](value: V) extends Estimate[V] {
-  val tempMinimum: V = value
-  val tempMaximum: V = value
   def map[T](operation: (V) => T): Estimate[T] = Actual(operation(value))
 }
 
 case object Unknown extends Estimate[Nothing] {
-  def tempMinimum: Nothing = ???
-  def tempMaximum: Nothing = ???
   def map[T](operation: (Nothing) => T): Estimate[T] = Unknown
 }

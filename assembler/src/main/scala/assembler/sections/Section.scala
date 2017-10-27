@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 import scala.language.implicitConversions
 
 abstract class Section[OffsetType<:Offset:OffsetFactory] {
-  val content: List[Resource]
+  def content: List[Resource]
 
   def name: String
 
@@ -94,10 +94,13 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
 trait LastIteration[OffsetType<:Offset] {
   iteration: Section[OffsetType] =>
 
-  val finalContent: List[Resource with Encodable]
+  def finalContent: List[Resource with Encodable]
 
-  def offset(label: Label): OffsetType = estimatedOffset(label).tempMinimum
-  def offset(encodable: Resource): OffsetType = estimatedOffset(encodable).tempMaximum
+  //assert(!finalContent.exists(r => r.estimateSize.isInstanceOf[Bounded[OffsetType]]))
+
+
+  def offset(label: Label): OffsetType = estimatedOffset(label).asInstanceOf[Actual[OffsetType]].value
+  def offset(encodable: Resource): OffsetType = estimatedOffset(encodable).asInstanceOf[Actual[OffsetType]].value
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 
