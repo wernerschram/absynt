@@ -3,9 +3,11 @@ package assembler.reference
 import assembler._
 import assembler.sections.Section
 
+import scala.annotation.tailrec
+
 class RelativeReferenceInSection[OffsetType<:Offset] (
   private val destination: Label, val label: Label,
-  override val estimateSize: Estimate[Int],
+  val initialEstimatedSize: Estimate[Int],
   val encodableForOffset: (OffsetType)=> Resource with Encodable,
   val sizeForDistance: (OffsetDirection, Long)=> Int,
   val intermediateInstructions: Seq[Resource],
@@ -13,77 +15,66 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
   )(implicit section: Section[OffsetType],
   positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
 
-  def encodeForDistance(offset: OffsetType): Seq[Byte] =
-    encodableForOffset(offset).encodeByte
-
-  def toFinalState = encodableForOffset(actualOffset)
-
   private lazy val (
     dependentReferences: Seq[RelativeReference[OffsetType]],
-    dependentResources: Seq[Resource]) =
+    independentResources: Seq[Resource]) =
   intermediateInstructions.partition {
-     case _: RelativeReference[OffsetType] => true
-     case _ => false
+    case _: RelativeReference[OffsetType] => true
+    case _ => false
   }
 
-  private lazy val dependentReferencesInSection = dependentReferences.map{ _.toInSectionState(section) }
+  private lazy val dependentReferencesInSection: Seq[RelativeReferenceInSection[OffsetType]] =
+    dependentReferences.map(_.toInSectionState(section))
 
   private lazy val independentEstimatedDistance: Estimate[Int] =
-    dependentResources
-      .map { v => v.estimateSize }.estimateSum
+    independentResources.map(_.estimateSize).estimateSum
 
   private def estimatedDistance: Estimate[Int] =
-   (dependentReferencesInSection.map(instruction =>
-      if (instruction.isEstimated) Actual(instruction.size) else instruction.estimateSize) :+ independentEstimatedDistance).estimateSum
+    intermediateInstructions.map(_.estimateSize).estimateSum
 
-  lazy val actualOffset: OffsetType = {
-    independentEstimatedDistance match {
-      case a: Actual[Int] =>
-        val distance = dependentReferencesInSection.map { _.size }.sum + a.value
-        positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
-      case _ => throw new AssertionError()
-    }
+  private lazy val actualOffset: OffsetType = independentEstimatedDistance match {
+    case a: Actual[Int] =>
+      val distance = dependentReferencesInSection.map { _.size }.sum + a.value
+      positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
+    case _ => throw new AssertionError()
   }
 
-  def estimatedSize: Estimate[Int] = estimatedDistance.map(e => sizeForDistance(offsetDirection, e))
+  private def currentEstimatedSize: Estimate[Int] = estimatedDistance.map(e => sizeForDistance(offsetDirection, e))
 
   private var _estimatedSize: Option[Int] = None
 
   def isEstimated: Boolean = _estimatedSize.isDefined
 
   private def predictedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
+    assert(currentEstimatedSize.isInstanceOf[Bounded[Int]])
     independentEstimatedDistance match {
       case a: Actual[Int] =>
         dependentReferencesInSection.map { (instruction) =>
-          if (sizeAssumptions.contains(instruction))
-            sizeAssumptions(instruction)
-          else
-            instruction.estimateSize(sizeAssumptions)
+          sizeAssumptions.getOrElse(instruction,
+            instruction.estimateSize(currentEstimatedSize.asInstanceOf[Bounded[Int]].minimum, sizeAssumptions))
         }.sum + a.value
       case _ => throw new AssertionError()
     }
   }
 
-  def estimateSize(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
-    assert(estimateSize.isInstanceOf[Bounded[Int]])
-    var assumption: Option[Int] = None
-    var newAssumption = estimatedSize.asInstanceOf[Bounded[Int]].minimum
-    while (assumption.isEmpty || assumption.get < newAssumption) {
-      assumption = Some(newAssumption)
-      newAssumption = sizeForDistance(offsetDirection, predictedOffset(sizeAssumptions + (this -> assumption.get)))
-    }
-    newAssumption
+  @tailrec
+  private[RelativeReferenceInSection] final def estimateSize(assumption: Int, sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
+    val newSize = sizeForDistance(offsetDirection, predictedOffset(sizeAssumptions + (this -> assumption)))
+    if (newSize < assumption) estimateSize(newSize, sizeAssumptions) else newSize
   }
+
+  override def estimateSize: Estimate[Int] = if (isEstimated) Actual(size) else initialEstimatedSize
 
   def size: Int = {
     if (_estimatedSize.isEmpty) {
-      estimatedSize match {
+      currentEstimatedSize match {
         case actual: Actual[Int] => _estimatedSize = Some(actual.value)
-        case _ => _estimatedSize = Some(estimateSize(collection.immutable.HashMap()))
+        case bounded: Bounded[Int] => _estimatedSize = Some(estimateSize(bounded.minimum, collection.immutable.HashMap()))
+        case _ => throw new AssertionError()
       }
     }
     _estimatedSize.get
   }
 
-  lazy val encodeByte: Seq[Byte] = encodeForDistance(actualOffset)
+  lazy val encodeByte: Seq[Byte] = encodableForOffset(actualOffset).encodeByte
 }
