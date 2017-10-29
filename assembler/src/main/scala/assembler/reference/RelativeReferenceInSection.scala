@@ -5,15 +5,16 @@ import assembler.sections.Section
 
 import scala.annotation.tailrec
 
-class RelativeReferenceInSection[OffsetType<:Offset] (
-  private val destination: Label, val label: Label,
+class RelativeReferenceInSection[OffsetType<:Offset] private(
+  val section: Section[OffsetType],
+  val destination: Label,
+  val label: Label,
   val initialEstimatedSize: Estimate[Int],
-  val encodableForOffset: (OffsetType)=> Resource with Encodable,
-  val sizeForDistance: (OffsetDirection, Long)=> Int,
+  encodableForOffset: (OffsetType)=> Resource with Encodable,
+  sizeForDistance: (OffsetDirection, Long)=> Int,
   val intermediateInstructions: Seq[Resource],
   val offsetDirection: OffsetDirection
-  )(implicit section: Section[OffsetType],
-  positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
+  )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
 
   private lazy val (
     dependentReferences: Seq[RelativeReference[OffsetType]],
@@ -77,4 +78,12 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
   }
 
   lazy val encodeByte: Seq[Byte] = encodableForOffset(actualOffset).encodeByte
+}
+
+object RelativeReferenceInSection {
+  def apply[OffsetType<:Offset](section: Section[OffsetType], reference: RelativeReference[OffsetType],
+    intermediateInstructions: Seq[Resource], offsetDirection: OffsetDirection):
+  RelativeReferenceInSection[OffsetType] =
+    new RelativeReferenceInSection(section, reference.target, reference.label, reference.estimateSize,
+      reference.encodableForOffset, reference.sizeForDistance, intermediateInstructions, offsetDirection)(reference.offsetFactory)
 }
