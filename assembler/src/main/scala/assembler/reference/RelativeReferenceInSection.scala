@@ -45,7 +45,7 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
 
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def predictedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
+  private def estimatedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
     assert(currentEstimatedSize.isInstanceOf[Bounded[Int]])
     independentEstimatedDistance match {
       case a: Actual[Int] =>
@@ -59,7 +59,7 @@ class RelativeReferenceInSection[OffsetType<:Offset] (
 
   @tailrec
   private[RelativeReferenceInSection] final def estimateSize(assumption: Int, sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
-    val newSize = sizeForDistance(offsetDirection, predictedOffset(sizeAssumptions + (this -> assumption)))
+    val newSize = sizeForDistance(offsetDirection, estimatedOffset(sizeAssumptions + (this -> assumption)))
     if (newSize < assumption) estimateSize(newSize, sizeAssumptions) else newSize
   }
 
