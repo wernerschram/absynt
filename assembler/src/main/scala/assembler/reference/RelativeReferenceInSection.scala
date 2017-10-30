@@ -17,19 +17,15 @@ class RelativeReferenceInSection[OffsetType<:Offset] private(
   )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
 
   private lazy val (
-    dependentReferences: Seq[RelativeReference[OffsetType]],
-    independentResources: Seq[Resource]) =
-  intermediateInstructions.partition {
-    case _: RelativeReference[OffsetType] => true
-    case _ => false
+    dependentReferencesInSection: Seq[RelativeReferenceInSection[OffsetType]],
+    independentEstimatedDistance: Estimate[Int]) = {
+    val (dependent: Seq[RelativeReference[OffsetType]], independent: Seq[Resource]) =
+      intermediateInstructions.partition {
+        case _: RelativeReference[OffsetType] => true
+        case _ => false
+      }
+    (dependent.map(_.toInSectionState(section)), independent.map(_.estimateSize).estimateSum))
   }
-
-  private lazy val dependentReferencesInSection: Seq[RelativeReferenceInSection[OffsetType]] =
-    dependentReferences.map(_.toInSectionState(section))
-
-  private lazy val independentEstimatedDistance: Estimate[Int] =
-    independentResources.map(_.estimateSize).estimateSum
-
   private def estimatedDistance: Estimate[Int] =
     intermediateInstructions.map(_.estimateSize).estimateSum
 
