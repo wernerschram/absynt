@@ -5,10 +5,11 @@ import assembler.sections.Section
 
 import scala.annotation.tailrec
 
-class RelativeReferenceInSection[OffsetType<:Offset] private(
+class BoundRelativeReference[OffsetType<:Offset] private(
   val section: Section[OffsetType],
   val destination: Label,
   val label: Label,
+  val reference: RelativeReference[OffsetType],
   val initialEstimatedSize: Estimate[Int],
   encodableForOffset: (OffsetType)=> Resource with Encodable,
   sizeForDistance: (OffsetDirection, Long)=> Int,
@@ -17,21 +18,21 @@ class RelativeReferenceInSection[OffsetType<:Offset] private(
   )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
 
   private lazy val (
-    dependentReferencesInSection: Seq[RelativeReferenceInSection[OffsetType]],
+    dependentReferencesInSection: Seq[RelativeReference[OffsetType]],
     independentEstimatedDistance: Estimate[Int]) = {
     val (dependent: Seq[RelativeReference[OffsetType]], independent: Seq[Resource]) =
       intermediateInstructions.partition {
         case _: RelativeReference[OffsetType] => true
         case _ => false
       }
-    (dependent.map(_.toInSectionState(section)), independent.map(_.estimateSize).estimateSum))
+    (dependent, independent.map(_.estimateSize).estimateSum)
   }
   private def estimatedDistance: Estimate[Int] =
     intermediateInstructions.map(_.estimateSize).estimateSum
 
   private lazy val actualOffset: OffsetType = independentEstimatedDistance match {
     case a: Actual[Int] =>
-      val distance = dependentReferencesInSection.map { _.size }.sum + a.value
+      val distance = dependentReferencesInSection.map { _.size(section) }.sum + a.value
       positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
     case _ => throw new AssertionError()
   }
@@ -42,21 +43,21 @@ class RelativeReferenceInSection[OffsetType<:Offset] private(
 
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def estimatedOffset(sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]) = {
+  private def estimatedOffset(sizeAssumptions: Map[RelativeReference[OffsetType], Int]) = {
     assert(currentEstimatedSize.isInstanceOf[Bounded[Int]])
     independentEstimatedDistance match {
       case a: Actual[Int] =>
         dependentReferencesInSection.map { (instruction) =>
           sizeAssumptions.getOrElse(instruction,
-            instruction.estimateSize(currentEstimatedSize.asInstanceOf[Bounded[Int]].minimum, sizeAssumptions))
+            instruction.estimateSize(currentEstimatedSize.asInstanceOf[Bounded[Int]].minimum, sizeAssumptions)(section))
         }.sum + a.value
       case _ => throw new AssertionError()
     }
   }
 
   @tailrec
-  private[RelativeReferenceInSection] final def estimateSize(assumption: Int, sizeAssumptions: Map[RelativeReferenceInSection[OffsetType], Int]): Int = {
-    val newSize = sizeForDistance(offsetDirection, estimatedOffset(sizeAssumptions + (this -> assumption)))
+  final def estimateSize(assumption: Int, sizeAssumptions: Map[RelativeReference[OffsetType], Int]): Int = {
+    val newSize = sizeForDistance(offsetDirection, estimatedOffset(sizeAssumptions + (this.reference -> assumption)))
     if (newSize < assumption) estimateSize(newSize, sizeAssumptions) else newSize
   }
 
@@ -76,10 +77,10 @@ class RelativeReferenceInSection[OffsetType<:Offset] private(
   lazy val encodeByte: Seq[Byte] = encodableForOffset(actualOffset).encodeByte
 }
 
-object RelativeReferenceInSection {
+object BoundRelativeReference {
   def apply[OffsetType<:Offset](section: Section[OffsetType], reference: RelativeReference[OffsetType],
     intermediateInstructions: Seq[Resource], offsetDirection: OffsetDirection):
-  RelativeReferenceInSection[OffsetType] =
-    new RelativeReferenceInSection(section, reference.target, reference.label, reference.estimateSize,
+  BoundRelativeReference[OffsetType] =
+    new BoundRelativeReference(section, reference.target, reference.label, reference, reference.estimateSize,
       reference.encodableForOffset, reference.sizeForDistance, intermediateInstructions, offsetDirection)(reference.offsetFactory)
 }

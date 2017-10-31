@@ -13,12 +13,20 @@ trait RelativeReference[OffsetType<:Offset]
 
   def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int
 
-  private val sectionMap = new TrieMap[Section[OffsetType], RelativeReferenceInSection[OffsetType]]
+  private val sectionMap = new TrieMap[Section[OffsetType], BoundRelativeReference[OffsetType]]
+
+  final def estimateSize(
+    assumption: Int, sizeAssumptions: Map[RelativeReference[OffsetType], Int])
+    (section: Section[OffsetType]): Int =
+      toInSectionState(section).estimateSize(assumption, sizeAssumptions)
+
+  final def size(section: Section[OffsetType]): Int =
+    toInSectionState(section).size
 
   implicit def offsetFactory: PositionalOffsetFactory[OffsetType]
 
-  def toInSectionState(section: Section[OffsetType]): RelativeReferenceInSection[OffsetType] =
-    sectionMap.getOrElseUpdate(section, RelativeReferenceInSection[OffsetType](section, this,
+  def toInSectionState(section: Section[OffsetType]): BoundRelativeReference[OffsetType] =
+    sectionMap.getOrElseUpdate(section, BoundRelativeReference[OffsetType](section, this,
       section.intermediateEncodables(this), section.offsetDirection(this)))
 }
 
