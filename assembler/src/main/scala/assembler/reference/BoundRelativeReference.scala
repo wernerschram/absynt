@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 
 sealed class BoundRelativeReference[OffsetType<:Offset] private(
   val section: Section[OffsetType],
-  val reference: RelativeReference[OffsetType],
+  val reference: SinglePassRelativeReference[OffsetType],
   val initialEstimatedSize: Estimate[Int]
   )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
 
@@ -24,11 +24,11 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
   def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = reference.sizeForDistance(offsetDirection, distance)
 
   private lazy val (
-    dependentReferencesInSection: Seq[RelativeReference[OffsetType]],
+    dependentReferencesInSection: Seq[SinglePassRelativeReference[OffsetType]],
     independentEstimatedDistance: Estimate[Int]) = {
-    val (dependent: Seq[RelativeReference[OffsetType]], independent: Seq[Resource]) =
+    val (dependent: Seq[SinglePassRelativeReference[OffsetType]], independent: Seq[Resource]) =
       intermediateInstructions.partition {
-        case _: RelativeReference[OffsetType] => true
+        case _: SinglePassRelativeReference[OffsetType] => true
         case _ => false
       }
     (dependent, independent.map(_.estimateSize).estimateSum)
@@ -49,7 +49,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
 
   def isEstimated: Boolean = _estimatedSize.isDefined
 
-  private def estimatedOffset(sizeAssumptions: Map[RelativeReference[OffsetType], Int]) = {
+  private def estimatedOffset(sizeAssumptions: Map[SinglePassRelativeReference[OffsetType], Int]) = {
     assert(currentEstimatedSize.isInstanceOf[Bounded[Int]])
     independentEstimatedDistance match {
       case a: Actual[Int] =>
@@ -62,7 +62,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
   }
 
   @tailrec
-  final def estimateSize(assumption: Int, sizeAssumptions: Map[RelativeReference[OffsetType], Int]): Int = {
+  final def estimateSize(assumption: Int, sizeAssumptions: Map[SinglePassRelativeReference[OffsetType], Int]): Int = {
     val newSize = sizeForDistance(offsetDirection, estimatedOffset(sizeAssumptions + (this.reference -> assumption)))
     if (newSize < assumption) estimateSize(newSize, sizeAssumptions) else newSize
   }
@@ -84,7 +84,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
 }
 
 object BoundRelativeReference {
-  def apply[OffsetType<:Offset](section: Section[OffsetType], reference: RelativeReference[OffsetType]):
+  def apply[OffsetType<:Offset](section: Section[OffsetType], reference: SinglePassRelativeReference[OffsetType]):
   BoundRelativeReference[OffsetType] =
     new BoundRelativeReference(section, reference, reference.estimateSize)(reference.offsetFactory)
 }

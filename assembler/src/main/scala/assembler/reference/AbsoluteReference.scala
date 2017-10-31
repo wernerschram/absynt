@@ -2,7 +2,8 @@ package assembler.reference
 
 import assembler._
 
-sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, override val label: Label)
+sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Address[OffsetType]](
+  target: Label, override val label: Label)
     extends Reference {
 
   def encodableForAddress(position: AddressType): Resource with Encodable

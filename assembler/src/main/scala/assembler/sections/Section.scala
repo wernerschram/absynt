@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -39,7 +39,7 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
     * @param from
     * @return
     */
-  def intermediateEncodables(from: RelativeReference[OffsetType]): List[Resource] = {
+  def intermediateEncodables(from: SinglePassRelativeReference[OffsetType]): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
@@ -55,7 +55,7 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
       trimLeft.head :: trimRight
   }
 
-  def offsetDirection(from: RelativeReference[OffsetType]): OffsetDirection = {
+  def offsetDirection(from: SinglePassRelativeReference[OffsetType]): OffsetDirection = {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     if (firstInstruction.label.matches(from.target))
       if (firstInstruction==from)
@@ -68,7 +68,7 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
 
   private def nextContent[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): List[Resource] = {
     val newContent: List[Resource] = content.map {
-      case referencing: RelativeReference[OffsetType] =>
+      case referencing: SinglePassRelativeReference[OffsetType] =>
         referencing.bind(this)
 
       case absolute: AbsoluteReference[OffsetType, AddressType] =>

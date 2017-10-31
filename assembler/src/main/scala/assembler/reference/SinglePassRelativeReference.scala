@@ -5,7 +5,7 @@ import assembler.sections.Section
 
 import scala.collection.concurrent.TrieMap
 
-trait RelativeReference[OffsetType<:Offset]
+trait SinglePassRelativeReference[OffsetType<:Offset]
     extends Reference {
 
   def encodableForOffset(offset: OffsetType): Resource with Encodable
@@ -15,7 +15,7 @@ trait RelativeReference[OffsetType<:Offset]
   private val sectionMap = new TrieMap[Section[OffsetType], BoundRelativeReference[OffsetType]]
 
   final def estimateSize(
-    assumption: Int, sizeAssumptions: Map[RelativeReference[OffsetType], Int])
+    assumption: Int, sizeAssumptions: Map[SinglePassRelativeReference[OffsetType], Int])
     (section: Section[OffsetType]): Int =
       bind(section).estimateSize(assumption, sizeAssumptions)
 
