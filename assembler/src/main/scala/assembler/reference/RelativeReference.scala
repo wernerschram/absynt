@@ -6,8 +6,7 @@ import assembler.sections.Section
 import scala.collection.concurrent.TrieMap
 
 trait RelativeReference[OffsetType<:Offset]
-    extends Resource {
-  def target: Label
+    extends Reference {
 
   def encodableForOffset(offset: OffsetType): Resource with Encodable
 
