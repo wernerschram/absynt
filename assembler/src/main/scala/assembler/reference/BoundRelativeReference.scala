@@ -5,17 +5,23 @@ import assembler.sections.Section
 
 import scala.annotation.tailrec
 
-class BoundRelativeReference[OffsetType<:Offset] private(
+sealed class BoundRelativeReference[OffsetType<:Offset] private(
   val section: Section[OffsetType],
-  val destination: Label,
-  val label: Label,
   val reference: RelativeReference[OffsetType],
-  val initialEstimatedSize: Estimate[Int],
-  encodableForOffset: (OffsetType)=> Resource with Encodable,
-  sizeForDistance: (OffsetDirection, Long)=> Int,
-  val intermediateInstructions: Seq[Resource],
-  val offsetDirection: OffsetDirection
+  val initialEstimatedSize: Estimate[Int]
   )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
+
+  val destination: Label = reference.target
+
+  val label: Label = reference.label
+
+  def intermediateInstructions: Seq[Resource] = section.intermediateEncodables(reference)
+
+  def offsetDirection: OffsetDirection = section.offsetDirection(reference)
+
+  def encodableForOffset(offset: OffsetType): Resource with Encodable = reference.encodableForOffset(offset)
+
+  def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = reference.sizeForDistance(offsetDirection, distance)
 
   private lazy val (
     dependentReferencesInSection: Seq[RelativeReference[OffsetType]],
@@ -78,9 +84,7 @@ class BoundRelativeReference[OffsetType<:Offset] private(
 }
 
 object BoundRelativeReference {
-  def apply[OffsetType<:Offset](section: Section[OffsetType], reference: RelativeReference[OffsetType],
-    intermediateInstructions: Seq[Resource], offsetDirection: OffsetDirection):
+  def apply[OffsetType<:Offset](section: Section[OffsetType], reference: RelativeReference[OffsetType]):
   BoundRelativeReference[OffsetType] =
-    new BoundRelativeReference(section, reference.target, reference.label, reference, reference.estimateSize,
-      reference.encodableForOffset, reference.sizeForDistance, intermediateInstructions, offsetDirection)(reference.offsetFactory)
+    new BoundRelativeReference(section, reference, reference.estimateSize)(reference.offsetFactory)
 }
