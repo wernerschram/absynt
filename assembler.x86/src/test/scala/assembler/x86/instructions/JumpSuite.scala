@@ -175,7 +175,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("EB 01")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("EB 01")) }
       }
 
       "correctly represent jmp Label as a string" in {
@@ -193,9 +193,9 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
 
-        jump.toInSectionState(p).size should be(2)
+        jump.bind(p).size should be(2)
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E3 01")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("E3 01")) }
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
@@ -207,7 +207,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             jump))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("EB FC")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("EB FC")) }
       }
 
       "Encode a simple program with an indirect backward conditional on count zero short jump instruction" in {
@@ -219,7 +219,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             jump))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E3 FC")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("E3 FC")) }
       }
 
       "Encode a simple program with an indirect forward long jump instruction" in {
@@ -231,7 +231,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 00 01")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("E9 00 01")) }
       }
 
       "throw an AssertionError for a simple program with an indirect forward conditional on count zero long jump instruction" in {
@@ -243,7 +243,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        an[AssertionError] should be thrownBy { jump.toInSectionState(p).encodeByte }
+        an[AssertionError] should be thrownBy { jump.bind(p).encodeByte }
       }
 
       "Encode a simple program with an indirect backward long jump instruction" in {
@@ -255,7 +255,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             jump))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 FC FE")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("E9 FC FE")) }
       }
 
       "Encode a program with two indirect short jump instructions of which one jumps across the other" in {
@@ -271,8 +271,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))},
             jump1))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB F9")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 01")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("EB F9")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("EB 01")) }
       }
 
       "Encode a program with two indirect short jump instructions of which one depends on the size of the other for its size" in {
@@ -288,8 +288,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel = label2; EncodedByteList(List.fill(1)(0x00))},
             jump1))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB 80")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7A")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("EB 7A")) }
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where both can be short" in {
@@ -306,8 +306,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB 80")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7F")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("EB 7F")) }
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the second forces the first to be long" in {
@@ -324,8 +324,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(3)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7E FF")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("E9 7E FF")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("E9 81 00")) }
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the first forces the second to be long" in {
@@ -342,8 +342,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7D FF")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 80 00")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("E9 7D FF")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("E9 80 00")) }
       }
 
       "Encode a program with three indirect jump instructions that depends on the size of the others for its size where all jumps can be short" in {
@@ -365,9 +365,9 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
             { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("EB 80")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7F")) }
-        withClue("Jump3") { jump3.toInSectionState(p).encodeByte should be(Hex.lsb("EB 7F")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("EB 7F")) }
+        withClue("Jump3") { jump3.bind(p).encodeByte should be(Hex.lsb("EB 7F")) }
       }
 
       "Encode a program with three indirect jump instructions that depends on the size of the others for its size where instruction 3 forces the others to be long" in {
@@ -389,9 +389,9 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(63)(0x00))},
             { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7D FF")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
-        withClue("Jump3") { jump3.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("E9 7D FF")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("E9 81 00")) }
+        withClue("Jump3") { jump3.bind(p).encodeByte should be(Hex.lsb("E9 81 00")) }
       }
 
       "Encode a program with three indirect jump instructions that depends on the size of the others for its size where instruction 1 forces the others to be long" in {
@@ -413,9 +413,9 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
             { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump1") { jump1.toInSectionState(p).encodeByte should be(Hex.lsb("E9 7C FF")) }
-        withClue("Jump2") { jump2.toInSectionState(p).encodeByte should be(Hex.lsb("E9 81 00")) }
-        withClue("Jump3") { jump3.toInSectionState(p).encodeByte should be(Hex.lsb("E9 80 00")) }
+        withClue("Jump1") { jump1.bind(p).encodeByte should be(Hex.lsb("E9 7C FF")) }
+        withClue("Jump2") { jump2.bind(p).encodeByte should be(Hex.lsb("E9 81 00")) }
+        withClue("Jump3") { jump3.bind(p).encodeByte should be(Hex.lsb("E9 80 00")) }
       }
     }
 
@@ -547,7 +547,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             jump))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("EB FC")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("EB FC")) }
       }
 
       "Encode a simple program with an indirect backward long jump instruction" in {
@@ -559,7 +559,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             jump))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 FA FE FF FF")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("E9 FA FE FF FF")) }
       }
 
       "Encode a simple program with an indirect forward long jump instruction" in {
@@ -571,7 +571,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        withClue("Jump") { jump.toInSectionState(p).encodeByte should be(Hex.lsb("E9 00 01 00 00")) }
+        withClue("Jump") { jump.bind(p).encodeByte should be(Hex.lsb("E9 00 01 00 00")) }
       }
 
     }

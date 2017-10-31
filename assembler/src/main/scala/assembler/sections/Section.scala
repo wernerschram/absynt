@@ -69,10 +69,10 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
   private def nextContent[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): List[Resource] = {
     val newContent: List[Resource] = content.map {
       case referencing: RelativeReference[OffsetType] =>
-        referencing.toInSectionState(this)
+        referencing.bind(this)
 
       case absolute: AbsoluteReference[OffsetType, AddressType] =>
-        absolute.toInSectionState(currentApplication)
+        absolute.bind(currentApplication)
 
       case resource =>
         resource

@@ -151,7 +151,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             EncodedByteList(List.fill(8)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801f01"))
+        instruction.bind(p).encodeByte should be(Hex.msb("e2801f01"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the instruction is not at position 0" in {
@@ -161,7 +161,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
+        instruction.bind(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the target is before the instruction" in {
@@ -172,7 +172,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
-        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
+        instruction.bind(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
 
     }
@@ -310,7 +310,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
         val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+        instruction.bind(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
@@ -321,7 +321,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
         val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+        instruction.bind(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
@@ -333,7 +333,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
         val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
+        instruction.bind(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 
     }

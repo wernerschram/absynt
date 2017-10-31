@@ -17,13 +17,13 @@ trait RelativeReference[OffsetType<:Offset]
   final def estimateSize(
     assumption: Int, sizeAssumptions: Map[RelativeReference[OffsetType], Int])
     (section: Section[OffsetType]): Int =
-      toInSectionState(section).estimateSize(assumption, sizeAssumptions)
+      bind(section).estimateSize(assumption, sizeAssumptions)
 
   final def size(section: Section[OffsetType]): Int =
-    toInSectionState(section).size
+    bind(section).size
 
   implicit def offsetFactory: PositionalOffsetFactory[OffsetType]
 
-  def toInSectionState(section: Section[OffsetType]): BoundRelativeReference[OffsetType] =
+  def bind(section: Section[OffsetType]): BoundRelativeReference[OffsetType] =
     sectionMap.getOrElseUpdate(section, BoundRelativeReference[OffsetType](section, this))
 }
