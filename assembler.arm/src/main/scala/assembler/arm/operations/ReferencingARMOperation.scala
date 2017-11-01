@@ -11,7 +11,8 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
                                                    (implicit armOffsetFactory: ArmOffsetFactory)
   extends SinglePassRelativeReference[ArmOffset] with NamedConditional {
 
-  val instructionSize = 4
+  //FIXME: this is not correct for add.forRelativeLabel.
+ val instructionSize = 4
 
   override def estimateSize: Estimate[Int] = Actual(instructionSize)
 

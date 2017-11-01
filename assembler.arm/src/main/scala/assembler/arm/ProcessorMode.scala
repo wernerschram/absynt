@@ -28,6 +28,8 @@ object ProcessorMode {
             case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 4)
             case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - (instructionSize + 4))
           }
+          // FIXME: add.forRelativeLabel(pc, x, label) should result in the sum of the address of label and the address
+          // FIXME: of the first operation in the set produced by add.forConstant for the given target plus 8
 
           override def offset(offsetValue: Long): ArmOffset = offsetFactory.offset(offsetValue)
 
