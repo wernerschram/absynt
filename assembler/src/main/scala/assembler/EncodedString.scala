@@ -1,6 +1,6 @@
 package assembler
 
-class EncodedString private(val string: String)(override val label: Label) extends Resource with Encodable {
+class EncodedString private(val string: String)(override val label: Label) extends Encodable {
   def encodeByte: List[Byte] = string.getBytes.toList
 
   def size: Int = string.length()

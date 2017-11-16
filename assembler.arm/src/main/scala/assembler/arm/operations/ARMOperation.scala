@@ -4,14 +4,13 @@ import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
 import assembler.{Resource, Encodable}
 
-trait NamedOperation extends Resource {
+trait NamedOperation {
   val opcode: String
 
   def mnemonic: List[PartialName] = PartialName(opcode, 0) :: Nil
 
   lazy val mnemonicString: String = mnemonic.sortBy { part => part.order }.map { part => part.name }.mkString
 
-  override def toString: String = s"$labelPrefix$mnemonicString"
 }
 
 trait ARMOperation extends NamedOperation with Encodable {
@@ -20,6 +19,8 @@ trait ARMOperation extends NamedOperation with Encodable {
   override def encodeByte: Seq[Byte] = encodeWord.encodeLittleEndian
 
   def encodeWord: Int = 0
+
+  override def toString: String = s"$labelPrefix$mnemonicString"
 }
 
 object ARMOperation {

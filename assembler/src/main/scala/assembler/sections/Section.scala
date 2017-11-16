@@ -39,7 +39,7 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
     * @param from
     * @return
     */
-  def intermediateEncodables(from: SinglePassRelativeReference[OffsetType]): List[Resource] = {
+  def intermediateEncodables(from: Reference): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 

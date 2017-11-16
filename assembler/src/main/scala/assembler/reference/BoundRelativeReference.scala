@@ -9,7 +9,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
   val section: Section[OffsetType],
   val reference: SinglePassRelativeReference[OffsetType],
   val initialEstimatedSize: Estimate[Int]
-  )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Resource with Encodable {
+  )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Encodable {
 
   val destination: Label = reference.target
 

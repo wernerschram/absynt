@@ -87,6 +87,9 @@ object Add extends DataProcessing(0x04.toByte, "add") {
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
       override def encodableForOffset(offset: ArmOffset): ResourceCollection =
         forConstant(source1, offset.offset, destination, condition)
+
+      override def encodeForDistance(distance: Int) =
+      forConstant(source1, distance, destination, condition)
     }
 }
 
@@ -135,8 +138,7 @@ object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
   }
 }
 
-object
-Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
+object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always)
     (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ResourceCollection = {
     if (source2 == 0)
@@ -148,8 +150,9 @@ Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
     (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset, RelativeA32Pointer] =
-    AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, Actual(4), label, (position: RelativeA32Pointer) =>
-      forConstant(position.toLong.toInt, destination, condition))
+    AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, Actual(4), 4 :: Nil, label, (position: RelativeA32Pointer) =>
+      forConstant(position.toLong.toInt, destination, condition), (position: Int) =>
+      forConstant(position, destination, condition))
 }
 
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")

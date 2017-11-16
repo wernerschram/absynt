@@ -2,7 +2,7 @@ package assembler
 
 import assembler.ListExtensions._
 
-trait EncodedByteList extends Resource with Encodable {
+trait EncodedByteList extends Encodable {
   val bytes: List[Byte]
 
   def encodeByte: List[Byte] = bytes

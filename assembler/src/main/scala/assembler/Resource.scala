@@ -1,6 +1,6 @@
 package assembler
 
-trait Resource {
+sealed trait Resource {
   def label: Label
 
   def estimateSize: Estimate[Int]
@@ -15,11 +15,20 @@ trait Resource {
 }
 
 trait Encodable extends Resource {
-  self: Resource =>
   def encodeByte: Seq[Byte]
 
   override def estimateSize: Estimate[Int] = Actual(size)
 
   def size: Int
-
 }
+
+trait Reference extends Resource {
+  def target: Label
+
+  def encodeForDistance(distance: Int): Resource with Encodable
+
+  def sizeForDistance(distance: Int): Int
+
+  def possibleSizes: Seq[Int]
+}
+

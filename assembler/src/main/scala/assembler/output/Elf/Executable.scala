@@ -1,13 +1,14 @@
 package assembler.output.Elf
 
 import assembler._
+import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
 import assembler.sections.{LastIteration, Section}
 
 abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   val architecture: Architecture,
   sections: List[Section[OffsetType]],
   val entryLabel: Label)
-  (implicit addressFactory: AddressFactory[OffsetType, AddressType]) extends Application[OffsetType, AddressType](sections) {
+  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) extends Application[OffsetType, AddressType](sections) {
 
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
 
@@ -108,14 +109,22 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
   architecture: Architecture,
   sections: List[Section[OffsetType]],
   entryLabel: Label)
-  (implicit addressFactory: AddressFactory[OffsetType, AddressType])
+  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
   extends Elf[OffsetType, AddressType](architecture, sections, entryLabel) {
   override def elfType: ElfType = ElfType.Executable
 
+  override def intermediateResources(from: Reference) = from match {
+    case relative: SinglePassRelativeReference[OffsetType] => sections.filter(s => s.contains(from)).head.intermediateEncodables(relative)
+    case absolute: AbsoluteReference[OffsetType, AddressType] => {
+      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
+      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r != absolute.target)
+    }
+  }
 }
 
 object Executable {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](architecture: Architecture, sections: List[Section[OffsetType]], entryLabel: Label)(implicit addressFactory: AddressFactory[OffsetType, AddressType]) =
+  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](architecture: Architecture, sections: List[Section[OffsetType]], entryLabel: Label)
+    (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) =
     new Executable(architecture, sections, entryLabel)
 }
 

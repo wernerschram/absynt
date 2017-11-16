@@ -29,18 +29,26 @@ class LoadStoreRegister(
           (implicit label: Label, processorMode: ProcessorMode): LoadStore =
     ImmedByte(label, condition, register, baseRegister, offset, addressingType)
 
-  def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory) =
+  def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, Always) {
 
       override def encodableForOffset(offset: ArmOffset): LoadStore =
         ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
         LoadStoreAddressingTypeNormal.OffsetNormal)
+
+      override def encodeForDistance(distance: Int): LoadStore =
+        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(distance.toShort),
+        LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
-  def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, armOffsetFactory: ArmOffsetFactory) =
+  def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, condition) {
       override def encodableForOffset(offset: ArmOffset): LoadStore =
         ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
+        LoadStoreAddressingTypeNormal.OffsetNormal)
+
+      override def encodeForDistance(distance: Int): LoadStore =
+        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(distance.toShort),
         LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 

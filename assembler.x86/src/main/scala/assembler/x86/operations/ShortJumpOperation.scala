@@ -6,7 +6,7 @@ import assembler._
 import assembler.x86.X86OffsetFactory
 
 abstract class ShortJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
-  extends Resource with SinglePassRelativeReference[OffsetType] {
+  extends SinglePassRelativeReference[OffsetType] {
 
   val shortJumpSize: Int = shortOpcode.length + 1
 
@@ -17,6 +17,12 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](val
   override def toString = s"$labelPrefix$mnemonic $target"
 
   override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = shortJumpSize
+
+  override def encodeForDistance(distance: Int): Resource with Encodable = encodableForShortPointer(ShortPointer[OffsetType](implicitly[X86OffsetFactory[OffsetType]].offset(distance)))
+
+  override def sizeForDistance(distance: Int): Int = encodeForDistance(distance).size
+
+  override def possibleSizes: List[Int] = shortOpcode.length + 1 :: Nil
 
   override def encodableForOffset(offset: OffsetType): Resource with Encodable = {
     assume(offset.isShort(shortJumpSize))
