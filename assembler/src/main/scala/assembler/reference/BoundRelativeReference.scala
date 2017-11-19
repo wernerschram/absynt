@@ -9,7 +9,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
   val section: Section[OffsetType],
   val reference: SinglePassRelativeReference[OffsetType],
   val initialEstimatedSize: Estimate[Int]
-  )(positionalOffsetFactory: PositionalOffsetFactory[OffsetType]) extends Encodable {
+  )(positionalOffsetFactory: OffsetFactory[OffsetType]) extends Encodable {
 
   val destination: Label = reference.target
 
@@ -19,7 +19,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
 
   def offsetDirection: OffsetDirection = section.offsetDirection(reference)
 
-  def encodableForOffset(offset: OffsetType): Resource with Encodable = reference.encodableForOffset(offset)
+  def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = reference.encodableForOffset(offset)
 
   def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = reference.sizeForDistance(offsetDirection, distance)
 
@@ -36,10 +36,10 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
   private def estimatedDistance: Estimate[Int] =
     intermediateInstructions.map(_.estimateSize).estimateSum
 
-  private lazy val actualOffset: OffsetType = independentEstimatedDistance match {
+  private lazy val actualOffset: OffsetType with RelativeOffset = independentEstimatedDistance match {
     case a: Actual[Int] =>
       val distance = dependentReferencesInSection.map { _.size(section) }.sum + a.value
-      positionalOffsetFactory.offset(sizeForDistance(offsetDirection, distance), offsetDirection, distance)
+      positionalOffsetFactory.positionalOffset(offsetDirection, distance)(sizeForDistance(offsetDirection, distance))
     case _ => throw new AssertionError()
   }
 

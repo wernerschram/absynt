@@ -16,17 +16,17 @@ sealed abstract case class FarPointer[OffsetType <: X86Offset](segment: Short, o
 }
 
 object FarPointer {
-  def apply(segment: Short, offset: RealOffset): FarPointer[RealOffset] =
-    new FarPointer[RealOffset](segment, offset) {
-      implicit def OffsetFactory: OffsetFactory[RealOffset] = ProcessorMode.Real.offsetFactory
+  def apply(segment: Short, offset: RealX86Offset): FarPointer[RealX86Offset] =
+    new FarPointer[RealX86Offset](segment, offset) {
+      implicit def OffsetFactory: OffsetFactory[RealX86Offset] = ProcessorMode.Real.offsetFactory
 
       override val operandByteSize: FarPointerSize = FarPointerSize.DoubleWord
       override def toLong: Long = offset.offset
     }
 
-  def apply(segment: Short, offset: ProtectedOffset): FarPointer[ProtectedOffset] =
-    new FarPointer[ProtectedOffset](segment, offset) {
-      implicit def OffsetFactory: OffsetFactory[ProtectedOffset] = ProcessorMode.Protected.offsetFactory
+  def apply(segment: Short, offset: ProtectedX86Offset): FarPointer[ProtectedX86Offset] =
+    new FarPointer[ProtectedX86Offset](segment, offset) {
+      implicit def OffsetFactory: OffsetFactory[ProtectedX86Offset] = ProcessorMode.Protected.offsetFactory
 
       override val operandByteSize: FarPointerSize = FarPointerSize.FarWord
       override def toLong: Long = offset.offset

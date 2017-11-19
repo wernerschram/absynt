@@ -17,7 +17,7 @@ class MoveSuite extends WordSpec with Matchers {
     "in real mode" should {
 
       import ProcessorMode.Real._
-      val zeroAddress: FarPointer[RealOffset] = FarPointer(0, offset(0))
+      val zeroAddress: FarPointer[RealX86Offset] = FarPointer(0, offset(0))
 
       "correctly encode mov bh, al" in {
         Move(AL, BH).encodeByte should be(Hex.lsb("88 C7"))

@@ -11,7 +11,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   def apply[OffsetType <: X86Offset : X86OffsetFactory](nearPointer: NearPointer[OffsetType])(implicit label: Label, processorMode: ProcessorMode):
     Static with NearPointerOperation[OffsetType] = Rel8(nearPointer)
 
-  def apply[OffsetType <: X86Offset:X86OffsetFactory](targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode): ShortJumpOperation[OffsetType] = {
+  def apply[OffsetType <: X86Offset](targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode, offsetFactory: X86OffsetFactory[OffsetType]): ShortJumpOperation[OffsetType] = {
     new ShortJumpOperation[OffsetType](label, shortOpcode, mnemonic, targetLabel) {
       override def encodableForShortPointer(nearPointer: NearPointer[OffsetType]): Resource with Encodable =
         Rel8(nearPointer)
@@ -51,7 +51,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: 
     }
   }
 
-  override def apply[OffsetType <: X86Offset : X86OffsetFactory](targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode): NearJumpOperation[OffsetType] = {
+  override def apply[OffsetType <: X86Offset](targetLabel: Label)(implicit label: Label, processorMode: ProcessorMode, offsetFactory: X86OffsetFactory[OffsetType]): NearJumpOperation[OffsetType] = {
     new NearJumpOperation[OffsetType](label, shortOpcode, longOpcode, mnemonic, targetLabel) {
       override def encodableForShortPointer(nearPointer: NearPointer[OffsetType]): Resource with Encodable = Rel8(nearPointer)
 

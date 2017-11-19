@@ -18,6 +18,7 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
 
 object Raw {
 //  def apply[OffsetType](section: Section[OffsetType]) = new Raw(section, 0x100)
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], baseAddress: AddressType)(implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
-  = new Raw[OffsetType, AddressType](section, baseAddress)
+  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], baseAddress: AddressType)
+    (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) =
+      new Raw[OffsetType, AddressType](section, baseAddress)
 }

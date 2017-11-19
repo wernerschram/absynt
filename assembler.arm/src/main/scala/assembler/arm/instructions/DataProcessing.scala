@@ -1,12 +1,12 @@
 package assembler.arm.instructions
 
+import assembler._
+import assembler.arm.ArmOffsetFactory
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operands.{ArmOffset, RelativeA32Pointer, RightRotateImmediate, Shifter}
+import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations._
-import assembler.arm.{ArmOffsetFactory, ProcessorMode}
 import assembler.reference.AbsoluteReference
-import assembler._
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -83,9 +83,9 @@ object Add extends DataProcessing(0x04.toByte, "add") {
 
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): ReferencingARMOperation =
+    (implicit offsetFactory: ArmOffsetFactory, label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForOffset(offset: ArmOffset): ResourceCollection =
+      override def encodableForOffset(offset: ArmOffset with RelativeOffset): ResourceCollection =
         forConstant(source1, offset.offset, destination, condition)
 
       override def encodeForDistance(distance: Int) =

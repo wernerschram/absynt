@@ -8,7 +8,11 @@ import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers with MockFactory {
 
-  class TestOffset(val offset: Long) extends Offset {
+  abstract class TestOffset extends Offset {
+    def offset: Long
+  }
+
+  case class TestRelativeOffset(override val offset: Long) extends TestOffset with RelativeOffset {
     def direction: OffsetDirection =
       if (offset == 0)
         OffsetDirection.None
@@ -22,20 +26,23 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     override def toLong: Long = offset.offset
   }
 
-  val zeroAddress: TestAddress = new TestAddress(new TestOffset(0))
+  val zeroAddress: TestAddress = new TestAddress(new TestRelativeOffset(0))
 
   // FIXME: mock[Application[TestOffset]] doesn't work
 
   implicit val offsetFactory: OffsetFactory[TestOffset] = new OffsetFactory[TestOffset] {
-    override implicit def offset(offsetValue: Long): TestOffset = new TestOffset(offsetValue)
-    override def add(offset: TestOffset, that: TestOffset): TestOffset = new TestOffset(offset.offset + that.offset)
-    override def add(offset: TestOffset, that: Long): TestOffset = new TestOffset(offset.offset + that)
+    override def offset(offsetValue: Long): TestOffset with RelativeOffset = new TestRelativeOffset(offsetValue)
+    override def add(thisOffset: TestOffset, that: TestOffset with RelativeOffset): TestOffset with RelativeOffset = offset(thisOffset.offset + that.offset)
+    override def add(thisOffset: TestOffset, that: Long): TestOffset with RelativeOffset = offset(thisOffset.offset + that)
+
+    override def positionalOffset(offsetDirection: OffsetDirection, offsetValue: Long)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
   }
 
   implicit val addressFactory: AddressFactory[TestOffset, TestAddress] = new AddressFactory[TestOffset, TestAddress] {
-    override def zero = new TestAddress(new TestOffset(0))
+    override def zero = new TestAddress(new TestRelativeOffset(0))
 
-    override def add(address: TestAddress, offset: TestOffset) = new TestAddress(offsetFactory.add(address.offset, offset))
+    override def add(address: TestAddress, offset: TestOffset with RelativeOffset) =
+      new TestAddress(offsetFactory.add(address.offset, offset))
   }
 
   "a Section" when {
@@ -44,7 +51,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a relative instruction and a label" in {
         val label = Label.unique
-        val myRelativeReference: SinglePassRelativeReference[TestOffset] = mock[SinglePassRelativeReference[TestOffset]]
+        val myRelativeReference: SinglePassRelativeReference[TestRelativeOffset] = mock[SinglePassRelativeReference[TestRelativeOffset]]
         (myRelativeReference.target _).expects().returning(label).anyNumberOfTimes()
         (myRelativeReference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val reference = myRelativeReference
@@ -61,7 +68,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a label and a relative instruction" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference[TestOffset] = mock[SinglePassRelativeReference[TestOffset]]
+        val reference: SinglePassRelativeReference[TestRelativeOffset] = mock[SinglePassRelativeReference[TestRelativeOffset]]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val intermediate = EncodedByteList(List.fill(5)(0))
@@ -77,7 +84,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
-        val reference: SinglePassRelativeReference[TestOffset] = mock[SinglePassRelativeReference[TestOffset]]
+        val reference: SinglePassRelativeReference[TestRelativeOffset] = mock[SinglePassRelativeReference[TestRelativeOffset]]
         (reference.target _).expects().returning(targetLabel).anyNumberOfTimes()
         (reference.label _).expects().returning(targetLabel).anyNumberOfTimes()
         val prefix = EncodedByteList(List.fill(2)(0))
@@ -177,7 +184,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           target))
 
         val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, zeroAddress)
-        application.encodableSections.head.offset(target).offset should be(5)
+        application.encodableSections.head.offset[TestRelativeOffset](target) should be(TestRelativeOffset(5))
       }
     }
   }

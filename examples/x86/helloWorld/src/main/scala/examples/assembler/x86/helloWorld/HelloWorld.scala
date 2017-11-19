@@ -9,7 +9,7 @@ import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.ProtectedOffset
+import assembler.x86.operands.memoryaccess.ProtectedX86Offset
 import assembler.{EncodedString, Label}
 
 object HelloWorld extends App {
@@ -24,7 +24,7 @@ object HelloWorld extends App {
     val entry: Label = "Entry"
     val hello: Label = "Text"
 
-    val text: Section[ProtectedOffset] = Section(SectionType.Text, ".text",
+    val text: Section[ProtectedX86Offset] = Section(SectionType.Text, ".text",
       // use the write Syscall
       { implicit val label: Label = entry; Move(0x04, EAX) } ::
       Move(0x01, EBX) ::
@@ -38,7 +38,7 @@ object HelloWorld extends App {
       Nil
     )
 
-    val data: Section[ProtectedOffset] = Section(SectionType.Data, ".data",
+    val data: Section[ProtectedX86Offset] = Section(SectionType.Data, ".data",
     { implicit val label: Label = hello; EncodedString("Hi World\n") } ::
       Nil
     )

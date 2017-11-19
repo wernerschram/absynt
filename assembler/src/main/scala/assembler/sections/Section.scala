@@ -15,18 +15,20 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
 
   val alignment: Int
 
-  protected def offset(value: Long): OffsetType = implicitly[OffsetFactory[OffsetType]].offset(value)
+  protected def offset(value: Long): OffsetType with RelativeOffset =
+    implicitly[OffsetFactory[OffsetType]].offset(value)
+
   type EncodableCondition = (Resource)=>Boolean
 
   def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def estimatedOffset(label: Label): Estimate[OffsetType] =
+  def estimatedOffset(label: Label): Estimate[OffsetType with RelativeOffset] =
     content.takeWhile(current => current.label != label)
       .map(_.estimateSize).estimateSum.map(offset(_))
 
-  def estimatedOffset(encodable: Resource): Estimate[OffsetType] =
+  def estimatedOffset(encodable: Resource): Estimate[OffsetType with RelativeOffset] =
     content.takeWhile(current => current != encodable)
       .map(_.estimateSize).estimateSum.map(offset(_))
 
@@ -99,8 +101,10 @@ trait LastIteration[OffsetType<:Offset] {
   //assert(!finalContent.exists(r => r.estimateSize.isInstanceOf[Bounded[OffsetType]]))
 
 
-  def offset(label: Label): OffsetType = estimatedOffset(label).asInstanceOf[Actual[OffsetType]].value
-  def offset(encodable: Resource): OffsetType = estimatedOffset(encodable).asInstanceOf[Actual[OffsetType]].value
+  def offset[RelativeOffsetType <: OffsetType with RelativeOffset](label: Label): RelativeOffsetType =
+    estimatedOffset(label).asInstanceOf[Actual[RelativeOffsetType]].value
+  def offset[RelativeOffsetType <: OffsetType with RelativeOffset](encodable: Resource): RelativeOffsetType =
+    estimatedOffset(encodable).asInstanceOf[Actual[RelativeOffsetType]].value
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 

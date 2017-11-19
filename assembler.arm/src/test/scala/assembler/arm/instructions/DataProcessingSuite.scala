@@ -4,7 +4,7 @@ import assembler._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, Shifter}
+import assembler.arm.operands._
 import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
@@ -309,7 +309,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
+        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
         instruction.bind(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
@@ -320,7 +320,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
+        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
         instruction.bind(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
@@ -332,7 +332,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
+        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
         instruction.bind(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 

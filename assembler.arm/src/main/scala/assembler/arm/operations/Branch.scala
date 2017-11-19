@@ -2,7 +2,7 @@ package assembler.arm.operations
 
 import assembler.Label
 import assembler.arm.operands.Condition._
-import assembler.arm.operands.{ArmOffset, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
+import assembler.arm.operands.{ArmRelativeOffset, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 import assembler.arm.operands.registers.GeneralRegister
 
 class BranchImmediate[AddressType<:RelativePointer](val label: Label, destination: AddressType, val condition: Condition, val code: Byte, val opcode: String)
@@ -15,10 +15,10 @@ class BranchImmediate[AddressType<:RelativePointer](val label: Label, destinatio
     destination match {
       case p: RelativeA32Pointer =>
         import assembler.arm.ProcessorMode.A32._
-        s"$labelPrefix$mnemonicString ${addressFactory.add(p, ArmOffset(8)).toString}"
+        s"$labelPrefix$mnemonicString ${addressFactory.add(p, ArmRelativeOffset(8)).toString}"
       case p: RelativeThumbPointer =>
         import assembler.arm.ProcessorMode.Thumb._
-        s"$labelPrefix$mnemonicString ${addressFactory.add(p, ArmOffset(8)).toString}"
+        s"$labelPrefix$mnemonicString ${addressFactory.add(p, ArmRelativeOffset(8)).toString}"
     }
   }
 }

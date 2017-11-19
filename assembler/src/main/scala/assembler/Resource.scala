@@ -25,10 +25,9 @@ trait Encodable extends Resource {
 trait Reference extends Resource {
   def target: Label
 
-  def encodeForDistance(distance: Int): Resource with Encodable
+  def encodeForDistance(distance: Int): Encodable
 
   def sizeForDistance(distance: Int): Int
 
   def possibleSizes: Seq[Int]
 }
-

@@ -13,37 +13,33 @@ object OffsetDirection {
   case object None extends OffsetDirection
 }
 
-trait Offset {
+class Offset
+
+trait RelativeOffset {
+  self: Offset =>
   def direction: OffsetDirection
 }
 
-object Offset {
-   implicit class EstimateListExtension[V<:Offset:OffsetFactory](l: Seq[Estimate[V]]) {
-    def estimateSum: Estimate[V] =
-      l.reduceOption(Estimate.reduceInner[V](implicitly[OffsetFactory[V]].add))
-        .getOrElse(Actual[V](implicitly[OffsetFactory[V]].offset(0)))
+trait AbsoluteOffset {
+  self: Offset =>
+}
+
+object RelativeOffset {
+   implicit class EstimateListExtension[OffsetType <: Offset](l: Seq[Estimate[OffsetType with RelativeOffset]])(implicit offsetFactory: OffsetFactory[OffsetType]) {
+    def estimateSum: Estimate[OffsetType with RelativeOffset] =
+      l.reduceOption(Estimate.reduceInner[OffsetType with RelativeOffset](offsetFactory.add))
+        .getOrElse(Actual[OffsetType with RelativeOffset](offsetFactory.offset(0)))
   }
 }
 
 trait AddressFactory[OffsetType <: Offset, AddressType<:Address[OffsetType]] {
   def zero: AddressType
-  def add(address: AddressType, offset: OffsetType): AddressType
+  def add(address: AddressType, offset: OffsetType with RelativeOffset): AddressType
 }
 
-trait OffsetFactory[OffsetType] {
-  def offset(offsetValue: Long): OffsetType
-  def offset(offsetDirection: OffsetDirection, offsetValue: Long): OffsetType = {
-    assume(offsetValue>=0)
-    offsetDirection match {
-      case OffsetDirection.None => offset(0)
-      case OffsetDirection.Forward => offset(offsetValue)
-      case OffsetDirection.Backward => offset(-offsetValue)
-    }
-  }
-  def add(offset: OffsetType, that: OffsetType): OffsetType
-  def add(offset: OffsetType, that: Long): OffsetType
-}
-
-trait PositionalOffsetFactory[OffsetType] extends OffsetFactory[OffsetType] {
-  def offset(instructionSize: Int, offsetDirection: OffsetDirection, offsetValue: Long): OffsetType
+trait OffsetFactory[OffsetType <: Offset] {
+  def offset(offsetValue: Long): OffsetType with RelativeOffset
+  def positionalOffset(offsetDirection: OffsetDirection, offsetValue: Long)(instructionSize: Int): OffsetType with RelativeOffset
+  def add(offset: OffsetType, that: OffsetType with RelativeOffset): OffsetType with RelativeOffset
+  def add(offset: OffsetType, that: Long): OffsetType with RelativeOffset
 }

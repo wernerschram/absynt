@@ -2,7 +2,7 @@ package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, Shifter}
+import assembler.arm.operands.{ArmRelativeOffset, Condition, RelativeA32Pointer, Shifter}
 import assembler.arm.operations._
 import assembler.sections.{Section, SectionType}
 import assembler._
@@ -88,7 +88,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}))
 
-        val application = Raw(p, RelativeA32Pointer(ArmOffset(0)))
+        val application = Raw(p, RelativeA32Pointer(ArmRelativeOffset(0)))
         p.encodable(application).encodeByte should be(Hex.msb("e59f1000 00000000 74736554"))
       }
 
@@ -99,7 +99,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             LoadRegister(targetLabel, R1, Condition.CarrySet)))
 
-        val application = Raw(p, RelativeA32Pointer(ArmOffset(0)))
+        val application = Raw(p, RelativeA32Pointer(ArmRelativeOffset(0)))
         p.encodable(application).encodeByte should be(Hex.msb("74736554 00000000 251F1010"))
       }
     }

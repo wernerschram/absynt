@@ -1,7 +1,7 @@
 package assembler.x86.instructions
 
 import assembler.reference.AbsoluteReference
-import assembler.x86.operands.memoryaccess.{FarPointer, MemoryAddress, MemoryLocation, X86Offset}
+import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 import assembler.x86.{ParameterPosition, ProcessorMode}
@@ -174,7 +174,7 @@ object Move {
       override def immediate: ImmediateValue = immediateValue
     }
 
-  def forLabel[OffsetType<:X86Offset](targetLabel: Label, register: WideRegister)
+  def forLabel[OffsetType<:X86Offset with AbsoluteOffset](targetLabel: Label, register: WideRegister)
               (implicit processorMode: ProcessorMode, label: Label): AbsoluteReference[OffsetType, FarPointer[OffsetType]] = {
     val prefixBytes = if (register.getRexRequirements(ParameterPosition.OpcodeReg).isEmpty) 0 else 1
 

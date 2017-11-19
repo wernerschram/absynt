@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
 import assembler.x86.{ProcessorMode, X86OffsetFactory}
-import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, X86RelativeOffset, NearPointer => NearPointerOperand}
 import assembler._
 
 abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
@@ -24,7 +24,7 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](labe
     case _ => longJumpSize
   }
 
-  override def encodableForOffset(offset: OffsetType): Resource with Encodable = {
+  override def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = {
     if (offset.isShort(shortJumpSize))
       encodableForShortPointer(ShortPointer(offset))
     else

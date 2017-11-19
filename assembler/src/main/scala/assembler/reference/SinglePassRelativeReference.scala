@@ -8,7 +8,7 @@ import scala.collection.concurrent.TrieMap
 trait SinglePassRelativeReference[OffsetType<:Offset]
     extends Reference {
 
-  def encodableForOffset(offset: OffsetType): Resource with Encodable
+  def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable
 
   def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int
 
@@ -22,7 +22,7 @@ trait SinglePassRelativeReference[OffsetType<:Offset]
   final def size(section: Section[OffsetType]): Int =
     bind(section).size
 
-  implicit def offsetFactory: PositionalOffsetFactory[OffsetType]
+  implicit def offsetFactory: OffsetFactory[OffsetType]
 
   def bind(section: Section[OffsetType]): BoundRelativeReference[OffsetType] =
     sectionMap.getOrElseUpdate(section, BoundRelativeReference[OffsetType](section, this))

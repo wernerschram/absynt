@@ -1,7 +1,7 @@
 package assembler.output.Elf
 
-import assembler.{Address, Offset}
 import assembler.sections.{LastIteration, Section}
+import assembler.{Address, Offset}
 
 abstract class SectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](elf: Elf[OffsetType, AddressType]) {
 

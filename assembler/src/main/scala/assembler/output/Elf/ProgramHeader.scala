@@ -1,7 +1,7 @@
 package assembler.output.Elf
 
-import assembler.{Address, Offset}
 import assembler.sections.{LastIteration, Section}
+import assembler.{Address, Offset}
 
 class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType] with LastIteration[OffsetType], val flags: Flags[ProgramFlag], elf: Elf[OffsetType, AddressType]) {
   def `type`: ProgramType = ProgramType.Load

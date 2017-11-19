@@ -1,14 +1,14 @@
 package assembler.arm.operations
 
-import assembler.arm.{ArmOffsetFactory, ProcessorMode}
+import assembler._
+import assembler.arm.ArmOffsetFactory
 import assembler.arm.operands.ArmOffset
 import assembler.arm.operands.Condition.Condition
 import assembler.reference.SinglePassRelativeReference
-import assembler._
 
 abstract class ReferencingARMOperation(val label: Label, val opcode: String, override val target: Label,
                                                     val condition: Condition)
-                                                   (implicit armOffsetFactory: ArmOffsetFactory)
+                                                   (implicit val offsetFactory: ArmOffsetFactory)
   extends SinglePassRelativeReference[ArmOffset] with NamedConditional {
 
   //FIXME: this is not correct for add.forRelativeLabel.
@@ -16,13 +16,11 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
 
   override def estimateSize: Estimate[Int] = Actual(instructionSize)
 
-  override def sizeForDistance(distance: Int) = instructionSize
+  override def sizeForDistance(distance: Int): Int = instructionSize
 
-  override def possibleSizes = instructionSize :: Nil
+  override def possibleSizes: List[Int] = instructionSize :: Nil
 
   override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = instructionSize
 
   override def toString = s"$labelPrefix$mnemonicString $target"
-
-  override implicit def offsetFactory: PositionalOffsetFactory[ArmOffset] = armOffsetFactory.positionalOffsetFactory
 }

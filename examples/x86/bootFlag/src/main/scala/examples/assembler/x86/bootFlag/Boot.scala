@@ -9,8 +9,8 @@ import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.{FarPointer, LongPointer, RealOffset}
-import assembler.{EncodedByteList, Label, Resource, UniqueLabel}
+import assembler.x86.operands.memoryaccess.{FarPointer, RealX86Offset}
+import assembler.{Label, Resource, UniqueLabel}
 
 object Boot extends App {
   createFile()
@@ -36,7 +36,7 @@ object Boot extends App {
     val bottomColor = Color(0, 0, 63)
 
     val targetLabel = Label.unique
-    val section: Section[RealOffset] = Section[RealOffset](SectionType.Text, ".text",
+    val section: Section[RealX86Offset] = Section[RealX86Offset](SectionType.Text, ".text",
 
 
       JumpIfCountZero(targetLabel) ::
@@ -82,7 +82,7 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val executable = Raw[RealOffset, FarPointer[RealOffset]](section, FarPointer(0.toShort, offset(0)))
+    val executable = Raw[RealX86Offset, FarPointer[RealX86Offset]](section, FarPointer(0.toShort, offset(0)))
     executable.encodableSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
