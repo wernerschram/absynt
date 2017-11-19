@@ -35,7 +35,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     override def add(thisOffset: TestOffset, that: TestOffset with RelativeOffset): TestOffset with RelativeOffset = offset(thisOffset.offset + that.offset)
     override def add(thisOffset: TestOffset, that: Long): TestOffset with RelativeOffset = offset(thisOffset.offset + that)
 
-    override def positionalOffset(offsetDirection: OffsetDirection, offsetValue: Long)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
+    override def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
   }
 
   implicit val addressFactory: AddressFactory[TestOffset, TestAddress] = new AddressFactory[TestOffset, TestAddress] {

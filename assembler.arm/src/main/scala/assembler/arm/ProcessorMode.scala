@@ -19,7 +19,7 @@ object ProcessorMode {
 
       override def add(thisOffset: ArmOffset, that: Long): ArmOffset with RelativeOffset = thisOffset + that
 
-      override implicit def positionalOffset(offsetDirection: OffsetDirection, offsetValue: Long)(instructionSize: Int): ArmOffset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
         offsetDirection match {
           case OffsetDirection.None => offsetFactory.offset(-instructionSize - 4)
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 4)
@@ -44,7 +44,7 @@ object ProcessorMode {
 
       override def add(thisOffset: ArmOffset, that: Long): ArmOffset with RelativeOffset = thisOffset + that
 
-      override implicit def positionalOffset(offsetDirection: OffsetDirection, offsetValue: Long)(instructionSize: Int): ArmOffset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
         offsetDirection match {
           case OffsetDirection.None => offsetFactory.offset(-instructionSize - 8)
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 8)

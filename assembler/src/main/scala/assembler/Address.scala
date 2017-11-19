@@ -39,7 +39,7 @@ trait AddressFactory[OffsetType <: Offset, AddressType<:Address[OffsetType]] {
 
 trait OffsetFactory[OffsetType <: Offset] {
   def offset(offsetValue: Long): OffsetType with RelativeOffset
-  def positionalOffset(offsetDirection: OffsetDirection, offsetValue: Long)(instructionSize: Int): OffsetType with RelativeOffset
+  def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): OffsetType with RelativeOffset
   def add(offset: OffsetType, that: OffsetType with RelativeOffset): OffsetType with RelativeOffset
   def add(offset: OffsetType, that: Long): OffsetType with RelativeOffset
 }
