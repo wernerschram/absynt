@@ -4,20 +4,29 @@ abstract class Address[OffsetType <: Offset] {
   def toLong: Long // FIXME: toLong is used for encoding addresses in Elf files. This should be replaced by some function in ProcessorClass
 }
 
+@deprecated("remove this when finished reimplementing References", "recent")
+sealed trait OffsetDirectionOld
+
+object OffsetDirectionOld {
+  case object Forward extends OffsetDirectionOld
+  case object Backward extends OffsetDirectionOld
+  case object None extends OffsetDirectionOld
+}
 
 sealed trait OffsetDirection
 
 object OffsetDirection {
   case object Forward extends OffsetDirection
   case object Backward extends OffsetDirection
-  case object None extends OffsetDirection
+  case object Absolute extends OffsetDirection
+  case object Self extends OffsetDirection
 }
 
 class Offset
 
 trait RelativeOffset {
   self: Offset =>
-  def direction: OffsetDirection
+  def direction: OffsetDirectionOld
 }
 
 trait AbsoluteOffset {
@@ -39,7 +48,7 @@ trait AddressFactory[OffsetType <: Offset, AddressType<:Address[OffsetType]] {
 
 trait OffsetFactory[OffsetType <: Offset] {
   def offset(offsetValue: Long): OffsetType with RelativeOffset
-  def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): OffsetType with RelativeOffset
+  def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): OffsetType with RelativeOffset
   def add(offset: OffsetType, that: OffsetType with RelativeOffset): OffsetType with RelativeOffset
   def add(offset: OffsetType, that: Long): OffsetType with RelativeOffset
 }

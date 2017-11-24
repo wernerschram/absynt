@@ -17,11 +17,11 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
 
   def intermediateInstructions: Seq[Resource] = section.intermediateEncodables(reference)
 
-  def offsetDirection: OffsetDirection = section.offsetDirection(reference)
+  def offsetDirection: OffsetDirectionOld = section.offsetDirectionOld(reference)
 
   def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = reference.encodableForOffset(offset)
 
-  def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = reference.sizeForDistance(offsetDirection, distance)
+  def sizeForDistance(offsetDirection: OffsetDirectionOld, distance: Long): Int = reference.sizeForDistance(offsetDirection, distance)
 
   private lazy val (
     dependentReferencesInSection: Seq[SinglePassRelativeReference[OffsetType]],

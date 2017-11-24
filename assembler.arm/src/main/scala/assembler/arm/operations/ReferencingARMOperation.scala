@@ -20,7 +20,7 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
 
   override def possibleSizes: List[Int] = instructionSize :: Nil
 
-  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = instructionSize
+  override def sizeForDistance(offsetDirection: OffsetDirectionOld, distance: Long): Int = instructionSize
 
   override def toString = s"$labelPrefix$mnemonicString $target"
 }

@@ -10,7 +10,7 @@ trait SinglePassRelativeReference[OffsetType<:Offset]
 
   def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable
 
-  def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int
+  def sizeForDistance(offsetDirection: OffsetDirectionOld, distance: Long): Int
 
   private val sectionMap = new TrieMap[Section[OffsetType], BoundRelativeReference[OffsetType]]
 

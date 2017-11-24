@@ -17,10 +17,10 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](labe
 
   def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
-  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = offsetDirection match {
-    case OffsetDirection.Backward if distance <= backwardShortLongBoundary => shortJumpSize
-    case OffsetDirection.Forward if distance <= forwardShortLongBoundary => shortJumpSize
-    case OffsetDirection.None => shortJumpSize
+  override def sizeForDistance(offsetDirection: OffsetDirectionOld, distance: Long): Int = offsetDirection match {
+    case OffsetDirectionOld.Backward if distance <= backwardShortLongBoundary => shortJumpSize
+    case OffsetDirectionOld.Forward if distance <= forwardShortLongBoundary => shortJumpSize
+    case OffsetDirectionOld.None => shortJumpSize
     case _ => longJumpSize
   }
 

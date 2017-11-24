@@ -61,11 +61,23 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     if (firstInstruction.label.matches(from.target))
       if (firstInstruction==from)
-        OffsetDirection.None
+        OffsetDirection.Self
       else
         OffsetDirection.Backward
     else
       OffsetDirection.Forward
+  }
+
+  @deprecated("remove this when finished reimplementing References", "recent")
+  def offsetDirectionOld(from: SinglePassRelativeReference[OffsetType]): OffsetDirectionOld = {
+    val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
+    if (firstInstruction.label.matches(from.target))
+      if (firstInstruction==from)
+        OffsetDirectionOld.None
+      else
+        OffsetDirectionOld.Backward
+    else
+      OffsetDirectionOld.Forward
   }
 
   private def nextContent[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): List[Resource] = {

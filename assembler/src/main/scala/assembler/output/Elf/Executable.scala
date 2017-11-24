@@ -113,12 +113,15 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
   extends Elf[OffsetType, AddressType](architecture, sections, entryLabel) {
   override def elfType: ElfType = ElfType.Executable
 
-  override def intermediateResources(from: Reference) = from match {
-    case relative: SinglePassRelativeReference[OffsetType] => sections.filter(s => s.contains(from)).head.intermediateEncodables(relative)
-    case absolute: AbsoluteReference[OffsetType, AddressType] => {
+  override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
+    case relative: SinglePassRelativeReference[OffsetType] =>
+      val section = sections.filter(s => s.contains(from)).head
+      (section.intermediateEncodables(relative), section.offsetDirection(relative))
+    case absolute: AbsoluteReference[OffsetType, AddressType] => (
       sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
-      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r != absolute.target)
-    }
+      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r != absolute.target), OffsetDirection.Absolute
+
+      )
   }
 }
 

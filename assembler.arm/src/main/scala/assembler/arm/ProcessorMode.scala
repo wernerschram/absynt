@@ -1,6 +1,6 @@
 package assembler.arm
 
-import assembler.{AddressFactory, OffsetDirection, OffsetFactory, RelativeOffset}
+import assembler.{AddressFactory, OffsetDirectionOld, OffsetFactory, RelativeOffset}
 import assembler.arm.operands.{ArmOffset, ArmRelativeOffset, RelativeA32Pointer, RelativeThumbPointer}
 
 sealed abstract class ProcessorMode {
@@ -19,11 +19,11 @@ object ProcessorMode {
 
       override def add(thisOffset: ArmOffset, that: Long): ArmOffset with RelativeOffset = thisOffset + that
 
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): ArmOffset with RelativeOffset =
         offsetDirection match {
-          case OffsetDirection.None => offsetFactory.offset(-instructionSize - 4)
-          case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 4)
-          case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - (instructionSize + 4))
+          case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize - 4)
+          case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue - 4)
+          case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - (instructionSize + 4))
         }
 
     }
@@ -44,11 +44,11 @@ object ProcessorMode {
 
       override def add(thisOffset: ArmOffset, that: Long): ArmOffset with RelativeOffset = thisOffset + that
 
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): ArmOffset with RelativeOffset =
         offsetDirection match {
-          case OffsetDirection.None => offsetFactory.offset(-instructionSize - 8)
-          case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 8)
-          case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize - 8)
+          case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize - 8)
+          case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue - 8)
+          case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - instructionSize - 8)
         }
     }
 

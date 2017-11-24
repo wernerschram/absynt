@@ -2,6 +2,8 @@ package assembler
 
 import assembler.sections.{LastIteration, Section}
 
+import scala.annotation.tailrec
+
 abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]] protected (
   val sections: List[Section[OffsetType]])
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) {
@@ -31,16 +33,16 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
 
   def encodeByte: List[Byte]
 
+  def intermediateResources(from: Reference): (List[Resource], OffsetDirection)
 
-  def intermediateResources(from: Reference): List[Resource]
-
-  private def intermediateReferencesAndOther(from: Reference): (Seq[Reference], Seq[Encodable]) = {
+  private def applicationContextProperties(from: Reference): (Seq[Reference], Int, OffsetDirection) = {
+    val (resources, offsetType) = intermediateResources(from)
     val (dependent: Seq[Reference], independent: Seq[Encodable]) =
-      intermediateResources(from).partition {
+      resources.partition {
         case _: Reference => true
         case _: Encodable => false
       }
-    (dependent, independent)
+    (dependent, independent.map(r => r.asInstanceOf[Encodable].size).sum, offsetType)
   }
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
@@ -70,7 +72,10 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
 
   private type distanceForAssumptions = Map[Reference, Int] => Int
 
-  private case class DistanceFunction(requiredAssumptions: Seq[Reference], distance: distanceForAssumptions)
+  private case class DistanceFunction(
+    requiredAssumptions: Seq[Reference],
+    distance: distanceForAssumptions,
+    offsetType: OffsetDirection)
 
   private final def distanceFunctionsForDependencies(visiting: List[Reference],
     visited: Map[Reference, DistanceFunction])(current: Reference): Map[Reference, DistanceFunction] = {
@@ -79,14 +84,13 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       // this reference that has been evaluated in an earlier call (in a prior branch)
       visited
     else {
-      val (references, resources) = intermediateReferencesAndOther(current)
-      val independentDistance = resources.map(r => r.size).sum
+      val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
       val (distanceFunctions: Map[Reference, DistanceFunction], newDistanceFunction: DistanceFunction) =
         references.foldLeft(
           (visited,
             DistanceFunction(Seq.empty[Reference],
-            (_: Map[Reference, Int]) => independentDistance))
+            (_: Map[Reference, Int]) => independentDistance, offsetDirection))
         ) {
           case (
             (previousDistanceFunctions: Map[Reference, DistanceFunction],
@@ -97,7 +101,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
               // cyclic dependency: add a dependency which can be resolved at a higher level
               (previousDistanceFunctions,
                 DistanceFunction(previousDistance.requiredAssumptions :+ child,
-                (assumptions) => previousDistance.distance(assumptions) + assumptions(child)))
+                  (assumptions) => previousDistance.distance(assumptions) + assumptions(child), offsetDirection))
             else {
               val evaluatedDistanceFunctions: Map[Reference, DistanceFunction] =
                 distanceFunctionsForDependencies(current :: visiting, previousDistanceFunctions)(child)
@@ -131,18 +135,18 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       case (Nil, Nil) =>
         val value = previousDistance.distance(Map.empty[Reference, Int]) +
           reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]))
-        DistanceFunction(requiredAssumptions, (_: Map[Reference, Int]) => value)
+        DistanceFunction(requiredAssumptions, (_: Map[Reference, Int]) => value, previousDistance.offsetType)
       case (Nil, _) =>
         val value = previousDistance.distance(Map.empty[Reference, Int])
         DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
-          value + reference.sizeForDistance(newDistanceFunction.distance(assumptions)))
+          value + reference.sizeForDistance(newDistanceFunction.distance(assumptions)), previousDistance.offsetType)
       case (_, Nil) =>
         val value = reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]))
         DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
-          previousDistance.distance(assumptions) + value)
+          previousDistance.distance(assumptions) + value, previousDistance.offsetType)
       case (_, _) =>
         DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
-          previousDistance.distance(assumptions) + reference.sizeForDistance(newDistanceFunction.distance(assumptions)))
+          previousDistance.distance(assumptions) + reference.sizeForDistance(newDistanceFunction.distance(assumptions)), previousDistance.offsetType)
     }
   }
 }

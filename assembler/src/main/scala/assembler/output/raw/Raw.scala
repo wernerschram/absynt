@@ -1,6 +1,7 @@
 package assembler.output.raw
 
 import assembler._
+import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
 import assembler.sections.{LastIteration, Section}
 
 class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], val baseAddress: AddressType)
@@ -13,7 +14,12 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
 
   override def encodeByte: List[Byte] = encodableSection.encodeByte
 
-  override def intermediateResources(from: Reference): List[Resource] = section.intermediateEncodables(from)
+  override def intermediateResources(from: Reference) = from match {
+    case relative: SinglePassRelativeReference[OffsetType] =>
+      (section.intermediateEncodables(relative), section.offsetDirection(relative))
+    case absolute: AbsoluteReference[OffsetType, AddressType] =>
+      (section.content.takeWhile(r => r != absolute.target), OffsetDirection.Absolute)
+  }
 }
 
 object Raw {

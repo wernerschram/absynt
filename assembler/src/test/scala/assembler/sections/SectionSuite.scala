@@ -13,13 +13,13 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
   }
 
   case class TestRelativeOffset(override val offset: Long) extends TestOffset with RelativeOffset {
-    def direction: OffsetDirection =
+    def direction: OffsetDirectionOld =
       if (offset == 0)
-        OffsetDirection.None
+        OffsetDirectionOld.None
       else if (offset < 0)
-        OffsetDirection.Backward
+        OffsetDirectionOld.Backward
       else
-        OffsetDirection.Forward
+        OffsetDirectionOld.Forward
   }
 
   class TestAddress(val offset: TestOffset) extends Address[TestOffset] {
@@ -35,7 +35,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     override def add(thisOffset: TestOffset, that: TestOffset with RelativeOffset): TestOffset with RelativeOffset = offset(thisOffset.offset + that.offset)
     override def add(thisOffset: TestOffset, that: Long): TestOffset with RelativeOffset = offset(thisOffset.offset + that)
 
-    override def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
+    override def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
   }
 
   implicit val addressFactory: AddressFactory[TestOffset, TestAddress] = new AddressFactory[TestOffset, TestAddress] {
@@ -112,7 +112,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           reference,
           target))
 
-        section.offsetDirection(reference) shouldBe OffsetDirection.Forward
+        section.offsetDirectionOld(reference) shouldBe OffsetDirectionOld.Forward
       }
 
       "know when a indirect reference is a backward reference" in {
@@ -126,7 +126,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           target,
           reference))
 
-        section.offsetDirection(reference) shouldBe OffsetDirection.Backward
+        section.offsetDirectionOld(reference) shouldBe OffsetDirectionOld.Backward
       }
 
       "know when a indirect reference is a reference to self" in {
@@ -138,7 +138,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
           reference))
 
-        section.offsetDirection(reference) shouldBe OffsetDirection.None
+        section.offsetDirectionOld(reference) shouldBe OffsetDirectionOld.None
       }
 
     }
