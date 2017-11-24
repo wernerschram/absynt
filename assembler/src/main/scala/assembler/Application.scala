@@ -24,6 +24,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
 
   def memoryAddress(section: Section[OffsetType]): AddressType
 
+  @deprecated("remove this when finished reimplementing References", "recent")
   def estimateAbsoluteAddress(label: Label): Estimate[AddressType] =
     sections.filter(s => s.contains(label))
       .map(s => s.estimatedOffset(label).map(v => addressFactory.add(memoryAddress(s), v))).head
@@ -43,14 +44,17 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
   }
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
-    val sizeFunctions: Map[Reference, SizeFunction] =
-      references.foldLeft(Map.empty[Reference, SizeFunction])((x,y) => x ++ sizeFunctionsForDependencies(Nil, x)(y))
+    val sizeFunctions: Map[Reference, DistanceFunction] =
+      references.foldLeft(Map.empty[Reference, DistanceFunction])((x,y) => x ++ distanceFunctionsForDependencies(Nil, x)(y))
 
     sizeFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
       val todo: Seq[Reference] = resourceSize._2.requiredAssumptions.filterNot(resources.contains)
-      val validCombinations = possibleSizeCombinations(todo).filter(c => !c.exists{case (reference, value) => sizeFunctions(reference).size(c) != value})
+      val validCombinations = possibleSizeCombinations(todo).filter(c => !c.exists{
+        case (reference, value) => reference.sizeForDistance(sizeFunctions(reference).distance(c)) != value
+      })
 
-      resources + (resourceSize._1 -> resourceSize._1.encodeForDistance(resourceSize._2.size(validCombinations.head)))
+      //TODO !!!
+      resources + (resourceSize._1 -> resourceSize._1.encodeForDistance(resourceSize._2.distance(validCombinations.head)))
     })
   }
 
@@ -64,60 +68,81 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       ) yield
         t + (references.head -> h)
 
-  private type sizeForAssumptions = Map[Reference, Int] => Int
   private type distanceForAssumptions = Map[Reference, Int] => Int
 
-  private case class SizeFunction(requiredAssumptions: Seq[Reference], size: sizeForAssumptions)
+  private case class DistanceFunction(requiredAssumptions: Seq[Reference], distance: distanceForAssumptions)
 
-  private case class IncrementalDistance(requiredAssumptions: Seq[Reference], distance: distanceForAssumptions)
+  private final def distanceFunctionsForDependencies(visiting: List[Reference],
+    visited: Map[Reference, DistanceFunction])(current: Reference): Map[Reference, DistanceFunction] = {
 
-  private final def sizeFunctionsForDependencies(visiting: List[Reference], visited: Map[Reference, SizeFunction])(start: Reference): Map[Reference, SizeFunction] = {
-    val (references, resources) = intermediateReferencesAndOther(start)
-    val independentDistance = resources.map(r => r.size).sum
-    if (visited.contains(start)) {
-      // this branch that has been evaluated in an earlier call (in a neighbour branch)
+    if (visited.contains(current))
+      // this reference that has been evaluated in an earlier call (in a prior branch)
       visited
-    } else if (visiting.contains(start)) {
-      // cyclic dependency: add a required assumption so that the caller can resolve the dependency
-      visited + (start -> SizeFunction(start:: Nil, assumptions => assumptions(start)))
-    }
     else {
-      val (sizeFunctions: Map[Reference, SizeFunction], distance: IncrementalDistance) = references.foldLeft(
-        (visited, IncrementalDistance(Seq.empty[Reference], (_: Map[Reference, Int]) => independentDistance))
-      ){
-        case ((previousSizeFunctions: Map[Reference, SizeFunction], previousDistance: IncrementalDistance), current) =>
-          val evaluatedSizeFunctions: Map[Reference, SizeFunction] = sizeFunctionsForDependencies(start::visiting, previousSizeFunctions)(current)
-          (previousSizeFunctions ++ evaluatedSizeFunctions, incrementalDistanceForAssumption(previousDistance, evaluatedSizeFunctions(current)))
-      }
+      val (references, resources) = intermediateReferencesAndOther(current)
+      val independentDistance = resources.map(r => r.size).sum
 
-      val requiredAssumptions = distance.requiredAssumptions
-      def size(assumptions: Map[Reference, Int]) = start.sizeForDistance(distance.distance(assumptions))
+      val (distanceFunctions: Map[Reference, DistanceFunction], newDistanceFunction: DistanceFunction) =
+        references.foldLeft(
+          (visited,
+            DistanceFunction(Seq.empty[Reference],
+            (_: Map[Reference, Int]) => independentDistance))
+        ) {
+          case (
+            (previousDistanceFunctions: Map[Reference, DistanceFunction],
+            previousDistance: DistanceFunction),
+            child: Resource) =>
+
+            if (visiting.contains(child))
+              // cyclic dependency: add a dependency which can be resolved at a higher level
+              (previousDistanceFunctions,
+                DistanceFunction(previousDistance.requiredAssumptions :+ child,
+                (assumptions) => previousDistance.distance(assumptions) + assumptions(child)))
+            else {
+              val evaluatedDistanceFunctions: Map[Reference, DistanceFunction] =
+                distanceFunctionsForDependencies(current :: visiting, previousDistanceFunctions)(child)
+
+              val childDistanceFunction: DistanceFunction = evaluatedDistanceFunctions(child)
+
+              (previousDistanceFunctions ++ evaluatedDistanceFunctions,
+                incrementalDistanceForAssumption(current, previousDistance, childDistanceFunction))
+            }
+        }
+      distanceFunctions + (current -> newDistanceFunction)
 
       // try to remove the required assumptions
-      val possibleSizes = possibleSizeCombinations(requiredAssumptions).map(c => size(c))
-      if (possibleSizes.size == 1) {
-        val actualSize = possibleSizes.head // evaluate before assigning to reduce lambda nesting
-          sizeFunctions + (start -> SizeFunction(Nil, (_: Map[Reference, Int]) => actualSize))
-      }
-      else
-        sizeFunctions + (start -> SizeFunction(requiredAssumptions, size))
+
+//      val sizeForCombination = possibleSizeCombinations(requiredAssumptions).map(c => c -> current.sizeForDistance(distance.distance(c)))
+//      if (sizeForCombination.groupBy(s => s._2).size == 1) {
+//        val actualDistance = distance.distance(sizeForCombination.map(s=>s._1).head) // evaluate before assigning to reduce lambda nesting
+//        distanceFunctions + (current -> DistanceFunction(Nil, (_: Map[Reference, Int]) => actualDistance))
+//      }
+//      else
+//        distanceFunctions + (current -> distance)
     }
   }
 
-  private def incrementalDistanceForAssumption(previousDistance: IncrementalDistance, newSizeFunction: SizeFunction): IncrementalDistance = {
-    val requiredAssumptions = previousDistance.requiredAssumptions ++ newSizeFunction.requiredAssumptions
-    (previousDistance.requiredAssumptions, newSizeFunction.requiredAssumptions) match {
+  private def incrementalDistanceForAssumption(
+    reference: Reference,
+    previousDistance: DistanceFunction,
+    newDistanceFunction: DistanceFunction): DistanceFunction = {
+    val requiredAssumptions = previousDistance.requiredAssumptions ++ newDistanceFunction.requiredAssumptions
+    (previousDistance.requiredAssumptions, newDistanceFunction.requiredAssumptions) match {
       case (Nil, Nil) =>
-        val value = previousDistance.distance(Map.empty[Reference, Int]) + newSizeFunction.size(Map.empty[Reference, Int])
-        IncrementalDistance(requiredAssumptions, (_: Map[Reference, Int]) => value)
+        val value = previousDistance.distance(Map.empty[Reference, Int]) +
+          reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]))
+        DistanceFunction(requiredAssumptions, (_: Map[Reference, Int]) => value)
       case (Nil, _) =>
         val value = previousDistance.distance(Map.empty[Reference, Int])
-        IncrementalDistance(requiredAssumptions, (assumptions: Map[Reference, Int]) => value + newSizeFunction.size(assumptions))
+        DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
+          value + reference.sizeForDistance(newDistanceFunction.distance(assumptions)))
       case (_, Nil) =>
-        val value = newSizeFunction.size(Map.empty[Reference, Int])
-        IncrementalDistance(requiredAssumptions, (assumptions: Map[Reference, Int]) => previousDistance.distance(assumptions) + value)
+        val value = reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]))
+        DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
+          previousDistance.distance(assumptions) + value)
       case (_, _) =>
-        IncrementalDistance(requiredAssumptions, (assumptions: Map[Reference, Int]) => previousDistance.distance(assumptions) + newSizeFunction.size(assumptions))
+        DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
+          previousDistance.distance(assumptions) + reference.sizeForDistance(newDistanceFunction.distance(assumptions)))
     }
   }
 }
