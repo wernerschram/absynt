@@ -40,7 +40,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("EA000000 00000000 00000000"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("EA000000 00000000 00000000"))
       }
 
       "correctly encode a backward branch to a labeled instruction" in {
@@ -51,7 +51,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             Branch(targetLabel, Condition.LowerOrSame)))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("00000000 00000000 9AFFFFFC"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
 
       "correctly encode a branch to self instruction" in {
@@ -62,7 +62,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(8)(0x00.toByte))))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
@@ -75,7 +75,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
       }
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
@@ -88,7 +88,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             Branch(targetLabel)))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
 
       "correctly represent b Label as a string" in {
@@ -124,7 +124,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("EB000000 00000000 00000000"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("EB000000 00000000 00000000"))
       }
     }
   }
@@ -162,7 +162,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("FA000000 00000000 00000000"))
+        application.encodableSections.head.encodeByte should be(Hex.msb("FA000000 00000000 00000000"))
       }
     }
   }
