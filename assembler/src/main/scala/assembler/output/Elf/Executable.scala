@@ -8,7 +8,8 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   val architecture: Architecture,
   sections: List[Section[OffsetType]],
   val entryLabel: Label)
-  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) extends Application[OffsetType, AddressType](sections) {
+  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
+  extends Application[OffsetType, AddressType](sections) {
 
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
 
@@ -111,6 +112,9 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
   entryLabel: Label)
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
   extends Elf[OffsetType, AddressType](architecture, sections, entryLabel) {
+
+  def startOffset: Int = ???
+
   override def elfType: ElfType = ElfType.Executable
 
   override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
@@ -119,7 +123,7 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference[OffsetType, AddressType] => (
       sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
-      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r != absolute.target), OffsetDirection.Absolute
+      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute
 
       )
   }

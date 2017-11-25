@@ -6,6 +6,8 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
   val sections: List[Section[OffsetType]])
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) {
 
+  def startOffset: Int
+
   lazy val encodableSections: List[Section[OffsetType] with LastIteration[OffsetType]] = {
     val referenceMap: Map[Reference, Encodable] = encodablesForReferences(sections.flatMap(s => s.content.collect{case r: Reference => r}))
     sections.map(s => Section.lastIteration(s.sectionType, s.name, s.content.map {
@@ -40,7 +42,11 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
         case _: Reference => true
         case _: Encodable => false
       }
-    (dependent, independent.map(r => r.asInstanceOf[Encodable].size).sum, offsetType)
+    val independentDistance = offsetType match {
+      case OffsetDirection.Absolute => independent.map(r => r.asInstanceOf[Encodable].size).sum + startOffset
+      case _ => independent.map(r => r.asInstanceOf[Encodable].size).sum
+    }
+    (dependent, independentDistance, offsetType)
   }
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {

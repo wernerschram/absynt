@@ -8,6 +8,8 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
   extends Application[OffsetType, AddressType](section :: Nil) {
 
+  def startOffset: Int = baseAddress.toLong.toInt
+
   def encodableSection: Section[OffsetType] with LastIteration[OffsetType] = section.encodable(this)
 
   override def memoryAddress(section: Section[OffsetType]): AddressType = baseAddress
@@ -18,7 +20,7 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
     case relative: SinglePassRelativeReference[OffsetType] =>
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference[OffsetType, AddressType] =>
-      (section.content.takeWhile(r => r != absolute.target), OffsetDirection.Absolute)
+      (section.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute)
   }
 }
 
