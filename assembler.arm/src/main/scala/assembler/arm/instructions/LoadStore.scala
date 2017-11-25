@@ -6,7 +6,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
 import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.{Encodable, Label, RelativeOffset}
+import assembler.{Encodable, Label, OffsetDirection, RelativeOffset}
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {
@@ -36,9 +36,10 @@ class LoadStoreRegister(
         ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
         LoadStoreAddressingTypeNormal.OffsetNormal)
 
-      override def encodeForDistance(distance: Int): LoadStore =
-        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(distance.toShort),
-        LoadStoreAddressingTypeNormal.OffsetNormal)
+      override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+        ImmedWord(label, Always, destination, GeneralRegister.PC,
+          LoadStoreOffset(offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset.toShort),
+            LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): ReferencingARMOperation =
@@ -47,9 +48,10 @@ class LoadStoreRegister(
         ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
         LoadStoreAddressingTypeNormal.OffsetNormal)
 
-      override def encodeForDistance(distance: Int): LoadStore =
-        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(distance.toShort),
-        LoadStoreAddressingTypeNormal.OffsetNormal)
+      override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+        ImmedWord(label, condition, destination, GeneralRegister.PC,
+          LoadStoreOffset(offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset.toShort),
+            LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   object UserMode {

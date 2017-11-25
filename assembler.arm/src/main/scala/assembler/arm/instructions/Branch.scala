@@ -5,7 +5,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
 import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.{Encodable, Label, RelativeOffset}
+import assembler.{Encodable, Label, OffsetDirection, RelativeOffset}
 
 class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)
@@ -17,8 +17,8 @@ class Branch(code: Byte, val opcode: String) {
       override def encodableForOffset(offset: ArmOffset with RelativeOffset): BranchImmediate[RelativeA32Pointer] =
         Immediate(label, RelativeA32Pointer(offset), Always)
 
-      override def encodeForDistance(distance: Int): Encodable =
-        Immediate(label, RelativeA32Pointer(offsetFactory.offset(distance)), Always)
+      override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+        Immediate(label, RelativeA32Pointer(offsetFactory.positionalOffset(distance)(offsetDirection)(4)), Always)
     }
 
   private def Immediate[AddressType<:RelativePointer](label: Label, destination: AddressType, condition: Condition = Always) =
@@ -29,8 +29,8 @@ class Branch(code: Byte, val opcode: String) {
       override def encodableForOffset(offset: ArmOffset with RelativeOffset): BranchImmediate[RelativeA32Pointer] =
         Immediate(label, RelativeA32Pointer(offset), condition)
 
-      override def encodeForDistance(distance: Int): Encodable =
-        Immediate(label, RelativeA32Pointer(armOffsetFactory.offset(distance)), condition)
+      override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+        Immediate(label, RelativeA32Pointer(armOffsetFactory.positionalOffset(distance)(offsetDirection)(4)), condition)
     }
 }
 
@@ -54,8 +54,8 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
       override def encodableForOffset(offset: ArmOffset with RelativeOffset): BranchImmediate[RelativeThumbPointer] =
         Immediate(label, RelativeThumbPointer(offset), Unpredictable)
 
-      override def encodeForDistance(distance: Int): Encodable =
-        Immediate(label, RelativeThumbPointer(armOffsetFactory.offset(distance)), Unpredictable)
+      override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+        Immediate(label, RelativeThumbPointer(armOffsetFactory.positionalOffset(distance)(offsetDirection)(4)), Unpredictable)
     }
 }
 

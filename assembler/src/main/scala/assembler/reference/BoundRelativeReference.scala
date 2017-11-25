@@ -39,7 +39,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
   private lazy val actualOffset: OffsetType with RelativeOffset = independentEstimatedDistance match {
     case a: Actual[Int] =>
       val distance = dependentReferencesInSection.map { _.size(section) }.sum + a.value
-      positionalOffsetFactory.positionalOffset(distance)(offsetDirection)(sizeForDistance(offsetDirection, distance))
+      positionalOffsetFactory.positionalOffsetOld(distance)(offsetDirection)(sizeForDistance(offsetDirection, distance))
     case _ => throw new AssertionError()
   }
 

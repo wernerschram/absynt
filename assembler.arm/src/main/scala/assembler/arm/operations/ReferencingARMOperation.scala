@@ -16,7 +16,7 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
 
   override def estimateSize: Estimate[Int] = Actual(instructionSize)
 
-  override def sizeForDistance(distance: Int): Int = instructionSize
+  override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int = instructionSize
 
   override def possibleSizes: List[Int] = instructionSize :: Nil
 

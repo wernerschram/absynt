@@ -88,8 +88,8 @@ object Add extends DataProcessing(0x04.toByte, "add") {
       override def encodableForOffset(offset: ArmOffset with RelativeOffset): ResourceCollection =
         forConstant(source1, offset.offset, destination, condition)
 
-      override def encodeForDistance(distance: Int) =
-      forConstant(source1, distance, destination, condition)
+      override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+        forConstant(source1, offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset, destination, condition)
     }
 }
 

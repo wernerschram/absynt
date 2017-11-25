@@ -6,7 +6,22 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Ad
   target: Label, override val label: Label)
     extends Reference {
 
+  @deprecated("remove this when finished reimplementing References", "recent")
   def encodableForAddress(position: AddressType): Resource with Encodable
+
+  def encodeForDistance(distance: Int): Encodable
+
+  override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable = {
+    assume(offsetDirection == OffsetDirection.Absolute)
+    encodeForDistance(distance)
+  }
+
+  def sizeForDistance(distance: Int): Int
+
+  override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int = {
+    assume(offsetDirection == OffsetDirection.Absolute)
+    sizeForDistance(distance)
+  }
 
   def bind(application: Application[OffsetType, AddressType]): Resource = {
     val newEstimate: Estimate[AddressType] = application.estimateAbsoluteAddress(target)
