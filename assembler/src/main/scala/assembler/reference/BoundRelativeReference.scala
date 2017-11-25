@@ -17,6 +17,7 @@ sealed class BoundRelativeReference[OffsetType<:Offset] private(
 
   def intermediateInstructions: Seq[Resource] = section.intermediateEncodables(reference)
 
+  @deprecated("remove this when finished reimplementing References", "recent")
   def offsetDirection: OffsetDirectionOld = section.offsetDirectionOld(reference)
 
   def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = reference.encodableForOffset(offset)

@@ -79,30 +79,6 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
     else
       OffsetDirectionOld.Forward
   }
-
-  private def nextContent[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): List[Resource] = {
-    val newContent: List[Resource] = content.map {
-      case referencing: SinglePassRelativeReference[OffsetType] =>
-        referencing.bind(this)
-
-      case absolute: AbsoluteReference[OffsetType, AddressType] =>
-        absolute.bind(currentApplication)
-
-      case resource =>
-        resource
-    }
-    newContent
-  }
-
-  @tailrec
-  final def encodable[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): Section[OffsetType] with LastIteration[OffsetType] = {
-    val newContent = nextContent(currentApplication)
-    if (newContent.forall { case _: Encodable => true; case _ => false }) {
-      Section.lastIteration(sectionType, name, newContent.map(r => r.asInstanceOf[Resource with Encodable]))
-   } else {
-      Section(sectionType, name, newContent).encodable(currentApplication)
-    }
-  }
 }
 
 trait LastIteration[OffsetType<:Offset] {
