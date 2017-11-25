@@ -52,7 +52,7 @@ object HelloWorld extends App {
     val raw = new FileOutputStream(rawFilePath.toFile)
 
     val exec = Executable(Architecture.X86, text :: data :: Nil, entry)
-    val finalSection = text.encodable(exec)
+    val finalSection = exec.encodableSections.head
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     raw.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")

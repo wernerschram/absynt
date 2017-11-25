@@ -10,11 +10,9 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
 
   def startOffset: Int = baseAddress.toLong.toInt
 
-  def encodableSection: Section[OffsetType] with LastIteration[OffsetType] = section.encodable(this)
-
   override def memoryAddress(section: Section[OffsetType]): AddressType = baseAddress
 
-  override def encodeByte: List[Byte] = encodableSection.encodeByte
+  override def encodeByte: List[Byte] = encodableSections.head.encodeByte
 
   override def intermediateResources(from: Reference) = from match {
     case relative: SinglePassRelativeReference[OffsetType] =>
