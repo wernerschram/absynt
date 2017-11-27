@@ -124,6 +124,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
     "in a32 mode" should {
 
       import ProcessorMode.A32._
+      val zeroAddress: RelativeA32Pointer = RelativeA32Pointer(ArmRelativeOffset(0))
 
       "correctly encode add r2, r0, rr" in {
         Add(R0, R1, R2).encodeByte should be(Hex.msb("e0802001"))
@@ -151,7 +152,11 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             EncodedByteList(List.fill(8)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        instruction.bind(p).encodeByte should be(Hex.msb("e2801f01"))
+
+        val app = Raw(p, zeroAddress)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).encodeByte should be(Hex.msb("e2801f01"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the instruction is not at position 0" in {
@@ -161,7 +166,11 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        instruction.bind(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
+
+        val app = Raw(p, zeroAddress)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the target is before the instruction" in {
@@ -172,7 +181,11 @@ class DataProcessingSuite extends WordSpec with Matchers {
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
-        instruction.bind(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
+
+        val app = Raw(p, zeroAddress)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
 
     }
