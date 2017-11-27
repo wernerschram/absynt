@@ -15,8 +15,6 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](labe
 
   override def possibleSizes: List[Int] = shortJumpSize :: longJumpSize :: Nil
 
-  override def estimateSize: Estimate[Int] = Estimate(shortJumpSize, longJumpSize)
-
   def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
   override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Resource with Encodable = {

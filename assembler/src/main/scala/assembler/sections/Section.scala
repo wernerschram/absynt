@@ -24,17 +24,8 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def estimatedOffset(label: Label): Estimate[OffsetType with RelativeOffset] =
-    content.takeWhile(current => current.label != label)
-      .map(_.estimateSize).estimateSum.map(offset(_))
-
-  def estimatedOffset(encodable: Resource): Estimate[OffsetType with RelativeOffset] =
-    content.takeWhile(current => current != encodable)
-      .map(_.estimateSize).estimateSum.map(offset(_))
-
   def precedingResources(target: Label): List[Resource] =
     content.takeWhile(x => !x.label.matches(target))
-
 
   /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
     *
@@ -77,11 +68,6 @@ trait LastIteration[OffsetType<:Offset] {
   def offset(label: Label): Int =
     finalContent.takeWhile(current => current.label != label)
       .map(_.size).sum
-
-  def offsetOld[RelativeOffsetType <: OffsetType with RelativeOffset](label: Label): RelativeOffsetType =
-    estimatedOffset(label).asInstanceOf[Actual[RelativeOffsetType]].value
-  def offsetOld[RelativeOffsetType <: OffsetType with RelativeOffset](encodable: Resource): RelativeOffsetType =
-    estimatedOffset(encodable).asInstanceOf[Actual[RelativeOffsetType]].value
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 

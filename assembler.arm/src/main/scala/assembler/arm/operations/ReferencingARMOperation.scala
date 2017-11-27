@@ -14,8 +14,6 @@ abstract class ReferencingARMOperation(val label: Label, val opcode: String, ove
   //FIXME: this is not correct for add.forRelativeLabel.
  val instructionSize = 4
 
-  override def estimateSize: Estimate[Int] = Actual(instructionSize)
-
   override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int = instructionSize
 
   override def possibleSizes: List[Int] = instructionSize :: Nil

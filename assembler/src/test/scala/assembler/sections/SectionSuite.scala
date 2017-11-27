@@ -164,7 +164,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           target))
 
         val application: Application[TestOffset] = Raw[TestOffset](section, 0)
-        application.encodableSections.head.offsetOld[TestRelativeOffset](target) should be(TestRelativeOffset(5))
+        application.encodableSections.head.offset(label) should be(5)
       }
     }
   }

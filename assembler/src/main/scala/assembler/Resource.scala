@@ -3,8 +3,6 @@ package assembler
 sealed trait Resource {
   def label: Label
 
-  def estimateSize: Estimate[Int]
-
   lazy val labelPrefix: String =
     label match {
       case _: NoLabel => ""
@@ -16,8 +14,6 @@ sealed trait Resource {
 
 trait Encodable extends Resource {
   def encodeByte: Seq[Byte]
-
-  override def estimateSize: Estimate[Int] = Actual(size)
 
   def size: Int
 }

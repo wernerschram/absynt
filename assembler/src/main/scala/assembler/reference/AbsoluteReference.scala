@@ -22,11 +22,9 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset](
 }
 
 object AbsoluteReference {
-  def apply[OffsetType<:Offset](target: Label, initialEstimatedSize: Estimate[Int],
+  def apply[OffsetType<:Offset](target: Label,
     sizes: Seq[Int], label: Label, encodableFactor: (Int) => Resource with Encodable) =
     new AbsoluteReference[OffsetType](target, label) {
-
-      override def estimateSize: Estimate[Int] = initialEstimatedSize
 
       override def possibleSizes: Seq[Int] = sizes
 

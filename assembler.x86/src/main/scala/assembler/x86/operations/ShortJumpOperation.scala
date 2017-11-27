@@ -12,8 +12,6 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset]
 
   val shortJumpSize: Int = shortOpcode.length + 1
 
-  override def estimateSize: Estimate[Int] = Actual(shortJumpSize)
-
   def encodableForShortPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
   override def toString = s"$labelPrefix$mnemonic $target"
