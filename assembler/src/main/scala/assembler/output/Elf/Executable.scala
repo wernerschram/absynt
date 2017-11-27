@@ -106,11 +106,11 @@ abstract class Elf[OffsetType<:Offset](
     sectionHeaders.flatMap(s => s.encodeByte)
 }
 
-class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
+class Executable[OffsetType<:Offset] private(
   architecture: Architecture,
   sections: List[Section[OffsetType]],
   entryLabel: Label)
-  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
+  (implicit offsetFactory: OffsetFactory[OffsetType])
   extends Elf[OffsetType](architecture, sections, entryLabel) {
 
   def startOffset: Int = ???
@@ -130,8 +130,8 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
 }
 
 object Executable {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](architecture: Architecture, sections: List[Section[OffsetType]], entryLabel: Label)
-    (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) =
+  def apply[OffsetType<:Offset](architecture: Architecture, sections: List[Section[OffsetType]], entryLabel: Label)
+    (implicit offsetFactory: OffsetFactory[OffsetType]) =
     new Executable(architecture, sections, entryLabel)
 }
 
