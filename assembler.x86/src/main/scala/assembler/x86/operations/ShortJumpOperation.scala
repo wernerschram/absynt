@@ -27,7 +27,7 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset]
   override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int =
     encodeForDistance(distance, offsetDirection).size
 
-  override def possibleSizes: List[Int] = shortOpcode.length + 1 :: Nil
+  override def possibleSizes: List[Int] = shortJumpSize :: Nil
 
   @deprecated("remove this when finished reimplementing References", "recent")
   override def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = {
