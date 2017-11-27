@@ -3,7 +3,7 @@ package assembler.output.Elf
 import assembler.sections.{LastIteration, Section}
 import assembler.{Address, Offset}
 
-abstract class SectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](elf: Elf[OffsetType, AddressType]) {
+abstract class SectionHeader[OffsetType<:Offset](elf: Elf[OffsetType]) {
 
   def nameReference: Int
   def `type`: SectionType
@@ -37,8 +37,8 @@ abstract class SectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType
   }
 }
 
-class SectionSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType]
-  with LastIteration[OffsetType], elf: Elf[OffsetType, AddressType]) extends SectionHeader[OffsetType, AddressType](elf) {
+class SectionSectionHeader[OffsetType<:Offset](section: Section[OffsetType]
+  with LastIteration[OffsetType], elf: Elf[OffsetType]) extends SectionHeader[OffsetType](elf) {
 
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
@@ -61,8 +61,8 @@ class SectionSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]]
   val entrySize: Int = 0x0
 }
 
-class NullSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](elf: Elf[OffsetType, AddressType])
-  extends SectionHeader[OffsetType, AddressType](elf) {
+class NullSectionHeader[OffsetType<:Offset](elf: Elf[OffsetType])
+  extends SectionHeader[OffsetType](elf) {
   val nameReference: Int = 0
   val `type`: SectionType = SectionType.Null
   val flags: Flags[SectionFlag] = Flags.None
@@ -78,11 +78,11 @@ class NullSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](el
 }
 
 object NullSectionHeader {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](elf: Elf[OffsetType, AddressType]):
-  NullSectionHeader[OffsetType, AddressType] = new NullSectionHeader[OffsetType, AddressType](elf)
+  def apply[OffsetType<:Offset](elf: Elf[OffsetType]):
+  NullSectionHeader[OffsetType] = new NullSectionHeader[OffsetType](elf)
 }
 
-class StringSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](elf: Elf[OffsetType, AddressType])
+class StringSectionHeader[OffsetType<:Offset](elf: Elf[OffsetType])
   extends SectionHeader(elf) {
 
   val nameReference: Int = elf.stringMap(StringSectionHeader.name)
@@ -101,8 +101,8 @@ class StringSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](
 
 object StringSectionHeader {
   val name = ".shstrtab"
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](elf: Elf[OffsetType, AddressType]):
-  StringSectionHeader[OffsetType, AddressType] = new StringSectionHeader(elf)
+  def apply[OffsetType<:Offset](elf: Elf[OffsetType]):
+  StringSectionHeader[OffsetType] = new StringSectionHeader(elf)
 }
 
 abstract case class SectionType private(id: Int)

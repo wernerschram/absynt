@@ -4,11 +4,11 @@ import assembler._
 import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
 import assembler.sections.{LastIteration, Section}
 
-abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
+abstract class Elf[OffsetType<:Offset](
   val architecture: Architecture,
   sections: List[Section[OffsetType]],
   val entryLabel: Label)
-  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
+  (implicit offsetFactory: OffsetFactory[OffsetType])
   extends Application[OffsetType](sections) {
 
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
@@ -24,10 +24,10 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   val stringMap: Map[String, Int] =
     stringOffset(("" :: sections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
 
-  val programHeaders: List[ProgramHeader[OffsetType, AddressType]] =
+  val programHeaders: List[ProgramHeader[OffsetType]] =
     encodableSections.map(s => ProgramHeader(s, this))
 
-  def sectionHeaders: List[SectionHeader[OffsetType, AddressType]] =
+  def sectionHeaders: List[SectionHeader[OffsetType]] =
     NullSectionHeader(this) ::
     encodableSections.map(s => new SectionSectionHeader(s, this)) :::
     new StringSectionHeader(this) :: Nil
@@ -111,7 +111,7 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
   sections: List[Section[OffsetType]],
   entryLabel: Label)
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
-  extends Elf[OffsetType, AddressType](architecture, sections, entryLabel) {
+  extends Elf[OffsetType](architecture, sections, entryLabel) {
 
   def startOffset: Int = ???
 

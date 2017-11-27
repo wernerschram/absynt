@@ -3,7 +3,8 @@ package assembler.output.Elf
 import assembler.sections.{LastIteration, Section}
 import assembler.{Address, Offset}
 
-class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType] with LastIteration[OffsetType], val flags: Flags[ProgramFlag], elf: Elf[OffsetType, AddressType]) {
+class ProgramHeader[OffsetType<:Offset](section: Section[OffsetType] with LastIteration[OffsetType],
+                                        val flags: Flags[ProgramFlag], elf: Elf[OffsetType]) {
   def `type`: ProgramType = ProgramType.Load
 
   def physicalAddress: Long = segmentMemoryOffset
@@ -37,7 +38,8 @@ class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](sectio
 }
 
 object ProgramHeader {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType] with LastIteration[OffsetType], elf: Elf[OffsetType, AddressType]): ProgramHeader[OffsetType, AddressType] = section.sectionType match {
+  def apply[OffsetType<:Offset](section: Section[OffsetType] with LastIteration[OffsetType],
+                                elf: Elf[OffsetType]): ProgramHeader[OffsetType] = section.sectionType match {
     case assembler.sections.SectionType.Text =>
       new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)
     case assembler.sections.SectionType.Data =>
