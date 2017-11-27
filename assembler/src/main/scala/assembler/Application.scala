@@ -2,9 +2,9 @@ package assembler
 
 import assembler.sections.{LastIteration, Section}
 
-abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]] protected (
+abstract class Application[OffsetType<:Offset] protected (
   val sections: List[Section[OffsetType]])
-  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) {
+  (implicit offsetFactory: OffsetFactory[OffsetType]) {
 
   def startOffset: Int
 

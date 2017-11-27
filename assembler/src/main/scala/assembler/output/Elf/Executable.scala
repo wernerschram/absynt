@@ -9,7 +9,7 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   sections: List[Section[OffsetType]],
   val entryLabel: Label)
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
-  extends Application[OffsetType, AddressType](sections) {
+  extends Application[OffsetType](sections) {
 
   val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
 
