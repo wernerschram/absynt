@@ -121,7 +121,7 @@ class Executable[OffsetType<:Offset, AddressType<:Address[OffsetType]] private(
     case relative: SinglePassRelativeReference[OffsetType] =>
       val section = sections.filter(s => s.contains(from)).head
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
-    case absolute: AbsoluteReference[OffsetType, AddressType] => (
+    case absolute: AbsoluteReference[OffsetType] => (
       sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
       sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute
 

@@ -146,9 +146,8 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
   }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset, RelativeA32Pointer] =
-    AbsoluteReference[ArmOffset, RelativeA32Pointer](targetLabel, Actual(4), 4 :: Nil, label, (position: RelativeA32Pointer) =>
-      forConstant(position.toLong.toInt, destination, condition), (position: Int) =>
+    (implicit armOffsetFactory: ArmOffsetFactory, label: Label): AbsoluteReference[ArmOffset] =
+    AbsoluteReference[ArmOffset](targetLabel, Actual(4), 4 :: Nil, label, (position: Int) =>
       forConstant(position, destination, condition))
 }
 

@@ -175,7 +175,7 @@ object Move {
     }
 
   def forLabel[OffsetType<:X86Offset with AbsoluteOffset](targetLabel: Label, register: WideRegister)
-              (implicit processorMode: ProcessorMode, label: Label): AbsoluteReference[OffsetType, FarPointer[OffsetType]] = {
+              (implicit processorMode: ProcessorMode, label: Label): AbsoluteReference[OffsetType] = {
     val prefixBytes = if (register.getRexRequirements(ParameterPosition.OpcodeReg).isEmpty) 0 else 1
 
     val size = processorMode match {
@@ -184,20 +184,6 @@ object Move {
       case (ProcessorMode.Protected) => 0 + 1 + 4
       case (ProcessorMode.Long) => prefixBytes + 1 + 8
     }
-
-    val encodableForPosition: (FarPointer[OffsetType]) => Resource with Encodable = (position) =>
-      (processorMode, register) match {
-          case (ProcessorMode.Real | ProcessorMode.Protected, _: GeneralPurposeRexRegister) =>
-            throw new AssertionError
-          case (ProcessorMode.Real, _) =>
-            Imm16ToR16(register, position.toLong.toShort)
-          case (ProcessorMode.Protected, _: DoubleWordRegister) =>
-            Imm16ToR16(register, position.toLong.toInt)
-          case (ProcessorMode.Long, _: QuadWordRegister) =>
-            Imm16ToR16(register, position.toLong)
-          case _ =>
-            throw new AssertionError
-       }
 
     val encodableForDistance: (Int) => Encodable = (distance) =>
       (processorMode, register) match {
@@ -213,7 +199,7 @@ object Move {
             throw new AssertionError
        }
 
-    AbsoluteReference[OffsetType, FarPointer[OffsetType]](targetLabel, Actual(size), size :: Nil, label, encodableForPosition, encodableForDistance)
+    AbsoluteReference[OffsetType](targetLabel, Actual(size), size :: Nil, label, encodableForDistance)
   }
 
   def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic
