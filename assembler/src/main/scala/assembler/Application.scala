@@ -26,11 +26,6 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
 
   def memoryAddress(section: Section[OffsetType]): AddressType
 
-  @deprecated("remove this when finished reimplementing References", "recent")
-  def estimateAbsoluteAddress(label: Label): Estimate[AddressType] =
-    sections.filter(s => s.contains(label))
-      .map(s => s.estimatedOffset(label).map(v => addressFactory.add(memoryAddress(s), v))).head
-
   def encodeByte: List[Byte]
 
   def intermediateResources(from: Reference): (List[Resource], OffsetDirection)

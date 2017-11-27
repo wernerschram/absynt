@@ -19,22 +19,6 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](labe
 
   def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
-  @deprecated("remove this when finished reimplementing References", "recent")
-  override def sizeForDistance(offsetDirection: OffsetDirectionOld, distance: Long): Int = offsetDirection match {
-    case OffsetDirectionOld.Backward if distance <= backwardShortLongBoundary => shortJumpSize
-    case OffsetDirectionOld.Forward if distance <= forwardShortLongBoundary => shortJumpSize
-    case OffsetDirectionOld.None => shortJumpSize
-    case _ => longJumpSize
-  }
-
-  @deprecated("remove this when finished reimplementing References", "recent")
-  override def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = {
-    if (offset.isShort(shortJumpSize))
-      encodableForShortPointer(ShortPointer(offset))
-    else
-      encodableForLongPointer(LongPointer(offset))
-  }
-
   override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Resource with Encodable = {
     val offset = offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)
     val x= if (offset.isShort(shortJumpSize))

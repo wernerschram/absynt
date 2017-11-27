@@ -2,7 +2,7 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
 import assembler.x86.operands.ValueSize
-import assembler.{Offset, OffsetDirectionOld, OffsetFactory, RelativeOffset}
+import assembler.{Offset, OffsetFactory, RelativeOffset}
 
 abstract class X86Offset(val offset: Long) extends Offset {
 
@@ -27,14 +27,6 @@ abstract class ProtectedX86Offset(offset: Long) extends X86Offset(offset)
 
 sealed trait X86RelativeOffset extends RelativeOffset {
   self: X86Offset =>
-
-  override def direction: OffsetDirectionOld =
-      if (offset == 0)
-        OffsetDirectionOld.None
-      else if (offset < 0)
-        OffsetDirectionOld.Backward
-      else
-        OffsetDirectionOld.Forward
 }
 
 sealed case class RealRelativeOffset(override val offset: Long) extends RealX86Offset(offset) with X86RelativeOffset {

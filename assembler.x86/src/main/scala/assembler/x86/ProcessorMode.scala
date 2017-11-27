@@ -24,12 +24,6 @@ object ProcessorMode {
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
           case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
         }
-      override implicit def positionalOffsetOld(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): RealX86Offset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize)
-          case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue)
-          case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - instructionSize)
-        }
     }
 
     implicit val addressFactory: AddressFactory[RealX86Offset, FarPointer[RealX86Offset]] =
@@ -59,12 +53,6 @@ object ProcessorMode {
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
           case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
         }
-      override implicit def positionalOffsetOld(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize)
-          case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue)
-          case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - instructionSize)
-        }
     }
 
     implicit val addressFactory: AddressFactory[ProtectedX86Offset, FarPointer[ProtectedX86Offset]] =
@@ -93,12 +81,6 @@ object ProcessorMode {
         case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
         case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
         case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
-      }
-      override implicit def positionalOffsetOld(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
-        offsetDirection match {
-        case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize)
-        case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue)
-        case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - instructionSize)
       }
     }
 

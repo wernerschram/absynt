@@ -18,9 +18,6 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset]
 
   override def toString = s"$labelPrefix$mnemonic $target"
 
-  @deprecated("remove this when finished reimplementing References", "recent")
-  override def sizeForDistance(offsetDirection: OffsetDirectionOld, distance: Long): Int = shortJumpSize
-
   override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Resource with Encodable =
     encodableForShortPointer(ShortPointer[OffsetType](offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)))
 
@@ -28,10 +25,4 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset]
     encodeForDistance(distance, offsetDirection).size
 
   override def possibleSizes: List[Int] = shortJumpSize :: Nil
-
-  @deprecated("remove this when finished reimplementing References", "recent")
-  override def encodableForOffset(offset: OffsetType with RelativeOffset): Resource with Encodable = {
-    assume(offset.isShort(shortJumpSize))
-    encodableForShortPointer(ShortPointer(offset))
-  }
 }

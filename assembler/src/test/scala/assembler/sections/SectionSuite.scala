@@ -13,13 +13,6 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
   }
 
   case class TestRelativeOffset(override val offset: Long) extends TestOffset with RelativeOffset {
-    def direction: OffsetDirectionOld =
-      if (offset == 0)
-        OffsetDirectionOld.None
-      else if (offset < 0)
-        OffsetDirectionOld.Backward
-      else
-        OffsetDirectionOld.Forward
   }
 
   class TestAddress(val offset: TestOffset) extends Address[TestOffset] {
@@ -36,7 +29,6 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     override def add(thisOffset: TestOffset, that: Long): TestOffset with RelativeOffset = offset(thisOffset.offset + that)
 
     override def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
-    override def positionalOffsetOld(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
   }
 
   implicit val addressFactory: AddressFactory[TestOffset, TestAddress] = new AddressFactory[TestOffset, TestAddress] {

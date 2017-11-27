@@ -1,12 +1,11 @@
 package assembler.arm.instructions
 
-import assembler.arm.operands.ArmOffset
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
 import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.{Encodable, Label, OffsetDirection, RelativeOffset}
+import assembler.{Encodable, Label, OffsetDirection}
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {
@@ -31,11 +30,6 @@ class LoadStoreRegister(
 
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, Always) {
-
-      override def encodableForOffset(offset: ArmOffset with RelativeOffset): Encodable =
-        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
-        LoadStoreAddressingTypeNormal.OffsetNormal)
-
       override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
         ImmedWord(label, Always, destination, GeneralRegister.PC,
           LoadStoreOffset(offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset.toShort),
@@ -44,10 +38,6 @@ class LoadStoreRegister(
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, condition) {
-      override def encodableForOffset(offset: ArmOffset with RelativeOffset): Encodable =
-        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
-        LoadStoreAddressingTypeNormal.OffsetNormal)
-
       override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
         ImmedWord(label, condition, destination, GeneralRegister.PC,
           LoadStoreOffset(offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset.toShort),

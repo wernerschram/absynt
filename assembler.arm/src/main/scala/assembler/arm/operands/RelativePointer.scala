@@ -1,7 +1,7 @@
 package assembler.arm.operands
 
-import assembler.{Address, Offset, OffsetDirectionOld, RelativeOffset}
 import assembler.ListExtensions._
+import assembler.{Address, Offset, RelativeOffset}
 
 import scala.language.implicitConversions
 
@@ -16,15 +16,7 @@ abstract class ArmOffset protected(val offset: Int) extends Offset {
 
 }
 
-sealed case class ArmRelativeOffset private(override val offset: Int) extends ArmOffset(offset) with RelativeOffset {
-  override def direction: OffsetDirectionOld =
-    if (offset == 0)
-      OffsetDirectionOld.None
-    else if (offset < 0)
-      OffsetDirectionOld.Backward
-    else
-      OffsetDirectionOld.Forward
-}
+sealed case class ArmRelativeOffset private(override val offset: Int) extends ArmOffset(offset) with RelativeOffset
 
 sealed abstract class RelativePointer(val offset: ArmOffset with RelativeOffset) extends Address[ArmOffset] with Operand {
   //offset should be between 3221225472 and -3221225473

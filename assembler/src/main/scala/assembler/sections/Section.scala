@@ -67,18 +67,6 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
     else
       OffsetDirection.Forward
   }
-
-  @deprecated("remove this when finished reimplementing References", "recent")
-  def offsetDirectionOld(from: SinglePassRelativeReference[OffsetType]): OffsetDirectionOld = {
-    val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
-    if (firstInstruction.label.matches(from.target))
-      if (firstInstruction==from)
-        OffsetDirectionOld.None
-      else
-        OffsetDirectionOld.Backward
-    else
-      OffsetDirectionOld.Forward
-  }
 }
 
 trait LastIteration[OffsetType<:Offset] {

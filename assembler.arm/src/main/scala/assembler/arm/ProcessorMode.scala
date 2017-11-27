@@ -25,13 +25,6 @@ object ProcessorMode {
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 4)
           case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - (instructionSize + 4))
         }
-      override implicit def positionalOffsetOld(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): ArmOffset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize - 4)
-          case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue - 4)
-          case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - (instructionSize + 4))
-        }
-
     }
 
     implicit val addressFactory: AddressFactory[ArmOffset, RelativeA32Pointer] = new AddressFactory[ArmOffset, RelativeA32Pointer] {
@@ -55,12 +48,6 @@ object ProcessorMode {
           case OffsetDirection.Self => offsetFactory.offset(-instructionSize - 8)
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue - 8)
           case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize - 8)
-        }
-      override implicit def positionalOffsetOld(offsetValue: Long)(offsetDirection: OffsetDirectionOld)(instructionSize: Int): ArmOffset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirectionOld.None => offsetFactory.offset(-instructionSize - 8)
-          case OffsetDirectionOld.Forward => offsetFactory.offset(offsetValue - 8)
-          case OffsetDirectionOld.Backward => offsetFactory.offset(-offsetValue - instructionSize - 8)
         }
     }
 

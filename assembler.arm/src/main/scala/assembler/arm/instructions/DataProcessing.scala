@@ -85,9 +85,6 @@ object Add extends DataProcessing(0x04.toByte, "add") {
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
     (implicit offsetFactory: ArmOffsetFactory, label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForOffset(offset: ArmOffset with RelativeOffset): ResourceCollection =
-        forConstant(source1, offset.offset, destination, condition)
-
       override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
         forConstant(source1, offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset, destination, condition)
     }
