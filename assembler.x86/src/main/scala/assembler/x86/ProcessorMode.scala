@@ -26,14 +26,6 @@ object ProcessorMode {
         }
     }
 
-    implicit val addressFactory: AddressFactory[RealX86Offset, FarPointer[RealX86Offset]] =
-      new AddressFactory[RealX86Offset, FarPointer[RealX86Offset]] {
-        override def zero = FarPointer(0.toShort, offsetFactory.offset(0))
-
-        override def add(address: FarPointer[RealX86Offset], offset: RealX86Offset with RelativeOffset) =
-          FarPointer(address.segment, offsetFactory.add(address.offset, offset))
-      }
-
     implicit val processorMode: ProcessorMode = this
     implicit def offset(offset: Long): RealX86Offset with RelativeOffset = offsetFactory.offset(offset)
   }
@@ -55,14 +47,6 @@ object ProcessorMode {
         }
     }
 
-    implicit val addressFactory: AddressFactory[ProtectedX86Offset, FarPointer[ProtectedX86Offset]] =
-      new AddressFactory[ProtectedX86Offset, FarPointer[ProtectedX86Offset]] {
-        override def zero = FarPointer(0.toShort, offsetFactory.offset(0))
-
-        override def add(address: FarPointer[ProtectedX86Offset], offset: ProtectedX86Offset with RelativeOffset) =
-          FarPointer(address.segment, offsetFactory.add(address.offset, offset))
-      }
-
     implicit val processorMode: ProcessorMode = this
     implicit def offset(offset: Long): ProtectedX86Offset with RelativeOffset = offsetFactory.offset(offset)
   }
@@ -83,14 +67,6 @@ object ProcessorMode {
         case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
       }
     }
-
-    implicit val addressFactory: AddressFactory[ProtectedX86Offset, FarPointer[ProtectedX86Offset]] =
-      new AddressFactory[ProtectedX86Offset, FarPointer[ProtectedX86Offset]] {
-        override def zero = FarPointer(0.toShort, offsetFactory.offset(0))
-
-        override def add(address: FarPointer[ProtectedX86Offset], offset: ProtectedX86Offset with RelativeOffset) =
-          FarPointer(address.segment, offsetFactory.add(address.offset, offset))
-      }
 
     implicit val processorMode: ProcessorMode = this
     implicit def offset(offset: Long): ProtectedX86Offset with RelativeOffset = offsetFactory.offset(offset)

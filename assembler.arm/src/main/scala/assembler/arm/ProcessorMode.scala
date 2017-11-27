@@ -26,13 +26,6 @@ object ProcessorMode {
           case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - (instructionSize + 4))
         }
     }
-
-    implicit val addressFactory: AddressFactory[ArmOffset, RelativeA32Pointer] = new AddressFactory[ArmOffset, RelativeA32Pointer] {
-      override def zero = RelativeA32Pointer(offsetFactory.offset(0))
-
-      override def add(address: RelativeA32Pointer, offset: ArmOffset with RelativeOffset) = RelativeA32Pointer(address.offset + offset)
-    }
-
   }
 
   case object Thumb extends ProcessorMode {
@@ -50,12 +43,5 @@ object ProcessorMode {
           case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize - 8)
         }
     }
-
-    implicit val addressFactory: AddressFactory[ArmOffset, RelativeThumbPointer] = new AddressFactory[ArmOffset, RelativeThumbPointer] {
-      override def zero = RelativeThumbPointer(offsetFactory.offset(0))
-
-      override def add(address: RelativeThumbPointer, offset: ArmOffset with RelativeOffset) = RelativeThumbPointer(address.offset + offset)
-    }
-
   }
 }

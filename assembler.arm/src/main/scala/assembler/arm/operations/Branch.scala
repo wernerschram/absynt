@@ -14,11 +14,9 @@ class BranchImmediate[AddressType<:RelativePointer](val label: Label, destinatio
   override def toString = {
     destination match {
       case p: RelativeA32Pointer =>
-        import assembler.arm.ProcessorMode.A32._
-        s"$labelPrefix$mnemonicString ${addressFactory.add(p, ArmRelativeOffset(8)).toString}"
+        s"$labelPrefix$mnemonicString ${p.toString}"
       case p: RelativeThumbPointer =>
-        import assembler.arm.ProcessorMode.Thumb._
-        s"$labelPrefix$mnemonicString ${addressFactory.add(p, ArmRelativeOffset(8)).toString}"
+        s"$labelPrefix$mnemonicString ${p.toString}"
     }
   }
 }
