@@ -82,7 +82,7 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val executable = Raw[RealX86Offset, FarPointer[RealX86Offset]](section, 0)
+    val executable = Raw[RealX86Offset](section, 0)
     executable.encodableSections.head.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")

@@ -4,8 +4,8 @@ import assembler._
 import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
 import assembler.sections.{LastIteration, Section}
 
-class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], override val startOffset: Int)
-  (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
+class Raw[OffsetType<:Offset](section: Section[OffsetType], override val startOffset: Int)
+  (implicit offsetFactory: OffsetFactory[OffsetType])
   extends Application[OffsetType](section :: Nil) {
 
   override def sectionOffset(section: Section[OffsetType] with LastIteration[OffsetType]): Long = startOffset
@@ -22,7 +22,7 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
 
 object Raw {
 //  def apply[OffsetType](section: Section[OffsetType]) = new Raw(section, 0x100)
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], startOffset: Int)
-    (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) =
-      new Raw[OffsetType, AddressType](section, startOffset)
+  def apply[OffsetType<:Offset](section: Section[OffsetType], startOffset: Int)
+    (implicit offsetFactory: OffsetFactory[OffsetType]) =
+      new Raw[OffsetType](section, startOffset)
 }

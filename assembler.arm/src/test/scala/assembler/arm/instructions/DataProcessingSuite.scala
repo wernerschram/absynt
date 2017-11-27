@@ -322,7 +322,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, 0)
+        val app = Raw[ArmOffset](p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
 
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
@@ -336,7 +336,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, 0)
+        val app = Raw[ArmOffset](p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
 
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
@@ -351,7 +351,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
 
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, 0)
+        val app = Raw[ArmOffset](p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
 
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
