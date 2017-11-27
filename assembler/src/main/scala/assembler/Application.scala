@@ -54,9 +54,11 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       references.foldLeft(Map.empty[Reference, DistanceFunction])((x,y) => x ++ distanceFunctionsForDependencies(Nil, x)(y))
 
     sizeFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
-      val todo: Seq[Reference] = resourceSize._2.requiredAssumptions.filterNot(resources.contains)
+      val todo: Set[Reference] = resourceSize._2.requiredAssumptions.filterNot(resources.contains)
       val validCombinations = possibleSizeCombinations(todo).filter(c => !c.exists{
-        case (reference, value) => reference.sizeForDistance(sizeFunctions(reference).distance(c), sizeFunctions(reference).offsetDirection) != value
+        case (reference, value) => {
+          reference.sizeForDistance(sizeFunctions(reference).distance(c), sizeFunctions(reference).offsetDirection) != value
+        }
       })
 
       //TODO !!!
@@ -64,7 +66,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
     })
   }
 
-  private def possibleSizeCombinations(references: Seq[Reference]): Seq[Map[Reference, Int]]  =
+  private def possibleSizeCombinations(references: Set[Reference]): Seq[Map[Reference, Int]]  =
     if (references.isEmpty)
       Seq(Map.empty[Reference,Int])
     else
@@ -77,7 +79,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
   private type distanceForAssumptions = Map[Reference, Int] => Int
 
   private case class DistanceFunction(
-    requiredAssumptions: Seq[Reference],
+    requiredAssumptions: Set[Reference],
     distance: distanceForAssumptions,
     offsetDirection: OffsetDirection)
 
@@ -93,7 +95,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       val (distanceFunctions: Map[Reference, DistanceFunction], newDistanceFunction: DistanceFunction) =
         references.foldLeft(
           (visited,
-            DistanceFunction(Seq.empty[Reference],
+            DistanceFunction(Set.empty[Reference],
             (_: Map[Reference, Int]) => independentDistance, offsetDirection))
         ) {
           case (
@@ -104,7 +106,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
             if (visiting.contains(child))
               // cyclic dependency: add a dependency which can be resolved at a higher level
               (previousDistanceFunctions,
-                DistanceFunction(previousDistance.requiredAssumptions :+ child,
+                DistanceFunction(previousDistance.requiredAssumptions + child,
                   (assumptions) => previousDistance.distance(assumptions) + assumptions(child), offsetDirection))
             else {
               val evaluatedDistanceFunctions: Map[Reference, DistanceFunction] =
@@ -113,7 +115,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
               val childDistanceFunction: DistanceFunction = evaluatedDistanceFunctions(child)
 
               (previousDistanceFunctions ++ evaluatedDistanceFunctions,
-                incrementalDistanceForAssumption(current, previousDistance, childDistanceFunction))
+                incrementalDistanceForAssumption(child, previousDistance, childDistanceFunction))
             }
         }
       distanceFunctions + (current -> newDistanceFunction)
@@ -135,7 +137,7 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
     previousDistance: DistanceFunction,
     newDistanceFunction: DistanceFunction): DistanceFunction = {
     val requiredAssumptions = previousDistance.requiredAssumptions ++ newDistanceFunction.requiredAssumptions
-    (previousDistance.requiredAssumptions, newDistanceFunction.requiredAssumptions) match {
+    (previousDistance.requiredAssumptions.toSeq, newDistanceFunction.requiredAssumptions.toSeq) match {
       case (Nil, Nil) =>
         val value = previousDistance.distance(Map.empty[Reference, Int]) +
           reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]), previousDistance.offsetDirection)
@@ -143,14 +145,14 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       case (Nil, _) =>
         val value = previousDistance.distance(Map.empty[Reference, Int])
         DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
-          value + reference.sizeForDistance(newDistanceFunction.distance(assumptions), previousDistance.offsetDirection), previousDistance.offsetDirection)
+          value + reference.sizeForDistance(newDistanceFunction.distance(assumptions), newDistanceFunction.offsetDirection), previousDistance.offsetDirection)
       case (_, Nil) =>
-        val value = reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]), previousDistance.offsetDirection)
+        val value = reference.sizeForDistance(newDistanceFunction.distance(Map.empty[Reference, Int]), newDistanceFunction.offsetDirection)
         DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
           previousDistance.distance(assumptions) + value, previousDistance.offsetDirection)
       case (_, _) =>
         DistanceFunction(requiredAssumptions, (assumptions: Map[Reference, Int]) =>
-          previousDistance.distance(assumptions) + reference.sizeForDistance(newDistanceFunction.distance(assumptions), previousDistance.offsetDirection), previousDistance.offsetDirection)
+          previousDistance.distance(assumptions) + reference.sizeForDistance(newDistanceFunction.distance(assumptions), newDistanceFunction.offsetDirection), previousDistance.offsetDirection)
     }
   }
 }
