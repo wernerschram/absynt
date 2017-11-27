@@ -23,14 +23,6 @@ trait AbsoluteOffset {
   self: Offset =>
 }
 
-object RelativeOffset {
-   implicit class EstimateListExtension[OffsetType <: Offset](l: Seq[Estimate[OffsetType with RelativeOffset]])(implicit offsetFactory: OffsetFactory[OffsetType]) {
-    def estimateSum: Estimate[OffsetType with RelativeOffset] =
-      l.reduceOption(Estimate.reduceInner[OffsetType with RelativeOffset](offsetFactory.add))
-        .getOrElse(Actual[OffsetType with RelativeOffset](offsetFactory.offset(0)))
-  }
-}
-
 trait OffsetFactory[OffsetType <: Offset] {
   def offset(offsetValue: Long): OffsetType with RelativeOffset
   def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): OffsetType with RelativeOffset
