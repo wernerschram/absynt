@@ -6,9 +6,9 @@ import assembler.{Address, Offset}
 class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType] with LastIteration[OffsetType], val flags: Flags[ProgramFlag], elf: Elf[OffsetType, AddressType]) {
   def `type`: ProgramType = ProgramType.Load
 
-  def physicalAddress: Address[OffsetType] = segmentMemoryOffset
+  def physicalAddress: Long = segmentMemoryOffset
   def segmentFileOffset: Long = elf.alignedSectionOffset(section)
-  def segmentMemoryOffset: Address[OffsetType] = elf.memoryAddress(section)
+  def segmentMemoryOffset: Long = elf.sectionOffset(section)
   def segmentFileSize: Long = section.size
   def segmentMemorySize: Long = segmentFileSize
 
@@ -18,8 +18,8 @@ class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](sectio
     case ProcessorClass._32Bit =>
       elf.endianness.encode(`type`.id) :::
       elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
-      elf.architecture.processorClass.numberBytes(segmentMemoryOffset.toLong) :::
-      elf.architecture.processorClass.numberBytes(physicalAddress.toLong) :::
+      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
+      elf.architecture.processorClass.numberBytes(physicalAddress) :::
       elf.architecture.processorClass.numberBytes(segmentFileSize) :::
       elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
       elf.endianness.encode(flags.encode.toInt) :::
@@ -28,8 +28,8 @@ class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](sectio
       elf.endianness.encode(`type`.id) :::
       elf.endianness.encode(flags.encode.toInt) :::
       elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
-      elf.architecture.processorClass.numberBytes(segmentMemoryOffset.toLong) :::
-      elf.architecture.processorClass.numberBytes(physicalAddress.toLong) :::
+      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
+      elf.architecture.processorClass.numberBytes(physicalAddress) :::
       elf.architecture.processorClass.numberBytes(segmentFileSize) :::
       elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
       elf.architecture.processorClass.numberBytes(elf.fileAlignment)

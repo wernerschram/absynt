@@ -8,9 +8,9 @@ abstract class SectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType
   def nameReference: Int
   def `type`: SectionType
   def flags: Flags[SectionFlag]
-  def sectionAddress: Option[Address[OffsetType]]
+  def sectionAddress: Option[Long]
   private def sectionAddressBytes = sectionAddress match {
-    case Some(address) => elf.architecture.processorClass.numberBytes(address.toLong)
+    case Some(address) => elf.architecture.processorClass.numberBytes(address)
     case None => List.fill(8)(0.toByte)
   }
   def sectionFileOffset: Long
@@ -49,7 +49,7 @@ class SectionSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]]
       case assembler.sections.SectionType.Data =>
         SectionFlag.Alloc | SectionFlag.Write
     }
-  val sectionAddress: Option[Address[OffsetType]] = Some(elf.memoryAddress(section))
+  val sectionAddress: Option[Long] = Some(elf.sectionOffset(section))
   val sectionFileOffset: Long = elf.alignedSectionOffset(section)
 
   val segmentFileSize: Long = section.size
@@ -66,7 +66,7 @@ class NullSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](el
   val nameReference: Int = 0
   val `type`: SectionType = SectionType.Null
   val flags: Flags[SectionFlag] = Flags.None
-  val sectionAddress: Option[Address[OffsetType]] = None
+  val sectionAddress: Option[Long] = None
   val sectionFileOffset: Long = 0
   val segmentFileSize: Long = 0
   val link: Int = 0
@@ -88,7 +88,7 @@ class StringSectionHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   val nameReference: Int = elf.stringMap(StringSectionHeader.name)
   val `type`: SectionType = SectionType.StringTable
   val flags: Flags[SectionFlag] = Flags.None
-  val sectionAddress: Option[Address[OffsetType]] = None
+  val sectionAddress: Option[Long] = None
   val sectionFileOffset: Long = elf.stringTableOffset
   val segmentFileSize: Long = elf.stringTableSize
   val link: Int = 0

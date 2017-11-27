@@ -42,11 +42,11 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   private val dataOffset: Long =
     programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
 
-  def sectionOffset(section: Section[OffsetType]): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
+  def sectionFileOffset(section: Section[OffsetType]): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
       (dataOffset, nextSection) => align(dataOffset, nextSection.alignment) + nextSection.size
     }
 
-  def alignedSectionOffset(section: Section[OffsetType]): Long = align(sectionOffset(section), section.alignment)
+  def alignedSectionOffset(section: Section[OffsetType]): Long = align(sectionFileOffset(section), section.alignment)
 
   private def align(value: Long, alignment: Int): Long = if (value % alignment == 0)
     value
@@ -59,7 +59,7 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  def memoryAddress(section: Section[OffsetType]): AddressType = addressFactory.zero //+ (alignedSectionOffset(section) % fileAlignment)
+  def sectionOffset(section: Section[OffsetType] with LastIteration[OffsetType]): Long = 0 //+ (alignedSectionOffset(section) % fileAlignment)
 
   def stringOffset(strings: List[String]): List[(String, Int)] =
     (strings.head, 0) :: stringOffset(1, strings)
@@ -79,7 +79,7 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
     prefix ::: section.encodeByte
   }
 
-  val alignedSectionData: List[List[Byte]] = encodableSections.map(s => alignSectionData(sectionOffset(s), s))
+  val alignedSectionData: List[List[Byte]] = encodableSections.map(s => alignSectionData(sectionFileOffset(s), s))
 
   override def encodeByte: List[Byte] =
     magic :::
@@ -90,7 +90,7 @@ abstract class Elf[OffsetType<:Offset, AddressType<:Address[OffsetType]](
     endianness.encode(elfType.id) :::
     endianness.encode(architecture.processor.id) :::
     endianness.encode(version.extended) :::
-    architecture.processorClass.numberBytes(getAbsoluteAddress(entryLabel).toLong) :::
+    architecture.processorClass.numberBytes(getAbsoluteOffset(entryLabel)) :::
     architecture.processorClass.numberBytes(programHeaderOffset) :::
     architecture.processorClass.numberBytes(sectionHeaderOffset) :::
     endianness.encode(architecture.processor.flags) :::

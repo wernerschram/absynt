@@ -74,12 +74,13 @@ trait LastIteration[OffsetType<:Offset] {
 
   def finalContent: List[Resource with Encodable]
 
-  //assert(!finalContent.exists(r => r.estimateSize.isInstanceOf[Bounded[OffsetType]]))
+  def offset(label: Label): Int =
+    finalContent.takeWhile(current => current.label != label)
+      .map(_.size).sum
 
-
-  def offset[RelativeOffsetType <: OffsetType with RelativeOffset](label: Label): RelativeOffsetType =
+  def offsetOld[RelativeOffsetType <: OffsetType with RelativeOffset](label: Label): RelativeOffsetType =
     estimatedOffset(label).asInstanceOf[Actual[RelativeOffsetType]].value
-  def offset[RelativeOffsetType <: OffsetType with RelativeOffset](encodable: Resource): RelativeOffsetType =
+  def offsetOld[RelativeOffsetType <: OffsetType with RelativeOffset](encodable: Resource): RelativeOffsetType =
     estimatedOffset(encodable).asInstanceOf[Actual[RelativeOffsetType]].value
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }

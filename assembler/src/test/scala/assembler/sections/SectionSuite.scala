@@ -19,8 +19,6 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     override def toLong: Long = offset.offset
   }
 
-  val zeroAddress: TestAddress = new TestAddress(new TestRelativeOffset(0))
-
   // FIXME: mock[Application[TestOffset]] doesn't work
 
   implicit val offsetFactory: OffsetFactory[TestOffset] = new OffsetFactory[TestOffset] {
@@ -143,7 +141,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)))
 
-        val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, zeroAddress)
+        val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, 0)
         application.encodableSections.head.encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
       }
     }
@@ -160,7 +158,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           one,
           two))
 
-        val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, zeroAddress)
+        val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, 0)
         application.encodableSections.head.size should be(oneSize + twoSize)
       }
     }
@@ -176,8 +174,8 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           intermediate,
           target))
 
-        val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, zeroAddress)
-        application.encodableSections.head.offset[TestRelativeOffset](target) should be(TestRelativeOffset(5))
+        val application: Application[TestOffset, TestAddress] = Raw[TestOffset, TestAddress](section, 0)
+        application.encodableSections.head.offsetOld[TestRelativeOffset](target) should be(TestRelativeOffset(5))
       }
     }
   }

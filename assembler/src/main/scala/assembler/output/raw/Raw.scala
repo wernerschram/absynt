@@ -4,13 +4,11 @@ import assembler._
 import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
 import assembler.sections.{LastIteration, Section}
 
-class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], val baseAddress: AddressType)
+class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], override val startOffset: Int)
   (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType])
   extends Application[OffsetType, AddressType](section :: Nil) {
 
-  def startOffset: Int = baseAddress.toLong.toInt
-
-  override def memoryAddress(section: Section[OffsetType]): AddressType = baseAddress
+  override def sectionOffset(section: Section[OffsetType] with LastIteration[OffsetType]): Long = startOffset
 
   override def encodeByte: List[Byte] = encodableSections.head.encodeByte
 
@@ -24,7 +22,7 @@ class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section
 
 object Raw {
 //  def apply[OffsetType](section: Section[OffsetType]) = new Raw(section, 0x100)
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], baseAddress: AddressType)
+  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], startOffset: Int)
     (implicit offsetFactory: OffsetFactory[OffsetType], addressFactory: AddressFactory[OffsetType, AddressType]) =
-      new Raw[OffsetType, AddressType](section, baseAddress)
+      new Raw[OffsetType, AddressType](section, startOffset)
 }

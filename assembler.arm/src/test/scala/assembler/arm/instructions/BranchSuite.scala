@@ -39,7 +39,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("EA000000 00000000 00000000"))
       }
 
@@ -50,7 +50,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel, Condition.LowerOrSame)))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 9AFFFFFC"))
       }
 
@@ -61,7 +61,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)},
           EncodedByteList(List.fill(8)(0x00.toByte))))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
       }
 
@@ -74,7 +74,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
       }
 
@@ -87,7 +87,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
             Branch(targetLabel)))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
       }
 
@@ -123,7 +123,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("EB000000 00000000 00000000"))
       }
     }
@@ -161,7 +161,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmRelativeOffset(0)))
+        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, 0)
         application.encodableSections.head.encodeByte should be(Hex.msb("FA000000 00000000 00000000"))
       }
     }

@@ -16,15 +16,11 @@ abstract class Application[OffsetType<:Offset, AddressType<:Address[OffsetType]]
     }))
   }
 
-  def getAbsoluteAddress(encodable: Resource): AddressType =
-    encodableSections.filter(s=> s.contains(encodable))
-      .map(s => addressFactory.add(memoryAddress(s), s.offset(encodable))).head
-
-  def getAbsoluteAddress(label: Label): AddressType =
+  def getAbsoluteOffset(label: Label): Long =
     encodableSections.filter(s => s.contains(label))
-      .map(s => addressFactory.add(memoryAddress(s), s.offset(label))).head
+      .map(s => sectionOffset(s) + s.offset(label)).head
 
-  def memoryAddress(section: Section[OffsetType]): AddressType
+  def sectionOffset(section: Section[OffsetType] with LastIteration[OffsetType]): Long
 
   def encodeByte: List[Byte]
 

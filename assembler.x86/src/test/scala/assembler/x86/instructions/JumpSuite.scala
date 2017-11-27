@@ -16,7 +16,6 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
     "in real mode" should {
 
       import ProcessorMode.Real._
-      val zeroAddress: FarPointer[RealX86Offset] = FarPointer(0, offset(0))
 
       "correctly encode jmp 0x10" in { Jump(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
       "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
@@ -176,7 +175,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
         withClue("Jump") { encodable.encodeByte should be(Hex.lsb("EB 01")) }
       }
@@ -195,7 +194,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(List.fill(1)(0x00)),
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
 
         encodable.size should be(2)
@@ -212,7 +211,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             jump))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
 
         withClue("Jump") { encodable.encodeByte should be(Hex.lsb("EB FC")) }
@@ -227,7 +226,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             jump))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
 
         withClue("Jump") { encodable.encodeByte should be(Hex.lsb("E3 FC")) }
@@ -242,7 +241,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
 
         withClue("Jump") { encodable.encodeByte should be(Hex.lsb("E9 00 01")) }
@@ -257,7 +256,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
 
         an[AssertionError] should be thrownBy { app.encodablesForReferences(jump :: Nil)(jump).encodeByte }
       }
@@ -271,7 +270,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             jump))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
 
         withClue("Jump") { encodable.encodeByte should be(Hex.lsb("E9 FC FE")) }
@@ -290,7 +289,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))},
             jump1))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("EB F9")) }
@@ -310,7 +309,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel = label2; EncodedByteList(List.fill(1)(0x00))},
             jump1))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("EB 80")) }
@@ -331,7 +330,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
 
 //        withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("EB 80")) }
@@ -352,7 +351,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(3)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("E9 7E FF")) }
@@ -373,7 +372,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(2)(0x00)),
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("E9 7D FF")) }
@@ -399,7 +398,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
             { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: jump3 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("EB 80")) }
@@ -426,7 +425,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(63)(0x00))},
             { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: jump3 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("E9 7D FF")) }
@@ -453,7 +452,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
             { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: jump3 :: Nil)
 
         withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("E9 7C FF")) }
@@ -465,7 +464,6 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
     "in protected mode" should {
 
       import ProcessorMode.Protected._
-      val zeroAddress: FarPointer[ProtectedX86Offset] = FarPointer(0, offset(0))
 
       "correctly encode jmp 0x10" in { Jump(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
       "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
@@ -590,7 +588,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(1)(0x00)),
             jump))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)
 
         withClue("Jump") { encodable(jump).encodeByte should be(Hex.lsb("EB FC")) }
@@ -605,7 +603,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             jump))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)
 
         withClue("Jump") { encodable(jump).encodeByte should be(Hex.lsb("E9 FA FE FF FF")) }
@@ -620,7 +618,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
             EncodedByteList(List.fill(256)(0x00)),
             { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
 
-        val app = Raw(p, zeroAddress)
+        val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)
 
         withClue("Jump") { encodable(jump).encodeByte should be(Hex.lsb("E9 00 01 00 00")) }
