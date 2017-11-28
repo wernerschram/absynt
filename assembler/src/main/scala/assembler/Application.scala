@@ -42,7 +42,7 @@ abstract class Application[OffsetType<:Offset] protected (
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
     val sizeFunctions: Map[Reference, DistanceFunction] =
-      references.foldLeft(Map.empty[Reference, DistanceFunction])((x,y) => x ++ distanceFunctionsForDependencies(Nil, x)(y))
+      references.foldLeft(Map.empty[Reference, DistanceFunction])((x,y) => x ++ distanceFunctionsForDependencies(Set.empty, x)(y))
 
     sizeFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
       val todo: Set[Reference] = resourceSize._2.requiredAssumptions.filterNot(resources.contains)
@@ -57,9 +57,9 @@ abstract class Application[OffsetType<:Offset] protected (
     })
   }
 
-  private def possibleSizeCombinations(references: Set[Reference]): Seq[Map[Reference, Int]]  =
+  private def possibleSizeCombinations(references: Set[Reference]): Set[Map[Reference, Int]]  =
     if (references.isEmpty)
-      Seq(Map.empty[Reference,Int])
+      Set(Map.empty[Reference,Int])
     else
       for (
         t <- possibleSizeCombinations(references.tail);
@@ -74,7 +74,7 @@ abstract class Application[OffsetType<:Offset] protected (
     distance: distanceForAssumptions,
     offsetDirection: OffsetDirection)
 
-  private final def distanceFunctionsForDependencies(visiting: List[Reference],
+  private final def distanceFunctionsForDependencies(visiting: Set[Reference],
     visited: Map[Reference, DistanceFunction])(current: Reference): Map[Reference, DistanceFunction] = {
 
     if (visited.contains(current))
@@ -101,7 +101,7 @@ abstract class Application[OffsetType<:Offset] protected (
                   (assumptions) => previousDistance.distance(assumptions) + assumptions(child), offsetDirection))
             else {
               val evaluatedDistanceFunctions: Map[Reference, DistanceFunction] =
-                distanceFunctionsForDependencies(current :: visiting, previousDistanceFunctions)(child)
+                distanceFunctionsForDependencies(visiting + current, previousDistanceFunctions)(child)
 
               val newDistanceFunctions = previousDistanceFunctions ++ evaluatedDistanceFunctions
               val childDistanceFunction: DistanceFunction = newDistanceFunctions(child)
