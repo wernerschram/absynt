@@ -79,7 +79,7 @@ abstract class Application[OffsetType<:Offset] protected (
 
     if (visited.contains(current))
       // this reference that has been evaluated in an earlier call (in a prior branch)
-      visited
+      Map.empty[Reference, DistanceFunction]
     else {
       val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
@@ -103,9 +103,10 @@ abstract class Application[OffsetType<:Offset] protected (
               val evaluatedDistanceFunctions: Map[Reference, DistanceFunction] =
                 distanceFunctionsForDependencies(current :: visiting, previousDistanceFunctions)(child)
 
-              val childDistanceFunction: DistanceFunction = evaluatedDistanceFunctions(child)
+              val newDistanceFunctions = previousDistanceFunctions ++ evaluatedDistanceFunctions
+              val childDistanceFunction: DistanceFunction = newDistanceFunctions(child)
 
-              (previousDistanceFunctions ++ evaluatedDistanceFunctions,
+              (newDistanceFunctions,
                 incrementalDistanceForAssumption(child, previousDistance, childDistanceFunction))
             }
         }
