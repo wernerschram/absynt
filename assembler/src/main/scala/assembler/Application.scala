@@ -41,37 +41,39 @@ abstract class Application[OffsetType<:Offset] protected (
   }
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
-    val sizeFunctions: Map[Reference, DistanceFunction] =
+    val distanceFunctions: Map[Reference, DistanceFunction] =
       references.foldLeft(Map.empty[Reference, DistanceFunction])((x,y) => x ++ distanceFunctionsForDependencies(Set.empty, x)(y))
 
-    sizeFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
-      val todo: Set[Reference] = resourceSize._2.requiredAssumptions.filterNot(resources.contains)
-      val validCombinations = possibleSizeCombinations(todo).filter(c => !c.exists{
-        case (reference, value) => {
-          reference.sizeForDistance(sizeFunctions(reference).distance(c), sizeFunctions(reference).offsetDirection) != value
-        }
+    distanceFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
+      val todo: Map[Reference, Seq[Int]] = resourceSize._2.requiredAssumptions.map(reference => resources.get(reference) match {
+        case None => reference -> reference.possibleSizes
+        case Some(resource) => reference -> Seq(resource.size)
+      }).toMap
+
+      val validCombinations = possibleSizeCombinations(todo).filter(c => c == c.map{
+        case (reference, _) =>
+          reference -> reference.sizeForDistance(distanceFunctions(reference).distance(c), distanceFunctions(reference).offsetDirection)
       })
 
-      //TODO !!!
-      resources + (resourceSize._1 -> resourceSize._1.encodeForDistance(resourceSize._2.distance(validCombinations.head), resourceSize._2.offsetDirection))
+      val shortestCombination = validCombinations.minBy(_.values.sum)
+
+      resources + (resourceSize._1 -> resourceSize._1.encodeForDistance(resourceSize._2.distance(shortestCombination), resourceSize._2.offsetDirection))
     })
   }
 
-  private def possibleSizeCombinations(references: Set[Reference]): Set[Map[Reference, Int]]  =
+  private def possibleSizeCombinations(references: Map[Reference, Seq[Int]]): Set[Map[Reference, Int]]  =
     if (references.isEmpty)
       Set(Map.empty[Reference,Int])
     else
       for (
         t <- possibleSizeCombinations(references.tail);
-        h <- references.head.possibleSizes
+        h <- references.head._2
       ) yield
-        t + (references.head -> h)
-
-  private type distanceForAssumptions = Map[Reference, Int] => Int
+        t + (references.head._1 -> h)
 
   private case class DistanceFunction(
     requiredAssumptions: Set[Reference],
-    distance: distanceForAssumptions,
+    distance: Map[Reference, Int] => Int,
     offsetDirection: OffsetDirection)
 
   private final def distanceFunctionsForDependencies(visiting: Set[Reference],
