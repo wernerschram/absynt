@@ -8,23 +8,6 @@ import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers with MockFactory {
 
-  abstract class TestOffset extends Offset {
-    def offset: Long
-  }
-
-  case class TestRelativeOffset(override val offset: Long) extends TestOffset with RelativeOffset {
-  }
-
-  // FIXME: mock[Application[TestOffset]] doesn't work
-
-  implicit val offsetFactory: OffsetFactory[TestOffset] = new OffsetFactory[TestOffset] {
-    override def offset(offsetValue: Long): TestOffset with RelativeOffset = new TestRelativeOffset(offsetValue)
-    override def add(thisOffset: TestOffset, that: TestOffset with RelativeOffset): TestOffset with RelativeOffset = offset(thisOffset.offset + that.offset)
-    override def add(thisOffset: TestOffset, that: Long): TestOffset with RelativeOffset = offset(thisOffset.offset + that)
-
-    override def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): TestOffset with TestRelativeOffset = ???
-  }
-
   "a Section" when {
     "queried for immediate instructions" should {
 
