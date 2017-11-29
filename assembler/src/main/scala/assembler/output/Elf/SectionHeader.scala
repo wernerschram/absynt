@@ -1,9 +1,8 @@
 package assembler.output.Elf
 
-import assembler.Offset
 import assembler.sections.{LastIteration, Section}
 
-abstract class SectionHeader[OffsetType<:Offset](elf: Elf[OffsetType]) {
+abstract class SectionHeader(elf: Elf) {
 
   def nameReference: Int
   def `type`: SectionType
@@ -37,8 +36,8 @@ abstract class SectionHeader[OffsetType<:Offset](elf: Elf[OffsetType]) {
   }
 }
 
-class SectionSectionHeader[OffsetType<:Offset](section: Section
-  with LastIteration, elf: Elf[OffsetType]) extends SectionHeader[OffsetType](elf) {
+class SectionSectionHeader(section: Section
+  with LastIteration, elf: Elf) extends SectionHeader(elf) {
 
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
@@ -61,8 +60,8 @@ class SectionSectionHeader[OffsetType<:Offset](section: Section
   val entrySize: Int = 0x0
 }
 
-class NullSectionHeader[OffsetType<:Offset](elf: Elf[OffsetType])
-  extends SectionHeader[OffsetType](elf) {
+class NullSectionHeader(elf: Elf)
+  extends SectionHeader(elf) {
   val nameReference: Int = 0
   val `type`: SectionType = SectionType.Null
   val flags: Flags[SectionFlag] = Flags.None
@@ -78,11 +77,11 @@ class NullSectionHeader[OffsetType<:Offset](elf: Elf[OffsetType])
 }
 
 object NullSectionHeader {
-  def apply[OffsetType<:Offset](elf: Elf[OffsetType]):
-  NullSectionHeader[OffsetType] = new NullSectionHeader[OffsetType](elf)
+  def apply(elf: Elf):
+  NullSectionHeader = new NullSectionHeader(elf)
 }
 
-class StringSectionHeader[OffsetType<:Offset](elf: Elf[OffsetType])
+class StringSectionHeader(elf: Elf)
   extends SectionHeader(elf) {
 
   val nameReference: Int = elf.stringMap(StringSectionHeader.name)
@@ -101,8 +100,8 @@ class StringSectionHeader[OffsetType<:Offset](elf: Elf[OffsetType])
 
 object StringSectionHeader {
   val name = ".shstrtab"
-  def apply[OffsetType<:Offset](elf: Elf[OffsetType]):
-  StringSectionHeader[OffsetType] = new StringSectionHeader(elf)
+  def apply(elf: Elf):
+  StringSectionHeader = new StringSectionHeader(elf)
 }
 
 abstract case class SectionType private(id: Int)
