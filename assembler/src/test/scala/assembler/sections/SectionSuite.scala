@@ -31,14 +31,14 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a relative instruction and a label" in {
         val label = Label.unique
-        val myRelativeReference: SinglePassRelativeReference[TestRelativeOffset] = mock[SinglePassRelativeReference[TestRelativeOffset]]
+        val myRelativeReference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
         (myRelativeReference.target _).expects().returning(label).anyNumberOfTimes()
         (myRelativeReference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val reference = myRelativeReference
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
           intermediate,
           target))
@@ -48,13 +48,13 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a label and a relative instruction" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference[TestRelativeOffset] = mock[SinglePassRelativeReference[TestRelativeOffset]]
+        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           target,
           intermediate,
           reference))
@@ -64,13 +64,13 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
-        val reference: SinglePassRelativeReference[TestRelativeOffset] = mock[SinglePassRelativeReference[TestRelativeOffset]]
+        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
         (reference.target _).expects().returning(targetLabel).anyNumberOfTimes()
         (reference.label _).expects().returning(targetLabel).anyNumberOfTimes()
         val prefix = EncodedByteList(List.fill(2)(0))
         val postfix = EncodedByteList(List.fill(3)(0))
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           prefix,
           reference,
           postfix))
@@ -83,12 +83,12 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a forward reference" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference[TestOffset] = mock[SinglePassRelativeReference[TestOffset]]
+        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
           target))
 
@@ -97,12 +97,12 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a backward reference" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference[TestOffset] = mock[SinglePassRelativeReference[TestOffset]]
+        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           target,
           reference))
 
@@ -111,11 +111,11 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a reference to self" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference[TestOffset] = mock[SinglePassRelativeReference[TestOffset]]
+        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(label).anyNumberOfTimes()
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           reference))
 
         section.offsetDirection(reference) shouldBe OffsetDirection.Self
@@ -126,7 +126,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     "asked to encode itself" should {
 
       "be able to encode itself" in {
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)))
 
@@ -143,7 +143,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val one = EncodedByteList(List.fill(oneSize)(1))
         val two = EncodedByteList(List.fill(twoSize)(2))
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           one,
           two))
 
@@ -159,7 +159,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val intermediate = EncodedByteList(List.fill(5)(0))
         val target = EncodedByteList(0.toByte :: Nil)(label)
 
-        val section = Section[TestOffset](SectionType.Text, ".test", List[Resource](
+        val section = Section(SectionType.Text, ".test", List[Resource](
           intermediate,
           target))
 

@@ -1,14 +1,14 @@
 package assembler.x86.operations
 
-import assembler.reference.SinglePassRelativeReference
-import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, X86RelativeOffset, NearPointer => NearPointerOperand}
 import assembler._
+import assembler.reference.SinglePassRelativeReference
 import assembler.x86.X86OffsetFactory
+import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 
 abstract class ShortJumpOperation[OffsetType <: X86Offset]
   (val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
   (implicit val offsetFactory: X86OffsetFactory[OffsetType])
-    extends SinglePassRelativeReference[OffsetType] {
+    extends SinglePassRelativeReference {
 
   val shortJumpSize: Int = shortOpcode.length + 1
 

@@ -9,7 +9,7 @@ import assembler.reference.SinglePassRelativeReference
 abstract class ReferencingARMOperation(val label: Label, val opcode: String, override val target: Label,
                                                     val condition: Condition)
                                                    (implicit val offsetFactory: ArmOffsetFactory)
-  extends SinglePassRelativeReference[ArmOffset] with NamedConditional {
+  extends SinglePassRelativeReference with NamedConditional {
 
   //FIXME: this is not correct for add.forRelativeLabel.
  val instructionSize = 4

@@ -64,7 +64,7 @@ object Boot extends App {
     val text: Label = "Text"
     val entry: Label = "Entry"
 
-    val section: Section[ArmOffset] = Section(SectionType.Text, ".text",
+    val section: Section = Section(SectionType.Text, ".text",
 
       // Disable UART0
       { implicit val label: Label = entry; Move.forConstant(UART0.Base, R0) } ::

@@ -9,7 +9,7 @@ import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.{FarPointer, RealX86Offset}
+import assembler.x86.operands.memoryaccess.RealX86Offset
 import assembler.{Label, Resource, UniqueLabel}
 
 object Boot extends App {
@@ -36,7 +36,7 @@ object Boot extends App {
     val bottomColor = Color(0, 0, 63)
 
     val targetLabel = Label.unique
-    val section: Section[RealX86Offset] = Section[RealX86Offset](SectionType.Text, ".text",
+    val section: Section = Section(SectionType.Text, ".text",
 
 
       JumpIfCountZero(targetLabel) ::

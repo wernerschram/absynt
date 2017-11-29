@@ -3,12 +3,12 @@ package assembler
 import assembler.sections.{LastIteration, Section}
 
 abstract class Application[OffsetType<:Offset] protected (
-  val sections: List[Section[OffsetType]])
+  val sections: List[Section])
   (implicit offsetFactory: OffsetFactory[OffsetType]) {
 
   def startOffset: Int
 
-  lazy val encodableSections: List[Section[OffsetType] with LastIteration[OffsetType]] = {
+  lazy val encodableSections: List[Section with LastIteration] = {
     val referenceMap: Map[Reference, Encodable] = encodablesForReferences(sections.flatMap(s => s.content.collect{case r: Reference => r}))
     sections.map(s => Section.lastIteration(s.sectionType, s.name, s.content.map {
       case reference: Reference => referenceMap(reference)
@@ -20,7 +20,7 @@ abstract class Application[OffsetType<:Offset] protected (
     encodableSections.filter(s => s.contains(label))
       .map(s => sectionOffset(s) + s.offset(label)).head
 
-  def sectionOffset(section: Section[OffsetType] with LastIteration[OffsetType]): Long
+  def sectionOffset(section: Section with LastIteration): Long
 
   def encodeByte: List[Byte]
 

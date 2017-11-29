@@ -3,7 +3,7 @@ package assembler.output.Elf
 import assembler.Offset
 import assembler.sections.{LastIteration, Section}
 
-class ProgramHeader[OffsetType<:Offset](section: Section[OffsetType] with LastIteration[OffsetType],
+class ProgramHeader[OffsetType<:Offset](section: Section with LastIteration,
                                         val flags: Flags[ProgramFlag], elf: Elf[OffsetType]) {
   def `type`: ProgramType = ProgramType.Load
 
@@ -38,7 +38,7 @@ class ProgramHeader[OffsetType<:Offset](section: Section[OffsetType] with LastIt
 }
 
 object ProgramHeader {
-  def apply[OffsetType<:Offset](section: Section[OffsetType] with LastIteration[OffsetType],
+  def apply[OffsetType<:Offset](section: Section with LastIteration,
                                 elf: Elf[OffsetType]): ProgramHeader[OffsetType] = section.sectionType match {
     case assembler.sections.SectionType.Text =>
       new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)

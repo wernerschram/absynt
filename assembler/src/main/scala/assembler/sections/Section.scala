@@ -1,12 +1,11 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
+import assembler.reference.SinglePassRelativeReference
 
-import scala.annotation.tailrec
 import scala.language.implicitConversions
 
-abstract class Section[OffsetType<:Offset:OffsetFactory] {
+abstract class Section {
   def content: List[Resource]
 
   def name: String
@@ -14,9 +13,6 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
   def sectionType: SectionType
 
   val alignment: Int
-
-  protected def offset(value: Long): OffsetType with RelativeOffset =
-    implicitly[OffsetFactory[OffsetType]].offset(value)
 
   type EncodableCondition = (Resource)=>Boolean
 
@@ -48,7 +44,7 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
       trimLeft.head :: trimRight
   }
 
-  def offsetDirection(from: SinglePassRelativeReference[OffsetType]): OffsetDirection = {
+  def offsetDirection(from: SinglePassRelativeReference): OffsetDirection = {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     if (firstInstruction.label.matches(from.target))
       if (firstInstruction==from)
@@ -60,8 +56,8 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
   }
 }
 
-trait LastIteration[OffsetType<:Offset] {
-  iteration: Section[OffsetType] =>
+trait LastIteration {
+  iteration: Section =>
 
   def finalContent: List[Resource with Encodable]
 
@@ -75,17 +71,17 @@ trait LastIteration[OffsetType<:Offset] {
 }
 
 object Section {
-  def apply[OffsetType<:Offset:OffsetFactory](`type`: SectionType, sectionName: String, resources: List[Resource]): Section[OffsetType] =
-    new Section[OffsetType] {
+  def apply(`type`: SectionType, sectionName: String, resources: List[Resource]): Section =
+    new Section {
       val alignment: Int = 16
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val content: List[Resource] = resources
     }
 
-  def lastIteration[OffsetType<:Offset:OffsetFactory](`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
-  Section[OffsetType] with LastIteration[OffsetType] =
-    new Section[OffsetType] with LastIteration[OffsetType] {
+  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
+  Section with LastIteration =
+    new Section with LastIteration {
       val alignment: Int = 16
       override val name: String = sectionName
       override val sectionType: SectionType = `type`

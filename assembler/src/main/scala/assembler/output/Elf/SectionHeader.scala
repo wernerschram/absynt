@@ -1,7 +1,7 @@
 package assembler.output.Elf
 
+import assembler.Offset
 import assembler.sections.{LastIteration, Section}
-import assembler.{Address, Offset}
 
 abstract class SectionHeader[OffsetType<:Offset](elf: Elf[OffsetType]) {
 
@@ -37,8 +37,8 @@ abstract class SectionHeader[OffsetType<:Offset](elf: Elf[OffsetType]) {
   }
 }
 
-class SectionSectionHeader[OffsetType<:Offset](section: Section[OffsetType]
-  with LastIteration[OffsetType], elf: Elf[OffsetType]) extends SectionHeader[OffsetType](elf) {
+class SectionSectionHeader[OffsetType<:Offset](section: Section
+  with LastIteration, elf: Elf[OffsetType]) extends SectionHeader[OffsetType](elf) {
 
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits

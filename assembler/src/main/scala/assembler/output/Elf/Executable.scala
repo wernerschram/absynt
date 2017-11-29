@@ -6,7 +6,7 @@ import assembler.sections.{LastIteration, Section}
 
 abstract class Elf[OffsetType<:Offset](
   val architecture: Architecture,
-  sections: List[Section[OffsetType]],
+  sections: List[Section],
   val entryLabel: Label)
   (implicit offsetFactory: OffsetFactory[OffsetType])
   extends Application[OffsetType](sections) {
@@ -42,11 +42,11 @@ abstract class Elf[OffsetType<:Offset](
   private val dataOffset: Long =
     programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
 
-  def sectionFileOffset(section: Section[OffsetType]): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
+  def sectionFileOffset(section: Section): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
       (dataOffset, nextSection) => align(dataOffset, nextSection.alignment) + nextSection.size
     }
 
-  def alignedSectionOffset(section: Section[OffsetType]): Long = align(sectionFileOffset(section), section.alignment)
+  def alignedSectionOffset(section: Section): Long = align(sectionFileOffset(section), section.alignment)
 
   private def align(value: Long, alignment: Int): Long = if (value % alignment == 0)
     value
@@ -59,7 +59,7 @@ abstract class Elf[OffsetType<:Offset](
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  def sectionOffset(section: Section[OffsetType] with LastIteration[OffsetType]): Long = 0 //+ (alignedSectionOffset(section) % fileAlignment)
+  def sectionOffset(section: Section with LastIteration): Long = 0 //+ (alignedSectionOffset(section) % fileAlignment)
 
   def stringOffset(strings: List[String]): List[(String, Int)] =
     (strings.head, 0) :: stringOffset(1, strings)
@@ -71,7 +71,7 @@ abstract class Elf[OffsetType<:Offset](
     case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
   }
 
-  private def alignSectionData(offset: Long, section: Section[OffsetType] with LastIteration[OffsetType]): List[Byte] = {
+  private def alignSectionData(offset: Long, section: Section with LastIteration): List[Byte] = {
     val prefix: List[Byte] = if (offset % section.alignment != 0)
       List.fill(section.alignment - offset.toInt % section.alignment)(0)
     else
@@ -108,7 +108,7 @@ abstract class Elf[OffsetType<:Offset](
 
 class Executable[OffsetType<:Offset] private(
   architecture: Architecture,
-  sections: List[Section[OffsetType]],
+  sections: List[Section],
   entryLabel: Label)
   (implicit offsetFactory: OffsetFactory[OffsetType])
   extends Elf[OffsetType](architecture, sections, entryLabel) {
@@ -118,7 +118,7 @@ class Executable[OffsetType<:Offset] private(
   override def elfType: ElfType = ElfType.Executable
 
   override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
-    case relative: SinglePassRelativeReference[OffsetType] =>
+    case relative: SinglePassRelativeReference =>
       val section = sections.filter(s => s.contains(from)).head
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference[OffsetType] => (
@@ -130,7 +130,7 @@ class Executable[OffsetType<:Offset] private(
 }
 
 object Executable {
-  def apply[OffsetType<:Offset](architecture: Architecture, sections: List[Section[OffsetType]], entryLabel: Label)
+  def apply[OffsetType<:Offset](architecture: Architecture, sections: List[Section], entryLabel: Label)
     (implicit offsetFactory: OffsetFactory[OffsetType]) =
     new Executable(architecture, sections, entryLabel)
 }
