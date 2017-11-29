@@ -2,7 +2,7 @@ package assembler.reference
 
 import assembler._
 
-sealed abstract case class AbsoluteReference[OffsetType<:Offset](
+sealed abstract case class AbsoluteReference(
   target: Label, override val label: Label)
     extends Reference {
 
@@ -22,9 +22,8 @@ sealed abstract case class AbsoluteReference[OffsetType<:Offset](
 }
 
 object AbsoluteReference {
-  def apply[OffsetType<:Offset](target: Label,
-    sizes: Seq[Int], label: Label, encodableFactor: (Int) => Resource with Encodable) =
-    new AbsoluteReference[OffsetType](target, label) {
+  def apply(target: Label, sizes: Seq[Int], label: Label, encodableFactor: (Int) => Resource with Encodable): AbsoluteReference =
+    new AbsoluteReference(target, label) {
 
       override def possibleSizes: Seq[Int] = sizes
 

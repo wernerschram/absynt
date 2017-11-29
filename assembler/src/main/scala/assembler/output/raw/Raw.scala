@@ -15,7 +15,7 @@ class Raw[OffsetType<:Offset](section: Section, override val startOffset: Int)
   override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
     case relative: SinglePassRelativeReference =>
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
-    case absolute: AbsoluteReference[OffsetType] =>
+    case absolute: AbsoluteReference =>
       (section.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute)
   }
 }
