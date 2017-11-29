@@ -30,8 +30,6 @@ sealed abstract class RelativePointer(val offset: ArmOffset with RelativeOffset)
 case class RelativeA32Pointer(override val offset: ArmOffset with RelativeOffset) extends RelativePointer(offset) {
   //offset should be divisible by 4
   assume((offset.offset & 0x00000003) == 0)
-
-  override def toLong: Long = offset.offset
 }
 
 case class RelativeThumbPointer(override val offset: ArmOffset with RelativeOffset) extends RelativePointer(offset) {
@@ -39,7 +37,5 @@ case class RelativeThumbPointer(override val offset: ArmOffset with RelativeOffs
   assume((offset.offset & 0x00000001) == 0)
 
   override def encode: Int = super.encode | ((offset.offset & 2) << 23)
-
-  override def toLong: Long = offset.offset
 }
 

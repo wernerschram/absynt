@@ -21,7 +21,6 @@ object FarPointer {
       implicit def OffsetFactory: OffsetFactory[RealX86Offset] = ProcessorMode.Real.offsetFactory
 
       override val operandByteSize: FarPointerSize = FarPointerSize.DoubleWord
-      override def toLong: Long = offset.offset
     }
 
   def apply(segment: Short, offset: ProtectedX86Offset): FarPointer[ProtectedX86Offset] =
@@ -29,6 +28,5 @@ object FarPointer {
       implicit def OffsetFactory: OffsetFactory[ProtectedX86Offset] = ProcessorMode.Protected.offsetFactory
 
       override val operandByteSize: FarPointerSize = FarPointerSize.FarWord
-      override def toLong: Long = offset.offset
     }
 }

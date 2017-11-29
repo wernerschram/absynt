@@ -1,8 +1,6 @@
 package assembler
 
-abstract class Address[OffsetType <: Offset] {
-  def toLong: Long // FIXME: toLong is used for encoding addresses in Elf files. This should be replaced by some function in ProcessorClass
-}
+abstract class Address[OffsetType <: Offset]
 
 sealed trait OffsetDirection
 

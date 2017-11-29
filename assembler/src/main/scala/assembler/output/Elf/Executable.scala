@@ -128,8 +128,7 @@ class Executable private(
 }
 
 object Executable {
-  def apply[OffsetType<:Offset](architecture: Architecture, sections: List[Section], entryLabel: Label)
-    (implicit offsetFactory: OffsetFactory[OffsetType]) =
+  def apply(architecture: Architecture, sections: List[Section], entryLabel: Label) =
     new Executable(architecture, sections, entryLabel)
 }
 

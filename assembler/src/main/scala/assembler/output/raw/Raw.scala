@@ -20,7 +20,5 @@ class Raw(section: Section, override val startOffset: Int)
 }
 
 object Raw {
-//  def apply[OffsetType](section: Section[OffsetType]) = new Raw(section, 0x100)
-  def apply(section: Section, startOffset: Int) =
-      new Raw(section, startOffset)
+  def apply(section: Section, startOffset: Int) = new Raw(section, startOffset)
 }

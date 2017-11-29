@@ -20,8 +20,6 @@ object ShortPointer {
       override def encodeBytes: List[Byte] = offset.encodeShort(1)
 
       override def toString: String = s"0x${offset.encodeShort(1).bigEndianHexString}"
-
-      override def toLong: Long = offset.offset
     }
 }
 
@@ -33,7 +31,5 @@ object LongPointer {
       override def encodeBytes: List[Byte] = offset.encode(1)
 
       override def toString: String = s"0x${offset.encode(1).bigEndianHexString}"
-
-      override def toLong: Long = offset.offset
     }
 }
