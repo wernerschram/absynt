@@ -130,7 +130,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)))
 
-        val application: Application[TestOffset] = Raw[TestOffset](section, 0)
+        val application: Application = Raw(section, 0)
         application.encodableSections.head.encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
       }
     }
@@ -147,7 +147,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           one,
           two))
 
-        val application: Application[TestOffset] = Raw[TestOffset](section, 0)
+        val application: Application = Raw(section, 0)
         application.encodableSections.head.size should be(oneSize + twoSize)
       }
     }
@@ -163,7 +163,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           intermediate,
           target))
 
-        val application: Application[TestOffset] = Raw[TestOffset](section, 0)
+        val application: Application = Raw(section, 0)
         application.encodableSections.head.offset(label) should be(5)
       }
     }

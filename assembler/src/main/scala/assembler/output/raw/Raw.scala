@@ -6,7 +6,7 @@ import assembler.sections.{LastIteration, Section}
 
 class Raw[OffsetType<:Offset](section: Section, override val startOffset: Int)
   (implicit offsetFactory: OffsetFactory[OffsetType])
-  extends Application[OffsetType](section :: Nil) {
+  extends Application(section :: Nil) {
 
   override def sectionOffset(section: Section with LastIteration): Long = startOffset
 
