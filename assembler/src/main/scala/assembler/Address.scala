@@ -1,7 +1,5 @@
 package assembler
 
-abstract class Address[OffsetType <: Offset]
-
 sealed trait OffsetDirection
 
 object OffsetDirection {

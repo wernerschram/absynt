@@ -3,10 +3,10 @@ package assembler.x86.operands.memoryaccess
 import assembler.ListExtensions._
 import assembler.x86.X86OffsetFactory
 import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize, ValueSize}
-import assembler.{Address, OffsetFactory, RelativeOffset}
+import assembler.{OffsetFactory, RelativeOffset}
 
 sealed abstract class NearPointer[OffsetType <: X86Offset : OffsetFactory](val offset: OffsetType with RelativeOffset)
-  extends Address[OffsetType] with Operand with FixedSizeOperand {
+  extends Operand with FixedSizeOperand {
   val operandByteSize: OperandSize
 
   def encodeBytes: List[Byte]

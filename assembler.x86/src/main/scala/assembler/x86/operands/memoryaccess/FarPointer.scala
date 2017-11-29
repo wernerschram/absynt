@@ -1,12 +1,12 @@
 package assembler.x86.operands.memoryaccess
 
-import assembler.{Address, OffsetFactory}
 import assembler.ListExtensions._
+import assembler.OffsetFactory
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.{FarPointerSize, FixedSizeOperand, Operand}
 
 sealed abstract case class FarPointer[OffsetType <: X86Offset](segment: Short, offset: OffsetType)
-  extends Address[OffsetType] with Operand with FixedSizeOperand {
+  extends Operand with FixedSizeOperand {
 
   override val operandByteSize: FarPointerSize
   override def toString =
