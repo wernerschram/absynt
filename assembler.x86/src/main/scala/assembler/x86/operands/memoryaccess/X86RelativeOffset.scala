@@ -12,14 +12,6 @@ abstract class X86Offset(val offset: Long) extends Offset {
 
   def encode(sourceInstructionBaseSize: Int): List[Byte]
   def encodeShort(sourceInstructionBaseSize: Int): List[Byte] = offset.toByte.encodeLittleEndian
-
-  def add[OffsetType <: X86Offset with RelativeOffset: OffsetFactory](that: OffsetType): OffsetType =
-    implicitly[OffsetFactory[OffsetType]].offset(this.offset + that.offset)
-  def +[OffsetType <: X86Offset with RelativeOffset: OffsetFactory](that: OffsetType): OffsetType = add(that)
-
-  def add[OffsetType <: X86Offset with X86RelativeOffset: OffsetFactory](that: Long): OffsetType =
-    implicitly[OffsetFactory[OffsetType]].offset(this.offset + that)
-  def +[OffsetType <: X86Offset with X86RelativeOffset: OffsetFactory](that: Long): OffsetType = add(that)
 }
 
 abstract class RealX86Offset(offset: Long) extends X86Offset(offset)
