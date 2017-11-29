@@ -16,7 +16,7 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset]
 
   override def toString = s"$labelPrefix$mnemonic $target"
 
-  override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Resource with Encodable =
+  override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with Encodable =
     encodableForShortPointer(ShortPointer[OffsetType](offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)))
 
   override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int =

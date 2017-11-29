@@ -18,7 +18,7 @@ object ProcessorMode {
       override def add(thisOffset: RealX86Offset, that: Long): RealX86Offset with RelativeOffset =
         offset(thisOffset.offset + that)
 
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): RealX86Offset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): RealX86Offset with RelativeOffset =
         offsetDirection match {
           case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
@@ -39,7 +39,7 @@ object ProcessorMode {
       override def add(thisOffset: ProtectedX86Offset, that: Long): ProtectedX86Offset with RelativeOffset =
       offset(thisOffset.offset + that)
 
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
         offsetDirection match {
           case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
           case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
@@ -60,7 +60,7 @@ object ProcessorMode {
       override def add(thisOffset: ProtectedX86Offset, that: Long): ProtectedX86Offset with RelativeOffset =
         offset(thisOffset.offset + that)
 
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: OffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
+      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
         offsetDirection match {
         case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
         case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
