@@ -2,7 +2,7 @@ package assembler.sections
 
 import assembler._
 import assembler.output.raw.Raw
-import assembler.reference.SinglePassRelativeReference
+import assembler.reference.RelativeReference
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
@@ -14,7 +14,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a relative instruction and a label" in {
         val label = Label.unique
-        val myRelativeReference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
+        val myRelativeReference: RelativeReference = mock[RelativeReference]
         (myRelativeReference.target _).expects().returning(label).anyNumberOfTimes()
         (myRelativeReference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val reference = myRelativeReference
@@ -31,7 +31,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a label and a relative instruction" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
+        val reference: RelativeReference = mock[RelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val intermediate = EncodedByteList(List.fill(5)(0))
@@ -47,7 +47,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
-        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
+        val reference: RelativeReference = mock[RelativeReference]
         (reference.target _).expects().returning(targetLabel).anyNumberOfTimes()
         (reference.label _).expects().returning(targetLabel).anyNumberOfTimes()
         val prefix = EncodedByteList(List.fill(2)(0))
@@ -66,7 +66,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a forward reference" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
+        val reference: RelativeReference = mock[RelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val target = EncodedByteList(0.toByte :: Nil)(label)
@@ -80,7 +80,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a backward reference" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
+        val reference: RelativeReference = mock[RelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
         val target = EncodedByteList(0.toByte :: Nil)(label)
@@ -94,7 +94,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a reference to self" in {
         val label = Label.unique
-        val reference: SinglePassRelativeReference = mock[SinglePassRelativeReference]
+        val reference: RelativeReference = mock[RelativeReference]
         (reference.target _).expects().returning(label).anyNumberOfTimes()
         (reference.label _).expects().returning(label).anyNumberOfTimes()
 

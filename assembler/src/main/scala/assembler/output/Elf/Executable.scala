@@ -1,7 +1,7 @@
 package assembler.output.Elf
 
 import assembler._
-import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
+import assembler.reference.{AbsoluteReference, RelativeReference}
 import assembler.sections.{LastIteration, Section}
 
 abstract class Elf(
@@ -116,7 +116,7 @@ class Executable private(
   override def elfType: ElfType = ElfType.Executable
 
   override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
-    case relative: SinglePassRelativeReference =>
+    case relative: RelativeReference =>
       val section = sections.filter(s => s.contains(from)).head
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference => (

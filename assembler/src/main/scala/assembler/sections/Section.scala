@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.SinglePassRelativeReference
+import assembler.reference.RelativeReference
 
 import scala.language.implicitConversions
 
@@ -44,7 +44,7 @@ abstract class Section {
       trimLeft.head :: trimRight
   }
 
-  def offsetDirection(from: SinglePassRelativeReference): OffsetDirection = {
+  def offsetDirection(from: RelativeReference): OffsetDirection = {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     if (firstInstruction.label.matches(from.target))
       if (firstInstruction==from)

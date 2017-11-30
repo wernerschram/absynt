@@ -2,7 +2,7 @@ package assembler.reference
 
 import assembler._
 
-trait SinglePassRelativeReference
+trait RelativeReference
     extends Reference {
 
   final def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =

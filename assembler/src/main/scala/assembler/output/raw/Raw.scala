@@ -1,7 +1,7 @@
 package assembler.output.raw
 
 import assembler._
-import assembler.reference.{AbsoluteReference, SinglePassRelativeReference}
+import assembler.reference.{AbsoluteReference, RelativeReference}
 import assembler.sections.{LastIteration, Section}
 
 class Raw(section: Section, override val startOffset: Int)
@@ -12,7 +12,7 @@ class Raw(section: Section, override val startOffset: Int)
   override def encodeByte: List[Byte] = encodableSections.head.encodeByte
 
   override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
-    case relative: SinglePassRelativeReference =>
+    case relative: RelativeReference =>
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference =>
       (section.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute)
