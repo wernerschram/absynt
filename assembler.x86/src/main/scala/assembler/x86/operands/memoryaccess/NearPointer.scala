@@ -1,11 +1,10 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
-import assembler.x86.X86OffsetFactory
+import assembler.RelativeOffset
 import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize, ValueSize}
-import assembler.{OffsetFactory, RelativeOffset}
 
-sealed abstract class NearPointer[OffsetType <: X86Offset : OffsetFactory](val offset: OffsetType with RelativeOffset)
+sealed abstract class NearPointer[OffsetType <: X86Offset](val offset: OffsetType with RelativeOffset)
   extends Operand with FixedSizeOperand {
   val operandByteSize: OperandSize
 
@@ -13,7 +12,7 @@ sealed abstract class NearPointer[OffsetType <: X86Offset : OffsetFactory](val o
 }
 
 object ShortPointer {
-  def apply[OffsetType <: X86Offset : X86OffsetFactory](offset: OffsetType with RelativeOffset): NearPointer[OffsetType] =
+  def apply[OffsetType <: X86Offset](offset: OffsetType with RelativeOffset): NearPointer[OffsetType] =
     new NearPointer[OffsetType](offset) {
       val operandByteSize: ValueSize = ValueSize.Byte
 
@@ -24,7 +23,7 @@ object ShortPointer {
 }
 
 object LongPointer {
-  def apply[OffsetType <: X86Offset : X86OffsetFactory](offset: OffsetType with RelativeOffset): NearPointer[OffsetType] =
+  def apply[OffsetType <: X86Offset](offset: OffsetType with RelativeOffset): NearPointer[OffsetType] =
     new NearPointer[OffsetType](offset) {
       val operandByteSize: OperandSize = offset.operandByteSize
 

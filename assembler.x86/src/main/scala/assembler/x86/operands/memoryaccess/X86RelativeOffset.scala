@@ -2,7 +2,7 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
 import assembler.x86.operands.ValueSize
-import assembler.{Offset, OffsetFactory, RelativeOffset}
+import assembler.{Offset, RelativeOffset}
 
 abstract class X86Offset(val offset: Long) extends Offset {
 
