@@ -5,7 +5,7 @@ import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
 import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.{Encodable, Label, OffsetDirection, RelativeOffsetDirection}
+import assembler.{Encodable, Label, RelativeOffsetDirection}
 
 class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)
@@ -29,7 +29,7 @@ class Branch(code: Byte, val opcode: String) {
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): BranchRegister =
+  def apply(destination: GeneralRegister, condition: Condition = Always)(implicit label: Label): BranchRegister =
     Register(label, destination, condition)
 
   private def Register(label: Label, destination: GeneralRegister, condition: Condition = Always) =
