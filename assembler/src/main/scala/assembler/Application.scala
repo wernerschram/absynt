@@ -73,26 +73,33 @@ abstract class Application protected (
 
   private sealed abstract class DistanceFunction(val offsetDirection: OffsetDirection) {
     def requiredAssumptions: Set[Reference]
+
     def distance(assumptions: Map[Reference, Int]): Int
 
-    def addDistanceFunction(reference: Reference, newDistanceFunction: DistanceFunction): DistanceFunction
+    def addDistanceFunction(reference: Reference, newDistanceFunction: DistanceFunction): DistanceFunction =  newDistanceFunction match {
+      case known: KnownDistance => addDistanceFunction(reference, known)
+      case unknown: UnknownDistance => addDistanceFunction(reference, unknown)
+    }
+
+    def addDistanceFunction(reference: Reference, newDistanceFunction: KnownDistance): DistanceFunction
+
+    def addDistanceFunction(reference: Reference, newDistanceFunction: UnknownDistance): DistanceFunction
+
     def addDependency(reference: Reference): UnknownDistance
   }
 
   private case class KnownDistance(distance: Int, override val offsetDirection: OffsetDirection) extends DistanceFunction(offsetDirection) {
     override def requiredAssumptions: Set[Reference] = Set.empty
+
     override def distance(assumptions: Map[Reference, Int]): Int = distance
 
-    override def addDistanceFunction(reference: Reference, newDistanceFunction: DistanceFunction): DistanceFunction = {
-      val requiredAssumptions = this.requiredAssumptions ++ newDistanceFunction.requiredAssumptions
-      newDistanceFunction match {
-        case (newDistance: KnownDistance) =>
-          KnownDistance(distance + reference.sizeForDistance(newDistance.distance, offsetDirection), this.offsetDirection)
-        case (newDistance: UnknownDistance) =>
-          UnknownDistance(requiredAssumptions, (assumptions) =>
-            distance + reference.sizeForDistance(newDistance.distanceFunction(assumptions), newDistance.offsetDirection), offsetDirection)
-      }
-    }
+    override def addDistanceFunction(reference: Reference, newDistanceFunction: KnownDistance): DistanceFunction =
+      KnownDistance(distance + reference.sizeForDistance(newDistanceFunction.distance, offsetDirection), this.offsetDirection)
+
+    override def addDistanceFunction(reference: Reference, newDistanceFunction: UnknownDistance): DistanceFunction =
+      UnknownDistance(this.requiredAssumptions ++ newDistanceFunction.requiredAssumptions, (assumptions) =>
+        distance + reference.sizeForDistance(newDistanceFunction.distanceFunction(assumptions),
+          newDistanceFunction.offsetDirection), offsetDirection)
 
     override def addDependency(reference: Reference): UnknownDistance =
       UnknownDistance(Set(reference), (assumptions) => assumptions(reference) + distance, offsetDirection)
@@ -103,17 +110,16 @@ abstract class Application protected (
 
     override def distance(assumptions: Map[Reference, Int]): Int = distanceFunction(assumptions)
 
-    override def addDistanceFunction(reference: Reference, newDistanceFunction: DistanceFunction): DistanceFunction = {
-      val requiredAssumptions = this.requiredAssumptions ++ newDistanceFunction.requiredAssumptions
-      newDistanceFunction match {
-        case (newDistance: KnownDistance) =>
-          val value = reference.sizeForDistance(newDistance.distance, newDistanceFunction.offsetDirection)
-          UnknownDistance(requiredAssumptions, (assumptions) =>
-            distanceFunction(assumptions) + value, offsetDirection)
-        case (newDistance: UnknownDistance) =>
-          UnknownDistance(requiredAssumptions, (assumptions) =>
-            distanceFunction(assumptions) + reference.sizeForDistance(newDistance.distanceFunction(assumptions), newDistance.offsetDirection), offsetDirection)
-      }
+    override def addDistanceFunction(reference: Reference, newDistanceFunction: KnownDistance): DistanceFunction = {
+      val value = reference.sizeForDistance(newDistanceFunction.distance, newDistanceFunction.offsetDirection)
+        UnknownDistance(requiredAssumptions ++ newDistanceFunction.requiredAssumptions, (assumptions) =>
+          distanceFunction(assumptions) + value, offsetDirection)
+    }
+
+    override def addDistanceFunction(reference: Reference, newDistanceFunction: UnknownDistance): DistanceFunction = {
+      UnknownDistance(requiredAssumptions ++ newDistanceFunction.requiredAssumptions, (assumptions) =>
+        distanceFunction(assumptions) + reference.sizeForDistance(newDistanceFunction.distanceFunction(assumptions),
+          newDistanceFunction.offsetDirection), offsetDirection)
     }
 
     override def addDependency(reference: Reference): UnknownDistance =
