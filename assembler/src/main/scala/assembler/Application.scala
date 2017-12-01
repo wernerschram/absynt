@@ -41,12 +41,20 @@ abstract class Application protected (
 
   //TODO: calculate global shortest for references with UnknownDistance
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
-    val distanceFunctions: Map[Reference, DistanceFunction] =
-      references.foldLeft(Map.empty[Reference, DistanceFunction])((x,y) => x ++ distanceFunctionsForDependencies(Set.empty, x)(y))
+    val (distanceFunctions: Map[Reference, DistanceFunction], restrictions: Map[Reference, Seq[Int]]) =
+      references.foldLeft((Map.empty[Reference, DistanceFunction], Map.empty[Reference, Seq[Int]])) {
+        case ((
+            currentDistanceFunctions: Map[Reference, DistanceFunction],
+            currentRestrictions: Map[Reference, Seq[Int]]),
+            currentReference: Reference) =>
+
+          val (newDistanceFunctions, newRestrictions) = distanceFunctionsForDependencies(Set.empty, currentDistanceFunctions, currentRestrictions)(currentReference)
+          (currentDistanceFunctions ++ newDistanceFunctions, currentRestrictions ++ newRestrictions)
+      }
 
     distanceFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
       val todo: Map[Reference, Seq[Int]] = resourceSize._2.requiredAssumptions.map(reference => resources.get(reference) match {
-        case None => reference -> reference.possibleSizes
+        case None => reference -> restrictions(reference)
         case Some(resource) => reference -> Seq(resource.size)
       }).toMap
 
@@ -128,34 +136,38 @@ abstract class Application protected (
   }
 
   private final def distanceFunctionsForDependencies(visiting: Set[Reference],
-    visited: Map[Reference, DistanceFunction])(current: Reference): Map[Reference, DistanceFunction] = {
+    visited: Map[Reference, DistanceFunction], restrictions: Map[Reference, Seq[Int]])(current: Reference):
+      (Map[Reference, DistanceFunction], Map[Reference, Seq[Int]]) = {
 
     if (visited.contains(current))
       // this reference that has been evaluated in an earlier call (in a prior branch)
-      Map.empty[Reference, DistanceFunction]
+      (Map.empty[Reference, DistanceFunction], Map.empty)
     else {
       val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
-      val (distanceFunctions: Map[Reference, DistanceFunction], newDistanceFunction: DistanceFunction) =
-        references.foldLeft[(Map[Reference, DistanceFunction], DistanceFunction)](
-          (visited, KnownDistance(independentDistance, offsetDirection))
+      val (distanceFunctions: Map[Reference, DistanceFunction], totalDistanceFunction: DistanceFunction, totalRestrictions: Map[Reference, Seq[Int]]) =
+        references.foldLeft[(Map[Reference, DistanceFunction], DistanceFunction, Map[Reference, Seq[Int]])](
+          (visited, KnownDistance(independentDistance, offsetDirection), Map.empty[Reference, Seq[Int]])
         ) {
           case (
             (previousDistanceFunctions: Map[Reference, DistanceFunction],
-            previousDistance: DistanceFunction),
+            previousDistance: DistanceFunction,
+            previousRestrictions: Map[Reference, Seq[Int]]),
             child: Resource) =>
 
             if (visiting.contains(child))
               // cyclic dependency: add a dependency which can be resolved at a higher level
-              (previousDistanceFunctions, previousDistance.addDependency(child))
+              (previousDistanceFunctions, previousDistance.addDependency(child), previousRestrictions + (child -> child.possibleSizes))
             else {
-              val newDistanceFunctions = previousDistanceFunctions ++
-                distanceFunctionsForDependencies(visiting + current, previousDistanceFunctions)(child)
+              val (childDistanceFunctions, childRestrictions) = distanceFunctionsForDependencies(visiting + current, previousDistanceFunctions, previousRestrictions)(child)
+              val newDistanceFunctions = previousDistanceFunctions ++ childDistanceFunctions
+              val newRestrictions = previousRestrictions ++ childRestrictions
 
-              (newDistanceFunctions, previousDistance.addDistanceFunction(child, newDistanceFunctions(child)))
+              (newDistanceFunctions, previousDistance.addDistanceFunction(child, newDistanceFunctions(child)), newRestrictions)
             }
         }
-      distanceFunctions + (current -> newDistanceFunction)
+      //TODO: further restrict the restrictions list here
+      (distanceFunctions + (current -> totalDistanceFunction), restrictions ++ totalRestrictions)
 
       // try to remove the required assumptions
 
