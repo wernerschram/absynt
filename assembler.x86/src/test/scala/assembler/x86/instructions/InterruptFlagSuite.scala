@@ -10,7 +10,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
 
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode cli" in {
         ClearInterruptFlag().encodeByte should be(Hex.lsb("FA"))
@@ -19,7 +19,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "correctly encode cli" in {
         ClearInterruptFlag().encodeByte should be(Hex.lsb("FA"))
@@ -31,7 +31,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
 
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode sti" in {
         SetInterruptFlag().encodeByte should be(Hex.lsb("FB"))
@@ -39,8 +39,7 @@ class InterruptFlagSuite extends WordSpec with Matchers {
     }
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
-
+      import ProcessorMode.Long._
 
       "correctly encode sti" in {
         SetInterruptFlag().encodeByte should be(Hex.lsb("FB"))

@@ -13,7 +13,7 @@ class StackSuite extends WordSpec with Matchers {
   "an Push instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "throw an AssertionError for push BYTE PTR [bp]" in {
         an[AssertionError] should be thrownBy {
@@ -58,7 +58,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in protected mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
+      import ProcessorMode.Protected._
 
       "correctly encode push eax" in {
         Push(EAX).encodeByte should be(0x50.toByte :: Nil)
@@ -93,7 +93,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "correctly encode push QWORD PTR [rax]" in {
         Push(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
@@ -135,7 +135,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode pusha" in {
         PushAll().encodeByte should be(Hex.lsb("60"))
@@ -144,7 +144,7 @@ class StackSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "throw an AssertionError for pusha" in {
         an[AssertionError] should be thrownBy {
@@ -157,7 +157,7 @@ class StackSuite extends WordSpec with Matchers {
   "an PushFlags instruction" when {
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "correctly encode pushf" in {
         PushFlags().encodeByte should be(Hex.lsb("9C"))

@@ -16,7 +16,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an AddCarry instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encodeByte adc al, 0x40" in {
         AddCarry(0x40.toByte, AL).encodeByte should be(Hex.lsb("14 40"))
@@ -31,7 +31,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an Add instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode add al, 0x40" in {
         Add(0x40.toByte, AL).encodeByte should be(Hex.lsb("04 40"))
@@ -46,7 +46,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an And instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode and al, 0x40" in {
         And(0x40.toByte, AL).encodeByte should be(Hex.lsb("24 40"))
@@ -61,7 +61,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an Compare instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode cmp al, 0x40" in {
         Compare(0x40.toByte, AL).encodeByte should be(Hex.lsb("3C 40"))
@@ -76,7 +76,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an Not instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode not BYTE PTR [0x01]" in {
         Not(MemoryAddress.byteSize(0x0001.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("F6 16 01 00"))
@@ -88,7 +88,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
     }
     "in protected mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
+      import ProcessorMode.Protected._
 
       "correctly encode not eax" in {
         Not(EAX).encodeByte should be(Hex.lsb("F7 D0"))
@@ -97,7 +97,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "correctly encode not QWORD PTR [rax]" in {
         Not(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(Hex.lsb("48 F7 10"))
@@ -108,7 +108,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an Or instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode or al, 0x40" in {
         Or(0x40.toByte, AL).encodeByte should be(Hex.lsb("0C 40"))
@@ -123,7 +123,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an SubtractCarry instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode sbb al, 0x40" in {
         SubtractCarry(0x40.toByte, AL).encodeByte should be(Hex.lsb("1C 40"))
@@ -138,7 +138,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an Subtract instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode sub al, 0x40" in {
         Subtract(0x40.toByte, AL).encodeByte should be(Hex.lsb("2C 40"))
@@ -153,7 +153,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
   "an Xor instruction" when {
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode xor al, 0x40" in {
         Xor(0x40.toByte, AL).encodeByte should be(Hex.lsb("34 40"))
@@ -200,7 +200,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
 
     "in protected mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Protected
+      import ProcessorMode.Protected._
 
       "correctly encode xor DWORD PTR [0x11111111], 0x44332211" in {
         Xor(0x44332211, MemoryAddress.doubleWordSize(0x11111111.encodeLittleEndian)).encodeByte should be(Hex.lsb("81 35 11 11 11 11 11 22 33 44"))
@@ -221,7 +221,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
 
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "correctly encode xor QWORD PTR [0x11111111], 0x44332211" in {
         Xor(0x44332211, MemoryAddress.quadWordSize(0x11111111.encodeLittleEndian)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
