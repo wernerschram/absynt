@@ -112,8 +112,11 @@ abstract class Application protected (
       UnknownDistance(Set(reference), (assumptions) => assumptions(reference) + distance, offsetDirection)
   }
 
-  private case class UnknownDistance(override val requiredAssumptions: Set[Reference],
-    distanceFunction: Map[Reference, Int] => Int, override val offsetDirection: OffsetDirection) extends DistanceFunction(offsetDirection) {
+  private case class UnknownDistance(
+    override val requiredAssumptions: Set[Reference],
+    distanceFunction: Map[Reference, Int] => Int,
+    override val offsetDirection: OffsetDirection
+  ) extends DistanceFunction(offsetDirection) {
 
     override def distance(assumptions: Map[Reference, Int]): Int = distanceFunction(assumptions)
 
@@ -144,24 +147,36 @@ abstract class Application protected (
     else {
       val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
-      val (distanceFunctions, totalDistanceFunction, totalRestrictions) =
-        references.foldLeft[(Map[Reference, DistanceFunction], DistanceFunction, Map[Reference, Seq[Int]])](
-          (visited, KnownDistance(independentDistance, offsetDirection), Map.empty)
+      val (distanceFunctions, fixedDistance, childDistanceFunctions, totalRestrictions) =
+        references.foldLeft[(Map[Reference, DistanceFunction], Int, Seq[Map[Reference, Int] => Int], Map[Reference, Seq[Int]])](
+          (visited, independentDistance, Seq.empty, Map.empty)
         ) {
           case (
-            (previousDistanceFunctions, previousDistance, previousRestrictions), child: Resource) =>
+            (previousDistanceFunctions, previousFixedDistance, previousChildDistanceFunctions, previousRestrictions), child: Resource) =>
 
             if (visiting.contains(child))
               // cyclic dependency: add a dependency which can be resolved at a higher level
-              (previousDistanceFunctions, previousDistance.addDependency(child), previousRestrictions + (child -> child.possibleSizes))
+              (previousDistanceFunctions, previousFixedDistance, previousChildDistanceFunctions :+ ((assumptions: Map[Reference, Int]) => assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
             else {
               val (childDistanceFunctions, childRestrictions) = distanceFunctionsForDependencies(visiting + current, previousDistanceFunctions, previousRestrictions)(child)
               val newDistanceFunctions = previousDistanceFunctions ++ childDistanceFunctions
               val newRestrictions = previousRestrictions ++ childRestrictions
-
-              (newDistanceFunctions, previousDistance.addDistanceFunction(child, newDistanceFunctions(child)), newRestrictions)
+              val distanceFunction = newDistanceFunctions(child)
+              distanceFunction match {
+                case known: KnownDistance =>
+                  val size = child.sizeForDistance(known.distance, known.offsetDirection)
+                  (newDistanceFunctions, previousFixedDistance + size, previousChildDistanceFunctions, newRestrictions)
+                case unknown: UnknownDistance =>
+                  val size = (assumptions: Map[Reference, Int]) => child.sizeForDistance(unknown.distanceFunction(assumptions), unknown.offsetDirection)
+                  (newDistanceFunctions, previousFixedDistance, previousChildDistanceFunctions :+ size, newRestrictions)
+              }
             }
         }
+
+      val totalDistanceFunction = if (childDistanceFunctions.isEmpty)
+        KnownDistance(fixedDistance, offsetDirection)
+      else
+        UnknownDistance(Set.empty, (assumptions) => independentDistance + childDistanceFunctions.map(f => f(assumptions)).sum, offsetDirection)
 
       //TODO: further restrict the restrictions list here
       (distanceFunctions + (current -> totalDistanceFunction), restrictions ++ totalRestrictions)
