@@ -79,63 +79,25 @@ abstract class Application protected (
         t + (references.head._1 -> h)
 
   private sealed abstract class DistanceFunction(val offsetDirection: OffsetDirection) {
-    def requiredAssumptions: Set[Reference]
-
     def distance(assumptions: Map[Reference, Int]): Int
 
     def addDistanceFunction(reference: Reference, newDistanceFunction: DistanceFunction): DistanceFunction =  newDistanceFunction match {
       case known: KnownDistance => addDistanceFunction(reference, known)
       case unknown: UnknownDistance => addDistanceFunction(reference, unknown)
     }
-
-    def addDistanceFunction(reference: Reference, newDistanceFunction: KnownDistance): DistanceFunction
-
-    def addDistanceFunction(reference: Reference, newDistanceFunction: UnknownDistance): DistanceFunction
-
-    def addDependency(reference: Reference): UnknownDistance
   }
 
   private case class KnownDistance(distance: Int, override val offsetDirection: OffsetDirection) extends DistanceFunction(offsetDirection) {
-    override def requiredAssumptions: Set[Reference] = Set.empty
-
     override def distance(assumptions: Map[Reference, Int]): Int = distance
-
-    override def addDistanceFunction(reference: Reference, newDistanceFunction: KnownDistance): DistanceFunction =
-      KnownDistance(distance + reference.sizeForDistance(newDistanceFunction.distance, offsetDirection), this.offsetDirection)
-
-    override def addDistanceFunction(reference: Reference, newDistanceFunction: UnknownDistance): DistanceFunction =
-      UnknownDistance(this.requiredAssumptions ++ newDistanceFunction.requiredAssumptions, (assumptions) =>
-        distance + reference.sizeForDistance(newDistanceFunction.distanceFunction(assumptions),
-          newDistanceFunction.offsetDirection), offsetDirection)
-
-    override def addDependency(reference: Reference): UnknownDistance =
-      UnknownDistance(Set(reference), (assumptions) => assumptions(reference) + distance, offsetDirection)
-  }
+ }
 
   private case class UnknownDistance(
-    override val requiredAssumptions: Set[Reference],
     distanceFunction: Map[Reference, Int] => Int,
     override val offsetDirection: OffsetDirection
   ) extends DistanceFunction(offsetDirection) {
 
     override def distance(assumptions: Map[Reference, Int]): Int = distanceFunction(assumptions)
-
-    override def addDistanceFunction(reference: Reference, newDistanceFunction: KnownDistance): DistanceFunction = {
-      val value = reference.sizeForDistance(newDistanceFunction.distance, newDistanceFunction.offsetDirection)
-        UnknownDistance(requiredAssumptions ++ newDistanceFunction.requiredAssumptions, (assumptions) =>
-          distanceFunction(assumptions) + value, offsetDirection)
-    }
-
-    override def addDistanceFunction(reference: Reference, newDistanceFunction: UnknownDistance): DistanceFunction = {
-      UnknownDistance(requiredAssumptions ++ newDistanceFunction.requiredAssumptions, (assumptions) =>
-        distanceFunction(assumptions) + reference.sizeForDistance(newDistanceFunction.distanceFunction(assumptions),
-          newDistanceFunction.offsetDirection), offsetDirection)
-    }
-
-    override def addDependency(reference: Reference): UnknownDistance =
-      UnknownDistance(requiredAssumptions + reference, (assumptions) =>
-        assumptions(reference) + distanceFunction(assumptions), offsetDirection)
-  }
+ }
 
   private final def distanceFunctionsForDependencies(visiting: Set[Reference],
     visited: Map[Reference, DistanceFunction], restrictions: Map[Reference, Seq[Int]])(current: Reference):
@@ -176,7 +138,7 @@ abstract class Application protected (
       val totalDistanceFunction = if (childDistanceFunctions.isEmpty)
         KnownDistance(fixedDistance, offsetDirection)
       else
-        UnknownDistance(Set.empty, (assumptions) => independentDistance + childDistanceFunctions.map(f => f(assumptions)).sum, offsetDirection)
+        UnknownDistance((assumptions) => independentDistance + childDistanceFunctions.map(f => f(assumptions)).sum, offsetDirection)
 
       //TODO: further restrict the restrictions list here
       (distanceFunctions + (current -> totalDistanceFunction), restrictions ++ totalRestrictions)
