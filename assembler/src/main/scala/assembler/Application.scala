@@ -27,16 +27,20 @@ abstract class Application protected (
 
   private def applicationContextProperties(from: Reference): (Seq[Reference], Int, OffsetDirection) = {
     val (resources, offsetType) = intermediateResources(from)
-    val (dependent: Seq[Reference], independent: Seq[Encodable]) =
-      resources.partition {
-        case _: Reference => true
-        case _: Encodable => false
+
+    val (totalDependent, totalIndependent) = resources
+      .foldLeft((Seq.empty[Reference], 0))
+      {
+        case ((dependent, independent), reference: Reference) => (dependent :+ reference, independent)
+        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
       }
-    val independentDistance = offsetType match {
-      case OffsetDirection.Absolute => independent.map(r => r.asInstanceOf[Encodable].size).sum + startOffset
-      case _ => independent.map(r => r.asInstanceOf[Encodable].size).sum
+
+    offsetType match {
+      case OffsetDirection.Absolute =>
+        (totalDependent, totalIndependent + startOffset, offsetType)
+      case _ =>
+        (totalDependent, totalIndependent, offsetType)
     }
-    (dependent, independentDistance, offsetType)
   }
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
@@ -59,6 +63,8 @@ abstract class Application protected (
       })
 
     // TODO Handle the possibility that no combination is valid
+    assert(validCombinations.nonEmpty)
+
     val shortestCombination = validCombinations.minBy(_.values.sum)
 
     references.map(reference =>
@@ -89,15 +95,14 @@ abstract class Application protected (
 
   private case class KnownDistance(distance: Int, override val offsetDirection: OffsetDirection) extends DistanceFunction(offsetDirection) {
     override def distance(assumptions: Map[Reference, Int]): Int = distance
- }
+  }
 
   private case class UnknownDistance(
     distanceFunction: Map[Reference, Int] => Int,
     override val offsetDirection: OffsetDirection
   ) extends DistanceFunction(offsetDirection) {
-
     override def distance(assumptions: Map[Reference, Int]): Int = distanceFunction(assumptions)
- }
+  }
 
   private final def distanceFunctionsForDependencies(visiting: Set[Reference],
     visited: Map[Reference, DistanceFunction], restrictions: Map[Reference, Set[Int]])(current: Reference):
@@ -118,7 +123,8 @@ abstract class Application protected (
 
             if (visiting.contains(child))
               // cyclic dependency: add a dependency which can be resolved at a higher level
-              (previousDistanceFunctions, previousFixedDistance, previousChildDistanceFunctions :+ ((assumptions: Map[Reference, Int]) => assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
+              (previousDistanceFunctions, previousFixedDistance, previousChildDistanceFunctions :+ ((assumptions: Map[Reference, Int]) =>
+                assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
             else {
               val (childDistanceFunctions, childRestrictions) = distanceFunctionsForDependencies(visiting + current, previousDistanceFunctions, previousRestrictions)(child)
               val newDistanceFunctions = previousDistanceFunctions ++ childDistanceFunctions
@@ -129,7 +135,8 @@ abstract class Application protected (
                   val size = child.sizeForDistance(known.distance, known.offsetDirection)
                   (newDistanceFunctions, previousFixedDistance + size, previousChildDistanceFunctions, newRestrictions)
                 case unknown: UnknownDistance =>
-                  val size = (assumptions: Map[Reference, Int]) => child.sizeForDistance(unknown.distanceFunction(assumptions), unknown.offsetDirection)
+                  val size = (assumptions: Map[Reference, Int]) => assumptions.getOrElse(child,
+                    child.sizeForDistance(unknown.distanceFunction(assumptions), unknown.offsetDirection))
                   (newDistanceFunctions, previousFixedDistance, previousChildDistanceFunctions :+ size, newRestrictions)
               }
             }
