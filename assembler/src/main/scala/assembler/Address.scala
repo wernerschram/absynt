@@ -24,6 +24,4 @@ trait AbsoluteOffset {
 trait OffsetFactory[OffsetType <: Offset] {
   def offset(offsetValue: Long): OffsetType with RelativeOffset
   def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): OffsetType with RelativeOffset
-  def add(offset: OffsetType, that: OffsetType with RelativeOffset): OffsetType with RelativeOffset
-  def add(offset: OffsetType, that: Long): OffsetType with RelativeOffset
 }

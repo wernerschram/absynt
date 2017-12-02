@@ -1,7 +1,7 @@
 package assembler.arm
 
 import assembler._
-import assembler.arm.operands.{ArmOffset, ArmRelativeOffset, RelativeA32Pointer, RelativeThumbPointer}
+import assembler.arm.operands.{ArmOffset, ArmRelativeOffset}
 
 sealed abstract class ProcessorMode {
   implicit val processorMode: ProcessorMode = this
@@ -15,10 +15,6 @@ object ProcessorMode {
     implicit val offsetFactory: ArmOffsetFactory = new ArmOffsetFactory {
       override implicit def offset(offset: Long): ArmRelativeOffset = ArmRelativeOffset(offset.toInt)
 
-      override def add(thisOffset: ArmOffset, that: ArmOffset with RelativeOffset): ArmOffset with RelativeOffset = thisOffset + that
-
-      override def add(thisOffset: ArmOffset, that: Long): ArmOffset with RelativeOffset = thisOffset + that
-
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
         offsetDirection match {
           case OffsetDirection.Self => offsetFactory.offset(-instructionSize - 4)
@@ -31,10 +27,6 @@ object ProcessorMode {
   case object Thumb extends ProcessorMode {
     implicit val offsetFactory: ArmOffsetFactory = new ArmOffsetFactory {
       override implicit def offset(offset: Long): ArmRelativeOffset = ArmRelativeOffset(offset.toInt)
-
-      override def add(thisOffset: ArmOffset, that: ArmOffset with RelativeOffset): ArmOffset with RelativeOffset = thisOffset + that
-
-      override def add(thisOffset: ArmOffset, that: Long): ArmOffset with RelativeOffset = thisOffset + that
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
         offsetDirection match {

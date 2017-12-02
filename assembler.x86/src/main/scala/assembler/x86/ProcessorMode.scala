@@ -13,10 +13,6 @@ object ProcessorMode {
   object Real extends ProcessorMode {
     implicit val offsetFactory: X86OffsetFactory[RealX86Offset] = new X86OffsetFactory[RealX86Offset] {
       override implicit def offset(offset: Long): RealX86Offset with RelativeOffset = RealRelativeOffset(offset)
-      override def add(thisOffset: RealX86Offset, that: RealX86Offset with RelativeOffset): RealX86Offset with RelativeOffset =
-        offset(thisOffset.offset + that.offset)
-      override def add(thisOffset: RealX86Offset, that: Long): RealX86Offset with RelativeOffset =
-        offset(thisOffset.offset + that)
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): RealX86Offset with RelativeOffset =
         offsetDirection match {
@@ -34,11 +30,6 @@ object ProcessorMode {
     implicit val offsetFactory: X86OffsetFactory[ProtectedX86Offset] = new X86OffsetFactory[ProtectedX86Offset] {
       override implicit def offset(offset: Long): ProtectedX86Offset with RelativeOffset = ProtectedRelativeOffset(offset)
 
-      override def add(thisOffset: ProtectedX86Offset, that: ProtectedX86Offset with RelativeOffset): ProtectedX86Offset with RelativeOffset =
-        offset(thisOffset.offset + that.offset)
-      override def add(thisOffset: ProtectedX86Offset, that: Long): ProtectedX86Offset with RelativeOffset =
-      offset(thisOffset.offset + that)
-
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
         offsetDirection match {
           case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
@@ -54,11 +45,6 @@ object ProcessorMode {
   object Long extends ProcessorMode {
     implicit val offsetFactory: X86OffsetFactory[ProtectedX86Offset] = new X86OffsetFactory[ProtectedX86Offset] {
       override implicit def offset(offset: Long): ProtectedX86Offset with RelativeOffset = ProtectedRelativeOffset(offset)
-
-      override def add(thisOffset: ProtectedX86Offset, that: ProtectedX86Offset with RelativeOffset): ProtectedX86Offset with RelativeOffset =
-        offset(thisOffset.offset + that.offset)
-      override def add(thisOffset: ProtectedX86Offset, that: Long): ProtectedX86Offset with RelativeOffset =
-        offset(thisOffset.offset + that)
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
         offsetDirection match {
