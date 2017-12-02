@@ -40,11 +40,11 @@ abstract class Application protected (
   }
 
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
-    val (distanceFunctions: Map[Reference, DistanceFunction], restrictions: Map[Reference, Seq[Int]]) =
-      references.foldLeft((Map.empty[Reference, DistanceFunction], Map.empty[Reference, Seq[Int]])) {
+    val (distanceFunctions: Map[Reference, DistanceFunction], restrictions: Map[Reference, Set[Int]]) =
+      references.foldLeft((Map.empty[Reference, DistanceFunction], Map.empty[Reference, Set[Int]])) {
         case ((
             currentDistanceFunctions: Map[Reference, DistanceFunction],
-            currentRestrictions: Map[Reference, Seq[Int]]),
+            currentRestrictions: Map[Reference, Set[Int]]),
             currentReference: Reference) =>
 
           val (newDistanceFunctions, newRestrictions) =
@@ -68,7 +68,7 @@ abstract class Application protected (
       .toMap
   }
 
-  private def possibleSizeCombinations(references: Map[Reference, Seq[Int]]): Set[Map[Reference, Int]]  =
+  private def possibleSizeCombinations(references: Map[Reference, Set[Int]]): Set[Map[Reference, Int]]  =
     if (references.isEmpty)
       Set(Map.empty)
     else
@@ -100,8 +100,8 @@ abstract class Application protected (
  }
 
   private final def distanceFunctionsForDependencies(visiting: Set[Reference],
-    visited: Map[Reference, DistanceFunction], restrictions: Map[Reference, Seq[Int]])(current: Reference):
-      (Map[Reference, DistanceFunction], Map[Reference, Seq[Int]]) = {
+    visited: Map[Reference, DistanceFunction], restrictions: Map[Reference, Set[Int]])(current: Reference):
+      (Map[Reference, DistanceFunction], Map[Reference, Set[Int]]) = {
 
     if (visited.contains(current))
       // this reference has been evaluated in an earlier call (in a prior branch)
@@ -110,7 +110,7 @@ abstract class Application protected (
       val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
       val (distanceFunctions, fixedDistance, childSizeFunctions, totalRestrictions) =
-        references.foldLeft[(Map[Reference, DistanceFunction], Int, Seq[Map[Reference, Int] => Int], Map[Reference, Seq[Int]])](
+        references.foldLeft[(Map[Reference, DistanceFunction], Int, Seq[Map[Reference, Int] => Int], Map[Reference, Set[Int]])](
           (visited, independentDistance, Seq.empty, Map.empty)
         ) {
           case (
@@ -141,7 +141,7 @@ abstract class Application protected (
         val distance = (assumptions: Map[Reference, Int]) => independentDistance + childSizeFunctions.map(_(assumptions)).sum
         if (totalRestrictions.contains(current)) {
           val combinations = possibleSizeCombinations(totalRestrictions)
-          val sizes: Seq[Int] = combinations.map(c => current.sizeForDistance(distance(c), offsetDirection)).toSeq
+          val sizes: Set[Int] = combinations.map(c => current.sizeForDistance(distance(c), offsetDirection))
           (distanceFunctions + (current -> UnknownDistance(distance, offsetDirection)), restrictions ++ totalRestrictions.updated(current, sizes))
         } else {
           (distanceFunctions + (current -> UnknownDistance(distance, offsetDirection)), restrictions ++ totalRestrictions)

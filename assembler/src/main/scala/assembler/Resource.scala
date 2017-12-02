@@ -25,5 +25,5 @@ trait Reference extends Resource {
 
   def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int
 
-  def possibleSizes: Seq[Int]
+  def possibleSizes: Set[Int]
 }

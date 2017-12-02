@@ -22,10 +22,10 @@ sealed abstract case class AbsoluteReference(
 }
 
 object AbsoluteReference {
-  def apply(target: Label, sizes: Seq[Int], label: Label, encodableFactor: (Int) => Resource with Encodable): AbsoluteReference =
+  def apply(target: Label, sizes: Set[Int], label: Label, encodableFactor: (Int) => Resource with Encodable): AbsoluteReference =
     new AbsoluteReference(target, label) {
 
-      override def possibleSizes: Seq[Int] = sizes
+      override def possibleSizes: Set[Int] = sizes
 
       override def encodeForDistance(distance: Int): Encodable = encodableFactor(distance)
 

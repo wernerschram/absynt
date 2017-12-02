@@ -1,8 +1,8 @@
 package assembler.x86.operations
 
-import assembler.x86.{ProcessorMode, X86OffsetFactory}
-import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, X86RelativeOffset, NearPointer => NearPointerOperand}
 import assembler._
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
+import assembler.x86.{ProcessorMode, X86OffsetFactory}
 
 abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
@@ -13,7 +13,7 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](labe
 
   val longJumpSize: Int = longOpcode.length + (if (processorMode == ProcessorMode.Real) 2 else 4)
 
-  override def possibleSizes: List[Int] = shortJumpSize :: longJumpSize :: Nil
+  override def possibleSizes: Set[Int] = Set(shortJumpSize, longJumpSize)
 
   def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 

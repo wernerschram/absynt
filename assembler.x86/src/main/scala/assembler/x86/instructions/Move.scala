@@ -199,7 +199,7 @@ object Move {
             throw new AssertionError
        }
 
-    AbsoluteReference(targetLabel, size :: Nil, label, encodableForDistance)
+    AbsoluteReference(targetLabel, Set(size), label, encodableForDistance)
   }
 
   def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic
