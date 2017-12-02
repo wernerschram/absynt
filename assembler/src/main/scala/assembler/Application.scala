@@ -39,7 +39,6 @@ abstract class Application protected (
     (dependent, independentDistance, offsetType)
   }
 
-  //TODO: calculate global shortest for references with UnknownDistance
   def encodablesForReferences(references: Seq[Reference]): Map[Reference, Encodable] = {
     val (distanceFunctions: Map[Reference, DistanceFunction], restrictions: Map[Reference, Seq[Int]]) =
       references.foldLeft((Map.empty[Reference, DistanceFunction], Map.empty[Reference, Seq[Int]])) {
@@ -48,30 +47,30 @@ abstract class Application protected (
             currentRestrictions: Map[Reference, Seq[Int]]),
             currentReference: Reference) =>
 
-          val (newDistanceFunctions, newRestrictions) = distanceFunctionsForDependencies(Set.empty, currentDistanceFunctions, currentRestrictions)(currentReference)
+          val (newDistanceFunctions, newRestrictions) =
+            distanceFunctionsForDependencies(Set.empty, currentDistanceFunctions, currentRestrictions)(currentReference)
+
           (currentDistanceFunctions ++ newDistanceFunctions, currentRestrictions ++ newRestrictions)
       }
 
-    distanceFunctions.foldLeft(Map.empty[Reference, Encodable])((resources, resourceSize) => {
-      val todo: Map[Reference, Seq[Int]] = resourceSize._2.requiredAssumptions.map(reference => resources.get(reference) match {
-        case None => reference -> restrictions(reference)
-        case Some(resource) => reference -> Seq(resource.size)
-      }).toMap
-
-      val validCombinations = possibleSizeCombinations(todo).filter(c => c == c.map{
+    val validCombinations = possibleSizeCombinations(restrictions).filter(c => c == c.map{
         case (reference, _) =>
           reference -> reference.sizeForDistance(distanceFunctions(reference).distance(c), distanceFunctions(reference).offsetDirection)
       })
 
-      val shortestCombination = validCombinations.minBy(_.values.sum)
+    // TODO Handle the possibility that no combination is valid
+    val shortestCombination = validCombinations.minBy(_.values.sum)
 
-      resources + (resourceSize._1 -> resourceSize._1.encodeForDistance(resourceSize._2.distance(shortestCombination), resourceSize._2.offsetDirection))
-    })
+    references.map(reference =>
+      reference -> reference.encodeForDistance(
+        distanceFunctions(reference).distance(shortestCombination),
+        distanceFunctions(reference).offsetDirection))
+      .toMap
   }
 
   private def possibleSizeCombinations(references: Map[Reference, Seq[Int]]): Set[Map[Reference, Int]]  =
     if (references.isEmpty)
-      Set(Map.empty[Reference,Int])
+      Set(Map.empty)
     else
       for (
         t <- possibleSizeCombinations(references.tail);
@@ -140,20 +139,17 @@ abstract class Application protected (
       (Map[Reference, DistanceFunction], Map[Reference, Seq[Int]]) = {
 
     if (visited.contains(current))
-      // this reference that has been evaluated in an earlier call (in a prior branch)
-      (Map.empty[Reference, DistanceFunction], Map.empty)
+      // this reference has been evaluated in an earlier call (in a prior branch)
+      (Map.empty, Map.empty)
     else {
       val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
-      val (distanceFunctions: Map[Reference, DistanceFunction], totalDistanceFunction: DistanceFunction, totalRestrictions: Map[Reference, Seq[Int]]) =
+      val (distanceFunctions, totalDistanceFunction, totalRestrictions) =
         references.foldLeft[(Map[Reference, DistanceFunction], DistanceFunction, Map[Reference, Seq[Int]])](
-          (visited, KnownDistance(independentDistance, offsetDirection), Map.empty[Reference, Seq[Int]])
+          (visited, KnownDistance(independentDistance, offsetDirection), Map.empty)
         ) {
           case (
-            (previousDistanceFunctions: Map[Reference, DistanceFunction],
-            previousDistance: DistanceFunction,
-            previousRestrictions: Map[Reference, Seq[Int]]),
-            child: Resource) =>
+            (previousDistanceFunctions, previousDistance, previousRestrictions), child: Resource) =>
 
             if (visiting.contains(child))
               // cyclic dependency: add a dependency which can be resolved at a higher level
@@ -166,18 +162,9 @@ abstract class Application protected (
               (newDistanceFunctions, previousDistance.addDistanceFunction(child, newDistanceFunctions(child)), newRestrictions)
             }
         }
+
       //TODO: further restrict the restrictions list here
       (distanceFunctions + (current -> totalDistanceFunction), restrictions ++ totalRestrictions)
-
-      // try to remove the required assumptions
-
-//      val sizeForCombination = possibleSizeCombinations(requiredAssumptions).map(c => c -> current.sizeForDistance(distance.distance(c)))
-//      if (sizeForCombination.groupBy(s => s._2).size == 1) {
-//        val actualDistance = distance.distance(sizeForCombination.map(s=>s._1).head) // evaluate before assigning to reduce lambda nesting
-//        distanceFunctions + (current -> DistanceFunction(Nil, (_: Map[Reference, Int]) => actualDistance))
-//      }
-//      else
-//        distanceFunctions + (current -> distance)
     }
   }
 }
