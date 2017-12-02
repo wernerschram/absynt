@@ -7,13 +7,6 @@ import scala.language.implicitConversions
 
 abstract class ArmOffset protected(val offset: Int) extends Offset {
   override def toString: String = s"0x${(offset + 8).encodeBigEndian.hexString}"
-
-  def add(that: ArmOffset with RelativeOffset): ArmOffset with RelativeOffset = ArmRelativeOffset(offset + that.offset)
-  def +(that: ArmOffset with RelativeOffset): ArmOffset with RelativeOffset = add(that)
-
-  def add(that: Long): ArmOffset with RelativeOffset = ArmRelativeOffset((offset + that).toInt)
-  def +(that: Long): ArmOffset with RelativeOffset = add(that)
-
 }
 
 sealed case class ArmRelativeOffset private(override val offset: Int) extends ArmOffset(offset) with RelativeOffset

@@ -16,9 +16,9 @@ object ProcessorMode {
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): RealX86Offset with RelativeOffset =
         offsetDirection match {
-          case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
-          case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
-          case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
+          case OffsetDirection.Self => RealRelativeOffset(-instructionSize)
+          case OffsetDirection.Forward => RealRelativeOffset(offsetValue)
+          case OffsetDirection.Backward => RealRelativeOffset(-offsetValue - instructionSize)
         }
     }
 
@@ -32,9 +32,9 @@ object ProcessorMode {
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
         offsetDirection match {
-          case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
-          case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
-          case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
+          case OffsetDirection.Self => ProtectedRelativeOffset(-instructionSize)
+          case OffsetDirection.Forward => ProtectedRelativeOffset(offsetValue)
+          case OffsetDirection.Backward => ProtectedRelativeOffset(-offsetValue - instructionSize)
         }
     }
 
@@ -48,9 +48,9 @@ object ProcessorMode {
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
         offsetDirection match {
-        case OffsetDirection.Self => offsetFactory.offset(-instructionSize)
-        case OffsetDirection.Forward => offsetFactory.offset(offsetValue)
-        case OffsetDirection.Backward => offsetFactory.offset(-offsetValue - instructionSize)
+        case OffsetDirection.Self => ProtectedRelativeOffset(-instructionSize)
+        case OffsetDirection.Forward => ProtectedRelativeOffset(offsetValue)
+        case OffsetDirection.Backward => ProtectedRelativeOffset(-offsetValue - instructionSize)
       }
     }
 
