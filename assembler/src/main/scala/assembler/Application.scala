@@ -109,7 +109,7 @@ abstract class Application protected (
     else {
       val (references, independentDistance, offsetDirection) = applicationContextProperties(current)
 
-      val (distanceFunctions, fixedDistance, childDistanceFunctions, totalRestrictions) =
+      val (distanceFunctions, fixedDistance, childSizeFunctions, totalRestrictions) =
         references.foldLeft[(Map[Reference, DistanceFunction], Int, Seq[Map[Reference, Int] => Int], Map[Reference, Seq[Int]])](
           (visited, independentDistance, Seq.empty, Map.empty)
         ) {
@@ -135,13 +135,18 @@ abstract class Application protected (
             }
         }
 
-      val totalDistanceFunction = if (childDistanceFunctions.isEmpty)
-        KnownDistance(fixedDistance, offsetDirection)
-      else
-        UnknownDistance((assumptions) => independentDistance + childDistanceFunctions.map(f => f(assumptions)).sum, offsetDirection)
-
-      //TODO: further restrict the restrictions list here
-      (distanceFunctions + (current -> totalDistanceFunction), restrictions ++ totalRestrictions)
+      if (childSizeFunctions.isEmpty)
+        (distanceFunctions + (current -> KnownDistance(fixedDistance, offsetDirection)), restrictions ++ totalRestrictions)
+      else {
+        val distance = (assumptions: Map[Reference, Int]) => independentDistance + childSizeFunctions.map(_(assumptions)).sum
+        if (totalRestrictions.contains(current)) {
+          val combinations = possibleSizeCombinations(totalRestrictions)
+          val sizes: Seq[Int] = combinations.map(c => current.sizeForDistance(distance(c), offsetDirection)).toSeq
+          (distanceFunctions + (current -> UnknownDistance(distance, offsetDirection)), restrictions ++ totalRestrictions.updated(current, sizes))
+        } else {
+          (distanceFunctions + (current -> UnknownDistance(distance, offsetDirection)), restrictions ++ totalRestrictions)
+        }
+      }
     }
   }
 }
