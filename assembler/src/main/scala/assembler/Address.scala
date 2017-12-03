@@ -20,7 +20,3 @@ trait RelativeOffset {
 trait AbsoluteOffset {
   self: Offset =>
 }
-
-trait OffsetFactory[OffsetType <: Offset] {
-  def offset(offsetValue: Long): OffsetType with RelativeOffset
-}

@@ -5,7 +5,8 @@ import assembler.x86.operands.memoryaccess._
 
 sealed abstract class ProcessorMode
 
-trait X86OffsetFactory[OffsetType<:X86Offset] extends OffsetFactory[OffsetType] {
+trait X86OffsetFactory[OffsetType<:X86Offset] {
+  def offset(offsetValue: Long): OffsetType with RelativeOffset
   def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): OffsetType with RelativeOffset
 }
 

@@ -5,12 +5,11 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler._
+import assembler.arm.ProcessorMode
 import assembler.arm.instructions._
-import assembler.arm.operands.ArmOffset
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.{ArmOffsetFactory, ProcessorMode}
 import assembler.output.Elf.{Architecture, Executable}
 import assembler.sections.{Section, SectionType}
 
@@ -46,7 +45,7 @@ object Boot extends App {
     val TDR: Short = 0x8C.toShort
   }
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): List[Resource] = {
+  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label): List[Resource] = {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
@@ -55,7 +54,7 @@ object Boot extends App {
     Nil
   }
 
-  private def halt()(implicit label: Label, armOffsetFactory: ArmOffsetFactory) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
+  private def halt()(implicit label: Label) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
 
   def createFile(): Unit = {
     import ProcessorMode.A32._

@@ -1,13 +1,11 @@
 package assembler.arm.operations
 
 import assembler._
-import assembler.arm.ArmOffsetFactory
 import assembler.arm.operands.Condition.Condition
 import assembler.reference.RelativeReference
 
 abstract class ReferencingARMOperation(val label: Label, val opcode: String, override val target: Label,
                                                     val condition: Condition)
-                                                   (implicit val offsetFactory: ArmOffsetFactory)
   extends RelativeReference with NamedConditional {
 
   override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int =

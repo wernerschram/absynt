@@ -1,7 +1,6 @@
 package assembler.arm.instructions
 
 import assembler._
-import assembler.arm.ArmOffsetFactory
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
@@ -83,7 +82,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
 
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit offsetFactory: ArmOffsetFactory, label: Label): ReferencingARMOperation =
+    (implicit label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, opcode, targetLabel, Always) {
       override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         forConstant(source1, ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset, destination, condition)
