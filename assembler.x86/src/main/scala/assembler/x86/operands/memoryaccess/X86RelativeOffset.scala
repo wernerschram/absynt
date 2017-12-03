@@ -2,7 +2,7 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
 import assembler.x86.operands.ValueSize
-import assembler.{Offset, RelativeOffset}
+import assembler.{Offset, OffsetDirection, RelativeOffset, RelativeOffsetDirection}
 
 abstract class X86Offset(val offset: Long) extends Offset {
 
@@ -36,5 +36,20 @@ sealed case class ProtectedRelativeOffset(override val offset: Long) extends Pro
 object X86RelativeOffset {
   def RealOffset(offset: Long) = RealRelativeOffset(offset)
   def ProtectedOffset(offset: Long) = ProtectedRelativeOffset(offset)
+
+  implicit def realPositionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): RealX86Offset with RelativeOffset =
+    offsetDirection match {
+      case OffsetDirection.Self => RealRelativeOffset(-instructionSize)
+      case OffsetDirection.Forward => RealRelativeOffset(offsetValue)
+      case OffsetDirection.Backward => RealRelativeOffset(-offsetValue - instructionSize)
+    }
+
+  implicit def protectedPositionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
+    offsetDirection match {
+      case OffsetDirection.Self => ProtectedRelativeOffset(-instructionSize)
+      case OffsetDirection.Forward => ProtectedRelativeOffset(offsetValue)
+      case OffsetDirection.Backward => ProtectedRelativeOffset(-offsetValue - instructionSize)
+    }
+
 }
 

@@ -6,6 +6,7 @@ import assembler.x86.operands.memoryaccess._
 sealed abstract class ProcessorMode
 
 trait X86OffsetFactory[OffsetType<:X86Offset] extends OffsetFactory[OffsetType] {
+  def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): OffsetType with RelativeOffset
 }
 
 object ProcessorMode {
@@ -15,11 +16,7 @@ object ProcessorMode {
       override implicit def offset(offset: Long): RealX86Offset with RelativeOffset = RealRelativeOffset(offset)
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): RealX86Offset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirection.Self => RealRelativeOffset(-instructionSize)
-          case OffsetDirection.Forward => RealRelativeOffset(offsetValue)
-          case OffsetDirection.Backward => RealRelativeOffset(-offsetValue - instructionSize)
-        }
+        X86RelativeOffset.realPositionalOffset(offsetValue)(offsetDirection)(instructionSize)
     }
 
     implicit val processorMode: ProcessorMode = this
@@ -31,11 +28,7 @@ object ProcessorMode {
       override implicit def offset(offset: Long): ProtectedX86Offset with RelativeOffset = ProtectedRelativeOffset(offset)
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirection.Self => ProtectedRelativeOffset(-instructionSize)
-          case OffsetDirection.Forward => ProtectedRelativeOffset(offsetValue)
-          case OffsetDirection.Backward => ProtectedRelativeOffset(-offsetValue - instructionSize)
-        }
+        X86RelativeOffset.protectedPositionalOffset(offsetValue)(offsetDirection)(instructionSize)
     }
 
     implicit val processorMode: ProcessorMode = this
@@ -47,11 +40,7 @@ object ProcessorMode {
       override implicit def offset(offset: Long): ProtectedX86Offset with RelativeOffset = ProtectedRelativeOffset(offset)
 
       override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ProtectedX86Offset with RelativeOffset =
-        offsetDirection match {
-        case OffsetDirection.Self => ProtectedRelativeOffset(-instructionSize)
-        case OffsetDirection.Forward => ProtectedRelativeOffset(offsetValue)
-        case OffsetDirection.Backward => ProtectedRelativeOffset(-offsetValue - instructionSize)
-      }
+        X86RelativeOffset.protectedPositionalOffset(offsetValue)(offsetDirection)(instructionSize)
     }
 
     implicit val processorMode: ProcessorMode = this

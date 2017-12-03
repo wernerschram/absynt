@@ -1,11 +1,12 @@
 package assembler.arm.instructions
 
+import assembler.arm.operands.ArmRelativeOffset
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
 import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.{Encodable, Label, OffsetDirection, RelativeOffsetDirection}
+import assembler.{Encodable, Label, RelativeOffsetDirection}
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {
@@ -32,7 +33,7 @@ class LoadStoreRegister(
     new ReferencingARMOperation(label, mnemonic, targetLabel, Always) {
       override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         ImmedWord(label, Always, destination, GeneralRegister.PC,
-          LoadStoreOffset(offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset.toShort),
+          LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
@@ -40,7 +41,7 @@ class LoadStoreRegister(
     new ReferencingARMOperation(label, mnemonic, targetLabel, condition) {
       override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         ImmedWord(label, condition, destination, GeneralRegister.PC,
-          LoadStoreOffset(offsetFactory.positionalOffset(distance)(offsetDirection)(4).offset.toShort),
+          LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 

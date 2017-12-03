@@ -14,26 +14,12 @@ object ProcessorMode {
   case object A32 extends ProcessorMode {
     implicit val offsetFactory: ArmOffsetFactory = new ArmOffsetFactory {
       override implicit def offset(offset: Long): ArmRelativeOffset = ArmRelativeOffset(offset.toInt)
-
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirection.Self => ArmRelativeOffset(-instructionSize - 4)
-          case OffsetDirection.Forward => ArmRelativeOffset((offsetValue - 4).toInt)
-          case OffsetDirection.Backward => ArmRelativeOffset((-offsetValue - (instructionSize + 4)).toInt)
-        }
     }
   }
 
   case object Thumb extends ProcessorMode {
     implicit val offsetFactory: ArmOffsetFactory = new ArmOffsetFactory {
       override implicit def offset(offset: Long): ArmRelativeOffset = ArmRelativeOffset(offset.toInt)
-
-      override implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection)(instructionSize: Int): ArmOffset with RelativeOffset =
-        offsetDirection match {
-          case OffsetDirection.Self => ArmRelativeOffset(-instructionSize - 4)
-          case OffsetDirection.Forward => ArmRelativeOffset((offsetValue - 4).toInt)
-          case OffsetDirection.Backward => ArmRelativeOffset((-offsetValue - (instructionSize + 4)).toInt)
-        }
     }
   }
 }
