@@ -18,12 +18,15 @@ trait Encodable extends Resource {
   def size: Int
 }
 
-trait Reference extends Resource {
-  def target: Label
+trait DependentResource extends Resource {
 
   def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable
 
   def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int
 
   def possibleSizes: Set[Int]
+}
+
+trait Reference extends DependentResource {
+  def target: Label
 }

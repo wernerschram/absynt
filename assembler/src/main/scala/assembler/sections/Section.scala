@@ -70,13 +70,27 @@ trait LastIteration {
   lazy val size: Int = encodeByte.length
 }
 
+case class AlignmentFiller(section: Section) extends DependentResource {
+  override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(Seq.fill(sizeForDistance(distance, offsetDirection))(0.toByte))(label)
+
+  override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int =
+    section.alignment - distance % section.alignment
+
+  override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
+
+  override def label: Label = Label.noLabel
+}
+
 object Section {
   def apply(`type`: SectionType, sectionName: String, resources: List[Resource]): Section =
     new Section {
       val alignment: Int = 16
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
-      override val content: List[Resource] = resources
+      override val content: List[Resource] =
+        //AlignmentFiller(this) ::
+        resources
     }
 
   def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):

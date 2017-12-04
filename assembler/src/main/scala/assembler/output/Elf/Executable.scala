@@ -2,7 +2,7 @@ package assembler.output.Elf
 
 import assembler._
 import assembler.reference.{AbsoluteReference, RelativeReference}
-import assembler.sections.{LastIteration, Section}
+import assembler.sections.{AlignmentFiller, LastIteration, Section}
 
 abstract class Elf(
   val architecture: Architecture,
@@ -115,15 +115,15 @@ class Executable private(
 
   override def elfType: ElfType = ElfType.Executable
 
-  override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
+  override def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection) = from match {
     case relative: RelativeReference =>
       val section = sections.filter(s => s.contains(from)).head
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference => (
       sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
       sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute
-
       )
+    case alignment: AlignmentFiller => ???
   }
 }
 

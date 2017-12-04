@@ -2,7 +2,7 @@ package assembler.output.raw
 
 import assembler._
 import assembler.reference.{AbsoluteReference, RelativeReference}
-import assembler.sections.{LastIteration, Section}
+import assembler.sections.{AlignmentFiller, LastIteration, Section}
 
 class Raw(section: Section, override val startOffset: Int)
   extends Application(section :: Nil) {
@@ -11,11 +11,12 @@ class Raw(section: Section, override val startOffset: Int)
 
   override def encodeByte: List[Byte] = encodableSections.head.encodeByte
 
-  override def intermediateResources(from: Reference): (List[Resource], OffsetDirection) = from match {
+  override def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection) = from match {
     case relative: RelativeReference =>
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference =>
       (section.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute)
+    case alignment: AlignmentFiller => ???
   }
 }
 
