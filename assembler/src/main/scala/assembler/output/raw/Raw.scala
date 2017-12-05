@@ -16,7 +16,8 @@ class Raw(section: Section, override val startOffset: Int)
       (section.intermediateEncodables(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference =>
       (section.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute)
-    case alignment: AlignmentFiller => ???
+    case _: AlignmentFiller =>
+      (Nil, OffsetDirection.Absolute)
   }
 }
 
