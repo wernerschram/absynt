@@ -108,10 +108,9 @@ abstract class Elf(
 class Executable private(
   architecture: Architecture,
   sections: List[Section],
-  entryLabel: Label)
+  entryLabel: Label,
+  override val startOffset: Int)
   extends Elf(architecture, sections, entryLabel) {
-
-  def startOffset: Int = ???
 
   override def elfType: ElfType = ElfType.Executable
 
@@ -129,8 +128,8 @@ class Executable private(
 }
 
 object Executable {
-  def apply(architecture: Architecture, sections: List[Section], entryLabel: Label) =
-    new Executable(architecture, sections, entryLabel)
+  def apply(architecture: Architecture, sections: List[Section], entryLabel: Label, startOffset: Int) =
+    new Executable(architecture, sections, entryLabel, startOffset)
 }
 
 case class ElfVersion private(id: Byte, extended: Int)

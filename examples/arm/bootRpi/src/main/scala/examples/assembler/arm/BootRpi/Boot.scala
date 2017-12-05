@@ -139,7 +139,7 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
 
-    val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry)
+    val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry, 0x10000)
 
     raw.write(exec.encodableSections.head.encodeByte.toArray)
     println(s"size: ${exec.encodableSections.head.size}")
