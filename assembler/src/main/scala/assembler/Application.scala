@@ -112,26 +112,7 @@ abstract class Application protected (
       val (totalDependencySizes, fixedSize, childSizeFunctions, totalRestrictions) =
         references.foldLeft((visited, independentSizes, Seq.empty[Map[DependentResource, Int] => Int], Map.empty[DependentResource, Set[Int]])) {
           case ((previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions, previousRestrictions), child: Resource) =>
-
-            if (visiting.contains(child))
-            // cyclic dependency: add a dependency which can be resolved at a higher level
-              (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ ((assumptions: Map[DependentResource, Int]) =>
-                assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
-            else {
-              val (childSizeFunctions, childRestrictions) = dependencySizes(visiting + current, previousDependencySizeFunctions, previousRestrictions)(child)
-              val newDependencySizes = previousDependencySizeFunctions ++ childSizeFunctions
-              val newRestrictions = previousRestrictions ++ childRestrictions
-              val dependencySize = newDependencySizes(child)
-              dependencySize match {
-                case known: KnownDependencySize =>
-                  val size = child.sizeForDependencySize(known.size, known.offsetDirection)
-                  (newDependencySizes, previousFixedSize + size, previousChildSizeFunctions, newRestrictions)
-                case unknown: UnknownDependencySize =>
-                  val size = (assumptions: Map[DependentResource, Int]) => assumptions.getOrElse(child,
-                    child.sizeForDependencySize(unknown.sizeFunction(assumptions), unknown.offsetDirection))
-                  (newDependencySizes, previousFixedSize, previousChildSizeFunctions :+ size, newRestrictions)
-              }
-            }
+            childDependencies(visiting, current)(previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions, previousRestrictions)(child)
         }
 
       if (childSizeFunctions.isEmpty)
@@ -144,6 +125,37 @@ abstract class Application protected (
           (totalDependencySizes + (current -> UnknownDependencySize(dependencySize, offsetDirection)), restrictions ++ totalRestrictions.updated(current, sizes))
         } else
           (totalDependencySizes + (current -> UnknownDependencySize(dependencySize, offsetDirection)), restrictions ++ totalRestrictions)
+      }
+    }
+  }
+
+  @inline // inline to reduce stack size of the recursive dependencySizes call
+  private final def childDependencies
+    (visiting: Set[DependentResource],
+      current: DependentResource)
+    (previousDependencySizeFunctions: Map[DependentResource, DependencySize],
+      previousFixedSize: Int,
+      previousChildSizeFunctions: Seq[Map[DependentResource, Int] => Int],
+      previousRestrictions: Map[DependentResource, Set[Int]])
+    (child: DependentResource) = {
+
+    if (visiting.contains(child))
+    // cyclic dependency: add a dependency which can be resolved at a higher level
+      (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ ((assumptions: Map[DependentResource, Int]) =>
+        assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
+    else {
+      val (childSizeFunctions, childRestrictions) = dependencySizes(visiting + current, previousDependencySizeFunctions, previousRestrictions)(child)
+      val newDependencySizes = previousDependencySizeFunctions ++ childSizeFunctions
+      val newRestrictions = previousRestrictions ++ childRestrictions
+      val dependencySize = newDependencySizes(child)
+      dependencySize match {
+        case known: KnownDependencySize =>
+          val size = child.sizeForDependencySize(known.size, known.offsetDirection)
+          (newDependencySizes, previousFixedSize + size, previousChildSizeFunctions, newRestrictions)
+        case unknown: UnknownDependencySize =>
+          val size = (assumptions: Map[DependentResource, Int]) => assumptions.getOrElse(child,
+            child.sizeForDependencySize(unknown.sizeFunction(assumptions), unknown.offsetDirection))
+          (newDependencySizes, previousFixedSize, previousChildSizeFunctions :+ size, newRestrictions)
       }
     }
   }
