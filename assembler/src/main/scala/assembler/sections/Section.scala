@@ -71,11 +71,11 @@ trait LastIteration {
 }
 
 case class AlignmentFiller(section: Section) extends DependentResource {
-  override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(Seq.fill(sizeForDistance(distance, offsetDirection))(0.toByte))(label)
+  override def encodeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
 
-  override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int =
-    section.alignment - distance % section.alignment
+  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
+    section.alignment - dependencySize % section.alignment
 
   override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
 

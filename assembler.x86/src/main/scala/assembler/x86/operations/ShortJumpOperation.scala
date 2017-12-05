@@ -19,8 +19,8 @@ abstract class ShortJumpOperation[OffsetType <: X86Offset]
   override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with Encodable =
     encodableForShortPointer(ShortPointer[OffsetType](offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)))
 
-  override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int =
-    encodeForDistance(distance, offsetDirection).size
+  override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
+    encodeForDependencySize(distance, offsetDirection).size
 
   override def possibleSizes: Set[Int] = Set(shortJumpSize)
 }

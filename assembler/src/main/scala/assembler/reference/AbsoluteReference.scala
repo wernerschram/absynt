@@ -8,16 +8,16 @@ sealed abstract case class AbsoluteReference(
 
   def encodeForDistance(distance: Int): Encodable
 
-  final override def encodeForDistance(distance: Int, offsetDirection: OffsetDirection): Encodable = {
+  final override def encodeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
     assume(offsetDirection == OffsetDirection.Absolute)
-    encodeForDistance(distance)
+    encodeForDistance(dependencySize)
   }
 
   def sizeForDistance(distance: Int): Int
 
-  final override def sizeForDistance(distance: Int, offsetDirection: OffsetDirection): Int = {
+  final override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
     assume(offsetDirection == OffsetDirection.Absolute)
-    sizeForDistance(distance)
+    sizeForDistance(dependencySize)
   }
 }
 
