@@ -346,14 +346,13 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-          EncodedByteList(List.fill(4)(0x00.toByte)),
+          EncodedByteList(List.fill(4)(0x01.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x02.toByte))},
+          EncodedByteList(List.fill(4)(0x03.toByte)),
           instruction))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
-
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 

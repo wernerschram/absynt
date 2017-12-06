@@ -8,7 +8,7 @@ abstract class Application protected (
   def startOffset: Int
 
   lazy val encodableSections: List[Section with LastIteration] = {
-    val dependentMap: Map[DependentResource, Encodable] = encodablesForReferences(sections.flatMap(s => s.content.collect{case r: Reference => r}))
+    val dependentMap: Map[DependentResource, Encodable] = encodablesForReferences(sections.flatMap(s => s.content.collect{case r: DependentResource => r}))
     sections.map(s => Section.lastIteration(s.sectionType, s.name, s.content.map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
@@ -44,13 +44,13 @@ abstract class Application protected (
     }
   }
 
-  def encodablesForReferences(references: Seq[Reference]): Map[DependentResource, Encodable] = {
+  def encodablesForReferences(references: Seq[DependentResource]): Map[DependentResource, Encodable] = {
     val (totalDependencySizes: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]]) =
       references.foldLeft((Map.empty[DependentResource, DependencySize], Map.empty[DependentResource, Set[Int]])) {
         case ((
             currentDependencySizeFunctions: Map[DependentResource, DependencySize],
             currentRestrictions: Map[DependentResource, Set[Int]]),
-            currentReference: Reference) =>
+            currentReference: DependentResource) =>
 
           val (newDependencySizeFunctions, newRestrictions) =
             dependencySizes(Set.empty, currentDependencySizeFunctions, currentRestrictions)(currentReference)

@@ -75,7 +75,7 @@ case class AlignmentFiller(section: Section) extends DependentResource {
     EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
-    section.alignment - dependencySize % section.alignment
+    (section.alignment - dependencySize) % section.alignment
 
   override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
 
@@ -89,8 +89,8 @@ object Section {
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val content: List[Resource] =
-        //AlignmentFiller(this) ::
-        resources
+        AlignmentFiller(this) ::
+          resources
     }
 
   def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
