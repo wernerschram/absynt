@@ -19,7 +19,8 @@ abstract class Application protected (
     encodableSections.filter(s => s.contains(label))
       .map(s => sectionOffset(s) + s.offset(label)).head
 
-  def sectionOffset(section: Section with LastIteration): Long
+  def sectionOffset(section: Section with LastIteration): Long =
+    encodableSections.takeWhile(s => s != section).map(_.size).sum
 
   def encodeByte: List[Byte]
 
