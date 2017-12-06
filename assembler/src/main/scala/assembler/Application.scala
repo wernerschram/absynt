@@ -1,6 +1,7 @@
 package assembler
 
-import assembler.sections.{LastIteration, Section}
+import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.sections.{AlignmentFiller, LastIteration, Section}
 
 abstract class Application protected (
   val sections: List[Section]) {
@@ -24,7 +25,17 @@ abstract class Application protected (
 
   def encodeByte: List[Byte]
 
-  def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection)
+  def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection) = from match {
+    case relative: RelativeReference =>
+      val section = sections.filter(s => s.contains(from)).head
+      (section.intermediateEncodables(relative), section.offsetDirection(relative))
+    case absolute: AbsoluteReference => (
+      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
+      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute
+      )
+    case alignment: AlignmentFiller =>
+      (sections.takeWhile(s => !s.contains(alignment)).flatMap(s => s.content), OffsetDirection.Absolute)
+  }
 
   private def applicationContextProperties(from: DependentResource): (Seq[DependentResource], Int, OffsetDirection) = {
     val (resources, offsetType) = intermediateResources(from)

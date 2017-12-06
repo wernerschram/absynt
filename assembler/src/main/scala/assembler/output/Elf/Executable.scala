@@ -113,18 +113,6 @@ class Executable private(
   extends Elf(architecture, sections, entryLabel) {
 
   override def elfType: ElfType = ElfType.Executable
-
-  override def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection) = from match {
-    case relative: RelativeReference =>
-      val section = sections.filter(s => s.contains(from)).head
-      (section.intermediateEncodables(relative), section.offsetDirection(relative))
-    case absolute: AbsoluteReference => (
-      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
-      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute
-      )
-    case alignment: AlignmentFiller =>
-      (sections.takeWhile(s => !s.contains(alignment)).flatMap(s => s.content), OffsetDirection.Absolute)
-  }
 }
 
 object Executable {

@@ -2,7 +2,7 @@ package assembler
 
 import assembler.output.raw.Raw
 import assembler.reference.RelativeReference
-import assembler.sections.{Section, SectionType}
+import assembler.sections.{AlignmentFiller, LastIteration, Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.reflect.ClassTag
@@ -256,6 +256,34 @@ class ApplicationSuite extends WordSpec with Matchers {
         an[AssertionError] shouldBe thrownBy { myEncodables(content, Seq(reference1, reference2)) }
       }
 
+    }
+
+    "defined with multiple sections" should {
+      case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application(sections) {
+
+        override def encodeByte: List[Byte] = ???
+      }
+
+      "align the first section" when {
+        val section = Section(SectionType.Data, "Test", List(EncodedByteList(Seq(0x00.toByte))))
+
+        "there is a zero start offset" in {
+          val application = MyApplication(List(section), 0)
+          val first = application.encodableSections.head.finalContent.head
+          first shouldBe a[EncodedByteList]
+          val filler = first.asInstanceOf[EncodedByteList]
+          filler.size shouldBe 0
+        }
+
+        "there is a start offset of 1" in {
+          val application = MyApplication(List(section), 1)
+          val first = application.encodableSections.head.finalContent.head
+          first shouldBe a[EncodedByteList]
+          val filler = first.asInstanceOf[EncodedByteList]
+          filler.size shouldBe 15
+        }
+
+      }
     }
 
   }
