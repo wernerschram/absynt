@@ -277,14 +277,36 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         "there is a start offset of 1" in {
           val application = MyApplication(List(section), 1)
-          val first = application.encodableSections.head.finalContent.head
-          first shouldBe a[EncodedByteList]
-          val filler = first.asInstanceOf[EncodedByteList]
+          val resource = application.encodableSections.head.finalContent.head
+          resource shouldBe a[EncodedByteList]
+          val filler = resource.asInstanceOf[EncodedByteList]
           filler.size shouldBe 15
         }
+      }
 
+      "align the second section" when {
+        val second = Section(SectionType.Data, "Second", List(EncodedByteList(Seq(0x02.toByte))))
+
+        "there is a zero start offset and a 16 byte first section" in {
+          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(16)(0x01.toByte))))
+          val application = MyApplication(List(first, second), 0)
+
+          val resource = application.encodableSections(1).finalContent.head
+          resource shouldBe a[EncodedByteList]
+          val filler = resource.asInstanceOf[EncodedByteList]
+          filler.size shouldBe 0
+        }
+
+        "there is a zero start offset and a 20 byte first section" in {
+          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(20)(0x01.toByte))))
+          val application = MyApplication(List(first, second), 0)
+
+          val resource = application.encodableSections(1).finalContent.head
+          resource shouldBe a[EncodedByteList]
+          val filler = resource.asInstanceOf[EncodedByteList]
+          filler.size shouldBe 12
+        }
       }
     }
-
   }
 }
