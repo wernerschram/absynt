@@ -333,8 +333,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
 
-//        withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("EB 80")) }
-//        withClue("Jump2") { encodable(jump2).encodeByte should be(Hex.lsb("EB 7F")) }
+        withClue("Jump1") { encodable(jump1).encodeByte should be(Hex.lsb("EB 80")) }
+        withClue("Jump2") { encodable(jump2).encodeByte should be(Hex.lsb("EB 7F")) }
       }
 
       "Encode a program with two indirect jump instructions that depends on the size of the other for its size where the second forces the first to be long" in {

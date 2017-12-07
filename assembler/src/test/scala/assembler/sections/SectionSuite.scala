@@ -26,7 +26,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           intermediate,
           target))
 
-        section.intermediateEncodables(reference) should be(intermediate :: Nil)
+        section.intermediateResources(reference) should be(intermediate :: Nil)
       }
 
       "provide the intermediate instructions between a label and a relative instruction" in {
@@ -42,7 +42,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           intermediate,
           reference))
 
-        section.intermediateEncodables(reference) should be(target :: intermediate :: Nil)
+        section.intermediateResources(reference) should be(target :: intermediate :: Nil)
       }
 
       "return an empty list for an instruction that references itself" in {
@@ -58,7 +58,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           reference,
           postfix))
 
-        section.intermediateEncodables(reference) should be(Nil)
+        section.intermediateResources(reference) should be(Nil)
       }
     }
 

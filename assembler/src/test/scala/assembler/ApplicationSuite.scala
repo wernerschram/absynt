@@ -190,12 +190,10 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         an[AssertionError] shouldBe thrownBy { myEncodables(content, Seq(reference1, reference2)) }
       }
-
     }
 
     "defined with multiple sections" should {
       case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application(sections) {
-
         override def encodeByte: List[Byte] = ???
       }
 
@@ -216,6 +214,54 @@ class ApplicationSuite extends WordSpec with Matchers {
           resource shouldBe a[EncodedByteList]
           val filler = resource.asInstanceOf[EncodedByteList]
           filler.size shouldBe 15
+        }
+      }
+
+      "align the second section" when {
+        val second = Section(SectionType.Data, "Second", List(EncodedByteList(Seq(0x02.toByte))))
+
+        "there is a zero start offset and a 16 byte first section" in {
+          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(16)(0x01.toByte))))
+          val application = MyApplication(List(first, second), 0)
+
+          val resource = application.encodableSections(1).finalContent.head
+          resource shouldBe a[EncodedByteList]
+          val filler = resource.asInstanceOf[EncodedByteList]
+          filler.size shouldBe 0
+        }
+
+        "there is a zero start offset and a 20 byte first section" in {
+          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(20)(0x01.toByte))))
+          val application = MyApplication(List(first, second), 0)
+
+          val resource = application.encodableSections(1).finalContent.head
+          resource shouldBe a[EncodedByteList]
+          val filler = resource.asInstanceOf[EncodedByteList]
+          filler.size shouldBe 12
+        }
+      }
+
+      "asked for the intermediate resources" should {
+        def dummyResource = EncodedByteList(Seq(0xdd.toByte))
+
+        val (relative1, targetRelative1) = TestEncodable.linearReferenceWithTarget
+        val (relative2, targetRelative2) = TestEncodable.linearReferenceWithTarget
+        val dummy1in1 = dummyResource
+        val dummy2in1 = dummyResource
+        val dummy1in2 = dummyResource
+        val dummy2in2 = dummyResource
+
+        val first = Section(SectionType.Text, "First", List(relative1, dummy1in1, targetRelative1, dummy2in1))
+        val second = Section(SectionType.Text, "Second", List(dummy1in2, targetRelative2, dummy2in2, relative2))
+
+        val application: MyApplication = MyApplication(List(first, second), 100)
+
+        "return the intermediate resources for a relative reference in the first section" in {
+          application.intermediateResources(relative1) shouldBe (Seq(dummy1in1), OffsetDirection.Forward)
+        }
+
+        "return the intermediate resources for a relative reference in the second section" in {
+          application.intermediateResources(relative2) shouldBe (Seq(targetRelative2, dummy2in2), OffsetDirection.Backward)
         }
       }
     }

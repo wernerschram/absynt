@@ -28,7 +28,7 @@ abstract class Section {
     * @param from
     * @return
     */
-  def intermediateEncodables(from: Reference): List[Resource] = {
+  def intermediateResources(from: RelativeReference): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
