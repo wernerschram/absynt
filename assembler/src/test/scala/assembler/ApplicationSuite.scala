@@ -24,44 +24,12 @@ class ApplicationSuite extends WordSpec with Matchers {
 
     "asked to return encodables for relative references with a linear sizeForDistance function" should {
 
-      case class MyEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable {
-        override def encodeByte: Seq[Byte] =
-          offsetDirection match {
-            case OffsetDirection.Forward => Seq.fill(size)(0xff.toByte)
-            case OffsetDirection.Backward => Seq.fill(size)(0xbb.toByte)
-            case OffsetDirection.Self => Seq.fill(size)(0x88.toByte)
-          }
-
-        override def size: Int =
-          if (distance < 10) 1
-          else if (distance < 20) 2
-          else 3
-      }
-
-      case class MyRelativeReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference {
-        override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
-          MyEncodable(distance, offsetDirection, label)
-
-        override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
-          if (dependencySize < 10) 1
-          else if (dependencySize < 20) 2
-          else 3
-
-        override def possibleSizes = Set(1, 2, 3)
-      }
-
-      def referenceWithTarget = {
-        val targetLabel = Label.unique
-        val reference = MyRelativeReference(targetLabel)
-        val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
-        (reference, targetResource)
-      }
 
       def myEncodables(content: List[Resource], references: Seq[Reference]) =
-        encodables[MyEncodable](content, references)
+        encodables[LinearRelativeTestEncodable](content, references)
 
       "calculate the correct distance and size for a forward relative reference with a nearby target" in {
-        val (reference, target) = referenceWithTarget
+        val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           reference ::
             filler(5) ::
@@ -74,7 +42,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "calculate the correct distance and size for a backward relative reference with a farther target" in {
-        val (reference, target) = referenceWithTarget
+        val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           target ::
             filler(15) ::
@@ -87,7 +55,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "represent a forward reference by a forward representation" in {
-        val (reference, target) = referenceWithTarget
+        val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           reference ::
             filler(5) ::
@@ -99,7 +67,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "represent a backward reference by a backward representation" in {
-        val (reference, target) = referenceWithTarget
+        val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           target ::
             filler(5) ::
@@ -111,8 +79,8 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "represent two forward references with a nearby target where one depends on the other for its size" in {
-        val (reference1, target1) = referenceWithTarget
-        val (reference2, target2) = referenceWithTarget
+        val (reference1, target1) = TestEncodable.linearReferenceWithTarget
+        val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           reference1 ::
             filler(2) ::
@@ -129,8 +97,8 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "represent two forward references with a farther target where one depends on the other for its size" in {
-        val (reference1, target1) = referenceWithTarget
-        val (reference2, target2) = referenceWithTarget
+        val (reference1, target1) = TestEncodable.linearReferenceWithTarget
+        val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           reference1 ::
             filler(2) ::
@@ -147,8 +115,8 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "represent two references with a farther target which both depend on each other for their size where there is an obvious single resolution" in {
-        val (reference1, target1) = referenceWithTarget
-        val (reference2, target2) = referenceWithTarget
+        val (reference1, target1) = TestEncodable.linearReferenceWithTarget
+        val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           target2 ::
             filler(12) ::
@@ -165,8 +133,8 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "represent two references with a farther target which both depend on each other for their size where there are multiple resolutions from which the optimal (smallest) one should be chosen" in {
-        val (reference1, target1) = referenceWithTarget
-        val (reference2, target2) = referenceWithTarget
+        val (reference1, target1) = TestEncodable.linearReferenceWithTarget
+        val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: List[Resource] =
           target2 ::
             filler(4) ::
@@ -185,45 +153,12 @@ class ApplicationSuite extends WordSpec with Matchers {
 
     "asked to return encodables for relative references with a non-linear sizeForDistance function" should {
 
-      case class MyEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable {
-        override def encodeByte: Seq[Byte] =
-          offsetDirection match {
-            case OffsetDirection.Forward => Seq.fill(size)(0xff.toByte)
-            case OffsetDirection.Backward => Seq.fill(size)(0xbb.toByte)
-            case OffsetDirection.Self => Seq.fill(size)(0x88.toByte)
-          }
-
-        override def size: Int =
-          if (distance < 10) 1
-          else if (distance < 20) 3
-          else 2
-      }
-
-      case class MyRelativeReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference {
-        override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
-          MyEncodable(distance, offsetDirection, label)
-
-        override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
-          if (dependencySize < 10) 1
-          else if (dependencySize < 20) 3
-          else 2
-
-        override def possibleSizes = Set(1, 2, 3)
-      }
-
-      def referenceWithTarget = {
-        val targetLabel = Label.unique
-        val reference = MyRelativeReference(targetLabel)
-        val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
-        (reference, targetResource)
-      }
-
-      def myEncodables(content: List[Resource], references: Seq[Reference]) =
-        encodables[MyEncodable](content, references)
+     def myEncodables(content: List[Resource], references: Seq[Reference]) =
+        encodables[NonLinearRelativeTestEncodable](content, references)
 
       "represent two references with a farther target which both depend on each other for their size where there is an obvious single resolution" in {
-        val (reference1, target1) = referenceWithTarget
-        val (reference2, target2) = referenceWithTarget
+        val (reference1, target1) = TestEncodable.nonLinearReferenceWithTarget
+        val (reference2, target2) = TestEncodable.nonLinearReferenceWithTarget
         val content: List[Resource] =
           target2 ::
             filler(12) ::
@@ -241,8 +176,8 @@ class ApplicationSuite extends WordSpec with Matchers {
 
       // TODO the algorithm should be modified to be able to resolve this case (i.e. Insert NOPs).
       "(currently) not represent two references with a farther target which both depend on each other for their size where there is no optimal resolution" in {
-        val (reference1, target1) = referenceWithTarget
-        val (reference2, target2) = referenceWithTarget
+        val (reference1, target1) = TestEncodable.nonLinearReferenceWithTarget
+        val (reference2, target2) = TestEncodable.nonLinearReferenceWithTarget
         val content: List[Resource] =
           target2 ::
             filler(14) ::
@@ -281,30 +216,6 @@ class ApplicationSuite extends WordSpec with Matchers {
           resource shouldBe a[EncodedByteList]
           val filler = resource.asInstanceOf[EncodedByteList]
           filler.size shouldBe 15
-        }
-      }
-
-      "align the second section" when {
-        val second = Section(SectionType.Data, "Second", List(EncodedByteList(Seq(0x02.toByte))))
-
-        "there is a zero start offset and a 16 byte first section" in {
-          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(16)(0x01.toByte))))
-          val application = MyApplication(List(first, second), 0)
-
-          val resource = application.encodableSections(1).finalContent.head
-          resource shouldBe a[EncodedByteList]
-          val filler = resource.asInstanceOf[EncodedByteList]
-          filler.size shouldBe 0
-        }
-
-        "there is a zero start offset and a 20 byte first section" in {
-          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(20)(0x01.toByte))))
-          val application = MyApplication(List(first, second), 0)
-
-          val resource = application.encodableSections(1).finalContent.head
-          resource shouldBe a[EncodedByteList]
-          val filler = resource.asInstanceOf[EncodedByteList]
-          filler.size shouldBe 12
         }
       }
     }

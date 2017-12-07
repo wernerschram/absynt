@@ -49,8 +49,6 @@ abstract class Elf(
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
-  //TODO review all alignment fixes. The AlignmentFiller should make all alignment implicit
-
   def stringOffset(strings: List[String]): List[(String, Int)] =
     (strings.head, 0) :: stringOffset(1, strings)
 
