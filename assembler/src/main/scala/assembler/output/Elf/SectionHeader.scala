@@ -49,7 +49,7 @@ class SectionSectionHeader(section: Section
         SectionFlag.Alloc | SectionFlag.Write
     }
   val sectionAddress: Option[Long] = Some(elf.sectionOffset(section))
-  val sectionFileOffset: Long = elf.alignedSectionOffset(section)
+  val sectionFileOffset: Long = elf.sectionOffset(section)
 
   val segmentFileSize: Long = section.size
   val link: Int = 0

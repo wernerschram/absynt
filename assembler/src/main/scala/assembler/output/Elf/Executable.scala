@@ -41,19 +41,10 @@ abstract class Elf(
   private val dataOffset: Long =
     programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
 
-  def sectionFileOffset(section: Section): Long = encodableSections.takeWhile(s => s!=section).foldLeft(dataOffset) {
-      (dataOffset, nextSection) => align(dataOffset, nextSection.alignment) + nextSection.size
-    }
-
-  def alignedSectionOffset(section: Section): Long = align(sectionFileOffset(section), section.alignment)
-
-  private def align(value: Long, alignment: Int): Long = if (value % alignment == 0)
-    value
-  else
-    value + alignment - value % alignment
+  def sectionFileOffset(section: Section): Long = encodableSections.takeWhile(s => s!=section).map(_.size).sum + dataOffset
 
   val stringTableOffset: Long =
-    alignedSectionOffset(encodableSections.last) + encodableSections.last.size
+    sectionOffset(encodableSections.last) + encodableSections.last.size
 
   val sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
@@ -69,16 +60,6 @@ abstract class Elf(
     case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
     case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
   }
-
-  private def alignSectionData(offset: Long, section: Section with LastIteration): List[Byte] = {
-    val prefix: List[Byte] = if (offset % section.alignment != 0)
-      List.fill(section.alignment - offset.toInt % section.alignment)(0)
-    else
-      Nil
-    prefix ::: section.encodeByte
-  }
-
-  val alignedSectionData: List[List[Byte]] = encodableSections.map(s => alignSectionData(sectionFileOffset(s), s))
 
   override def encodeByte: List[Byte] =
     magic :::
@@ -100,7 +81,7 @@ abstract class Elf(
     endianness.encode(sectionHeaders.size.toShort) :::
     endianness.encode(stringSectionHeaderIndex.toShort) :::
     programHeaders.flatMap(p => p.encodeByte) :::
-    alignedSectionData.flatten :::
+    encodableSections.flatMap(_.encodeByte) :::
     stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
     sectionHeaders.flatMap(s => s.encodeByte)
 }

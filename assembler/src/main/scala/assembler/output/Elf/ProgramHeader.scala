@@ -6,7 +6,7 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
   def `type`: ProgramType = ProgramType.Load
 
   def physicalAddress: Long = segmentMemoryOffset
-  def segmentFileOffset: Long = elf.alignedSectionOffset(section)
+  def segmentFileOffset: Long = elf.sectionOffset(section)
   def segmentMemoryOffset: Long = elf.sectionOffset(section)
   def segmentFileSize: Long = section.size
   def segmentMemorySize: Long = segmentFileSize
