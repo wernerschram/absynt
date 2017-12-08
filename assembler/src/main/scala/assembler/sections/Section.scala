@@ -71,7 +71,7 @@ trait LastIteration {
 }
 
 case class AlignmentFiller(section: Section) extends DependentResource {
-  override def encodeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {

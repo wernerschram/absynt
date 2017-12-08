@@ -31,7 +31,7 @@ class LoadStoreRegister(
 
   def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, Always) {
-      override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         ImmedWord(label, Always, destination, GeneralRegister.PC,
           LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)
@@ -39,7 +39,7 @@ class LoadStoreRegister(
 
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, condition) {
-      override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         ImmedWord(label, condition, destination, GeneralRegister.PC,
           LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)

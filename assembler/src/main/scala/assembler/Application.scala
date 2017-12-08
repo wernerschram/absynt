@@ -80,7 +80,7 @@ abstract class Application protected (
     val shortestCombination = validCombinations.minBy(_.values.sum)
 
     references.map(reference =>
-      reference -> reference.encodeForDependencySize(
+      reference -> reference.encodableForDependencySize(
         totalDependencySizes(reference).size(shortestCombination),
         totalDependencySizes(reference).offsetDirection))
       .toMap

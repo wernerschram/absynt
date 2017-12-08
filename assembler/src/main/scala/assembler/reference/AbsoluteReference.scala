@@ -6,11 +6,11 @@ sealed abstract case class AbsoluteReference(
   target: Label, override val label: Label)
     extends Reference {
 
-  def encodeForDistance(distance: Int): Encodable
+  def encodableForDistance(distance: Int): Encodable
 
-  final override def encodeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
+  final override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
     assume(offsetDirection == OffsetDirection.Absolute)
-    encodeForDistance(dependencySize)
+    encodableForDistance(dependencySize)
   }
 
   def sizeForDistance(distance: Int): Int
@@ -27,7 +27,7 @@ object AbsoluteReference {
 
       override def possibleSizes: Set[Int] = sizes
 
-      override def encodeForDistance(distance: Int): Encodable = encodableFactory(distance)
+      override def encodableForDistance(distance: Int): Encodable = encodableFactory(distance)
 
       override def sizeForDistance(distance: Int): Int = encodableFactory(distance).size
 

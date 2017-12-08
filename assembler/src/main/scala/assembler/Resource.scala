@@ -20,7 +20,7 @@ trait Encodable extends Resource {
 
 trait DependentResource extends Resource {
 
-  def encodeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
+  def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 

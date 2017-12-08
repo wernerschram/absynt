@@ -17,7 +17,7 @@ case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeO
 }
 
 case class LinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference {
-  override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
     LinearRelativeTestEncodable(distance, offsetDirection, label)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
@@ -44,7 +44,7 @@ case class NonLinearRelativeTestEncodable(distance: Int, offsetDirection: Relati
 }
 
 case class NonLinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference {
-  override def encodeForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
     NonLinearRelativeTestEncodable(distance, offsetDirection, label)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
