@@ -90,7 +90,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}))
 
         val application = Raw(p, 0)
-        application.encodablesForReferences(Seq(reference))(reference).encodeByte should be(Hex.msb("e59f100"))
+        application.encodablesForReferences(Seq(reference))(reference).encodeByte should be(Hex.msb("e59f1000"))
       }
 
       "correctly encode a conditional indirect ldr instruction with an indirect reference to a labeled resource" in {

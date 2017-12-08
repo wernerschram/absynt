@@ -17,99 +17,99 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
       import ProcessorMode.Real._
 
-      "correctly encode jmp 0x10" in { Jump(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
-      "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
-      "correctly encode jae 0x10" in { JumpIfAboveOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jb 0x10" in { JumpIfBelow(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode jbe 0x10" in { JumpIfBelowOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
-      "correctly encode jc 0x10" in { JumpIfCarry(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode je 0x10" in { JumpIfEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("74 10")) }
-      "correctly encode jg 0x10" in { JumpIfGreater(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
-      "correctly encode jge 0x10" in { JumpIfGreaterOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
-      "correctly encode jl 0x10" in { JumpIfLess(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
-      "correctly encode jle 0x10" in { JumpIfLessOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
-      "correctly encode jna 0x10" in { JumpIfNotAbove(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
-      "correctly encode jnae 0x10" in { JumpIfNotAboveOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode jnb 0x10" in { JumpIfNotBelow(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jnbe 0x10" in { JumpIfNotBelowOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
-      "correctly encode jnc 0x10" in { JumpIfNoCarry(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jne 0x10" in { JumpIfNotEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("75 10")) }
-      "correctly encode jng 0x10" in { JumpIfNotGreater(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
-      "correctly encode jnge 0x10" in { JumpIfNotGreaterOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
-      "correctly encode jnl 0x10" in { JumpIfNotLess(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
-      "correctly encode jnle 0x10" in { JumpIfNotLessOrEqual(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
+      "correctly encode jmp 0x10" in { Jump(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
+      "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
+      "correctly encode jae 0x10" in { JumpIfAboveOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jb 0x10" in { JumpIfBelow(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode jbe 0x10" in { JumpIfBelowOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
+      "correctly encode jc 0x10" in { JumpIfCarry(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode je 0x10" in { JumpIfEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("74 10")) }
+      "correctly encode jg 0x10" in { JumpIfGreater(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
+      "correctly encode jge 0x10" in { JumpIfGreaterOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
+      "correctly encode jl 0x10" in { JumpIfLess(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
+      "correctly encode jle 0x10" in { JumpIfLessOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
+      "correctly encode jna 0x10" in { JumpIfNotAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
+      "correctly encode jnae 0x10" in { JumpIfNotAboveOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode jnb 0x10" in { JumpIfNotBelow(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jnbe 0x10" in { JumpIfNotBelowOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
+      "correctly encode jnc 0x10" in { JumpIfNoCarry(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jne 0x10" in { JumpIfNotEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("75 10")) }
+      "correctly encode jng 0x10" in { JumpIfNotGreater(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
+      "correctly encode jnge 0x10" in { JumpIfNotGreaterOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
+      "correctly encode jnl 0x10" in { JumpIfNotLess(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
+      "correctly encode jnle 0x10" in { JumpIfNotLessOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
 
-      "correctly encode jmp 0x2030" in { Jump(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("E9 30 20")) }
-      "correctly encode ja 0x2030" in { JumpIfAbove(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 87 30 20")) }
-      "correctly encode jae 0x2030" in { JumpIfAboveOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 83 30 20")) }
-      "correctly encode jb 0x2030" in { JumpIfBelow(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 82 30 20")) }
-      "correctly encode jbe 0x2030" in { JumpIfBelowOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 86 30 20")) }
-      "correctly encode jc 0x2030" in { JumpIfCarry(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 82 30 20")) }
-      "correctly encode je 0x2030" in { JumpIfEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 84 30 20")) }
-      "correctly encode jg 0x2030" in { JumpIfGreater(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8F 30 20")) }
-      "correctly encode jge 0x2030" in { JumpIfGreaterOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8D 30 20")) }
-      "correctly encode jl 0x2030" in { JumpIfLess(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8C 30 20")) }
-      "correctly encode jle 0x2030" in { JumpIfLessOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8E 30 20")) }
-      "correctly encode jna 0x2030" in { JumpIfNotAbove(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 86 30 20")) }
-      "correctly encode jnae 0x2030" in { JumpIfNotAboveOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 82 30 20")) }
-      "correctly encode jnb 0x2030" in { JumpIfNotBelow(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 83 30 20")) }
-      "correctly encode jnbe 0x2030" in { JumpIfNotBelowOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 87 30 20")) }
-      "correctly encode jnc 0x2030" in { JumpIfNoCarry(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 83 30 20")) }
-      "correctly encode jne 0x2030" in { JumpIfNotEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 85 30 20")) }
-      "correctly encode jng 0x2030" in { JumpIfNotGreater(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8E 30 20")) }
-      "correctly encode jnge 0x2030" in { JumpIfNotGreaterOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8C 30 20")) }
-      "correctly encode jnl 0x2030" in { JumpIfNotLess(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8D 30 20")) }
-      "correctly encode jnle 0x2030" in { JumpIfNotLessOrEqual(LongPointer[RealX86Offset](offset(0x2030))).encodeByte should be(Hex.lsb("0F 8F 30 20")) }
+      "correctly encode jmp 0x2030" in { Jump(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("E9 30 20")) }
+      "correctly encode ja 0x2030" in { JumpIfAbove(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 87 30 20")) }
+      "correctly encode jae 0x2030" in { JumpIfAboveOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 83 30 20")) }
+      "correctly encode jb 0x2030" in { JumpIfBelow(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 82 30 20")) }
+      "correctly encode jbe 0x2030" in { JumpIfBelowOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 86 30 20")) }
+      "correctly encode jc 0x2030" in { JumpIfCarry(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 82 30 20")) }
+      "correctly encode je 0x2030" in { JumpIfEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 84 30 20")) }
+      "correctly encode jg 0x2030" in { JumpIfGreater(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8F 30 20")) }
+      "correctly encode jge 0x2030" in { JumpIfGreaterOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8D 30 20")) }
+      "correctly encode jl 0x2030" in { JumpIfLess(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8C 30 20")) }
+      "correctly encode jle 0x2030" in { JumpIfLessOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8E 30 20")) }
+      "correctly encode jna 0x2030" in { JumpIfNotAbove(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 86 30 20")) }
+      "correctly encode jnae 0x2030" in { JumpIfNotAboveOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 82 30 20")) }
+      "correctly encode jnb 0x2030" in { JumpIfNotBelow(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 83 30 20")) }
+      "correctly encode jnbe 0x2030" in { JumpIfNotBelowOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 87 30 20")) }
+      "correctly encode jnc 0x2030" in { JumpIfNoCarry(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 83 30 20")) }
+      "correctly encode jne 0x2030" in { JumpIfNotEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 85 30 20")) }
+      "correctly encode jng 0x2030" in { JumpIfNotGreater(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8E 30 20")) }
+      "correctly encode jnge 0x2030" in { JumpIfNotGreaterOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8C 30 20")) }
+      "correctly encode jnl 0x2030" in { JumpIfNotLess(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8D 30 20")) }
+      "correctly encode jnle 0x2030" in { JumpIfNotLessOrEqual(LongPointer(offset(0x2030))).encodeByte should be(Hex.lsb("0F 8F 30 20")) }
 
-      "correctly represent jmp 0x10 as a string" in { Jump(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jmp 0x10") }
-      "correctly represent ja 0x10 as a string" in { JumpIfAbove(ShortPointer[RealX86Offset](offset(0x10))).toString should be("ja 0x10") }
-      "correctly represent jae 0x10 as a string" in { JumpIfAboveOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jae 0x10") }
-      "correctly represent jb 0x10 as a string" in { JumpIfBelow(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jb 0x10") }
-      "correctly represent jbe 0x10 as a string" in { JumpIfBelowOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jbe 0x10") }
-      "correctly represent jc 0x10 as a string" in { JumpIfCarry(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jc 0x10") }
-      "correctly represent je 0x10 as a string" in { JumpIfEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("je 0x10") }
-      "correctly represent jg 0x10 as a string" in { JumpIfGreater(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jg 0x10") }
-      "correctly represent jge 0x10 as a string" in { JumpIfGreaterOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jge 0x10") }
-      "correctly represent jl 0x10 as a string" in { JumpIfLess(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jl 0x10") }
-      "correctly represent jle 0x10 as a string" in { JumpIfLessOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jle 0x10") }
-      "correctly represent jna 0x10 as a string" in { JumpIfNotAbove(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jna 0x10") }
-      "correctly represent jnae 0x10 as a string" in { JumpIfNotAboveOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnae 0x10") }
-      "correctly represent jnb 0x10 as a string" in { JumpIfNotBelow(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnb 0x10") }
-      "correctly represent jnbe 0x10 as a string" in { JumpIfNotBelowOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnbe 0x10") }
-      "correctly represent jnc 0x10 as a string" in { JumpIfNoCarry(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnc 0x10") }
-      "correctly represent jne 0x10 as a string" in { JumpIfNotEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jne 0x10") }
-      "correctly represent jng 0x10 as a string" in { JumpIfNotGreater(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jng 0x10") }
-      "correctly represent jnge 0x10 as a string" in { JumpIfNotGreaterOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnge 0x10") }
-      "correctly represent jnl 0x10 as a string" in { JumpIfNotLess(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnl 0x10") }
-      "correctly represent jnle 0x10 as a string" in { JumpIfNotLessOrEqual(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jnle 0x10") }
+      "correctly represent jmp 0x10 as a string" in { Jump(ShortPointer(offset(0x10))).toString should be("jmp 0x10") }
+      "correctly represent ja 0x10 as a string" in { JumpIfAbove(ShortPointer(offset(0x10))).toString should be("ja 0x10") }
+      "correctly represent jae 0x10 as a string" in { JumpIfAboveOrEqual(ShortPointer(offset(0x10))).toString should be("jae 0x10") }
+      "correctly represent jb 0x10 as a string" in { JumpIfBelow(ShortPointer(offset(0x10))).toString should be("jb 0x10") }
+      "correctly represent jbe 0x10 as a string" in { JumpIfBelowOrEqual(ShortPointer(offset(0x10))).toString should be("jbe 0x10") }
+      "correctly represent jc 0x10 as a string" in { JumpIfCarry(ShortPointer(offset(0x10))).toString should be("jc 0x10") }
+      "correctly represent je 0x10 as a string" in { JumpIfEqual(ShortPointer(offset(0x10))).toString should be("je 0x10") }
+      "correctly represent jg 0x10 as a string" in { JumpIfGreater(ShortPointer(offset(0x10))).toString should be("jg 0x10") }
+      "correctly represent jge 0x10 as a string" in { JumpIfGreaterOrEqual(ShortPointer(offset(0x10))).toString should be("jge 0x10") }
+      "correctly represent jl 0x10 as a string" in { JumpIfLess(ShortPointer(offset(0x10))).toString should be("jl 0x10") }
+      "correctly represent jle 0x10 as a string" in { JumpIfLessOrEqual(ShortPointer(offset(0x10))).toString should be("jle 0x10") }
+      "correctly represent jna 0x10 as a string" in { JumpIfNotAbove(ShortPointer(offset(0x10))).toString should be("jna 0x10") }
+      "correctly represent jnae 0x10 as a string" in { JumpIfNotAboveOrEqual(ShortPointer(offset(0x10))).toString should be("jnae 0x10") }
+      "correctly represent jnb 0x10 as a string" in { JumpIfNotBelow(ShortPointer(offset(0x10))).toString should be("jnb 0x10") }
+      "correctly represent jnbe 0x10 as a string" in { JumpIfNotBelowOrEqual(ShortPointer(offset(0x10))).toString should be("jnbe 0x10") }
+      "correctly represent jnc 0x10 as a string" in { JumpIfNoCarry(ShortPointer(offset(0x10))).toString should be("jnc 0x10") }
+      "correctly represent jne 0x10 as a string" in { JumpIfNotEqual(ShortPointer(offset(0x10))).toString should be("jne 0x10") }
+      "correctly represent jng 0x10 as a string" in { JumpIfNotGreater(ShortPointer(offset(0x10))).toString should be("jng 0x10") }
+      "correctly represent jnge 0x10 as a string" in { JumpIfNotGreaterOrEqual(ShortPointer(offset(0x10))).toString should be("jnge 0x10") }
+      "correctly represent jnl 0x10 as a string" in { JumpIfNotLess(ShortPointer(offset(0x10))).toString should be("jnl 0x10") }
+      "correctly represent jnle 0x10 as a string" in { JumpIfNotLessOrEqual(ShortPointer(offset(0x10))).toString should be("jnle 0x10") }
 
-      "correctly represent jmp 0x2030 as a string" in { Jump(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jmp 0x2030") }
-      "correctly represent ja 0x2030 as a string" in { JumpIfAbove(LongPointer[RealX86Offset](offset(0x2030))).toString should be("ja 0x2030") }
-      "correctly represent jae 0x2030 as a string" in { JumpIfAboveOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jae 0x2030") }
-      "correctly represent jb 0x2030 as a string" in { JumpIfBelow(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jb 0x2030") }
-      "correctly represent jbe 0x2030 as a string" in { JumpIfBelowOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jbe 0x2030") }
-      "correctly represent jc 0x2030 as a string" in { JumpIfCarry(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jc 0x2030") }
-      "correctly represent je 0x2030 as a string" in { JumpIfEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("je 0x2030") }
-      "correctly represent jg 0x2030 as a string" in { JumpIfGreater(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jg 0x2030") }
-      "correctly represent jge 0x2030 as a string" in { JumpIfGreaterOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jge 0x2030") }
-      "correctly represent jl 0x2030 as a string" in { JumpIfLess(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jl 0x2030") }
-      "correctly represent jle 0x2030 as a string" in { JumpIfLessOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jle 0x2030") }
-      "correctly represent jna 0x2030 as a string" in { JumpIfNotAbove(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jna 0x2030") }
-      "correctly represent jnae 0x2030 as a string" in { JumpIfNotAboveOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnae 0x2030") }
-      "correctly represent jnb 0x2030 as a string" in { JumpIfNotBelow(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnb 0x2030") }
-      "correctly represent jnbe 0x2030 as a string" in { JumpIfNotBelowOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnbe 0x2030") }
-      "correctly represent jnc 0x2030 as a string" in { JumpIfNoCarry(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnc 0x2030") }
-      "correctly represent jne 0x2030 as a string" in { JumpIfNotEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jne 0x2030") }
-      "correctly represent jng 0x2030 as a string" in { JumpIfNotGreater(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jng 0x2030") }
-      "correctly represent jnge 0x2030 as a string" in { JumpIfNotGreaterOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnge 0x2030") }
-      "correctly represent jnl 0x2030 as a string" in { JumpIfNotLess(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnl 0x2030") }
-      "correctly represent jnle 0x2030 as a string" in { JumpIfNotLessOrEqual(LongPointer[RealX86Offset](offset(0x2030))).toString should be("jnle 0x2030") }
+      "correctly represent jmp 0x2030 as a string" in { Jump(LongPointer(offset(0x2030))).toString should be("jmp 0x2030") }
+      "correctly represent ja 0x2030 as a string" in { JumpIfAbove(LongPointer(offset(0x2030))).toString should be("ja 0x2030") }
+      "correctly represent jae 0x2030 as a string" in { JumpIfAboveOrEqual(LongPointer(offset(0x2030))).toString should be("jae 0x2030") }
+      "correctly represent jb 0x2030 as a string" in { JumpIfBelow(LongPointer(offset(0x2030))).toString should be("jb 0x2030") }
+      "correctly represent jbe 0x2030 as a string" in { JumpIfBelowOrEqual(LongPointer(offset(0x2030))).toString should be("jbe 0x2030") }
+      "correctly represent jc 0x2030 as a string" in { JumpIfCarry(LongPointer(offset(0x2030))).toString should be("jc 0x2030") }
+      "correctly represent je 0x2030 as a string" in { JumpIfEqual(LongPointer(offset(0x2030))).toString should be("je 0x2030") }
+      "correctly represent jg 0x2030 as a string" in { JumpIfGreater(LongPointer(offset(0x2030))).toString should be("jg 0x2030") }
+      "correctly represent jge 0x2030 as a string" in { JumpIfGreaterOrEqual(LongPointer(offset(0x2030))).toString should be("jge 0x2030") }
+      "correctly represent jl 0x2030 as a string" in { JumpIfLess(LongPointer(offset(0x2030))).toString should be("jl 0x2030") }
+      "correctly represent jle 0x2030 as a string" in { JumpIfLessOrEqual(LongPointer(offset(0x2030))).toString should be("jle 0x2030") }
+      "correctly represent jna 0x2030 as a string" in { JumpIfNotAbove(LongPointer(offset(0x2030))).toString should be("jna 0x2030") }
+      "correctly represent jnae 0x2030 as a string" in { JumpIfNotAboveOrEqual(LongPointer(offset(0x2030))).toString should be("jnae 0x2030") }
+      "correctly represent jnb 0x2030 as a string" in { JumpIfNotBelow(LongPointer(offset(0x2030))).toString should be("jnb 0x2030") }
+      "correctly represent jnbe 0x2030 as a string" in { JumpIfNotBelowOrEqual(LongPointer(offset(0x2030))).toString should be("jnbe 0x2030") }
+      "correctly represent jnc 0x2030 as a string" in { JumpIfNoCarry(LongPointer(offset(0x2030))).toString should be("jnc 0x2030") }
+      "correctly represent jne 0x2030 as a string" in { JumpIfNotEqual(LongPointer(offset(0x2030))).toString should be("jne 0x2030") }
+      "correctly represent jng 0x2030 as a string" in { JumpIfNotGreater(LongPointer(offset(0x2030))).toString should be("jng 0x2030") }
+      "correctly represent jnge 0x2030 as a string" in { JumpIfNotGreaterOrEqual(LongPointer(offset(0x2030))).toString should be("jnge 0x2030") }
+      "correctly represent jnl 0x2030 as a string" in { JumpIfNotLess(LongPointer(offset(0x2030))).toString should be("jnl 0x2030") }
+      "correctly represent jnle 0x2030 as a string" in { JumpIfNotLessOrEqual(LongPointer(offset(0x2030))).toString should be("jnle 0x2030") }
 
-      "correctly encode jcx 0x10" in { JumpIfCountZero(ShortPointer[RealX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("E3 10")) }
-      "throw an AssertionError for jcx 0x2030" in { an[AssertionError] should be thrownBy { JumpIfCountZero(LongPointer[RealX86Offset](offset(0x2030))) } }
-      "correctly represent jcx 0x10 as a string" in { JumpIfCountZero(ShortPointer[RealX86Offset](offset(0x10))).toString should be("jcx 0x10") }
+      "correctly encode jcx 0x10" in { JumpIfCountZero(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("E3 10")) }
+      "throw an AssertionError for jcx 0x2030" in { an[AssertionError] should be thrownBy { JumpIfCountZero(LongPointer(offset(0x2030))) } }
+      "correctly represent jcx 0x10 as a string" in { JumpIfCountZero(ShortPointer(offset(0x10))).toString should be("jcx 0x10") }
 
-      "throw an AssertionError for jmp 0x10203040" in { an[AssertionError] should be thrownBy { Jump(LongPointer[RealX86Offset](offset(0x10203040))).encodeByte } }
+      "throw an AssertionError for jmp 0x10203040" in { an[AssertionError] should be thrownBy { Jump(LongPointer(offset(0x10203040))).encodeByte } }
 
       "correctly encode jmp ax" in { Jump(AX).encodeByte should be(Hex.lsb("FF E0")) }
       "correctly represent jmp ax as a string" in { Jump(AX).toString should be("jmp ax") }
@@ -465,71 +465,71 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
       import ProcessorMode.Protected._
 
-      "correctly encode jmp 0x10" in { Jump(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
-      "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
-      "correctly encode jae 0x10" in { JumpIfAboveOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jb 0x10" in { JumpIfBelow(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode jbe 0x10" in { JumpIfBelowOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
-      "correctly encode jc 0x10" in { JumpIfCarry(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode je 0x10" in { JumpIfEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("74 10")) }
-      "correctly encode jg 0x10" in { JumpIfGreater(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
-      "correctly encode jge 0x10" in { JumpIfGreaterOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
-      "correctly encode jl 0x10" in { JumpIfLess(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
-      "correctly encode jle 0x10" in { JumpIfLessOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
-      "correctly encode jna 0x10" in { JumpIfNotAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
-      "correctly encode jnae 0x10" in { JumpIfNotAboveOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode jnb 0x10" in { JumpIfNotBelow(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jnbe 0x10" in { JumpIfNotBelowOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
-      "correctly encode jnc 0x10" in { JumpIfNoCarry(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jne 0x10" in { JumpIfNotEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("75 10")) }
-      "correctly encode jng 0x10" in { JumpIfNotGreater(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
-      "correctly encode jnge 0x10" in { JumpIfNotGreaterOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
-      "correctly encode jnl 0x10" in { JumpIfNotLess(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
-      "correctly encode jnle 0x10" in { JumpIfNotLessOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
+      "correctly encode jmp 0x10" in { Jump(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
+      "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
+      "correctly encode jae 0x10" in { JumpIfAboveOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jb 0x10" in { JumpIfBelow(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode jbe 0x10" in { JumpIfBelowOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
+      "correctly encode jc 0x10" in { JumpIfCarry(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode je 0x10" in { JumpIfEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("74 10")) }
+      "correctly encode jg 0x10" in { JumpIfGreater(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
+      "correctly encode jge 0x10" in { JumpIfGreaterOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
+      "correctly encode jl 0x10" in { JumpIfLess(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
+      "correctly encode jle 0x10" in { JumpIfLessOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
+      "correctly encode jna 0x10" in { JumpIfNotAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
+      "correctly encode jnae 0x10" in { JumpIfNotAboveOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode jnb 0x10" in { JumpIfNotBelow(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jnbe 0x10" in { JumpIfNotBelowOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
+      "correctly encode jnc 0x10" in { JumpIfNoCarry(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jne 0x10" in { JumpIfNotEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("75 10")) }
+      "correctly encode jng 0x10" in { JumpIfNotGreater(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
+      "correctly encode jnge 0x10" in { JumpIfNotGreaterOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
+      "correctly encode jnl 0x10" in { JumpIfNotLess(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
+      "correctly encode jnle 0x10" in { JumpIfNotLessOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
 
-      "correctly represent jmp 0x10 as a string" in { Jump(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jmp 0x10") }
-      "correctly represent ja 0x10 as a string" in { JumpIfAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("ja 0x10") }
-      "correctly represent jae 0x10 as a string" in { JumpIfAboveOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jae 0x10") }
-      "correctly represent jb 0x10 as a string" in { JumpIfBelow(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jb 0x10") }
-      "correctly represent jbe 0x10 as a string" in { JumpIfBelowOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jbe 0x10") }
-      "correctly represent jc 0x10 as a string" in { JumpIfCarry(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jc 0x10") }
-      "correctly represent je 0x10 as a string" in { JumpIfEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("je 0x10") }
-      "correctly represent jg 0x10 as a string" in { JumpIfGreater(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jg 0x10") }
-      "correctly represent jge 0x10 as a string" in { JumpIfGreaterOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jge 0x10") }
-      "correctly represent jl 0x10 as a string" in { JumpIfLess(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jl 0x10") }
-      "correctly represent jle 0x10 as a string" in { JumpIfLessOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jle 0x10") }
-      "correctly represent jna 0x10 as a string" in { JumpIfNotAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jna 0x10") }
-      "correctly represent jnae 0x10 as a string" in { JumpIfNotAboveOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnae 0x10") }
-      "correctly represent jnb 0x10 as a string" in { JumpIfNotBelow(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnb 0x10") }
-      "correctly represent jnbe 0x10 as a string" in { JumpIfNotBelowOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnbe 0x10") }
-      "correctly represent jnc 0x10 as a string" in { JumpIfNoCarry(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnc 0x10") }
-      "correctly represent jne 0x10 as a string" in { JumpIfNotEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jne 0x10") }
-      "correctly represent jng 0x10 as a string" in { JumpIfNotGreater(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jng 0x10") }
-      "correctly represent jnge 0x10 as a string" in { JumpIfNotGreaterOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnge 0x10") }
-      "correctly represent jnl 0x10 as a string" in { JumpIfNotLess(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnl 0x10") }
-      "correctly represent jnle 0x10 as a string" in { JumpIfNotLessOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).toString should be("jnle 0x10") }
+      "correctly represent jmp 0x10 as a string" in { Jump(ShortPointer(offset(0x10))).toString should be("jmp 0x10") }
+      "correctly represent ja 0x10 as a string" in { JumpIfAbove(ShortPointer(offset(0x10))).toString should be("ja 0x10") }
+      "correctly represent jae 0x10 as a string" in { JumpIfAboveOrEqual(ShortPointer(offset(0x10))).toString should be("jae 0x10") }
+      "correctly represent jb 0x10 as a string" in { JumpIfBelow(ShortPointer(offset(0x10))).toString should be("jb 0x10") }
+      "correctly represent jbe 0x10 as a string" in { JumpIfBelowOrEqual(ShortPointer(offset(0x10))).toString should be("jbe 0x10") }
+      "correctly represent jc 0x10 as a string" in { JumpIfCarry(ShortPointer(offset(0x10))).toString should be("jc 0x10") }
+      "correctly represent je 0x10 as a string" in { JumpIfEqual(ShortPointer(offset(0x10))).toString should be("je 0x10") }
+      "correctly represent jg 0x10 as a string" in { JumpIfGreater(ShortPointer(offset(0x10))).toString should be("jg 0x10") }
+      "correctly represent jge 0x10 as a string" in { JumpIfGreaterOrEqual(ShortPointer(offset(0x10))).toString should be("jge 0x10") }
+      "correctly represent jl 0x10 as a string" in { JumpIfLess(ShortPointer(offset(0x10))).toString should be("jl 0x10") }
+      "correctly represent jle 0x10 as a string" in { JumpIfLessOrEqual(ShortPointer(offset(0x10))).toString should be("jle 0x10") }
+      "correctly represent jna 0x10 as a string" in { JumpIfNotAbove(ShortPointer(offset(0x10))).toString should be("jna 0x10") }
+      "correctly represent jnae 0x10 as a string" in { JumpIfNotAboveOrEqual(ShortPointer(offset(0x10))).toString should be("jnae 0x10") }
+      "correctly represent jnb 0x10 as a string" in { JumpIfNotBelow(ShortPointer(offset(0x10))).toString should be("jnb 0x10") }
+      "correctly represent jnbe 0x10 as a string" in { JumpIfNotBelowOrEqual(ShortPointer(offset(0x10))).toString should be("jnbe 0x10") }
+      "correctly represent jnc 0x10 as a string" in { JumpIfNoCarry(ShortPointer(offset(0x10))).toString should be("jnc 0x10") }
+      "correctly represent jne 0x10 as a string" in { JumpIfNotEqual(ShortPointer(offset(0x10))).toString should be("jne 0x10") }
+      "correctly represent jng 0x10 as a string" in { JumpIfNotGreater(ShortPointer(offset(0x10))).toString should be("jng 0x10") }
+      "correctly represent jnge 0x10 as a string" in { JumpIfNotGreaterOrEqual(ShortPointer(offset(0x10))).toString should be("jnge 0x10") }
+      "correctly represent jnl 0x10 as a string" in { JumpIfNotLess(ShortPointer(offset(0x10))).toString should be("jnl 0x10") }
+      "correctly represent jnle 0x10 as a string" in { JumpIfNotLessOrEqual(ShortPointer(offset(0x10))).toString should be("jnle 0x10") }
 
-      "correctly encode jmp 0x20304050" in { Jump(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("E9 50 40 30 20")) }
-      "correctly encode ja 0x20304050" in { JumpIfAbove(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
-      "correctly encode jae 0x20304050" in { JumpIfAboveOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
-      "correctly encode jb 0x20304050" in { JumpIfBelow(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
-      "correctly encode jbe 0x20304050" in { JumpIfBelowOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
-      "correctly encode jc 0x20304050" in { JumpIfCarry(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
-      "correctly encode je 0x20304050" in { JumpIfEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 84 50 40 30 20")) }
-      "correctly encode jg 0x20304050" in { JumpIfGreater(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
-      "correctly encode jge 0x20304050" in { JumpIfGreaterOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
-      "correctly encode jl 0x20304050" in { JumpIfLess(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
-      "correctly encode jle 0x20304050" in { JumpIfLessOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
-      "correctly encode jna 0x20304050" in { JumpIfNotAbove(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
-      "correctly encode jnae 0x20304050" in { JumpIfNotAboveOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
-      "correctly encode jnb 0x20304050" in { JumpIfNotBelow(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
-      "correctly encode jnbe 0x20304050" in { JumpIfNotBelowOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
-      "correctly encode jnc 0x20304050" in { JumpIfNoCarry(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
-      "correctly encode jne 0x20304050" in { JumpIfNotEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 85 50 40 30 20")) }
-      "correctly encode jng 0x20304050" in { JumpIfNotGreater(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
-      "correctly encode jnge 0x20304050" in { JumpIfNotGreaterOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
-      "correctly encode jnl 0x20304050" in { JumpIfNotLess(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
-      "correctly encode jnle 0x20304050" in { JumpIfNotLessOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
+      "correctly encode jmp 0x20304050" in { Jump(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("E9 50 40 30 20")) }
+      "correctly encode ja 0x20304050" in { JumpIfAbove(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
+      "correctly encode jae 0x20304050" in { JumpIfAboveOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
+      "correctly encode jb 0x20304050" in { JumpIfBelow(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
+      "correctly encode jbe 0x20304050" in { JumpIfBelowOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
+      "correctly encode jc 0x20304050" in { JumpIfCarry(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
+      "correctly encode je 0x20304050" in { JumpIfEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 84 50 40 30 20")) }
+      "correctly encode jg 0x20304050" in { JumpIfGreater(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
+      "correctly encode jge 0x20304050" in { JumpIfGreaterOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
+      "correctly encode jl 0x20304050" in { JumpIfLess(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
+      "correctly encode jle 0x20304050" in { JumpIfLessOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
+      "correctly encode jna 0x20304050" in { JumpIfNotAbove(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
+      "correctly encode jnae 0x20304050" in { JumpIfNotAboveOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
+      "correctly encode jnb 0x20304050" in { JumpIfNotBelow(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
+      "correctly encode jnbe 0x20304050" in { JumpIfNotBelowOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
+      "correctly encode jnc 0x20304050" in { JumpIfNoCarry(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
+      "correctly encode jne 0x20304050" in { JumpIfNotEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 85 50 40 30 20")) }
+      "correctly encode jng 0x20304050" in { JumpIfNotGreater(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
+      "correctly encode jnge 0x20304050" in { JumpIfNotGreaterOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
+      "correctly encode jnl 0x20304050" in { JumpIfNotLess(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
+      "correctly encode jnle 0x20304050" in { JumpIfNotLessOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
 
       "correctly encode jmp si" in {
         Jump(AX).encodeByte should be(Hex.lsb("66 FF E0"))
@@ -630,49 +630,49 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
       import ProcessorMode.Long._
 
-      "correctly encode jmp 0x10" in { Jump(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
-      "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
-      "correctly encode jae 0x10" in { JumpIfAboveOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jb 0x10" in { JumpIfBelow(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode jbe 0x10" in { JumpIfBelowOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
-      "correctly encode jc 0x10" in { JumpIfCarry(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode je 0x10" in { JumpIfEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("74 10")) }
-      "correctly encode jg 0x10" in { JumpIfGreater(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
-      "correctly encode jge 0x10" in { JumpIfGreaterOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
-      "correctly encode jl 0x10" in { JumpIfLess(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
-      "correctly encode jle 0x10" in { JumpIfLessOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
-      "correctly encode jna 0x10" in { JumpIfNotAbove(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
-      "correctly encode jnae 0x10" in { JumpIfNotAboveOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
-      "correctly encode jnb 0x10" in { JumpIfNotBelow(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jnbe 0x10" in { JumpIfNotBelowOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
-      "correctly encode jnc 0x10" in { JumpIfNoCarry(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
-      "correctly encode jne 0x10" in { JumpIfNotEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("75 10")) }
-      "correctly encode jng 0x10" in { JumpIfNotGreater(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
-      "correctly encode jnge 0x10" in { JumpIfNotGreaterOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
-      "correctly encode jnl 0x10" in { JumpIfNotLess(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
-      "correctly encode jnle 0x10" in { JumpIfNotLessOrEqual(ShortPointer[ProtectedX86Offset](offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
+      "correctly encode jmp 0x10" in { Jump(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("EB 10")) }
+      "correctly encode ja 0x10" in { JumpIfAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
+      "correctly encode jae 0x10" in { JumpIfAboveOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jb 0x10" in { JumpIfBelow(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode jbe 0x10" in { JumpIfBelowOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
+      "correctly encode jc 0x10" in { JumpIfCarry(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode je 0x10" in { JumpIfEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("74 10")) }
+      "correctly encode jg 0x10" in { JumpIfGreater(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
+      "correctly encode jge 0x10" in { JumpIfGreaterOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
+      "correctly encode jl 0x10" in { JumpIfLess(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
+      "correctly encode jle 0x10" in { JumpIfLessOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
+      "correctly encode jna 0x10" in { JumpIfNotAbove(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("76 10")) }
+      "correctly encode jnae 0x10" in { JumpIfNotAboveOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("72 10")) }
+      "correctly encode jnb 0x10" in { JumpIfNotBelow(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jnbe 0x10" in { JumpIfNotBelowOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("77 10")) }
+      "correctly encode jnc 0x10" in { JumpIfNoCarry(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("73 10")) }
+      "correctly encode jne 0x10" in { JumpIfNotEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("75 10")) }
+      "correctly encode jng 0x10" in { JumpIfNotGreater(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7E 10")) }
+      "correctly encode jnge 0x10" in { JumpIfNotGreaterOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7C 10")) }
+      "correctly encode jnl 0x10" in { JumpIfNotLess(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7D 10")) }
+      "correctly encode jnle 0x10" in { JumpIfNotLessOrEqual(ShortPointer(offset(0x10))).encodeByte should be(Hex.lsb("7F 10")) }
 
-      "correctly encode jmp 0x20304050" in { Jump(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("E9 50 40 30 20")) }
-      "correctly encode ja 0x20304050" in { JumpIfAbove(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
-      "correctly encode jae 0x20304050" in { JumpIfAboveOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
-      "correctly encode jb 0x20304050" in { JumpIfBelow(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
-      "correctly encode jbe 0x20304050" in { JumpIfBelowOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
-      "correctly encode jc 0x20304050" in { JumpIfCarry(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
-      "correctly encode je 0x20304050" in { JumpIfEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 84 50 40 30 20")) }
-      "correctly encode jg 0x20304050" in { JumpIfGreater(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
-      "correctly encode jge 0x20304050" in { JumpIfGreaterOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
-      "correctly encode jl 0x20304050" in { JumpIfLess(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
-      "correctly encode jle 0x20304050" in { JumpIfLessOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
-      "correctly encode jna 0x20304050" in { JumpIfNotAbove(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
-      "correctly encode jnae 0x20304050" in { JumpIfNotAboveOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
-      "correctly encode jnb 0x20304050" in { JumpIfNotBelow(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
-      "correctly encode jnbe 0x20304050" in { JumpIfNotBelowOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
-      "correctly encode jnc 0x20304050" in { JumpIfNoCarry(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
-      "correctly encode jne 0x20304050" in { JumpIfNotEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 85 50 40 30 20")) }
-      "correctly encode jng 0x20304050" in { JumpIfNotGreater(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
-      "correctly encode jnge 0x20304050" in { JumpIfNotGreaterOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
-      "correctly encode jnl 0x20304050" in { JumpIfNotLess(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
-      "correctly encode jnle 0x20304050" in { JumpIfNotLessOrEqual(LongPointer[ProtectedX86Offset](offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
+      "correctly encode jmp 0x20304050" in { Jump(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("E9 50 40 30 20")) }
+      "correctly encode ja 0x20304050" in { JumpIfAbove(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
+      "correctly encode jae 0x20304050" in { JumpIfAboveOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
+      "correctly encode jb 0x20304050" in { JumpIfBelow(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
+      "correctly encode jbe 0x20304050" in { JumpIfBelowOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
+      "correctly encode jc 0x20304050" in { JumpIfCarry(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
+      "correctly encode je 0x20304050" in { JumpIfEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 84 50 40 30 20")) }
+      "correctly encode jg 0x20304050" in { JumpIfGreater(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
+      "correctly encode jge 0x20304050" in { JumpIfGreaterOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
+      "correctly encode jl 0x20304050" in { JumpIfLess(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
+      "correctly encode jle 0x20304050" in { JumpIfLessOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
+      "correctly encode jna 0x20304050" in { JumpIfNotAbove(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 86 50 40 30 20")) }
+      "correctly encode jnae 0x20304050" in { JumpIfNotAboveOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 82 50 40 30 20")) }
+      "correctly encode jnb 0x20304050" in { JumpIfNotBelow(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
+      "correctly encode jnbe 0x20304050" in { JumpIfNotBelowOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 87 50 40 30 20")) }
+      "correctly encode jnc 0x20304050" in { JumpIfNoCarry(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 83 50 40 30 20")) }
+      "correctly encode jne 0x20304050" in { JumpIfNotEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 85 50 40 30 20")) }
+      "correctly encode jng 0x20304050" in { JumpIfNotGreater(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8E 50 40 30 20")) }
+      "correctly encode jnge 0x20304050" in { JumpIfNotGreaterOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8C 50 40 30 20")) }
+      "correctly encode jnl 0x20304050" in { JumpIfNotLess(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8D 50 40 30 20")) }
+      "correctly encode jnle 0x20304050" in { JumpIfNotLessOrEqual(LongPointer(offset(0x20304050))).encodeByte should be(Hex.lsb("0F 8F 50 40 30 20")) }
 
       "throw an AssertionError for jmp ax" in {
         an[AssertionError] should be thrownBy {

@@ -34,61 +34,73 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          Branch(targetLabel),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("EA000000 00000000 00000000"))
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EA000000")
       }
 
       "correctly encode a backward branch to a labeled instruction" in {
         val targetLabel: Label = "Label"
+        val reference = Branch(targetLabel, Condition.LowerOrSame)
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: Label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel, Condition.LowerOrSame)))
+          EncodedByteList(List.fill(4)(0x00.toByte)),
+          reference))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 9AFFFFFC"))
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("9AFFFFFC")
       }
 
       "correctly encode a branch to self instruction" in {
         val targetLabel = Label.unique
+        val reference = { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)}
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(8)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)},
+          reference,
           EncodedByteList(List.fill(8)(0x00.toByte))))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EAFFFFFE")
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel),
+            reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EA000000")
       }
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference1 = Branch(targetLabel)
+        val reference2 = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel),
+            reference1,
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel)))
+            reference2))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
+        val encodables = application.encodablesForReferences(Seq(reference1, reference2))
+        encodables(reference1).encodeByte shouldBe Hex.msb("EAFFFFFC")
+        encodables(reference2).encodeByte shouldBe Hex.msb("EAFFFFFA")
       }
 
       "correctly represent b Label as a string" in {
@@ -118,13 +130,15 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch-link to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = BranchLink(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          BranchLink(targetLabel),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("EB000000 00000000 00000000"))
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EB000000")
       }
     }
   }
@@ -156,13 +170,15 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = BranchLinkExchange(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          BranchLinkExchange(targetLabel),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        application.encodableSections.head.encodeByte should be(Hex.msb("FA000000 00000000 00000000"))
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("FA000000")
       }
     }
   }
