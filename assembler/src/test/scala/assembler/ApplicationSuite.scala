@@ -256,8 +256,8 @@ class ApplicationSuite extends WordSpec with Matchers {
         val first = Section(SectionType.Text, "First", List(relative1, absolute1, dummy1in1, targetAbsolute2, targetRelative1, dummy2in1))
         val second = Section(SectionType.Text, "Second", List(absolute2, dummy1in2, targetRelative2, dummy2in2, relative2, targetAbsolute1))
 
-        val filler1 = first.content.head
-        val filler2 = second.content.head
+        val filler1 = first.content.head.asInstanceOf[AlignmentFiller]
+        val filler2 = second.content.head.asInstanceOf[AlignmentFiller]
 
         val application: MyApplication = MyApplication(List(first, second), 100)
 
@@ -276,6 +276,15 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         "return the intermediate resources for an absolute reference in the second section" in {
           application.intermediateResources(absolute2) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1), OffsetDirection.Absolute)
+        }
+
+        "return the intermediate resources for the filler in the first section" in {
+          application.intermediateResources(filler1) shouldBe(Seq.empty, OffsetDirection.Absolute)
+        }
+
+        "return the intermediate resources for the filler in the second section" in {
+          application.intermediateResources(filler2) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
+            targetAbsolute2, targetRelative1, dummy2in1), OffsetDirection.Absolute)
         }
       }
     }
