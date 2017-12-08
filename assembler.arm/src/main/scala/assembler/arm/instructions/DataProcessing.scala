@@ -146,7 +146,7 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
     (implicit label: Label): AbsoluteReference =
-    AbsoluteReference(targetLabel, Set(4), label, (position: Int) =>
+    AbsoluteReference(targetLabel, Set(4, 8, 12, 16), label, (position: Int) =>
       forConstant(position, destination, condition))
 }
 
