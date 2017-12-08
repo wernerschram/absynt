@@ -1,6 +1,6 @@
 package assembler
 
-import assembler.reference.RelativeReference
+import assembler.reference.{AbsoluteReference, RelativeReference}
 
 case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable {
   override def encodeByte: Seq[Byte] =
@@ -55,6 +55,15 @@ case class NonLinearRelativeTestReference(override val target: Label, override v
   override def possibleSizes = Set(1, 2, 3)
 }
 
+case class AbsoluteTestEncodable(distance: Int, override val label: Label) extends Encodable {
+  override def encodeByte: Seq[Byte] = Seq.fill(size)(0xaa.toByte)
+
+  override def size: Int =
+    if (distance < 10) 1
+    else if (distance < 20) 3
+    else 2
+}
+
 object TestEncodable {
   def linearReferenceWithTarget: (LinearRelativeTestReference, EncodedByteList) = {
     val targetLabel = Label.unique
@@ -70,4 +79,10 @@ object TestEncodable {
     (reference, targetResource)
   }
 
+  def absoluteReferenceWithTarget: (AbsoluteReference, EncodedByteList) = {
+    val targetLabel = Label.unique
+    val reference = AbsoluteReference(targetLabel, Set(1,2,3), Label.noLabel, (distance) => AbsoluteTestEncodable(distance, Label.noLabel))
+    val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
+    (reference, targetResource)
+  }
 }

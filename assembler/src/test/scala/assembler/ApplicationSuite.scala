@@ -246,22 +246,36 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         val (relative1, targetRelative1) = TestEncodable.linearReferenceWithTarget
         val (relative2, targetRelative2) = TestEncodable.linearReferenceWithTarget
+        val (absolute1, targetAbsolute1) = TestEncodable.absoluteReferenceWithTarget
+        val (absolute2, targetAbsolute2) = TestEncodable.absoluteReferenceWithTarget
         val dummy1in1 = dummyResource
         val dummy2in1 = dummyResource
         val dummy1in2 = dummyResource
         val dummy2in2 = dummyResource
 
-        val first = Section(SectionType.Text, "First", List(relative1, dummy1in1, targetRelative1, dummy2in1))
-        val second = Section(SectionType.Text, "Second", List(dummy1in2, targetRelative2, dummy2in2, relative2))
+        val first = Section(SectionType.Text, "First", List(relative1, absolute1, dummy1in1, targetAbsolute2, targetRelative1, dummy2in1))
+        val second = Section(SectionType.Text, "Second", List(absolute2, dummy1in2, targetRelative2, dummy2in2, relative2, targetAbsolute1))
+
+        val filler1 = first.content.head
+        val filler2 = second.content.head
 
         val application: MyApplication = MyApplication(List(first, second), 100)
 
         "return the intermediate resources for a relative reference in the first section" in {
-          application.intermediateResources(relative1) shouldBe (Seq(dummy1in1), OffsetDirection.Forward)
+          application.intermediateResources(relative1) shouldBe (Seq(absolute1, dummy1in1, targetAbsolute2), OffsetDirection.Forward)
         }
 
         "return the intermediate resources for a relative reference in the second section" in {
           application.intermediateResources(relative2) shouldBe (Seq(targetRelative2, dummy2in2), OffsetDirection.Backward)
+        }
+
+        "return the intermediate resources for an absolute reference in the first section" in {
+          application.intermediateResources(absolute1) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
+            targetAbsolute2, targetRelative1, dummy2in1, filler2, absolute2, dummy1in2, targetRelative2, dummy2in2, relative2), OffsetDirection.Absolute)
+        }
+
+        "return the intermediate resources for an absolute reference in the second section" in {
+          application.intermediateResources(absolute2) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1), OffsetDirection.Absolute)
         }
       }
     }
