@@ -14,6 +14,8 @@ abstract class Section {
 
   val alignment: Int
 
+  val alignmentFiller: AlignmentFiller
+
   type EncodableCondition = (Resource)=>Boolean
 
   def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
@@ -21,7 +23,7 @@ abstract class Section {
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
   def precedingResources(target: Label): List[Resource] =
-    content.takeWhile(x => !x.label.matches(target))
+    alignmentFiller :: content.takeWhile(x => !x.label.matches(target))
 
   /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
     *
@@ -92,17 +94,18 @@ object Section {
   def apply(`type`: SectionType, sectionName: String, resources: List[Resource]): Section =
     new Section {
       val alignment: Int = 16
+      val alignmentFiller: AlignmentFiller = AlignmentFiller(this)
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val content: List[Resource] =
-        AlignmentFiller(this) ::
           resources
     }
 
-  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
+  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], filler: AlignmentFiller):
   Section with LastIteration =
     new Section with LastIteration {
       val alignment: Int = 16
+      val alignmentFiller: AlignmentFiller = filler
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val finalContent: List[Resource with Encodable] = encodables

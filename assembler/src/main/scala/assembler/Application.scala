@@ -13,7 +13,7 @@ abstract class Application protected (
     sections.map(s => Section.lastIteration(s.sectionType, s.name, s.content.map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
-    }))
+    }, s.alignmentFiller))
   }
 
   def getAbsoluteOffset(label: Label): Long =

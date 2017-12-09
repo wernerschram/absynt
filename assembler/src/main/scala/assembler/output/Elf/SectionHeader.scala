@@ -1,6 +1,6 @@
 package assembler.output.Elf
 
-import assembler.sections.{LastIteration, Section}
+import assembler.sections.{AlignmentFiller, LastIteration, Section}
 
 abstract class SectionHeader(elf: Elf) {
 
@@ -8,10 +8,7 @@ abstract class SectionHeader(elf: Elf) {
   def `type`: SectionType
   def flags: Flags[SectionFlag]
   def sectionAddress: Option[Long]
-  private def sectionAddressBytes = sectionAddress match {
-    case Some(address) => elf.architecture.processorClass.numberBytes(address)
-    case None => List.fill(8)(0.toByte)
-  }
+  private def sectionAddressBytes = elf.architecture.processorClass.numberBytes(sectionAddress.getOrElse(0l))
   def sectionFileOffset: Long
   def segmentFileSize: Long
   def link: Int
@@ -49,7 +46,7 @@ class SectionSectionHeader(section: Section
         SectionFlag.Alloc | SectionFlag.Write
     }
   val sectionAddress: Option[Long] = Some(elf.sectionOffset(section))
-  val sectionFileOffset: Long = elf.sectionOffset(section)
+  val sectionFileOffset: Long = elf.sectionFileOffset(section) + section.finalContent.head.size
 
   val segmentFileSize: Long = section.size
   val link: Int = 0
