@@ -30,11 +30,11 @@ abstract class Application protected (
       val section = sections.filter(s => s.contains(from)).head
       (section.intermediateResources(relative), section.offsetDirection(relative))
     case absolute: AbsoluteReference => (
-      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.content) ++
-      sections.filter(s => s.contains(absolute.target)).head.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute
+      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.alignmentFiller :: s.content) ++
+      sections.filter(s => s.contains(absolute.target)).head.precedingResources(absolute.target), OffsetDirection.Absolute
       )
     case alignment: AlignmentFiller =>
-      (sections.takeWhile(s => s != alignment.section).flatMap(s => s.content), OffsetDirection.Absolute)
+      (sections.takeWhile(s => s != alignment.section).flatMap(s => s.alignmentFiller :: s.content), OffsetDirection.Absolute)
   }
 
   private def applicationContextProperties(from: DependentResource): (Seq[DependentResource], Int, OffsetDirection) = {

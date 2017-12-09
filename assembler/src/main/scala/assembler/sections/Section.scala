@@ -23,7 +23,7 @@ abstract class Section {
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
   def precedingResources(target: Label): List[Resource] =
-    alignmentFiller :: content.takeWhile(x => !x.label.matches(target))
+    alignmentFiller :: content.takeWhile(_.label != target)
 
   /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
     *
