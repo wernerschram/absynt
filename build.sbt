@@ -37,18 +37,21 @@ lazy val assemblerARM = (project in file("assembler.arm"))
 lazy val ARMBootRpiExample = (project in file("examples/arm/bootRpi")) 
 .settings(
   name := "assembler.examples.arm.bootRpi",
-  version := "1.0"
+  version := "1.0",
+  coverageEnabled := false
 ).dependsOn(assembler, assemblerARM)
 
 lazy val X86BootFlagExample = (project in file("examples/x86/bootFlag"))
 .settings(
   name := "assembler.examples.x86.bootFlag",
-  version := "1.0"
+  version := "1.0",
+  coverageEnabled := false
 ).dependsOn(assembler, assemblerX86)
 
 lazy val X86HelloWorldExample = (project in file("examples/x86/helloWorld"))
 .settings(
   name := "assembler.examples.x86.helloWorld",
-  version := "1.0"
+  version := "1.0",
+  coverageEnabled := false
 ).dependsOn(assembler, assemblerX86)
 

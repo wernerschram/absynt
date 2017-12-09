@@ -9,7 +9,6 @@ import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.ProtectedOffset
 import assembler.{EncodedString, Label}
 
 object HelloWorld extends App {
@@ -24,7 +23,7 @@ object HelloWorld extends App {
     val entry: Label = "Entry"
     val hello: Label = "Text"
 
-    val text: Section[ProtectedOffset] = Section(SectionType.Text, ".text",
+    val text: Section = Section(SectionType.Text, ".text",
       // use the write Syscall
       { implicit val label: Label = entry; Move(0x04, EAX) } ::
       Move(0x01, EBX) ::
@@ -38,7 +37,7 @@ object HelloWorld extends App {
       Nil
     )
 
-    val data: Section[ProtectedOffset] = Section(SectionType.Data, ".data",
+    val data: Section = Section(SectionType.Data, ".data",
     { implicit val label: Label = hello; EncodedString("Hi World\n") } ::
       Nil
     )
@@ -51,8 +50,8 @@ object HelloWorld extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
 
-    val exec = Executable(Architecture.X86, text :: data :: Nil, entry)
-    val finalSection = text.encodable(exec)
+    val exec = Executable(Architecture.X86, text :: data :: Nil, entry, 0x8048000)
+    val finalSection = exec.encodableSections.head
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     raw.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")

@@ -5,12 +5,11 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler._
+import assembler.arm.ProcessorMode
 import assembler.arm.instructions._
-import assembler.arm.operands.ArmOffset
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.{ArmOffsetFactory, ProcessorMode}
 import assembler.output.Elf.{Architecture, Executable}
 import assembler.sections.{Section, SectionType}
 
@@ -32,21 +31,21 @@ object Boot extends App {
     val ILPR: Short = 0x20
     val IBRD: Short = 0x24
     val FBRD: Short = 0x28
-    val LCRH: Short = 0x2C
+    val LCRH: Short = 0x2C.toShort
     val CR: Short = 0x30
     val IFLS: Short = 0x34
     val IMSC: Short = 0x38
-    val RIS: Short = 0x3C
+    val RIS: Short = 0x3C.toShort
     val MIS: Short = 0x40
     val ICR: Short = 0x44
     val DMACR: Short = 0x48
     val ITCR: Short = 0x80
     val ITIP: Short = 0x84
     val ITOP: Short = 0x88
-    val TDR: Short = 0x8C
+    val TDR: Short = 0x8C.toShort
   }
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory): List[Resource] = {
+  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label): List[Resource] = {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
@@ -55,7 +54,7 @@ object Boot extends App {
     Nil
   }
 
-  private def halt()(implicit label: Label, armOffsetFactory: ArmOffsetFactory) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
+  private def halt()(implicit label: Label) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
 
   def createFile(): Unit = {
     import ProcessorMode.A32._
@@ -64,17 +63,11 @@ object Boot extends App {
     val text: Label = "Text"
     val entry: Label = "Entry"
 
-    val targetLabel = Label.unique
-    val section: Section[ArmOffset] = Section(SectionType.Text, ".text",
+    val section: Section = Section(SectionType.Text, ".text",
 
-      BranchLinkExchange(targetLabel) ::
-      EncodedByteList(List.fill(4)(0x00.toByte)) ::
-      { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))} ::
-
-//          { implicit val label: UniqueLabel = Label.unique; LoadRegister(label, R1, Condition.CarrySet)} ::
       // Disable UART0
       { implicit val label: Label = entry; Move.forConstant(UART0.Base, R0) } ::
-/*      Move.forConstant(0, R1) ::
+      Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       //
       // Disable pull up/down for all GPIO pins & delay for 150 cycles.
@@ -133,7 +126,7 @@ object Boot extends App {
       Branch(putString, NotEqual) ::
       //
       // Goal achieved.
-      halt() :: */
+      halt() ::
       //
       // Resources
       { implicit val label: Label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil)
@@ -146,7 +139,7 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
     val raw = new FileOutputStream(rawFilePath.toFile)
 
-    val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry)
+    val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry, 0x10000)
 
     raw.write(exec.encodableSections.head.encodeByte.toArray)
     println(s"size: ${exec.encodableSections.head.size}")

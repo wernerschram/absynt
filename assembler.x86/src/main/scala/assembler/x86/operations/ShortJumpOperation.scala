@@ -1,27 +1,26 @@
 package assembler.x86.operations
 
-import assembler.reference.RelativeReference
-import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 import assembler._
+import assembler.reference.RelativeReference
 import assembler.x86.X86OffsetFactory
+import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 
-abstract class ShortJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
-  extends Resource with RelativeReference[OffsetType] {
+abstract class ShortJumpOperation[OffsetType <: X86Offset]
+  (val label: Label, val shortOpcode: List[Byte], mnemonic: String, override val target: Label)
+  (implicit val offsetFactory: X86OffsetFactory[OffsetType])
+    extends RelativeReference {
 
   val shortJumpSize: Int = shortOpcode.length + 1
-
-  override def estimateSize: Estimate[Int] = Actual(shortJumpSize)
 
   def encodableForShortPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
   override def toString = s"$labelPrefix$mnemonic $target"
 
-  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = shortJumpSize
+  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with Encodable =
+    encodableForShortPointer(ShortPointer[OffsetType](offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)))
 
-  override def encodableForOffset(offset: OffsetType): Resource with Encodable = {
-    assume(offset.isShort(shortJumpSize))
-    encodableForShortPointer(ShortPointer(offset))
-  }
+  override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
+    encodableForDependencySize(distance, offsetDirection).size
 
-  override implicit def offsetFactory: PositionalOffsetFactory[OffsetType] = implicitly[X86OffsetFactory[OffsetType]].positionalOffsetFactory()
+  override def possibleSizes: Set[Int] = Set(shortJumpSize)
 }

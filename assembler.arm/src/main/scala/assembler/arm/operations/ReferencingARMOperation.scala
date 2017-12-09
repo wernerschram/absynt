@@ -1,23 +1,17 @@
 package assembler.arm.operations
 
-import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.arm.operands.ArmOffset
+import assembler._
 import assembler.arm.operands.Condition.Condition
 import assembler.reference.RelativeReference
-import assembler._
 
 abstract class ReferencingARMOperation(val label: Label, val opcode: String, override val target: Label,
                                                     val condition: Condition)
-                                                   (implicit armOffsetFactory: ArmOffsetFactory)
-  extends RelativeReference[ArmOffset] with NamedConditional {
+  extends RelativeReference with NamedConditional {
 
-  val instructionSize = 4
+  override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
+    encodableForDependencySize(distance, offsetDirection).size
 
-  override def estimateSize: Estimate[Int] = Actual(instructionSize)
-
-  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = instructionSize
+  override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
 
   override def toString = s"$labelPrefix$mnemonicString $target"
-
-  override implicit def offsetFactory: PositionalOffsetFactory[ArmOffset] = armOffsetFactory.positionalOffsetFactory
 }

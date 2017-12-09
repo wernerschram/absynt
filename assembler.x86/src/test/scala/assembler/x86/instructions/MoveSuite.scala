@@ -17,7 +17,6 @@ class MoveSuite extends WordSpec with Matchers {
     "in real mode" should {
 
       import ProcessorMode.Real._
-      val zeroAddress: FarPointer[RealOffset] = FarPointer(0, offset(0))
 
       "correctly encode mov bh, al" in {
         Move(AL, BH).encodeByte should be(Hex.lsb("88 C7"))
@@ -316,8 +315,9 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
-        val app = Raw(p, zeroAddress)
-        withClue("Move") { p.encodable(app).finalContent.head.encodeByte should be(Hex.lsb("B8 04 00")) }
+        val app = Raw(p, 0)
+        val encodables = app.encodablesForReferences(Seq(move))
+        withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("B8 04 00")) }
       }
 
       "correctly encode mov esi, 0x78563412" in {
@@ -397,8 +397,8 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
-          p.encodable(app).finalContent(1).encodeByte
+          val app = Raw(p, 0x100)
+          app.encodableSections.head.encodeByte
         }
       }
 
@@ -413,8 +413,8 @@ class MoveSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
         an[AssertionError] should be thrownBy {
-          val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
-          p.encodable(app).finalContent(1).encodeByte
+          val app = Raw(p, 0x100)
+          app.encodableSections.head.finalContent(1).encodeByte
         }
       }
 
@@ -428,8 +428,9 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(1)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
-        val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
-        withClue("Move") { p.encodable(app).finalContent(1).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
+        val app = Raw(p, 0x100)
+        val encodables = app.encodablesForReferences(Seq(move))
+        withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
       }
 
     }
@@ -593,8 +594,8 @@ class MoveSuite extends WordSpec with Matchers {
 
 
         an[AssertionError] should be thrownBy {
-          val app = Raw(p, FarPointer(0.toShort, offset(0x100)))
-          p.encodable(app).finalContent(1).encodeByte
+          val app = Raw(p, 0x100)
+          app.encodableSections.head.finalContent(1).encodeByte
         }
       }
 
@@ -608,8 +609,9 @@ class MoveSuite extends WordSpec with Matchers {
             EncodedByteList(List.fill(2)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
 
-        val app = Raw(p, FarPointer(0.toShort, offset(0x10000)))
-        withClue("Move") { p.encodable(app).finalContent(1).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
+        val app = Raw(p, 0x10000)
+        val encodables = app.encodablesForReferences(Seq(move))
+        withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
       }
 
        "correctly encode mov rbx, [label]" in {
@@ -622,8 +624,9 @@ class MoveSuite extends WordSpec with Matchers {
           EncodedByteList(List.fill(2)(0x00.toByte)),
           move))
 
-         val app = Raw(p, FarPointer(0.toShort, offset(0x3000000)))
-        withClue("Move") { p.encodable(app).finalContent(3).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
+        val app = Raw(p, 0x3000000)
+        val encodables = app.encodablesForReferences(Seq(move))
+        withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
       }
 
      "correctly represent mov r14d, 2018915346 as a string" in {

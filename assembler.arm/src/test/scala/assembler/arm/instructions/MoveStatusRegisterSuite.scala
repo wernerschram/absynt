@@ -13,7 +13,7 @@ class MoveStatusRegisterSuite extends WordSpec with Matchers {
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode mrs r1, CPSR" in {
         MoveFromStatusRegister(CPSR, R1).encodeByte should be(Hex.msb("e10f1000"))
@@ -34,7 +34,7 @@ class MoveStatusRegisterSuite extends WordSpec with Matchers {
   "an MoveToStatusRegister instruction" when {
     "in a32 mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.A32
+      import ProcessorMode.A32._
 
       "correctly encode msr SPSR_xc, r1" in {
         MoveToStatusRegister(R1, SPSR, Fields.control + Fields.extension).encodeByte should be(Hex.msb("e163f001"))

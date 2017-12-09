@@ -1,7 +1,7 @@
 package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
-import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, RelativeThumbPointer}
+import assembler.arm.operands._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.sections.{Section, SectionType}
 import assembler._
@@ -17,78 +17,90 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       import ProcessorMode.A32._
 
       "correctly encode b +0x3e8" in {
-        Branch(RelativeA32Pointer(ArmOffset(0x3e8))).encodeByte should be(Hex.msb("ea0000fa"))
+        Branch(RelativeA32Pointer(ArmRelativeOffset(0x3e8))).encodeByte should be(Hex.msb("ea0000fa"))
       }
 
       "correctly encode beq +0x1111110" in {
-        Branch(RelativeA32Pointer(ArmOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0a444444"))
+        Branch(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0a444444"))
       }
 
       "correctly encode blt -0x08" in {
-        Branch(RelativeA32Pointer(ArmOffset(-0x08)), Condition.SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
+        Branch(RelativeA32Pointer(ArmRelativeOffset(-0x08)), Condition.SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
       }
 
       "correctly represent blt -0x08 as a string" in {
-        Branch(RelativeA32Pointer(ArmOffset(-0x08)), Condition.SignedLessThan).toString should be("blt 0x00000000")
+        Branch(RelativeA32Pointer(ArmRelativeOffset(-0x08)), Condition.SignedLessThan).toString should be("blt 0x00000000")
       }
 
       "correctly encode a forward branch to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          Branch(targetLabel),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("EA000000 00000000 00000000"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EA000000")
       }
 
       "correctly encode a backward branch to a labeled instruction" in {
         val targetLabel: Label = "Label"
+        val reference = Branch(targetLabel, Condition.LowerOrSame)
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: Label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel, Condition.LowerOrSame)))
+          EncodedByteList(List.fill(4)(0x00.toByte)),
+          reference))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("00000000 00000000 9AFFFFFC"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("9AFFFFFC")
       }
 
       "correctly encode a branch to self instruction" in {
         val targetLabel = Label.unique
+        val reference = { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)}
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(8)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)},
+          reference,
           EncodedByteList(List.fill(8)(0x00.toByte))))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFE 00000000 00000000"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EAFFFFFE")
       }
 
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           Branch(targetLabel),
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel),
+            reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("EA000002 00000000 EA000000 00000000 00000000"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EA000000")
       }
 
       "correctly encode a backward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference1 = Branch(targetLabel)
+        val reference2 = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel),
+            reference1,
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            Branch(targetLabel)))
+            reference2))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("00000000 00000000 EAFFFFFC 00000000 EAFFFFFA"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference1, reference2))
+        encodables(reference1).encodeByte shouldBe Hex.msb("EAFFFFFC")
+        encodables(reference2).encodeByte shouldBe Hex.msb("EAFFFFFA")
       }
 
       "correctly represent b Label as a string" in {
@@ -109,22 +121,24 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       import ProcessorMode.A32._
 
       "correctly encode bleq 0x1111118" in {
-        BranchLink(RelativeA32Pointer(ArmOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
+        BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
       }
 
       "correctly represent bleq 0x01111118 as a string" in {
-        BranchLink(RelativeA32Pointer(ArmOffset(0x1111110)), Condition.Equal).toString should be("bleq 0x01111118")
+        BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).toString should be("bleq 0x01111118")
       }
 
       "correctly encode a forward branch-link to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = BranchLink(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          BranchLink(targetLabel),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("EB000000 00000000 00000000"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("EB000000")
       }
     }
   }
@@ -135,19 +149,19 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       import ProcessorMode.A32._
 
       "correctly encode blx 0x123C" in {
-        BranchLinkExchange(RelativeThumbPointer(ArmOffset(0x1234))).encodeByte should be(Hex.msb("fa00048d"))
+        BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1234))).encodeByte should be(Hex.msb("fa00048d"))
       }
 
       "correctly represent blx 0x123C as a string" in {
-        BranchLinkExchange(RelativeThumbPointer(ArmOffset(0x1234))).toString should be("blx 0x0000123C")
+        BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1234))).toString should be("blx 0x0000123C")
       }
 
       "correctly encode blx 0x123E" in {
-        BranchLinkExchange(RelativeThumbPointer(ArmOffset(0x1236))).encodeByte should be(Hex.msb("fb00048d"))
+        BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1236))).encodeByte should be(Hex.msb("fb00048d"))
       }
 
       "correctly represent blx 0x123E as a string" in {
-        BranchLinkExchange(RelativeThumbPointer(ArmOffset(0x1236))).toString should be("blx 0x0000123E")
+        BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1236))).toString should be("blx 0x0000123E")
       }
 
       "correctly encode blx r12" in {
@@ -156,13 +170,15 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val targetLabel = Label.unique
+        val reference = BranchLinkExchange(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          BranchLinkExchange(targetLabel),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
 
-        val application: Application[ArmOffset, RelativeA32Pointer] = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("FA000000 00000000 00000000"))
+        val application: Application = Raw(p, 0)
+        val encodables = application.encodablesForReferences(Seq(reference))
+        encodables(reference).encodeByte shouldBe Hex.msb("FA000000")
       }
     }
   }

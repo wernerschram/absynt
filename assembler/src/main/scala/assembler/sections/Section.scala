@@ -1,12 +1,11 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.reference.RelativeReference
 
-import scala.annotation.tailrec
 import scala.language.implicitConversions
 
-abstract class Section[OffsetType<:Offset:OffsetFactory] {
+abstract class Section {
   def content: List[Resource]
 
   def name: String
@@ -15,31 +14,23 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
 
   val alignment: Int
 
-  protected def offset(value: Long): OffsetType = implicitly[OffsetFactory[OffsetType]].offset(value)
+  val alignmentFiller: AlignmentFiller
+
   type EncodableCondition = (Resource)=>Boolean
 
   def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
   def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
   def contains(condition: EncodableCondition): Boolean = content.exists(condition)
 
-  def estimatedOffset(label: Label): Estimate[OffsetType] =
-    content.takeWhile(current => current.label != label)
-      .map(_.estimateSize).estimateSum.map(offset(_))
-
-  def estimatedOffset(encodable: Resource): Estimate[OffsetType] =
-    content.takeWhile(current => current != encodable)
-      .map(_.estimateSize).estimateSum.map(offset(_))
-
   def precedingResources(target: Label): List[Resource] =
-    content.takeWhile(x => !x.label.matches(target))
-
+    alignmentFiller :: content.takeWhile(_.label != target)
 
   /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
     *
     * @param from
     * @return
     */
-  def intermediateEncodables(from: RelativeReference[OffsetType]): List[Resource] = {
+  def intermediateResources(from: RelativeReference): List[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
@@ -55,71 +46,66 @@ abstract class Section[OffsetType<:Offset:OffsetFactory] {
       trimLeft.head :: trimRight
   }
 
-  def offsetDirection(from: RelativeReference[OffsetType]): OffsetDirection = {
+  def offsetDirection(from: RelativeReference): OffsetDirection = {
     val firstInstruction = content.find(x => x == from || x.label.matches(from.target)).get
     if (firstInstruction.label.matches(from.target))
       if (firstInstruction==from)
-        OffsetDirection.None
+        OffsetDirection.Self
       else
         OffsetDirection.Backward
     else
       OffsetDirection.Forward
   }
-
-  private def nextContent[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): List[Resource] = {
-    val newContent: List[Resource] = content.map {
-      case referencing: RelativeReference[OffsetType] =>
-        referencing.toInSectionState(this)
-
-      case absolute: AbsoluteReference[OffsetType, AddressType] =>
-        absolute.toInSectionState(currentApplication)
-
-      case resource =>
-        resource
-    }
-    newContent
-  }
-
-  @tailrec
-  final def encodable[AddressType<:Address[OffsetType]](currentApplication: Application[OffsetType, AddressType]): Section[OffsetType] with LastIteration[OffsetType] = {
-    val newContent = nextContent(currentApplication)
-    if (newContent.forall { case _: Encodable => true; case _ => false }) {
-      Section.lastIteration(sectionType, name, newContent.map(r => r.asInstanceOf[Resource with Encodable]))
-   } else {
-      Section(sectionType, name, newContent).encodable(currentApplication)
-    }
-  }
 }
 
-trait LastIteration[OffsetType<:Offset] {
-  iteration: Section[OffsetType] =>
+trait LastIteration {
+  iteration: Section =>
 
   def finalContent: List[Resource with Encodable]
 
-  //assert(!finalContent.exists(r => r.estimateSize.isInstanceOf[Bounded[OffsetType]]))
-
-
-  def offset(label: Label): OffsetType = estimatedOffset(label).asInstanceOf[Actual[OffsetType]].value
-  def offset(encodable: Resource): OffsetType = estimatedOffset(encodable).asInstanceOf[Actual[OffsetType]].value
+  def offset(label: Label): Int =
+    finalContent.takeWhile(current => current.label != label)
+      .map(_.size).sum
 
   lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
 
   lazy val size: Int = encodeByte.length
 }
 
+case class AlignmentFiller(section: Section) extends DependentResource {
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
+
+  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
+    val alignment = dependencySize % section.alignment
+    if (alignment != 0)
+      section.alignment - alignment
+    else 0
+  }
+
+  override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
+
+  override def label: Label = Label.noLabel
+
+  override def toString: String = s"filler for ${section.name}"
+}
+
 object Section {
-  def apply[OffsetType<:Offset:OffsetFactory](`type`: SectionType, sectionName: String, resources: List[Resource]): Section[OffsetType] =
-    new Section[OffsetType] {
+  def apply(`type`: SectionType, sectionName: String, resources: List[Resource]): Section =
+    new Section {
       val alignment: Int = 16
+      val alignmentFiller: AlignmentFiller = AlignmentFiller(this)
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
-      override val content: List[Resource] = resources
+      override val content: List[Resource] =
+          resources
     }
 
-  def lastIteration[OffsetType<:Offset:OffsetFactory](`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
-  Section[OffsetType] with LastIteration[OffsetType] =
-    new Section[OffsetType] with LastIteration[OffsetType] {
+  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], filler: AlignmentFiller):
+  Section with LastIteration =
+    new Section with LastIteration {
       val alignment: Int = 16
+      val alignmentFiller: AlignmentFiller = filler
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val finalContent: List[Resource with Encodable] = encodables

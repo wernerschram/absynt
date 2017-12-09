@@ -1,8 +1,8 @@
 package assembler.x86.operations
 
-import assembler.x86.{ProcessorMode, X86OffsetFactory}
-import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 import assembler._
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
+import assembler.x86.{ProcessorMode, X86OffsetFactory}
 
 abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
@@ -13,21 +13,15 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](labe
 
   val longJumpSize: Int = longOpcode.length + (if (processorMode == ProcessorMode.Real) 2 else 4)
 
-  override def estimateSize: Estimate[Int] = Estimate(shortJumpSize, longJumpSize)
+  override def possibleSizes: Set[Int] = Set(shortJumpSize, longJumpSize)
 
   def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
-  override def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int = offsetDirection match {
-    case OffsetDirection.Backward if distance <= backwardShortLongBoundary => shortJumpSize
-    case OffsetDirection.Forward if distance <= forwardShortLongBoundary => shortJumpSize
-    case OffsetDirection.None => shortJumpSize
-    case _ => longJumpSize
-  }
-
-  override def encodableForOffset(offset: OffsetType): Resource with Encodable = {
+  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with Encodable = {
+    val offset = offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)
     if (offset.isShort(shortJumpSize))
       encodableForShortPointer(ShortPointer(offset))
     else
-      encodableForLongPointer(LongPointer(offset))
+      encodableForLongPointer(LongPointer(offsetFactory.positionalOffset(distance)(offsetDirection)(longJumpSize)))
   }
 }

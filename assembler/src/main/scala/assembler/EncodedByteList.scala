@@ -2,10 +2,10 @@ package assembler
 
 import assembler.ListExtensions._
 
-trait EncodedByteList extends Resource with Encodable {
-  val bytes: List[Byte]
+trait EncodedByteList extends Encodable {
+  val bytes: Seq[Byte]
 
-  def encodeByte: List[Byte] = bytes
+  def encodeByte: Seq[Byte] = bytes
 
   def size: Int = bytes.length
 
@@ -13,7 +13,7 @@ trait EncodedByteList extends Resource with Encodable {
 }
 
 object EncodedByteList {
-  def apply(bytesValue: List[Byte])(implicit newLabel: Label) = new EncodedByteList { val label: Label = newLabel; val bytes: List[Byte] =
+  def apply(bytesValue: Seq[Byte])(implicit newLabel: Label) = new EncodedByteList { val label: Label = newLabel; val bytes: Seq[Byte] =
     bytesValue }
 }
 

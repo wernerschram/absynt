@@ -2,7 +2,7 @@ package assembler.arm.instructions
 
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, Shifter}
+import assembler.arm.operands.{ArmRelativeOffset, Condition, RelativeA32Pointer, Shifter}
 import assembler.arm.operations._
 import assembler.sections.{Section, SectionType}
 import assembler._
@@ -83,24 +83,26 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
 
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
         val targetLabel = Label.unique
+        val reference = LoadRegister(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          LoadRegister(targetLabel, R1),
+          reference,
             EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}))
 
-        val application = Raw(p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("e59f1000 00000000 74736554"))
+        val application = Raw(p, 0)
+        application.encodablesForReferences(Seq(reference))(reference).encodeByte should be(Hex.msb("e59f1000"))
       }
 
       "correctly encode a conditional indirect ldr instruction with an indirect reference to a labeled resource" in {
         val targetLabel = Label.unique
+        val reference = LoadRegister(targetLabel, R1, Condition.CarrySet)
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")},
             EncodedByteList(List.fill(4)(0x00.toByte)),
-            LoadRegister(targetLabel, R1, Condition.CarrySet)))
+            reference))
 
-        val application = Raw(p, RelativeA32Pointer(ArmOffset(0)))
-        p.encodable(application).encodeByte should be(Hex.msb("74736554 00000000 251F1010"))
+        val application = Raw(p, 0)
+        application.encodablesForReferences(Seq(reference))(reference).encodeByte should be(Hex.msb("251F1010"))
       }
     }
   }

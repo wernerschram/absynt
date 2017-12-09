@@ -4,7 +4,7 @@ import assembler._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{ArmOffset, Condition, RelativeA32Pointer, Shifter}
+import assembler.arm.operands._
 import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
@@ -147,32 +147,44 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly encode an add of a register and a labeled relative address to a register" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
-        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           instruction,
             EncodedByteList(List.fill(8)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801f01"))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).encodeByte should be(Hex.msb("e2801f01"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
-        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
 
       "correctly encode an add of a register and a labeled relative address to a register when the target is before the instruction" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
-        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
-        instruction.toInSectionState(p).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
 
     }
@@ -305,35 +317,43 @@ class DataProcessingSuite extends WordSpec with Matchers {
       "correctly encode a move of a labeled address to a register" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
-        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           instruction,
             EncodedByteList(List.fill(4)(0x00.toByte)),
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
-        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction,
             { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+
+        encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
-        val p = Section[ArmOffset](SectionType.Text, ".test", List[Resource](
+        val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedByteList(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
           EncodedByteList(List.fill(4)(0x00.toByte)),
           instruction))
-        val app = Raw[ArmOffset, RelativeA32Pointer](p, RelativeA32Pointer(ArmOffset(0)))
-        instruction.toInSectionState(app).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForReferences(instruction :: Nil)
+        encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 
     }

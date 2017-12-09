@@ -1,12 +1,12 @@
 package assembler.arm.instructions
 
-import assembler.Label
-import assembler.arm.{ArmOffsetFactory, ProcessorMode}
-import assembler.arm.operands.ArmOffset
+import assembler.arm.ProcessorMode
+import assembler.arm.operands.ArmRelativeOffset
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
+import assembler.{Encodable, Label, RelativeOffsetDirection}
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {
@@ -29,19 +29,20 @@ class LoadStoreRegister(
           (implicit label: Label, processorMode: ProcessorMode): LoadStore =
     ImmedByte(label, condition, register, baseRegister, offset, addressingType)
 
-  def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label, armOffsetFactory: ArmOffsetFactory) =
+  def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, Always) {
-
-      override def encodableForOffset(offset: ArmOffset): LoadStore =
-        ImmedWord(label, Always, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
-        LoadStoreAddressingTypeNormal.OffsetNormal)
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+        ImmedWord(label, Always, destination, GeneralRegister.PC,
+          LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
+            LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
-  def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label, armOffsetFactory: ArmOffsetFactory) =
+  def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label): ReferencingARMOperation =
     new ReferencingARMOperation(label, mnemonic, targetLabel, condition) {
-      override def encodableForOffset(offset: ArmOffset): LoadStore =
-        ImmedWord(label, condition, destination, GeneralRegister.PC, LoadStoreOffset(offset.offset.toShort),
-        LoadStoreAddressingTypeNormal.OffsetNormal)
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+        ImmedWord(label, condition, destination, GeneralRegister.PC,
+          LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
+            LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
   object UserMode {

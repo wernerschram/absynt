@@ -11,7 +11,7 @@ class InterruptSuite extends WordSpec with Matchers {
 
     "in real mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Real
+      import ProcessorMode.Real._
 
       "correctly encode int 0x03" in {
         Interrupt(0x03.toByte).encodeByte should be (Hex.lsb("CC"))
@@ -23,7 +23,7 @@ class InterruptSuite extends WordSpec with Matchers {
     }
     "in long mode" should {
 
-      implicit val processorMode: ProcessorMode = ProcessorMode.Long
+      import ProcessorMode.Long._
 
       "correctly encode int 0x01" in {
         Interrupt(0x01.toByte).encodeByte should be (Hex.lsb("CD 01"))

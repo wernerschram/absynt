@@ -1,14 +1,13 @@
 package assembler.output.Elf
 
-import assembler.{Address, Offset}
 import assembler.sections.{LastIteration, Section}
 
-class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType] with LastIteration[OffsetType], val flags: Flags[ProgramFlag], elf: Elf[OffsetType, AddressType]) {
+class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
 
-  def physicalAddress: Address[OffsetType] = segmentMemoryOffset
-  def segmentFileOffset: Long = elf.alignedSectionOffset(section)
-  def segmentMemoryOffset: Address[OffsetType] = elf.memoryAddress(section)
+  def physicalAddress: Long = segmentMemoryOffset
+  def segmentFileOffset: Long = elf.sectionFileOffset(section)
+  def segmentMemoryOffset: Long = elf.sectionOffset(section)
   def segmentFileSize: Long = section.size
   def segmentMemorySize: Long = segmentFileSize
 
@@ -18,8 +17,8 @@ class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](sectio
     case ProcessorClass._32Bit =>
       elf.endianness.encode(`type`.id) :::
       elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
-      elf.architecture.processorClass.numberBytes(segmentMemoryOffset.toLong) :::
-      elf.architecture.processorClass.numberBytes(physicalAddress.toLong) :::
+      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
+      elf.architecture.processorClass.numberBytes(physicalAddress) :::
       elf.architecture.processorClass.numberBytes(segmentFileSize) :::
       elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
       elf.endianness.encode(flags.encode.toInt) :::
@@ -28,8 +27,8 @@ class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](sectio
       elf.endianness.encode(`type`.id) :::
       elf.endianness.encode(flags.encode.toInt) :::
       elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
-      elf.architecture.processorClass.numberBytes(segmentMemoryOffset.toLong) :::
-      elf.architecture.processorClass.numberBytes(physicalAddress.toLong) :::
+      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
+      elf.architecture.processorClass.numberBytes(physicalAddress) :::
       elf.architecture.processorClass.numberBytes(segmentFileSize) :::
       elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
       elf.architecture.processorClass.numberBytes(elf.fileAlignment)
@@ -37,7 +36,8 @@ class ProgramHeader[OffsetType<:Offset, AddressType<:Address[OffsetType]](sectio
 }
 
 object ProgramHeader {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType] with LastIteration[OffsetType], elf: Elf[OffsetType, AddressType]): ProgramHeader[OffsetType, AddressType] = section.sectionType match {
+  def apply(section: Section with LastIteration,
+                                elf: Elf): ProgramHeader = section.sectionType match {
     case assembler.sections.SectionType.Text =>
       new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)
     case assembler.sections.SectionType.Data =>

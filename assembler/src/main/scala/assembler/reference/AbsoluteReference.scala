@@ -2,32 +2,34 @@ package assembler.reference
 
 import assembler._
 
-sealed abstract case class AbsoluteReference[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, override val label: Label)
-    extends Resource {
+sealed abstract case class AbsoluteReference(
+  target: Label, override val label: Label)
+    extends Reference {
 
-  def encodableForAddress(position: AddressType): Resource with Encodable
+  def encodableForDistance(distance: Int): Encodable
 
-  def toInSectionState(application: Application[OffsetType, AddressType]): Resource = {
-    val newEstimate: Estimate[AddressType] = application.estimateAbsoluteAddress(target)
-    newEstimate match {
-      case actual: Actual[AddressType] => encodableForAddress(actual.value)
-      case bounded: Bounded[AddressType] => new AbsoluteReference[OffsetType, AddressType](target, label) {
-        override def encodableForAddress(position: AddressType): Resource with Encodable =
-          AbsoluteReference.this.encodableForAddress(position)
+  final override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
+    assume(offsetDirection == OffsetDirection.Absolute)
+    encodableForDistance(dependencySize)
+  }
 
-        override def estimateSize: Estimate[Int] = bounded.map(encodableForAddress(_).size)
-      }
-      case _ => throw new AssertionError()
-    }
+  def sizeForDistance(distance: Int): Int
+
+  final override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
+    assume(offsetDirection == OffsetDirection.Absolute)
+    sizeForDistance(dependencySize)
   }
 }
 
 object AbsoluteReference {
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](target: Label, initialEstimatedSize: Estimate[Int], label: Label,
-    encodableFactory: (AddressType)=>Resource with Encodable) =
-    new AbsoluteReference[OffsetType, AddressType](target, label) {
-      override def encodableForAddress(position: AddressType): Resource with Encodable = encodableFactory(position)
+  def apply(target: Label, sizes: Set[Int], label: Label, encodableFactory: (Int) => Resource with Encodable): AbsoluteReference =
+    new AbsoluteReference(target, label) {
 
-      override def estimateSize: Estimate[Int] = initialEstimatedSize
+      override def possibleSizes: Set[Int] = sizes
+
+      override def encodableForDistance(distance: Int): Encodable = encodableFactory(distance)
+
+      override def sizeForDistance(distance: Int): Int = encodableFactory(distance).size
+
     }
 }

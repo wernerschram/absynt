@@ -1,21 +1,26 @@
 package assembler.output.raw
 
 import assembler._
-import assembler.sections.{LastIteration, Section}
+import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.sections.{AlignmentFiller, LastIteration, Section}
 
-class Raw[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], val baseAddress: AddressType)
-  (implicit addressFactory: AddressFactory[OffsetType, AddressType])
-  extends Application[OffsetType, AddressType](section :: Nil) {
+class Raw(section: Section, override val startOffset: Int)
+  extends Application(section :: Nil) {
 
-  def encodableSection: Section[OffsetType] with LastIteration[OffsetType] = section.encodable(this)
+  override def sectionOffset(section: Section with LastIteration): Long = startOffset
 
-  override def memoryAddress(section: Section[OffsetType]): AddressType = baseAddress
+  override def encodeByte: List[Byte] = encodableSections.head.encodeByte
 
-  override def encodeByte: List[Byte] = encodableSection.encodeByte
+  override def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection) = from match {
+    case relative: RelativeReference =>
+      (section.intermediateResources(relative), section.offsetDirection(relative))
+    case absolute: AbsoluteReference =>
+      (section.content.takeWhile(r => r.label != absolute.target), OffsetDirection.Absolute)
+    case _: AlignmentFiller =>
+      (Nil, OffsetDirection.Absolute)
+  }
 }
 
 object Raw {
-//  def apply[OffsetType](section: Section[OffsetType]) = new Raw(section, 0x100)
-  def apply[OffsetType<:Offset, AddressType<:Address[OffsetType]](section: Section[OffsetType], baseAddress: AddressType)(implicit addressFactory: AddressFactory[OffsetType, AddressType])
-  = new Raw[OffsetType, AddressType](section, baseAddress)
+  def apply(section: Section, startOffset: Int) = new Raw(section, startOffset)
 }

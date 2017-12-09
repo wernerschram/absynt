@@ -1,9 +1,7 @@
 package assembler
 
-trait Resource {
+sealed trait Resource {
   def label: Label
-
-  def estimateSize: Estimate[Int]
 
   lazy val labelPrefix: String =
     label match {
@@ -15,11 +13,20 @@ trait Resource {
 }
 
 trait Encodable extends Resource {
-  self: Resource =>
   def encodeByte: Seq[Byte]
 
-  override def estimateSize: Estimate[Int] = Actual(size)
-
   def size: Int
+}
 
+trait DependentResource extends Resource {
+
+  def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
+
+  def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
+
+  def possibleSizes: Set[Int]
+}
+
+trait Reference extends DependentResource {
+  def target: Label
 }

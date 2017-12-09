@@ -1,25 +1,18 @@
 package assembler.reference
 
 import assembler._
-import assembler.sections.Section
 
-import scala.collection.concurrent.TrieMap
+trait RelativeReference
+    extends Reference {
 
-trait RelativeReference[OffsetType<:Offset]
-    extends Resource {
-  def target: Label
+  final def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    offsetDirection match {
+      case direction: RelativeOffsetDirection => encodableForDistance(dependencySize, direction)
+      case _ => throw new AssertionError()
+    }
 
-  def encodableForOffset(offset: OffsetType): Resource with Encodable
+  def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable
 
-  def sizeForDistance(offsetDirection: OffsetDirection, distance: Long): Int
+  def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 
-  private val sectionMap = new TrieMap[Section[OffsetType], RelativeReferenceInSection[OffsetType]]
-
-  implicit def offsetFactory: PositionalOffsetFactory[OffsetType]
-
-  def toInSectionState(section: Section[OffsetType]): RelativeReferenceInSection[OffsetType] =
-    sectionMap.getOrElseUpdate(section, new RelativeReferenceInSection[OffsetType](target, label, estimateSize,
-      encodableForOffset, sizeForDistance,
-      section.intermediateEncodables(this), section.offsetDirection(this))(section, offsetFactory))
 }
-
