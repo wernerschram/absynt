@@ -1,8 +1,7 @@
 package assembler
 
 import assembler.output.raw.Raw
-import assembler.reference.RelativeReference
-import assembler.sections.{AlignmentFiller, LastIteration, Section, SectionType}
+import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.reflect.ClassTag
@@ -202,13 +201,15 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         "there is a zero start offset" in {
           val application = MyApplication(List(section), 0)
-          val filler = application.encodablesForReferences(Seq(section.alignmentFiller))(section.alignmentFiller)
+          val alignmentFiller = application.alignmentFillers(section)
+          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 0
         }
 
         "there is a start offset of 1" in {
           val application = MyApplication(List(section), 1)
-          val filler = application.encodablesForReferences(Seq(section.alignmentFiller))(section.alignmentFiller)
+          val alignmentFiller = application.alignmentFillers(section)
+          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 15
         }
       }
@@ -220,7 +221,8 @@ class ApplicationSuite extends WordSpec with Matchers {
           val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(16)(0x01.toByte))))
           val application = MyApplication(List(first, second), 0)
 
-          val filler = application.encodablesForReferences(Seq(second.alignmentFiller))(second.alignmentFiller)
+          val alignmentFiller = application.alignmentFillers(second)
+          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 0
         }
 
@@ -228,7 +230,8 @@ class ApplicationSuite extends WordSpec with Matchers {
           val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(20)(0x01.toByte))))
           val application = MyApplication(List(first, second), 0)
 
-          val filler = application.encodablesForReferences(Seq(second.alignmentFiller))(second.alignmentFiller)
+          val alignmentFiller = application.alignmentFillers(second)
+          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 12
         }
       }
@@ -248,10 +251,10 @@ class ApplicationSuite extends WordSpec with Matchers {
         val first = Section(SectionType.Text, "First", List(relative1, absolute1, dummy1in1, targetAbsolute2, targetRelative1, dummy2in1))
         val second = Section(SectionType.Text, "Second", List(absolute2, dummy1in2, targetRelative2, dummy2in2, relative2, targetAbsolute1))
 
-        val filler1 = first.alignmentFiller
-        val filler2 = second.alignmentFiller
-
         val application: MyApplication = MyApplication(List(first, second), 100)
+
+        val filler1 = application.alignmentFillers(first)
+        val filler2 = application.alignmentFillers(second)
 
         "return the intermediate resources for a relative reference in the first section" in {
           application.intermediateResources(relative1) shouldBe (Seq(absolute1, dummy1in1, targetAbsolute2), OffsetDirection.Forward)

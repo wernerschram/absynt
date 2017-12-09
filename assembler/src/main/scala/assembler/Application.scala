@@ -6,6 +6,8 @@ import assembler.sections.{AlignmentFiller, LastIteration, Section}
 abstract class Application protected (
   val sections: List[Section]) {
 
+  val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
+
   def startOffset: Int
 
   lazy val encodableSections: List[Section with LastIteration] = {
@@ -13,7 +15,7 @@ abstract class Application protected (
     sections.map(s => Section.lastIteration(s.sectionType, s.name, s.content.map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
-    }, s.alignmentFiller))
+    }))
   }
 
   def getAbsoluteOffset(label: Label): Long =
@@ -29,12 +31,15 @@ abstract class Application protected (
     case relative: RelativeReference =>
       val section = sections.filter(s => s.contains(from)).head
       (section.intermediateResources(relative), section.offsetDirection(relative))
-    case absolute: AbsoluteReference => (
-      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => s.alignmentFiller :: s.content) ++
-      sections.filter(s => s.contains(absolute.target)).head.precedingResources(absolute.target), OffsetDirection.Absolute
+    case absolute: AbsoluteReference =>
+      val containingSection: Section = sections.filter(s => s.contains(absolute.target)).head
+      (
+      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => alignmentFillers(s) :: s.content) ++
+        (alignmentFillers(containingSection) +: containingSection.precedingResources(absolute.target))
+         ,OffsetDirection.Absolute
       )
     case alignment: AlignmentFiller =>
-      (sections.takeWhile(s => s != alignment.section).flatMap(s => s.alignmentFiller :: s.content), OffsetDirection.Absolute)
+      (sections.takeWhile(s => s != alignment.section).flatMap(s => alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
   }
 
   private def applicationContextProperties(from: DependentResource): (Seq[DependentResource], Int, OffsetDirection) = {

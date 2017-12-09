@@ -10,7 +10,7 @@ abstract class Elf(
   val entryLabel: Label)
   extends Application(sections) {
 
-  val magic: List[Byte] = 0x7F.toByte :: Nil ::: "ELF".toCharArray.map(_.toByte).toList
+  val magic: List[Byte] = 0x7F.toByte :: "ELF".toCharArray.map(_.toByte).toList
 
   val version: ElfVersion = ElfVersion.Original
 
