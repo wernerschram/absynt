@@ -10,7 +10,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
   "a Section" when {
 
-    class MyReference(targetLabel: Label, override val label: Label) extends RelativeReference(targetLabel) {
+    class MyReference(targetLabel: Label, label: Label) extends RelativeReference(targetLabel, label) {
       override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = ???
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable = ???
       override def possibleSizes: Set[Int] = ???

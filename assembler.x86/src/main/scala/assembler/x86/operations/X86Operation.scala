@@ -1,10 +1,11 @@
 package assembler.x86.operations
 
+import assembler.Label
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.resource.Encodable
 
-trait X86Operation extends Encodable {
+abstract class X86Operation(label: Label) extends Encodable(label) {
   val includeRexW: Boolean = true
 
   def operands: List[Operand]

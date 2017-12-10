@@ -7,7 +7,7 @@ import assembler.sections.{LastIteration, Section}
 class Raw(section: Section, override val startOffset: Int)
   extends Application(section :: Nil) {
 
-  override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> new AlignmentFiller {
+  override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> new AlignmentFiller(Label.noLabel) {
 
     override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = startOffset
 

@@ -3,8 +3,7 @@ package assembler.resource
 import assembler._
 import assembler.sections.Section
 
-sealed trait Resource {
-  def label: Label
+sealed abstract class Resource(val label: Label) {
 
   lazy val labelPrefix: String =
     label match {
@@ -15,13 +14,13 @@ sealed trait Resource {
   override def toString: String = labelPrefix
 }
 
-abstract class Encodable extends Resource {
+abstract class Encodable(label: Label) extends Resource(label) {
   def encodeByte: Seq[Byte]
 
   def size: Int
 }
 
-sealed abstract class DependentResource extends Resource {
+sealed abstract class DependentResource(label: Label) extends Resource(label) {
 
   def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
@@ -30,15 +29,13 @@ sealed abstract class DependentResource extends Resource {
   def possibleSizes: Set[Int]
 }
 
-sealed abstract class Reference(val target: Label) extends DependentResource
+sealed abstract class Reference(val target: Label, label: Label) extends DependentResource(label)
 
-abstract class AlignmentFiller extends DependentResource {
+abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
   def section: Section
-
-  override def label: Label = Label.noLabel
 }
 
-abstract class RelativeReference(target: Label) extends Reference(target) {
+abstract class RelativeReference(target: Label, label: Label) extends Reference(target, label) {
 
   final def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
     assume(offsetDirection.isInstanceOf[RelativeOffsetDirection])
@@ -50,7 +47,7 @@ abstract class RelativeReference(target: Label) extends Reference(target) {
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 }
 
-abstract class AbsoluteReference(target: Label) extends Reference(target) {
+abstract class AbsoluteReference(target: Label, label: Label) extends Reference(target, label) {
 
   def encodableForDistance(distance: Int): Encodable
 

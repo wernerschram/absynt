@@ -5,8 +5,8 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.{ArmRelativeOffset, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 import assembler.arm.operands.registers.GeneralRegister
 
-class BranchImmediate[AddressType<:RelativePointer](val label: Label, destination: AddressType, val condition: Condition, val code: Byte, val opcode: String)
-  extends Conditional {
+class BranchImmediate[AddressType<:RelativePointer](label: Label, destination: AddressType, val condition: Condition, val code: Byte, val opcode: String)
+  extends Conditional(label) {
   override def encodeWord: Int =
     super.encodeWord | ((code & 0xF0) << 20) | destination.encode
 
@@ -21,8 +21,8 @@ class BranchImmediate[AddressType<:RelativePointer](val label: Label, destinatio
   }
 }
 
-class BranchRegister(val label: Label, destination: GeneralRegister, val condition: Condition, val code: Byte, val opcode: String)
-  extends Conditional {
+class BranchRegister(label: Label, destination: GeneralRegister, val condition: Condition, val code: Byte, val opcode: String)
+  extends Conditional(label) {
   override def encodeWord: Int =
     super.encodeWord | 0x012FFF00 | ((code & 0x0F) << 4) | destination.registerCode
 

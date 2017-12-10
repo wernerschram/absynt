@@ -146,13 +146,12 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
     (implicit thisLabel: Label): AbsoluteReference =
-    new AbsoluteReference(targetLabel) {override def sizeForDistance(distance: Int): Int = encodableForDistance(distance).size
+    new AbsoluteReference(targetLabel, thisLabel) {
+      override def sizeForDistance(distance: Int): Int = encodableForDistance(distance).size
 
       override def encodableForDistance(distance: Int): Encodable = forConstant(distance, destination, condition)
 
       override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
-
-      override def label: Label = thisLabel
     }
 }
 

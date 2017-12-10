@@ -5,9 +5,9 @@ import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.sections.Section
 
-class MultiplyOperation(val label: Label, val code: Byte, override val opcode: String, destination: GeneralRegister,
+class MultiplyOperation(label: Label, val code: Byte, override val opcode: String, destination: GeneralRegister,
                         source: GeneralRegister, multiplyValue: GeneralRegister, val condition: Condition)
-  extends Conditional {
+  extends Conditional(label) {
   override def encodeWord: Int =
     super.encodeWord |
       0x00000090 |

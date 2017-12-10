@@ -10,7 +10,7 @@ class X86OperationSuite extends WordSpec with Matchers {
   "an X86 instruction" when {
     "in protected mode" should {
 
-      class MyInstruction extends X86Operation {
+      class MyInstruction extends X86Operation(Label.noLabel) {
         override def code: List[Byte] = 0x00.toByte :: Nil
 
         override def mnemonic = "mis"
@@ -18,8 +18,6 @@ class X86OperationSuite extends WordSpec with Matchers {
         override def operands: List[Operand] = Nil
 
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
-
-        override val label: Label = Label.noLabel
       }
 
       "return the size of the instruction" in {

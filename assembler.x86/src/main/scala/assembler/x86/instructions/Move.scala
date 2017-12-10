@@ -133,7 +133,7 @@ object Move {
   def forLabel[OffsetType<:X86Offset with AbsoluteOffset](targetLabel: Label, register: WideRegister)
               (implicit processorMode: ProcessorMode, thisLabel: Label): AbsoluteReference = {
 
-    new AbsoluteReference(targetLabel) {
+    new AbsoluteReference(targetLabel, thisLabel) {
       private def prefixBytes = if (register.getRexRequirements(ParameterPosition.OpcodeReg).isEmpty) 0 else 1
 
       private val size = processorMode match {
@@ -157,12 +157,9 @@ object Move {
             throw new AssertionError
        }
 
-
       override def sizeForDistance(distance: Int): Int = size
 
       override def possibleSizes: Set[Int] = Set(size)
-
-      override def label: Label = thisLabel
     }
   }
 

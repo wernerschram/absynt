@@ -14,9 +14,9 @@ object LoadStoreMultipleDirection {
 
 }
 
-class LoadStoreMultiple(val label: Label, direction: LoadStoreMultipleDirection, val condition: Condition, val registers:
+class LoadStoreMultiple(label: Label, direction: LoadStoreMultipleDirection, val condition: Condition, val registers:
                         List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, val opcode: String)
-  extends Conditional {
+  extends Conditional(label) {
   assume(registers.nonEmpty)
   assume(baseRegister != GeneralRegister.R15)
 
@@ -54,9 +54,9 @@ trait UserModeRegisters extends LoadStoreMultiple {
   override def registerString = s"${super.registerString}^"
 }
 
-class ReturnFromException(val label: Label, baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean,
+class ReturnFromException(label: Label, baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean,
                           val opcode: String)
-  extends ARMOperation() {
+  extends ARMOperation(label) {
   override def encodeWord: Int =
     0xf8100a00 |
       (if (updateBase) 0x00200000 else 0) |

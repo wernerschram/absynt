@@ -5,8 +5,8 @@ import assembler.arm.operands.Condition._
 
 import scala.language.implicitConversions
 
-class Miscellaneous(val label: Label, val code: Byte, override val opcode: String, value: Short, condition: Condition)
-  extends ARMOperation {
+class Miscellaneous(label: Label, val code: Byte, override val opcode: String, value: Short, condition: Condition)
+  extends ARMOperation(label) {
   override def encodeWord: Int = {
     val valuePart1: Byte = (value & 0x0f).toByte
     val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
@@ -59,9 +59,9 @@ object InterruptDisableFlags extends Enumeration {
   }
 }
 
-class ProcessorState(val label: Label, val code: Byte, val opcode: String, val condition: Condition,
+class ProcessorState(label: Label, val code: Byte, val opcode: String, val condition: Condition,
                      iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, postFixString: String)
-  extends Conditional {
+  extends Conditional(label) {
 
   def this(label: Label, code: Byte, opcode: String, mode: ExecutionMode) =
     this(label, code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")

@@ -88,7 +88,7 @@ abstract class Elf(
   override val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
 }
 
-case class ElfAlignmentFiller(section: Section) extends AlignmentFiller {
+case class ElfAlignmentFiller(section: Section) extends AlignmentFiller(Label.noLabel) {
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
 

@@ -9,9 +9,9 @@ import assembler.sections.Section
 
 import scala.language.implicitConversions
 
-class MoveFromStatusRegister(val label: Label, override val opcode: String, source: StatusRegister, destination: GeneralRegister,
+class MoveFromStatusRegister(label: Label, override val opcode: String, source: StatusRegister, destination: GeneralRegister,
                              override val condition: Condition)
-  extends Conditional {
+  extends Conditional(label) {
   override def encodeWord: Int =
     super.encodeWord | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12)
 
@@ -31,9 +31,9 @@ object Fields extends Enumeration {
   }
 }
 
-class MoveToStatusRegister private(val label: Label, override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,
+class MoveToStatusRegister private(label: Label, override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,
                                    override val condition: Condition, val sourceString: String, val sourceValue: Int)
-  extends Conditional {
+  extends Conditional(label) {
 
   def this(label: Label, opcode: String, source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet,
            condition: Condition) =

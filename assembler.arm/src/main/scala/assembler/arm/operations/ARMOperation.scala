@@ -1,5 +1,6 @@
 package assembler.arm.operations
 
+import assembler.Label
 import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
 import assembler.resource.Encodable
@@ -13,7 +14,7 @@ trait NamedOperation {
 
 }
 
-trait ARMOperation extends Encodable with NamedOperation {
+abstract class ARMOperation(label: Label) extends Encodable(label) with NamedOperation {
   override def size = 4
 
   override def encodeByte: Seq[Byte] = encodeWord.encodeLittleEndian
@@ -35,7 +36,7 @@ trait NamedConditional extends NamedOperation {
   override def mnemonic: List[PartialName] = PartialName(condition.mnemonicExtension, 3) :: super.mnemonic
 }
 
-trait Conditional extends ARMOperation with NamedConditional {
+abstract class Conditional(label: Label) extends ARMOperation(label) with NamedConditional {
   override def encodeWord: Int =
     super.encodeWord | (condition.value << 28)
 }

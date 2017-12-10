@@ -9,12 +9,10 @@ class ARMInstructionSuite extends WordSpec with Matchers {
   "an ARM instruction" when {
     "in a32 mode" should {
 
-      class MyInstruction extends ARMOperation {
+      class MyInstruction extends ARMOperation(Label.noLabel) {
         val opcode = "my"
 
         override def encodeWord = 4
-
-        val label: Label = Label.noLabel
       }
 
       "return the size of the instruction" in {

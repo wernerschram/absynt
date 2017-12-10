@@ -4,13 +4,13 @@ import assembler.Label
 import assembler.x86.operands.{GeneralPurposeRegister, Operand}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class RegisterEncoded[RegisterType <: GeneralPurposeRegister](val label: Label,
+class RegisterEncoded[RegisterType <: GeneralPurposeRegister](label: Label,
                                                               register: RegisterType,
                                                               rawCode: List[Byte],
                                                               override val mnemonic: String,
                                                               override val includeRexW: Boolean = true)
                                                              (override implicit val processorMode: ProcessorMode)
-  extends X86Operation {
+  extends X86Operation(label) {
 
   override def operands: List[Operand] = register :: Nil
 

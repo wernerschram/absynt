@@ -5,12 +5,12 @@ import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class ModRMStatic(val label: Label, val operandRM: ModRMEncodableOperand,
+class ModRMStatic(label: Label, val operandRM: ModRMEncodableOperand,
                   override val code: List[Byte],
                   val rValue: Byte,
                   override val mnemonic: String,
                   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
-  extends X86Operation {
+  extends X86Operation(label) {
 
   override def operands: List[Operand] = operandRM :: Nil
 

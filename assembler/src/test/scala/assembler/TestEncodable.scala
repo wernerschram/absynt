@@ -2,7 +2,7 @@ package assembler
 
 import assembler.resource.{AbsoluteReference, Encodable, RelativeReference}
 
-case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable {
+case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable(label) {
   override def encodeByte: Seq[Byte] =
     offsetDirection match {
       case OffsetDirection.Forward => Seq.fill(size)(0xff.toByte)
@@ -16,7 +16,7 @@ case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeO
     else 3
 }
 
-case class LinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference(target) {
+case class LinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference(target, label) {
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
     LinearRelativeTestEncodable(distance, offsetDirection, label)
 
@@ -29,7 +29,7 @@ case class LinearRelativeTestReference(override val target: Label, override val 
 }
 
 
-case class NonLinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable {
+case class NonLinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable(label) {
   override def encodeByte: Seq[Byte] =
     offsetDirection match {
       case OffsetDirection.Forward => Seq.fill(size)(0xff.toByte)
@@ -43,7 +43,7 @@ case class NonLinearRelativeTestEncodable(distance: Int, offsetDirection: Relati
     else 2
 }
 
-case class NonLinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference(target) {
+case class NonLinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference(target, label) {
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
     NonLinearRelativeTestEncodable(distance, offsetDirection, label)
 
@@ -55,7 +55,7 @@ case class NonLinearRelativeTestReference(override val target: Label, override v
   override def possibleSizes = Set(1, 2, 3)
 }
 
-case class AbsoluteTestEncodable(distance: Int, override val label: Label) extends Encodable {
+case class AbsoluteTestEncodable(distance: Int, override val label: Label) extends Encodable(label) {
   override def encodeByte: Seq[Byte] = Seq.fill(size)(0xaa.toByte)
 
   override def size: Int =
@@ -64,7 +64,7 @@ case class AbsoluteTestEncodable(distance: Int, override val label: Label) exten
     else 2
 }
 
-case class AbsoluteTestReference(override val target: Label, override val label: Label = Label.noLabel) extends AbsoluteReference(target) {
+case class AbsoluteTestReference(override val target: Label, override val label: Label = Label.noLabel) extends AbsoluteReference(target, label) {
   override def encodableForDistance(distance: Int): Encodable = AbsoluteTestEncodable(distance, Label.noLabel)
 
   override def sizeForDistance(distance: Int): Int = encodableForDistance(distance).size
