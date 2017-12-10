@@ -21,7 +21,7 @@ trait Encodable extends Resource {
   def size: Int
 }
 
-sealed trait DependentResource extends Resource {
+sealed abstract class DependentResource extends Resource {
 
   def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
@@ -32,7 +32,7 @@ sealed trait DependentResource extends Resource {
 
 sealed abstract class Reference(val target: Label) extends DependentResource
 
-trait AlignmentFiller extends DependentResource {
+abstract class AlignmentFiller extends DependentResource {
   def section: Section
 
   override def label: Label = Label.noLabel
