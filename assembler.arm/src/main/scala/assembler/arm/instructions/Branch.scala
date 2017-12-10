@@ -4,17 +4,27 @@ import assembler.arm.ProcessorMode
 import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
-import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
-import assembler.resource.Encodable
-import assembler.{Label, RelativeOffsetDirection}
+import assembler.arm.operations.{BranchImmediate, BranchRegister, NamedConditional}
+import assembler.resource.{Encodable, RelativeReference}
+import assembler.{Label, OffsetDirection, RelativeOffsetDirection}
+
+abstract class BranchReference(label: Label, val opcode: String, target: Label, val condition: Condition)
+  extends RelativeReference(target, label) with NamedConditional {
+
+  override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int = 4
+
+  override def possibleSizes: Set[Int] = Set(4)
+
+  override def toString = s"$labelPrefix$mnemonicString $target"
+}
 
 class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)
            (implicit label: Label, processorMode: ProcessorMode):  BranchImmediate[RelativeA32Pointer] =
     Immediate(label, destination, condition)
 
-  def apply(targetLabel: Label)(implicit label: Label): ReferencingARMOperation =
-    new ReferencingARMOperation(label, opcode, targetLabel, Always) {
+  def apply(targetLabel: Label)(implicit label: Label): BranchReference =
+    new BranchReference(label, opcode, targetLabel, Always) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         Immediate(label, RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Always)
     }
@@ -22,8 +32,8 @@ class Branch(code: Byte, val opcode: String) {
   private def Immediate[AddressType<:RelativePointer](label: Label, destination: AddressType, condition: Condition = Always) =
     new BranchImmediate[AddressType](label, destination, condition, code, opcode)
 
-  def apply(targetLabel: Label, condition: Condition)(implicit label: Label): ReferencingARMOperation =
-    new ReferencingARMOperation(label, opcode, targetLabel, condition) {
+  def apply(targetLabel: Label, condition: Condition)(implicit label: Label): RelativeReference =
+    new BranchReference(label, opcode, targetLabel, condition) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         Immediate(label, RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), condition)
     }
@@ -44,8 +54,8 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
   private def Immediate(label: Label, destination: RelativeThumbPointer, condition: Condition = Always) =
     new BranchImmediate(label, destination, condition, immediateCode, opcode)
 
-  def apply(targetLabel: Label)(implicit label: Label): ReferencingARMOperation =
-    new ReferencingARMOperation(label, opcode, targetLabel, Unpredictable) {
+  def apply(targetLabel: Label)(implicit label: Label): BranchReference =
+    new BranchReference(label, opcode, targetLabel, Unpredictable) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         Immediate(label, RelativeThumbPointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Unpredictable)
     }
