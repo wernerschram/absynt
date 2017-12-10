@@ -5,7 +5,7 @@ import assembler.sections.Section
 
 sealed abstract class Resource(val label: Label) {
 
-  lazy val labelPrefix: String =
+  final val labelPrefix: String =
     label match {
       case _: NoLabel => ""
       case _ => s"$label: "
