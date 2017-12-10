@@ -5,7 +5,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations._
-import assembler.resource.{AbsoluteReference, Encodable}
+import assembler.resource.{AbsoluteReference, Encodable, RelativeReference}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)
@@ -82,10 +82,20 @@ object Add extends DataProcessing(0x04.toByte, "add") {
 
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always)
-    (implicit label: Label): ReferencingARMOperation =
-    new ReferencingARMOperation(label, opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
-        forConstant(source1, ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset, destination, condition)
+    (implicit label: Label): RelativeReference =
+    new RelativeReference(targetLabel, label) with NamedConditional {
+      override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
+        encodableForDependencySize(distance, offsetDirection).size
+
+      override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
+
+      override def toString = s"$labelPrefix$mnemonicString $target"
+          override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+            forConstant(source1, ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset, destination, condition)
+
+      override val condition: Condition = Always
+
+      override val opcode: String = "add"
     }
 }
 
