@@ -6,8 +6,18 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
-import assembler.resource.Encodable
-import assembler.{Label, RelativeOffsetDirection}
+import assembler.resource.{Encodable, RelativeReference}
+import assembler.{Label, OffsetDirection, RelativeOffsetDirection}
+
+abstract class LoadStoreReference(label: Label, val opcode: String, target: Label, val condition: Condition)
+  extends RelativeReference(target, label) with NamedConditional {
+
+  override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int = 4
+
+  override def possibleSizes: Set[Int] = Set(4)
+
+  override def toString = s"$labelPrefix$mnemonicString $target"
+}
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {
@@ -30,16 +40,16 @@ class LoadStoreRegister(
           (implicit label: Label, processorMode: ProcessorMode): LoadStore =
     ImmedByte(label, condition, register, baseRegister, offset, addressingType)
 
-  def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label): ReferencingARMOperation =
-    new ReferencingARMOperation(label, mnemonic, targetLabel, Always) {
+  def apply(targetLabel: Label, destination: GeneralRegister)(implicit label: Label): RelativeReference =
+    new LoadStoreReference(label, mnemonic, targetLabel, Always) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         ImmedWord(label, Always, destination, GeneralRegister.PC,
           LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
-  def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label): ReferencingARMOperation =
-    new ReferencingARMOperation(label, mnemonic, targetLabel, condition) {
+  def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition)(implicit label: Label): RelativeReference =
+    new LoadStoreReference(label, mnemonic, targetLabel, condition) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
         ImmedWord(label, condition, destination, GeneralRegister.PC,
           LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
