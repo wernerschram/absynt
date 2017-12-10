@@ -4,9 +4,8 @@ import assembler._
 import assembler.arm.operands.Condition.Condition
 import assembler.resource.RelativeReference
 
-abstract class ReferencingARMOperation(val label: Label, val opcode: String, override val target: Label,
-                                                    val condition: Condition)
-  extends RelativeReference with NamedConditional {
+abstract class ReferencingARMOperation(val label: Label, val opcode: String, target: Label, val condition: Condition)
+  extends RelativeReference(target) with NamedConditional {
 
   override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
     encodableForDependencySize(distance, offsetDirection).size

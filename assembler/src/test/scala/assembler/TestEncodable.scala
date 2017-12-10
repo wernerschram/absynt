@@ -16,7 +16,7 @@ case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeO
     else 3
 }
 
-case class LinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference {
+case class LinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference(target) {
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
     LinearRelativeTestEncodable(distance, offsetDirection, label)
 
@@ -43,7 +43,7 @@ case class NonLinearRelativeTestEncodable(distance: Int, offsetDirection: Relati
     else 2
 }
 
-case class NonLinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference {
+case class NonLinearRelativeTestReference(override val target: Label, override val label: Label = Label.noLabel) extends RelativeReference(target) {
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
     NonLinearRelativeTestEncodable(distance, offsetDirection, label)
 
@@ -64,6 +64,14 @@ case class AbsoluteTestEncodable(distance: Int, override val label: Label) exten
     else 2
 }
 
+case class AbsoluteTestReference(override val target: Label, override val label: Label = Label.noLabel) extends AbsoluteReference(target) {
+  override def encodableForDistance(distance: Int): Encodable = AbsoluteTestEncodable(distance, Label.noLabel)
+
+  override def sizeForDistance(distance: Int): Int = encodableForDistance(distance).size
+
+  override def possibleSizes: Set[Int] = Set(1, 2, 3)
+}
+
 object TestEncodable {
   def linearReferenceWithTarget: (LinearRelativeTestReference, EncodedByteList) = {
     val targetLabel = Label.unique
@@ -81,7 +89,7 @@ object TestEncodable {
 
   def absoluteReferenceWithTarget: (AbsoluteReference, EncodedByteList) = {
     val targetLabel = Label.unique
-    val reference = AbsoluteReference(targetLabel, Set(1,2,3), Label.noLabel, (distance) => AbsoluteTestEncodable(distance, Label.noLabel))
+    val reference = AbsoluteTestReference(targetLabel)
     val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
     (reference, targetResource)
   }

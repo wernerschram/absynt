@@ -30,9 +30,7 @@ sealed trait DependentResource extends Resource {
   def possibleSizes: Set[Int]
 }
 
-sealed trait Reference extends DependentResource {
-  def target: Label
-}
+sealed abstract class Reference(val target: Label) extends DependentResource
 
 trait AlignmentFiller extends DependentResource {
   def section: Section
@@ -40,22 +38,19 @@ trait AlignmentFiller extends DependentResource {
   override def label: Label = Label.noLabel
 }
 
-trait RelativeReference
-    extends Reference {
+abstract class RelativeReference(target: Label) extends Reference(target) {
 
-  final def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    offsetDirection match {
-      case direction: RelativeOffsetDirection => encodableForDistance(dependencySize, direction)
-      case _ => throw new AssertionError()
-    }
+  final def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
+    assume(offsetDirection.isInstanceOf[RelativeOffsetDirection])
+    encodableForDistance(dependencySize, offsetDirection.asInstanceOf[RelativeOffsetDirection])
+  }
 
   def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable
 
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 }
-sealed abstract case class AbsoluteReference(
-  target: Label, override val label: Label)
-    extends Reference {
+
+abstract class AbsoluteReference(target: Label) extends Reference(target) {
 
   def encodableForDistance(distance: Int): Encodable
 
@@ -72,15 +67,3 @@ sealed abstract case class AbsoluteReference(
   }
 }
 
-object AbsoluteReference {
-  def apply(target: Label, sizes: Set[Int], label: Label, encodableFactory: (Int) => Resource with Encodable): AbsoluteReference =
-    new AbsoluteReference(target, label) {
-
-      override def possibleSizes: Set[Int] = sizes
-
-      override def encodableForDistance(distance: Int): Encodable = encodableFactory(distance)
-
-      override def sizeForDistance(distance: Int): Int = encodableFactory(distance).size
-
-    }
-}

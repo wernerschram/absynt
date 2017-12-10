@@ -2,24 +2,27 @@ package assembler.sections
 
 import assembler._
 import assembler.output.raw.Raw
-import assembler.resource.{RelativeReference, Resource}
+import assembler.resource.{Encodable, RelativeReference, Resource}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers with MockFactory {
 
   "a Section" when {
+
+    class MyReference(targetLabel: Label, override val label: Label) extends RelativeReference(targetLabel) {
+      override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = ???
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable = ???
+      override def possibleSizes: Set[Int] = ???
+    }
+
     "queried for immediate instructions" should {
 
-
       "provide the intermediate instructions between a relative instruction and a label" in {
-        val label = Label.unique
-        val myRelativeReference: RelativeReference = mock[RelativeReference]
-        (myRelativeReference.target _).expects().returning(label).anyNumberOfTimes()
-        (myRelativeReference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
-        val reference = myRelativeReference
+        val targetLabel = Label.unique
+        val reference = new MyReference(targetLabel, Label.noLabel)
         val intermediate = EncodedByteList(List.fill(5)(0))
-        val target = EncodedByteList(0.toByte :: Nil)(label)
+        val target = EncodedByteList(0.toByte :: Nil)(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
@@ -30,12 +33,10 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "provide the intermediate instructions between a label and a relative instruction" in {
-        val label = Label.unique
-        val reference: RelativeReference = mock[RelativeReference]
-        (reference.target _).expects().returning(label).anyNumberOfTimes()
-        (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
+        val targetLabel = Label.unique
+        val reference = new MyReference(targetLabel, Label.noLabel)
         val intermediate = EncodedByteList(List.fill(5)(0))
-        val target = EncodedByteList(0.toByte :: Nil)(label)
+        val target = EncodedByteList(0.toByte :: Nil)(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           target,
@@ -47,9 +48,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
-        val reference: RelativeReference = mock[RelativeReference]
-        (reference.target _).expects().returning(targetLabel).anyNumberOfTimes()
-        (reference.label _).expects().returning(targetLabel).anyNumberOfTimes()
+        val reference = new MyReference(targetLabel, targetLabel)
         val prefix = EncodedByteList(List.fill(2)(0))
         val postfix = EncodedByteList(List.fill(3)(0))
 
@@ -65,11 +64,9 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     "queried for a references direction" should {
 
       "know when a indirect reference is a forward reference" in {
-        val label = Label.unique
-        val reference: RelativeReference = mock[RelativeReference]
-        (reference.target _).expects().returning(label).anyNumberOfTimes()
-        (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
-        val target = EncodedByteList(0.toByte :: Nil)(label)
+        val targetLabel = Label.unique
+        val reference = new MyReference(targetLabel, Label.noLabel)
+        val target = EncodedByteList(0.toByte :: Nil)(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
@@ -79,11 +76,9 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "know when a indirect reference is a backward reference" in {
-        val label = Label.unique
-        val reference: RelativeReference = mock[RelativeReference]
-        (reference.target _).expects().returning(label).anyNumberOfTimes()
-        (reference.label _).expects().returning(NoLabel()).anyNumberOfTimes()
-        val target = EncodedByteList(0.toByte :: Nil)(label)
+        val targetLabel = Label.unique
+        val reference = new MyReference(targetLabel, Label.noLabel)
+        val target = EncodedByteList(0.toByte :: Nil)(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           target,
@@ -93,10 +88,8 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "know when a indirect reference is a reference to self" in {
-        val label = Label.unique
-        val reference: RelativeReference = mock[RelativeReference]
-        (reference.target _).expects().returning(label).anyNumberOfTimes()
-        (reference.label _).expects().returning(label).anyNumberOfTimes()
+        val targetLabel = Label.unique
+        val reference = new MyReference(targetLabel, targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           reference))
