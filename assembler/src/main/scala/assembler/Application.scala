@@ -1,12 +1,12 @@
 package assembler
 
 import assembler.reference.{AbsoluteReference, RelativeReference}
-import assembler.sections.{AlignmentFiller, LastIteration, Section}
+import assembler.sections.{LastIteration, Section}
 
 abstract class Application protected (
   val sections: List[Section]) {
 
-  val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
+  def alignmentFillers: Map[Section, AlignmentFiller]
 
   def startOffset: Int
 

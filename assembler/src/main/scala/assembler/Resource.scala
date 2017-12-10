@@ -1,5 +1,7 @@
 package assembler
 
+import assembler.sections.Section
+
 sealed trait Resource {
   def label: Label
 
@@ -18,7 +20,7 @@ trait Encodable extends Resource {
   def size: Int
 }
 
-trait DependentResource extends Resource {
+sealed trait DependentResource extends Resource {
 
   def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
@@ -30,3 +32,10 @@ trait DependentResource extends Resource {
 trait Reference extends DependentResource {
   def target: Label
 }
+
+trait AlignmentFiller extends DependentResource {
+  def section: Section
+
+  override def label: Label = Label.noLabel
+}
+

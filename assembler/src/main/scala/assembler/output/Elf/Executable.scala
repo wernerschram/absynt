@@ -1,8 +1,7 @@
 package assembler.output.Elf
 
 import assembler._
-import assembler.reference.{AbsoluteReference, RelativeReference}
-import assembler.sections.{AlignmentFiller, LastIteration, Section}
+import assembler.sections.Section
 
 abstract class Elf(
   val architecture: Architecture,
@@ -83,6 +82,25 @@ abstract class Elf(
     encodableSections.flatMap(_.encodeByte) :::
     stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
     sectionHeaders.flatMap(s => s.encodeByte)
+
+
+  override val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
+}
+
+case class ElfAlignmentFiller(section: Section) extends AlignmentFiller {
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
+
+  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
+    val alignment = dependencySize % section.alignment
+    if (alignment != 0)
+      section.alignment - alignment
+    else 0
+  }
+
+  override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
+
+  override def toString: String = s"filler for ${section.name}"
 }
 
 class Executable private(

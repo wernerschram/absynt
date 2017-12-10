@@ -1,5 +1,6 @@
 package assembler
 
+import assembler.output.Elf.ElfAlignmentFiller
 import assembler.output.raw.Raw
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
@@ -194,6 +195,8 @@ class ApplicationSuite extends WordSpec with Matchers {
     "defined with multiple sections" should {
       case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application(sections) {
         override def encodeByte: List[Byte] = ???
+
+        override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
       }
 
       "align the first section" when {

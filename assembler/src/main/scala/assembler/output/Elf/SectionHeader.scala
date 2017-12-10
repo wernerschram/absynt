@@ -1,6 +1,6 @@
 package assembler.output.Elf
 
-import assembler.sections.{AlignmentFiller, LastIteration, Section}
+import assembler.sections.{LastIteration, Section}
 
 abstract class SectionHeader(elf: Elf) {
 
