@@ -13,7 +13,7 @@ trait NamedOperation {
 
 }
 
-trait ARMOperation extends NamedOperation with Encodable {
+trait ARMOperation extends Encodable with NamedOperation {
   override def size = 4
 
   override def encodeByte: Seq[Byte] = encodeWord.encodeLittleEndian

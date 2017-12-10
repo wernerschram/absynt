@@ -15,7 +15,7 @@ sealed trait Resource {
   override def toString: String = labelPrefix
 }
 
-trait Encodable extends Resource {
+abstract class Encodable extends Resource {
   def encodeByte: Seq[Byte]
 
   def size: Int
