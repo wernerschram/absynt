@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.reference.RelativeReference
+import assembler.resource.{Encodable, RelativeReference, Resource}
 
 import scala.language.implicitConversions
 

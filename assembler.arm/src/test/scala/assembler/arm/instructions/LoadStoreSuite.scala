@@ -7,6 +7,7 @@ import assembler.arm.operations._
 import assembler.sections.{Section, SectionType}
 import assembler._
 import assembler.output.raw.Raw
+import assembler.resource.Resource
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 

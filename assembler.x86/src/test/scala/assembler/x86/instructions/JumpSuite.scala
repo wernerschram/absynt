@@ -2,6 +2,7 @@ package assembler.x86.instructions
 
 import assembler._
 import assembler.output.raw.Raw
+import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._

@@ -11,6 +11,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.output.Elf.{Architecture, Executable}
+import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 
 object Boot extends App {

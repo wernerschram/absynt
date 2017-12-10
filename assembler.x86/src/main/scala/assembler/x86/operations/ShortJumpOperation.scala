@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
 import assembler._
-import assembler.reference.RelativeReference
+import assembler.resource.{Encodable, RelativeReference, Resource}
 import assembler.x86.X86OffsetFactory
 import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 

@@ -1,7 +1,7 @@
 package assembler.output.raw
 
 import assembler._
-import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.resource._
 import assembler.sections.{LastIteration, Section}
 
 class Raw(section: Section, override val startOffset: Int)

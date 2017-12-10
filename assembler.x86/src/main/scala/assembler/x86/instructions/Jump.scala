@@ -1,10 +1,11 @@
 package assembler.x86.instructions
 
+import assembler.resource.{Encodable, Resource}
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{FixedSizeOperand, ModRMEncodableOperand, ValueSize}
 import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 import assembler.x86.{ProcessorMode, X86OffsetFactory}
-import assembler.{Encodable, Label, Resource}
+import assembler.Label
 
 abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
 

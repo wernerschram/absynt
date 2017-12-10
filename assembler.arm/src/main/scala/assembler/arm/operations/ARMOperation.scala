@@ -2,7 +2,7 @@ package assembler.arm.operations
 
 import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
-import assembler.{Resource, Encodable}
+import assembler.resource.Encodable
 
 trait NamedOperation {
   val opcode: String

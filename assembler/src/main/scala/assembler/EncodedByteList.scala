@@ -1,6 +1,7 @@
 package assembler
 
 import assembler.ListExtensions._
+import assembler.resource.Encodable
 
 trait EncodedByteList extends Encodable {
   val bytes: Seq[Byte]

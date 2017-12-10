@@ -9,6 +9,7 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
 import assembler._
 import assembler.output.raw.Raw
+import assembler.resource.Resource
 import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {

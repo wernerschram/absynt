@@ -5,7 +5,8 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations.{BranchImmediate, BranchRegister, ReferencingARMOperation}
-import assembler.{Encodable, Label, RelativeOffsetDirection}
+import assembler.resource.Encodable
+import assembler.{Label, RelativeOffsetDirection}
 
 class Branch(code: Byte, val opcode: String) {
   def apply(destination: RelativeA32Pointer, condition: Condition = Always)

@@ -1,6 +1,6 @@
 package assembler
 
-import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.resource.{AbsoluteReference, Encodable, RelativeReference}
 
 case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeOffsetDirection, override val label: Label) extends Encodable {
   override def encodeByte: Seq[Byte] =

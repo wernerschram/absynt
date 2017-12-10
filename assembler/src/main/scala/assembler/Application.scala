@@ -1,6 +1,6 @@
 package assembler
 
-import assembler.reference.{AbsoluteReference, RelativeReference}
+import assembler.resource._
 import assembler.sections.{LastIteration, Section}
 
 abstract class Application protected (

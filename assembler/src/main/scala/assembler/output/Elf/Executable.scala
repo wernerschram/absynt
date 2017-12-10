@@ -1,6 +1,7 @@
 package assembler.output.Elf
 
 import assembler._
+import assembler.resource.{AlignmentFiller, Encodable}
 import assembler.sections.Section
 
 abstract class Elf(

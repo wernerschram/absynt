@@ -2,6 +2,7 @@ package assembler
 
 import assembler.output.Elf.ElfAlignmentFiller
 import assembler.output.raw.Raw
+import assembler.resource._
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 

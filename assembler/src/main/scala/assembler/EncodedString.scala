@@ -1,5 +1,7 @@
 package assembler
 
+import assembler.resource.Encodable
+
 class EncodedString private(val string: String)(override val label: Label) extends Encodable {
   def encodeByte: List[Byte] = string.getBytes.toList
 

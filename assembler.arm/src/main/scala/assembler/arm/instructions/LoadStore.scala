@@ -6,7 +6,8 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.LoadStoreOperation.LoadStoreOperation
 import assembler.arm.operations._
-import assembler.{Encodable, Label, RelativeOffsetDirection}
+import assembler.resource.Encodable
+import assembler.{Label, RelativeOffsetDirection}
 
 class LoadStoreRegister(
     wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {

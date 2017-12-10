@@ -6,6 +6,7 @@ import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands._
 import assembler.output.raw.Raw
+import assembler.resource.{Encodable, Resource}
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 

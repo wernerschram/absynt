@@ -5,12 +5,13 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.raw.Raw
+import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.RealX86Offset
-import assembler.{Label, Resource, UniqueLabel}
+import assembler.{Label, UniqueLabel}
 
 object Boot extends App {
   createFile()

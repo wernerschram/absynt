@@ -2,7 +2,7 @@ package assembler.sections
 
 import assembler._
 import assembler.output.raw.Raw
-import assembler.reference.RelativeReference
+import assembler.resource.{RelativeReference, Resource}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 

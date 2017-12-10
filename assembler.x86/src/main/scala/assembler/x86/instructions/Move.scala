@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.reference.AbsoluteReference
+import assembler.resource.{AbsoluteReference, Encodable}
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}

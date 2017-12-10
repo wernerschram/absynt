@@ -1,6 +1,7 @@
 package assembler.x86.operations
 
 import assembler._
+import assembler.resource.{Encodable, Resource}
 import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 import assembler.x86.{ProcessorMode, X86OffsetFactory}
 

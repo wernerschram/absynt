@@ -5,7 +5,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations._
-import assembler.reference.AbsoluteReference
+import assembler.resource.{AbsoluteReference, Encodable}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always)

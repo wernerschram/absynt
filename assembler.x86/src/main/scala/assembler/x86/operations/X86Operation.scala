@@ -2,7 +2,7 @@ package assembler.x86.operations
 
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
-import assembler.{Resource, Encodable}
+import assembler.resource.Encodable
 
 trait X86Operation extends Encodable {
   val includeRexW: Boolean = true
