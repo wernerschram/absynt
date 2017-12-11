@@ -25,6 +25,9 @@ abstract class Application protected (
   def sectionOffset(section: Section with LastIteration): Long =
     encodableSections.takeWhile(s => s != section).map(_.size).sum + startOffset
 
+  def sectionDependencies(section: Section): List[Resource] =
+    sections.takeWhile(_ != section).flatMap(_.content)
+
   def encodeByte: List[Byte]
 
   def encodablesForReferences(references: Seq[DependentResource]): Map[DependentResource, Encodable] = {

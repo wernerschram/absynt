@@ -1,5 +1,7 @@
 package assembler.output.Elf
 
+import assembler.EncodedByteList
+import assembler.resource.Resource
 import assembler.sections.{LastIteration, Section}
 
 class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag], elf: Elf) {
@@ -7,11 +9,36 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
 
   def physicalAddress: Long = segmentMemoryOffset
   def segmentFileOffset: Long = elf.sectionFileOffset(section)
+  def segmentFileReference = ElfSectionFileReference(section, elf)
+  def segmentMemoryReference = ElfSectionReference(section, elf)
   def segmentMemoryOffset: Long = elf.sectionOffset(section)
   def segmentFileSize: Long = section.size
   def segmentMemorySize: Long = segmentFileSize
 
   implicit def endianness: Endianness = elf.endianness
+
+  def resources: Seq[Resource] = elf.architecture.processorClass match {
+    case ProcessorClass._32Bit =>
+      EncodedByteList(elf.endianness.encode(`type`.id)) ::
+      ElfSectionFileReference(section, elf) ::
+      ElfSectionReference(section, elf) ::
+      ElfSectionReference(section, elf) ::
+      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentFileSize)) ::
+      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentMemorySize)) ::
+      EncodedByteList(elf.endianness.encode(flags.encode.toInt)) ::
+        EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
+      Nil
+    case ProcessorClass._64Bit =>
+      EncodedByteList(elf.endianness.encode(`type`.id)) ::
+      EncodedByteList(elf.endianness.encode(flags.encode.toInt)) ::
+      ElfSectionFileReference(section, elf) ::
+      ElfSectionReference(section, elf) ::
+      ElfSectionReference(section, elf) ::
+      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentFileSize)) ::
+      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentMemorySize)) ::
+      EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
+      Nil
+  }
 
   def encodeByte: List[Byte] = elf.architecture.processorClass match {
     case ProcessorClass._32Bit =>

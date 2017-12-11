@@ -160,6 +160,8 @@ case object ElfType {
 }
 
 case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
+  implicit def endianness: Endianness = elf.endianness
+  
   override def encodableForDistance(distance: Int): Encodable = EncodedByteList(elf.architecture.processorClass.numberBytes(distance))
 
   override def sizeForDistance(distance: Int): Int = elf.architecture.processorClass.numberSize
@@ -167,7 +169,9 @@ case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends Ab
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 }
 
-case class ElfFileReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+  implicit def endianness: Endianness = elf.endianness
+
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize))
 
@@ -178,4 +182,19 @@ case class ElfFileReference(target: Section, elf: Elf) extends DependentResource
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) =
     (context.sections.takeWhile(s => s != target).flatMap(s => s.content), OffsetDirection.Absolute)
+}
+
+case class ElfSectionReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+  implicit def endianness: Endianness = elf.endianness
+
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize + elf.startOffset))
+
+  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
+    elf.architecture.processorClass.numberSize
+
+  override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
+
+  override def dependencies(context: Application): (List[Resource], OffsetDirection) =
+    (context.sectionDependencies(target), OffsetDirection.Absolute)
 }
