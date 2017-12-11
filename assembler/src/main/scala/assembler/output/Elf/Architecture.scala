@@ -46,6 +46,7 @@ abstract sealed case class ProcessorClass private(id: Byte) {
   def headerSize: Short
   def programHeaderSize: Short
   def sectionHeaderSize: Short
+  def numberSize: Byte
 
   def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): List[Byte]
   def numberBytes(number: Long)(implicit  endianness: Endianness): List[Byte]
@@ -58,6 +59,7 @@ case object ProcessorClass {
     override val headerSize: Short = 0x34
     override val programHeaderSize: Short = 0x20
     override val sectionHeaderSize: Short = 0x28
+    override val numberSize: Byte = 4
 
     override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): List[Byte] = endianness.encode(flags.encode.toInt)
     override def numberBytes(number: Long)(implicit  endianness: Endianness): List[Byte] = endianness.encode(number.toInt)
@@ -69,6 +71,7 @@ case object ProcessorClass {
     override val headerSize: Short = 0x40
     override val programHeaderSize: Short = 0x38
     override val sectionHeaderSize: Short = 0x40
+    override val numberSize: Byte = 8
 
     override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): List[Byte] = endianness.encode(flags.encode)
     override def numberBytes(Number: Long)(implicit  endianness: Endianness): List[Byte] = endianness.encode(Number)

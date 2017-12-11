@@ -1,7 +1,7 @@
 package assembler.output.Elf
 
 import assembler._
-import assembler.resource.{AlignmentFiller, Encodable}
+import assembler.resource._
 import assembler.sections.Section
 
 abstract class Elf(
@@ -134,3 +134,23 @@ case object ElfType {
   object Core extends ElfType(0x04.toShort)
 }
 
+class ElfAbsoluteReference(target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
+  override def encodableForDistance(distance: Int): Encodable = EncodedByteList(elf.architecture.processorClass.numberBytes(distance))
+
+  override def sizeForDistance(distance: Int): Int = elf.architecture.processorClass.numberSize
+
+  override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
+}
+
+class ElfFileReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize))
+
+  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
+    elf.architecture.processorClass.numberSize
+
+  override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
+
+  override def dependencies(context: Application): (List[Resource], OffsetDirection) =
+    (context.sections.takeWhile(s => s != target).flatMap(s => s.content), OffsetDirection.Absolute)
+}
