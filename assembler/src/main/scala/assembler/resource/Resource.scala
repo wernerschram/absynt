@@ -20,7 +20,7 @@ abstract class Encodable(label: Label) extends Resource(label) {
   def size: Int
 }
 
-sealed abstract class DependentResource(label: Label) extends Resource(label) {
+abstract class DependentResource(label: Label) extends Resource(label) {
 
   def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
@@ -43,8 +43,6 @@ sealed abstract class DependentResource(label: Label) extends Resource(label) {
   }
 }
 
-sealed abstract class Reference(val target: Label, label: Label) extends DependentResource(label)
-
 abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
   def section: Section
 
@@ -64,7 +62,7 @@ abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
   }
 }
 
-abstract class RelativeReference(target: Label, label: Label) extends Reference(target, label) {
+abstract class RelativeReference(val target: Label, label: Label) extends DependentResource(label) {
 
   final def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable = {
     assume(offsetDirection.isInstanceOf[RelativeOffsetDirection])
@@ -81,7 +79,7 @@ abstract class RelativeReference(target: Label, label: Label) extends Reference(
   }
 }
 
-abstract class AbsoluteReference(target: Label, label: Label) extends Reference(target, label) {
+abstract class AbsoluteReference(val target: Label, label: Label) extends DependentResource(label) {
 
   def encodableForDistance(distance: Int): Encodable
 

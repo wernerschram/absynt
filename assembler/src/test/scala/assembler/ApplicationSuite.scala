@@ -15,7 +15,7 @@ class ApplicationSuite extends WordSpec with Matchers {
     def filler(count: Int): EncodedByteList =
       EncodedByteList(Seq.fill(count)(0x00.toByte))
 
-    def encodables[T <: Encodable : ClassTag](content: List[Resource], references: Seq[Reference]): Map[DependentResource, T] = {
+    def encodables[T <: Encodable : ClassTag](content: List[Resource], references: Seq[DependentResource]): Map[DependentResource, T] = {
       val application = Raw(Section(SectionType.Text, "Text", content), 0)
 
       val result = application.encodablesForReferences(references)
@@ -26,7 +26,7 @@ class ApplicationSuite extends WordSpec with Matchers {
     "asked to return encodables for relative references with a linear sizeForDistance function" should {
 
 
-      def myEncodables(content: List[Resource], references: Seq[Reference]) =
+      def myEncodables(content: List[Resource], references: Seq[DependentResource]) =
         encodables[LinearRelativeTestEncodable](content, references)
 
       "calculate the correct distance and size for a forward relative reference with a nearby target" in {
@@ -154,7 +154,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
     "asked to return encodables for relative references with a non-linear sizeForDistance function" should {
 
-     def myEncodables(content: List[Resource], references: Seq[Reference]) =
+     def myEncodables(content: List[Resource], references: Seq[DependentResource]) =
         encodables[NonLinearRelativeTestEncodable](content, references)
 
       "represent two references with a farther target which both depend on each other for their size where there is an obvious single resolution" in {
