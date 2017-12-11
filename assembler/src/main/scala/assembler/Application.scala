@@ -27,24 +27,6 @@ abstract class Application protected (
 
   def encodeByte: List[Byte]
 
-  private def applicationContextProperties(from: DependentResource): (Seq[DependentResource], Int, OffsetDirection) = {
-    val (resources, offsetType) = from.dependencies(this)
-
-    val (totalDependent, totalIndependent) = resources
-      .foldLeft((Seq.empty[DependentResource], 0))
-      {
-        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
-        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
-      }
-
-    from match {
-      case _: AlignmentFiller if resources.isEmpty =>
-        (totalDependent, totalIndependent + startOffset, offsetType)
-      case _ =>
-        (totalDependent, totalIndependent, offsetType)
-    }
-  }
-
   def encodablesForReferences(references: Seq[DependentResource]): Map[DependentResource, Encodable] = {
     val (totalDependencySizes: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]]) =
       references.foldLeft((Map.empty[DependentResource, DependencySize], Map.empty[DependentResource, Set[Int]])) {
@@ -109,7 +91,7 @@ abstract class Application protected (
       // this reference has been evaluated in an earlier call (in a prior branch)
       (Map.empty, Map.empty)
     else {
-      val (references, independentSizes, offsetDirection) = applicationContextProperties(current)
+      val (references, independentSizes, offsetDirection) = current.applicationContextProperties(this)
 
       val (totalDependencySizes, fixedSize, childSizeFunctions, totalRestrictions) =
         references.foldLeft((visited, independentSizes, Seq.empty[Map[DependentResource, Int] => Int], Map.empty[DependentResource, Set[Int]])) {

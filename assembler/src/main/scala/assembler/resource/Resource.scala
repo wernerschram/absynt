@@ -29,6 +29,18 @@ sealed abstract class DependentResource(label: Label) extends Resource(label) {
   def possibleSizes: Set[Int]
 
   def dependencies(context: Application): (List[Resource], OffsetDirection)
+
+  def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
+    val (resources, offsetType) = dependencies(context)
+
+    val (totalDependent, totalIndependent) = resources
+      .foldLeft((Seq.empty[DependentResource], 0)) {
+        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
+        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
+      }
+
+    (totalDependent, totalIndependent, offsetType)
+  }
 }
 
 sealed abstract class Reference(val target: Label, label: Label) extends DependentResource(label)
@@ -38,6 +50,18 @@ abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
 
   def dependencies(context: Application): (List[Resource], OffsetDirection) =
     (context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
+
+  override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
+    val (resources, offsetType) = dependencies(context)
+
+    val (totalDependent, totalIndependent) = resources
+      .foldLeft((Seq.empty[DependentResource], 0)) {
+        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
+        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
+      }
+
+    (totalDependent, totalIndependent + context.startOffset, offsetType)
+  }
 }
 
 abstract class RelativeReference(target: Label, label: Label) extends Reference(target, label) {
