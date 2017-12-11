@@ -60,6 +60,31 @@ abstract class Elf(
     case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
   }
 
+  def entryReference: ElfAbsoluteReference = ElfAbsoluteReference(entryLabel, this)
+
+  def resources: Seq[Resource] =
+    EncodedByteList(
+      magic :::
+      architecture.processorClass.id ::
+      endianness.id ::
+      version.id ::
+      architecture.ABI.encodeBytes :::
+      endianness.encode(elfType.id) :::
+      endianness.encode(architecture.processor.id) :::
+      endianness.encode(version.extended)) ::
+    entryReference ::
+    EncodedByteList(
+      architecture.processorClass.numberBytes(programHeaderOffset) :::
+      architecture.processorClass.numberBytes(sectionHeaderOffset) :::
+      endianness.encode(architecture.processor.flags) :::
+      endianness.encode(architecture.processorClass.headerSize) :::
+      endianness.encode(architecture.processorClass.programHeaderSize) :::
+      endianness.encode(programHeaders.size.toShort) :::
+      endianness.encode(architecture.processorClass.sectionHeaderSize) :::
+      endianness.encode(sectionHeaders.size.toShort) :::
+      endianness.encode(stringSectionHeaderIndex.toShort))::
+    Nil
+
   override def encodeByte: List[Byte] =
     magic :::
     architecture.processorClass.id ::
@@ -134,7 +159,7 @@ case object ElfType {
   object Core extends ElfType(0x04.toShort)
 }
 
-class ElfAbsoluteReference(target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
+case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
   override def encodableForDistance(distance: Int): Encodable = EncodedByteList(elf.architecture.processorClass.numberBytes(distance))
 
   override def sizeForDistance(distance: Int): Int = elf.architecture.processorClass.numberSize
@@ -142,7 +167,7 @@ class ElfAbsoluteReference(target: Label, elf: Elf) extends AbsoluteReference(ta
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 }
 
-class ElfFileReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+case class ElfFileReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize))
 
