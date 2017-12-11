@@ -1,5 +1,7 @@
 package assembler.output.Elf
 
+import assembler.EncodedByteList
+import assembler.resource.Resource
 import assembler.sections.{LastIteration, Section}
 
 abstract class SectionHeader(elf: Elf) {
@@ -10,7 +12,8 @@ abstract class SectionHeader(elf: Elf) {
   def sectionAddress: Option[Long]
   private def sectionAddressBytes = elf.architecture.processorClass.numberBytes(sectionAddress.getOrElse(0l))
   def sectionFileOffset: Long
-  def segmentFileSize: Long
+  def sectionFileReference: Resource
+  def sectionFileSize: Long
   def link: Int
   def info: Int
 
@@ -19,13 +22,28 @@ abstract class SectionHeader(elf: Elf) {
 
   implicit def endianness: Endianness = elf.endianness
 
+  def resources: Seq[Resource] =
+    EncodedByteList(
+      elf.endianness.encode(nameReference) :::
+      elf.endianness.encode(`type`.id) :::
+      elf.architecture.processorClass.flagBytes(flags) :::
+      sectionAddressBytes) ::
+    sectionFileReference ::
+    EncodedByteList(
+      elf.architecture.processorClass.numberBytes(sectionFileSize) :::
+      elf.endianness.encode(link) :::
+      elf.endianness.encode(info) :::
+      elf.architecture.processorClass.numberBytes(alignBytes) :::
+      elf.architecture.processorClass.numberBytes(entrySize)) ::
+    Nil
+
   def encodeByte: List[Byte] = {
     elf.endianness.encode(nameReference) :::
     elf.endianness.encode(`type`.id) :::
     elf.architecture.processorClass.flagBytes(flags) :::
     sectionAddressBytes :::
     elf.architecture.processorClass.numberBytes(sectionFileOffset) :::
-    elf.architecture.processorClass.numberBytes(segmentFileSize) :::
+    elf.architecture.processorClass.numberBytes(sectionFileSize) :::
     elf.endianness.encode(link) :::
     elf.endianness.encode(info) :::
     elf.architecture.processorClass.numberBytes(alignBytes) :::
@@ -48,13 +66,15 @@ class SectionSectionHeader(section: Section
   val sectionAddress: Option[Long] = Some(elf.sectionOffset(section))
   val sectionFileOffset: Long = elf.sectionFileOffset(section) + section.finalContent.head.size
 
-  val segmentFileSize: Long = section.size
+  val sectionFileSize: Long = section.size
   val link: Int = 0
   val info: Int = 0
 
   val alignBytes: Int = section.alignment
 
   val entrySize: Int = 0x0
+
+  override def sectionFileReference: Resource = ElfSectionFileReference(section, elf)
 }
 
 class NullSectionHeader(elf: Elf)
@@ -64,13 +84,15 @@ class NullSectionHeader(elf: Elf)
   val flags: Flags[SectionFlag] = Flags.None
   val sectionAddress: Option[Long] = None
   val sectionFileOffset: Long = 0
-  val segmentFileSize: Long = 0
+  val sectionFileSize: Long = 0
   val link: Int = 0
   val info: Int = 0
 
   val alignBytes: Int = 0
   val entrySize: Int = 0
   override def encodeByte: List[Byte] = List.fill(elf.architecture.processorClass.sectionHeaderSize)(0.toByte)
+
+  override def sectionFileReference: Resource = EncodedByteList(Seq.fill(8)(0.toByte))
 }
 
 object NullSectionHeader {
@@ -86,13 +108,15 @@ class StringSectionHeader(elf: Elf)
   val flags: Flags[SectionFlag] = Flags.None
   val sectionAddress: Option[Long] = None
   val sectionFileOffset: Long = elf.stringTableOffset
-  val segmentFileSize: Long = elf.stringTableSize
+  val sectionFileSize: Long = elf.stringTableSize
   val link: Int = 0
   val info: Int = 0
 
   val alignBytes: Int = 0x01
 
   val entrySize: Int = 0x01
+
+  override def sectionFileReference: Resource = ???
 }
 
 object StringSectionHeader {

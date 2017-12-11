@@ -161,7 +161,7 @@ case object ElfType {
 
 case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
   implicit def endianness: Endianness = elf.endianness
-  
+
   override def encodableForDistance(distance: Int): Encodable = EncodedByteList(elf.architecture.processorClass.numberBytes(distance))
 
   override def sizeForDistance(distance: Int): Int = elf.architecture.processorClass.numberSize

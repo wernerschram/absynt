@@ -26,7 +26,7 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
       EncodedByteList(elf.architecture.processorClass.numberBytes(segmentFileSize)) ::
       EncodedByteList(elf.architecture.processorClass.numberBytes(segmentMemorySize)) ::
       EncodedByteList(elf.endianness.encode(flags.encode.toInt)) ::
-        EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
+      EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
       Nil
     case ProcessorClass._64Bit =>
       EncodedByteList(elf.endianness.encode(`type`.id)) ::
