@@ -27,23 +27,8 @@ abstract class Application protected (
 
   def encodeByte: List[Byte]
 
-  def intermediateResources(from: DependentResource): (List[Resource], OffsetDirection) = from match {
-    case relative: RelativeReference =>
-      val section = sections.filter(s => s.contains(from)).head
-      (section.intermediateResources(relative), section.offsetDirection(relative))
-    case absolute: AbsoluteReference =>
-      val containingSection: Section = sections.filter(s => s.contains(absolute.target)).head
-      (
-      sections.takeWhile(s => !s.contains(absolute.target)).flatMap(s => alignmentFillers(s) :: s.content) ++
-        (alignmentFillers(containingSection) +: containingSection.precedingResources(absolute.target))
-         ,OffsetDirection.Absolute
-      )
-    case alignment: AlignmentFiller =>
-      (sections.takeWhile(s => s != alignment.section).flatMap(s => alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
-  }
-
   private def applicationContextProperties(from: DependentResource): (Seq[DependentResource], Int, OffsetDirection) = {
-    val (resources, offsetType) = intermediateResources(from)
+    val (resources, offsetType) = from.dependencies(this)
 
     val (totalDependent, totalIndependent) = resources
       .foldLeft((Seq.empty[DependentResource], 0))
@@ -52,8 +37,8 @@ abstract class Application protected (
         case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
       }
 
-    offsetType match {
-      case OffsetDirection.Absolute =>
+    from match {
+      case _: AlignmentFiller if resources.isEmpty =>
         (totalDependent, totalIndependent + startOffset, offsetType)
       case _ =>
         (totalDependent, totalIndependent, offsetType)
@@ -135,7 +120,7 @@ abstract class Application protected (
       if (childSizeFunctions.isEmpty)
         (totalDependencySizes + (current -> KnownDependencySize(fixedSize, offsetDirection)), restrictions ++ totalRestrictions)
       else {
-        val dependencySize = (assumptions: Map[DependentResource, Int]) => independentSizes + childSizeFunctions.map(_(assumptions)).sum
+        val dependencySize = (assumptions: Map[DependentResource, Int]) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
         if (totalRestrictions.contains(current)) {
           val combinations = possibleSizeCombinations(totalRestrictions)
           val sizes: Set[Int] = combinations.map(c => current.sizeForDependencySize(dependencySize(c), offsetDirection))

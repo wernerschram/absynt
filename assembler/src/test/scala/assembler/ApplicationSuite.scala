@@ -261,28 +261,28 @@ class ApplicationSuite extends WordSpec with Matchers {
         val filler2 = application.alignmentFillers(second)
 
         "return the intermediate resources for a relative reference in the first section" in {
-          application.intermediateResources(relative1) shouldBe (Seq(absolute1, dummy1in1, targetAbsolute2), OffsetDirection.Forward)
+          relative1.dependencies(application) shouldBe (Seq(absolute1, dummy1in1, targetAbsolute2), OffsetDirection.Forward)
         }
 
         "return the intermediate resources for a relative reference in the second section" in {
-          application.intermediateResources(relative2) shouldBe (Seq(targetRelative2, dummy2in2), OffsetDirection.Backward)
+          relative2.dependencies(application) shouldBe (Seq(targetRelative2, dummy2in2), OffsetDirection.Backward)
         }
 
         "return the intermediate resources for an absolute reference in the first section" in {
-          application.intermediateResources(absolute1) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
+          absolute1.dependencies(application) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
             targetAbsolute2, targetRelative1, dummy2in1, filler2, absolute2, dummy1in2, targetRelative2, dummy2in2, relative2), OffsetDirection.Absolute)
         }
 
         "return the intermediate resources for an absolute reference in the second section" in {
-          application.intermediateResources(absolute2) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1), OffsetDirection.Absolute)
+          absolute2.dependencies(application) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1), OffsetDirection.Absolute)
         }
 
         "return the intermediate resources for the filler in the first section" in {
-          application.intermediateResources(filler1) shouldBe(Seq.empty, OffsetDirection.Absolute)
+          filler1.dependencies(application) shouldBe(Seq.empty, OffsetDirection.Absolute)
         }
 
         "return the intermediate resources for the filler in the second section" in {
-          application.intermediateResources(filler2) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
+          filler2.dependencies(application) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
             targetAbsolute2, targetRelative1, dummy2in1), OffsetDirection.Absolute)
         }
       }

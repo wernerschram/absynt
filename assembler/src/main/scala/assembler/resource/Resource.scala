@@ -27,12 +27,17 @@ sealed abstract class DependentResource(label: Label) extends Resource(label) {
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 
   def possibleSizes: Set[Int]
+
+  def dependencies(context: Application): (List[Resource], OffsetDirection)
 }
 
 sealed abstract class Reference(val target: Label, label: Label) extends DependentResource(label)
 
 abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
   def section: Section
+
+  def dependencies(context: Application): (List[Resource], OffsetDirection) =
+    (context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
 }
 
 abstract class RelativeReference(target: Label, label: Label) extends Reference(target, label) {
@@ -45,6 +50,11 @@ abstract class RelativeReference(target: Label, label: Label) extends Reference(
   def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable
 
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
+
+  override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
+    val section = context.sections.filter(s => s.contains(this)).head
+      (section.intermediateResources(this), section.offsetDirection(this))
+  }
 }
 
 abstract class AbsoluteReference(target: Label, label: Label) extends Reference(target, label) {
@@ -61,6 +71,15 @@ abstract class AbsoluteReference(target: Label, label: Label) extends Reference(
   final override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
     assume(offsetDirection == OffsetDirection.Absolute)
     sizeForDistance(dependencySize)
+  }
+
+  override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
+    val containingSection: Section = context.sections.filter(s => s.contains(target)).head
+    (
+    context.sections.takeWhile(s => !s.contains(target)).flatMap(s => context.alignmentFillers(s) :: s.content) ++
+      (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
+       ,OffsetDirection.Absolute
+    )
   }
 }
 
