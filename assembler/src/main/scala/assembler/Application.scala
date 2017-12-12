@@ -12,11 +12,19 @@ abstract class Application protected (
 
   lazy val encodableSections: List[Section with LastIteration] = {
     val dependentMap: Map[DependentResource, Encodable] = encodablesForReferences(sections.flatMap(s => s.content.collect{case r: DependentResource => r}))
-    sections.map(s => Section.lastIteration(s.sectionType, s.name, s.content.map {
+    sections.map(s => encodableSection(s, dependentMap))
+  }
+
+  protected def encodableResources(resources: Seq[Resource], dependentMap: Map[DependentResource, Encodable]): Seq[Encodable] = resources.map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
-    }))
-  }
+    }
+
+  protected def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
+    Section.lastIteration(section.sectionType, section.name, section.content.map {
+      case reference: DependentResource => dependentMap(reference)
+      case encodable: Encodable => encodable
+    })
 
   def getAbsoluteOffset(label: Label): Long =
     encodableSections.filter(s => s.contains(label))

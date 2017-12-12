@@ -85,30 +85,20 @@ abstract class Elf(
       endianness.encode(stringSectionHeaderIndex.toShort))::
     Nil
 
-  override def encodeByte: List[Byte] =
-    magic :::
-    architecture.processorClass.id ::
-    endianness.id ::
-    version.id ::
-    architecture.ABI.encodeBytes :::
-    endianness.encode(elfType.id) :::
-    endianness.encode(architecture.processor.id) :::
-    endianness.encode(version.extended) :::
-    architecture.processorClass.numberBytes(getAbsoluteOffset(entryLabel)) :::
-    architecture.processorClass.numberBytes(programHeaderOffset) :::
-    architecture.processorClass.numberBytes(sectionHeaderOffset) :::
-    endianness.encode(architecture.processor.flags) :::
-    endianness.encode(architecture.processorClass.headerSize) :::
-    endianness.encode(architecture.processorClass.programHeaderSize) :::
-    endianness.encode(programHeaders.size.toShort) :::
-    endianness.encode(architecture.processorClass.sectionHeaderSize) :::
-    endianness.encode(sectionHeaders.size.toShort) :::
-    endianness.encode(stringSectionHeaderIndex.toShort) :::
-    programHeaders.flatMap(p => p.encodeByte) :::
-    encodableSections.flatMap(_.encodeByte) :::
-    stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
-    sectionHeaders.flatMap(s => s.encodeByte)
+  override def encodeByte: List[Byte] = {
+    val dependentMap: Map[DependentResource, Encodable] =
+      encodablesForReferences(
+        resources.collect{case r: DependentResource => r}.toList :::
+        programHeaders.flatMap(p => p.resources.collect{case r: DependentResource => r}) :::
+        sections.flatMap(s => s.content.collect{case r: DependentResource => r}))
 
+
+    encodableResources(resources, dependentMap).flatMap(_.encodeByte).toList :::
+      programHeaders.flatMap(p => encodableResources(p.resources, dependentMap)).flatMap(_.encodeByte) :::
+      sections.flatMap(s => encodableSection(s, dependentMap).encodeByte) :::
+      stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
+      sectionHeaders.flatMap(s => s.encodeByte)
+  }
 
   override val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
 }
