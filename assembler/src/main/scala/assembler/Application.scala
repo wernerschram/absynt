@@ -3,8 +3,9 @@ package assembler
 import assembler.resource._
 import assembler.sections.{LastIteration, Section}
 
-abstract class Application protected (
-  val sections: List[Section]) {
+abstract class Application {
+
+  def sections: List[Section]
 
   def alignmentFillers: Map[Section, AlignmentFiller]
 

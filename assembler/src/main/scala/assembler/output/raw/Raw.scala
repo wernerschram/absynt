@@ -5,7 +5,9 @@ import assembler.resource._
 import assembler.sections.{LastIteration, Section}
 
 class Raw(section: Section, override val startOffset: Int)
-  extends Application(section :: Nil) {
+  extends Application {
+
+  override val sections: List[Section] = section :: Nil
 
   override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> new AlignmentFiller(Label.noLabel) {
 

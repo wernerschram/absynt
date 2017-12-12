@@ -6,9 +6,11 @@ import assembler.sections.Section
 
 abstract class Elf(
   val architecture: Architecture,
-  sections: List[Section],
+  val applicationSections: List[Section],
   val entryLabel: Label)
-  extends Application(sections) {
+  extends Application {
+
+  def sections: List[Section] = applicationSections ::: stringSection :: Nil
 
   val magic: List[Byte] = 0x7F.toByte :: "ELF".toCharArray.map(_.toByte).toList
 
@@ -96,11 +98,13 @@ abstract class Elf(
     encodableResources(resources, dependentMap).flatMap(_.encodeByte).toList :::
       programHeaders.flatMap(p => encodableResources(p.resources, dependentMap)).flatMap(_.encodeByte) :::
       sections.flatMap(s => encodableSection(s, dependentMap).encodeByte) :::
-      stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil) :::
       sectionHeaders.flatMap(s => s.encodeByte)
   }
 
   override val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
+
+  def stringSection = Section(assembler.sections.SectionType.Data, ".shstrtab",
+    EncodedByteList(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil)
 }
 
 case class ElfAlignmentFiller(section: Section) extends AlignmentFiller(Label.noLabel) {
