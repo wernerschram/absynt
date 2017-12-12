@@ -23,9 +23,9 @@ abstract class Elf(
   val fileAlignment: Int = 0x1000
 
   val stringMap: Map[String, Int] =
-    stringOffset(("" :: sections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
+    stringOffset(("" :: applicationSections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
 
-  val programHeaders: List[ProgramHeader] =
+  def programHeaders: List[ProgramHeader] =
     encodableSections.map(s => ProgramHeader(s, this))
 
   def sectionHeaders: List[SectionHeader] =
@@ -33,7 +33,7 @@ abstract class Elf(
     encodableSections.map(s => new SectionSectionHeader(s, this)) :::
     new StringSectionHeader(this) :: Nil
 
-  val stringSectionHeaderIndex: Int = sectionHeaders.size - 1 // last section
+  val stringSectionHeaderIndex: Int = applicationSections.size + 1
 
   val stringTableSize: Int = stringMap.keys.toList.map(k => k.length + 1).sum // + 1 because they are null terminated
 
@@ -41,15 +41,15 @@ abstract class Elf(
     architecture.processorClass.headerSize
 
   private val dataOffset: Long =
-    programHeaderOffset + programHeaders.size * architecture.processorClass.programHeaderSize
+    programHeaderOffset + applicationSections.size * architecture.processorClass.programHeaderSize
 
   def sectionFileOffset(section: Section): Long =
     encodableSections.takeWhile(s => s!=section).map(_.size).sum + dataOffset
 
-  val stringTableOffset: Long =
+  def stringTableOffset: Long =
     sectionFileOffset(encodableSections.last) + encodableSections.last.size
 
-  val sectionHeaderOffset: Long =
+  def sectionHeaderOffset: Long =
     stringTableOffset + stringTableSize
 
   def stringOffset(strings: List[String]): List[(String, Int)] =
