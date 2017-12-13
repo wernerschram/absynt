@@ -2,18 +2,13 @@ package assembler.output.Elf
 
 import assembler.EncodedByteList
 import assembler.resource.Resource
-import assembler.sections.{LastIteration, Section}
+import assembler.sections.Section
 
-class ProgramHeader(section: Section with LastIteration, val flags: Flags[ProgramFlag], elf: Elf) {
+class ProgramHeader(section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
 
-  def physicalAddress: Long = segmentMemoryOffset
-  def segmentFileOffset: Long = elf.sectionFileOffset(section)
-  def segmentFileReference = ElfSectionFileReference(section, elf)
-  def segmentMemoryReference = ElfSectionReference(section, elf)
-  def segmentMemoryOffset: Long = elf.sectionOffset(section)
-  def segmentFileSize: Long = section.size
-  def segmentMemorySize: Long = segmentFileSize
+//  def segmentFileSize: Long = 0//encodableSection.size
+//  def segmentMemorySize: Long = segmentFileSize
 
   implicit def endianness: Endianness = elf.endianness
 
@@ -23,8 +18,8 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
       ElfSectionFileReference(section, elf) ::
       ElfSectionReference(section, elf) ::
       ElfSectionReference(section, elf) ::
-      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentFileSize)) ::
-      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentMemorySize)) ::
+      ElfSectionSize(section, elf) ::
+      ElfSectionSize(section, elf) ::
       EncodedByteList(elf.endianness.encode(flags.encode.toInt)) ::
       EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
       Nil
@@ -34,42 +29,23 @@ class ProgramHeader(section: Section with LastIteration, val flags: Flags[Progra
       ElfSectionFileReference(section, elf) ::
       ElfSectionReference(section, elf) ::
       ElfSectionReference(section, elf) ::
-      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentFileSize)) ::
-      EncodedByteList(elf.architecture.processorClass.numberBytes(segmentMemorySize)) ::
+      ElfSectionSize(section, elf) ::
+      ElfSectionSize(section, elf) ::
       EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
       Nil
   }
 
-  def encodeByte: List[Byte] = elf.architecture.processorClass match {
-    case ProcessorClass._32Bit =>
-      elf.endianness.encode(`type`.id) :::
-      elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
-      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
-      elf.architecture.processorClass.numberBytes(physicalAddress) :::
-      elf.architecture.processorClass.numberBytes(segmentFileSize) :::
-      elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
-      elf.endianness.encode(flags.encode.toInt) :::
-      elf.architecture.processorClass.numberBytes(elf.fileAlignment)
-    case ProcessorClass._64Bit =>
-      elf.endianness.encode(`type`.id) :::
-      elf.endianness.encode(flags.encode.toInt) :::
-      elf.architecture.processorClass.numberBytes(segmentFileOffset) :::
-      elf.architecture.processorClass.numberBytes(segmentMemoryOffset) :::
-      elf.architecture.processorClass.numberBytes(physicalAddress) :::
-      elf.architecture.processorClass.numberBytes(segmentFileSize) :::
-      elf.architecture.processorClass.numberBytes(segmentMemorySize) :::
-      elf.architecture.processorClass.numberBytes(elf.fileAlignment)
-  }
+
 }
 
 object ProgramHeader {
-  def apply(section: Section with LastIteration,
-                                elf: Elf): ProgramHeader = section.sectionType match {
-    case assembler.sections.SectionType.Text =>
-      new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)
-    case assembler.sections.SectionType.Data =>
-      new ProgramHeader(section, ProgramFlag.Read | ProgramFlag.Write, elf)
-  }
+  def apply(section: Section, elf: Elf): ProgramHeader =
+    section.sectionType match {
+      case assembler.sections.SectionType.Text =>
+        new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)
+      case assembler.sections.SectionType.Data =>
+        new ProgramHeader(section, ProgramFlag.Read | ProgramFlag.Write, elf)
+    }
 }
 
 abstract case class ProgramType private(id: Int)
