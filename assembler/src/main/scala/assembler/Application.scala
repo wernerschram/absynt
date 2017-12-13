@@ -12,7 +12,10 @@ abstract class Application {
   def startOffset: Int
 
   lazy val encodableSections: List[Section with LastIteration] = {
-    val dependentMap: Map[DependentResource, Encodable] = encodablesForReferences(sections.flatMap(s => s.content.collect{case r: DependentResource => r}))
+    val dependentMap: Map[DependentResource, Encodable] = encodablesForReferences(
+      alignmentFillers.values.toList :::
+      sections.flatMap(s => s.content.collect{case r: DependentResource => r})
+    )
     sections.map(s => encodableSection(s, dependentMap))
   }
 
@@ -22,7 +25,7 @@ abstract class Application {
     }
 
   protected def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
-    Section.lastIteration(section.sectionType, section.name, section.content.map {
+    Section.lastIteration(section.sectionType, section.name, (alignmentFillers(section) :: section.content).map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
     })
@@ -115,11 +118,12 @@ abstract class Application {
         (totalDependencySizes + (current -> KnownDependencySize(fixedSize, offsetDirection)), restrictions ++ totalRestrictions)
       else {
         val dependencySize = (assumptions: Map[DependentResource, Int]) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
-        if (totalRestrictions.contains(current)) {
-          val combinations = possibleSizeCombinations(totalRestrictions)
-          val sizes: Set[Int] = combinations.map(c => current.sizeForDependencySize(dependencySize(c), offsetDirection))
-          (totalDependencySizes + (current -> UnknownDependencySize(dependencySize, offsetDirection)), restrictions ++ totalRestrictions.updated(current, sizes))
-        } else
+        // TODO: Deactivated optimization. investigation needed.
+//        if (totalRestrictions.contains(current)) {
+//          val combinations = possibleSizeCombinations(totalRestrictions)
+//          val sizes: Set[Int] = combinations.map(c => current.sizeForDependencySize(dependencySize(c), offsetDirection))
+//          (totalDependencySizes + (current -> UnknownDependencySize(dependencySize, offsetDirection)), restrictions ++ totalRestrictions.updated(current, sizes))
+//        } else
           (totalDependencySizes + (current -> UnknownDependencySize(dependencySize, offsetDirection)), restrictions ++ totalRestrictions)
       }
     }

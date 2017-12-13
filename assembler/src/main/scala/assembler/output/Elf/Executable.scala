@@ -26,7 +26,7 @@ abstract class Elf(
     stringOffset(("" :: applicationSections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
 
   def programHeaders: List[ProgramHeader] =
-    sections.map(s => ProgramHeader(s, this))
+    sections.init.map(s => ProgramHeader(s, this))
 
   def sectionHeaders: List[SectionHeader] =
     NullSectionHeader(this) ::
@@ -92,6 +92,7 @@ abstract class Elf(
 
     val dependentMap: Map[DependentResource, Encodable] =
       encodablesForReferences(
+        alignmentFillers.values.toList :::
         resources.collect{case r: DependentResource => r}.toList :::
         programHeaders.flatMap(p => p.resources.collect{case r: DependentResource => r}) :::
         sections.flatMap(s => s.content.collect{case r: DependentResource => r}) :::
@@ -213,8 +214,12 @@ case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(L
 
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
-  override def dependencies(context: Application): (List[Resource], OffsetDirection) =
-    (elf.alignmentFillers(target) :: target.content, OffsetDirection.Absolute)
+  override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
+    if (elf.sections.head == target)
+      (elf.resources.toList ::: elf.programHeaders.flatMap(_.resources) ::: elf.alignmentFillers(target) :: target.content, OffsetDirection.Absolute)
+    else
+      (elf.alignmentFillers(target) :: target.content, OffsetDirection.Absolute)
+  }
 
   override def toString: String = s"Size of section: ${target.name}"
 }
@@ -231,7 +236,7 @@ case class ElfSectionHeaderReference(elf: Elf) extends DependentResource(Label.n
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) =
-    (elf.resources.toList ::: elf.programHeaders.flatMap(_.resources) ::: context.sections.flatMap(_.content), OffsetDirection.Absolute)
+    (elf.resources.toList ::: elf.programHeaders.flatMap(_.resources) ::: context.sections.flatMap(s => elf.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
 
   override def toString: String = s"Section header reference"
 }

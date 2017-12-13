@@ -34,16 +34,6 @@ abstract class SectionHeader(elf: Elf) {
       elf.architecture.processorClass.numberBytes(alignBytes) :::
       elf.architecture.processorClass.numberBytes(entrySize)) ::
     Nil
-
-  def encodeByte: List[Byte] = {
-    elf.endianness.encode(nameReference) :::
-    elf.endianness.encode(`type`.id) :::
-    elf.architecture.processorClass.flagBytes(flags) :::
-    elf.endianness.encode(link) :::
-    elf.endianness.encode(info) :::
-    elf.architecture.processorClass.numberBytes(alignBytes) :::
-    elf.architecture.processorClass.numberBytes(entrySize)
-  }
 }
 
 class SectionSectionHeader(section: Section, elf: Elf) extends SectionHeader(elf) {
@@ -81,7 +71,6 @@ class NullSectionHeader(elf: Elf)
 
   val alignBytes: Int = 0
   val entrySize: Int = 0
-  override def encodeByte: List[Byte] = List.fill(elf.architecture.processorClass.sectionHeaderSize)(0.toByte)
 
   override def sectionFileSize: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))
   override def sectionFileReference: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))

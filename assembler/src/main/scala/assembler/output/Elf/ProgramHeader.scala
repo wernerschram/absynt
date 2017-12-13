@@ -7,9 +7,6 @@ import assembler.sections.Section
 class ProgramHeader(section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
 
-//  def segmentFileSize: Long = 0//encodableSection.size
-//  def segmentMemorySize: Long = segmentFileSize
-
   implicit def endianness: Endianness = elf.endianness
 
   def resources: Seq[Resource] = elf.architecture.processorClass match {
@@ -34,8 +31,6 @@ class ProgramHeader(section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
       EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
       Nil
   }
-
-
 }
 
 object ProgramHeader {
