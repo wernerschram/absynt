@@ -77,6 +77,18 @@ abstract class RelativeReference(val target: Label, label: Label) extends Depend
     val section = context.sections.filter(s => s.contains(this)).head
       (section.intermediateResources(this), section.offsetDirection(this))
   }
+
+  override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
+    val (resources, offsetType) = dependencies(context)
+
+    val (totalDependent, totalIndependent) = resources
+      .foldLeft((Seq.empty[DependentResource], 0)) {
+        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
+        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
+      }
+
+    (totalDependent, totalIndependent, offsetType)
+  }
 }
 
 abstract class AbsoluteReference(val target: Label, label: Label) extends DependentResource(label) {
@@ -98,10 +110,22 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
   override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
     val containingSection: Section = context.sections.filter(s => s.contains(target)).head
     (
-    context.initialResources ::: context.sections.takeWhile(s => !s.contains(target)).flatMap(s => context.alignmentFillers(s) :: s.content) ++
+    context.initialResources ::: context.sectionDependencies(containingSection) ++
       (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
        ,OffsetDirection.Absolute
     )
+  }
+
+  override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
+    val (resources, offsetType) = dependencies(context)
+
+    val (totalDependent, totalIndependent) = resources
+      .foldLeft((Seq.empty[DependentResource], 0)) {
+        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
+        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
+      }
+
+    (totalDependent, totalIndependent + context.startOffset, offsetType)
   }
 }
 
