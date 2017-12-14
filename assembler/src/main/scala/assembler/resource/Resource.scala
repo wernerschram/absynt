@@ -47,7 +47,7 @@ abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
   def section: Section
 
   def dependencies(context: Application): (List[Resource], OffsetDirection) =
-    (context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
+    (context.initialResources ::: context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
 
   override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
     val (resources, offsetType) = dependencies(context)
