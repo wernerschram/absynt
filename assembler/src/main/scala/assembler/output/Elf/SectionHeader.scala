@@ -98,7 +98,7 @@ class StringSectionHeader(elf: Elf)
 
   override def sectionFileSize: Resource =  ElfSectionSize(elf.stringSection, elf)
   override def sectionFileReference: Resource = ElfSectionFileReference(elf.stringSection, elf)
-  override def sectionReference: Resource = ElfSectionReference(elf.stringSection, elf)
+  override def sectionReference: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))
 }
 
 object StringSectionHeader {
