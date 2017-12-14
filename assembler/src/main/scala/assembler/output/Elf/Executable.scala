@@ -154,7 +154,8 @@ case object ElfType {
 case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
   implicit def endianness: Endianness = elf.endianness
 
-  override def encodableForDistance(distance: Int): Encodable = EncodedByteList(elf.architecture.processorClass.numberBytes(distance + elf.startOffset))
+  override def encodableForDistance(distance: Int): Encodable =
+    EncodedByteList(elf.architecture.processorClass.numberBytes(distance + elf.startOffset))
 
   override def sizeForDistance(distance: Int): Int = elf.architecture.processorClass.numberSize
 
@@ -176,9 +177,9 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentR
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) =
     if (elf.sections.head != target)
-      (elf.initialResources :::
-        context.sections.takeWhile(s => s != target).flatMap(s => elf.alignmentFillers(s) :: s.content :::
-        context.alignmentFillers(target) :: Nil), OffsetDirection.Absolute)
+      (elf.initialResources ::: context.alignmentFillers(target) ::
+        context.sections.takeWhile(_ != target).flatMap(s => context.alignmentFillers(s) :: s.content)
+        , OffsetDirection.Absolute)
     else
      (Nil, OffsetDirection.Absolute)
 
@@ -201,7 +202,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
       (elf.initialResources ::: context.alignmentFillers(target) ::
         context.sectionDependencies(target), OffsetDirection.Absolute)
     else
-      (context.sectionDependencies(target), OffsetDirection.Absolute)
+      (Nil, OffsetDirection.Absolute)
 
   override def toString: String = s"Memory address of section: ${target.name}"
 }
