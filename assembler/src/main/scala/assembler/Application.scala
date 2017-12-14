@@ -38,7 +38,7 @@ abstract class Application {
     encodableSections.takeWhile(s => s != section).map(_.size).sum + startOffset
 
   def sectionDependencies(section: Section): List[Resource] =
-    sections.takeWhile(_ != section).flatMap(_.content)
+    sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) :: s.content)
 
   def encodeByte: List[Byte]
 

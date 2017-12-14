@@ -181,7 +181,12 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentR
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) =
-    (context.sections.takeWhile(s => s != target).flatMap(s => s.content), OffsetDirection.Absolute)
+    if (elf.sections.head != target)
+      (elf.resources.toList ::: elf.programHeaders.flatMap(_.resources) :::
+        context.sections.takeWhile(s => s != target).flatMap(s => elf.alignmentFillers(s) :: s.content :::
+        context.alignmentFillers(target) :: Nil), OffsetDirection.Absolute)
+    else
+     (Nil, OffsetDirection.Absolute)
 
   override def toString: String = s"File address of section: ${target.name}"
 }
@@ -198,7 +203,11 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) =
-    (context.sectionDependencies(target), OffsetDirection.Absolute)
+    if (elf.sections.head != target)
+      (elf.resources.toList ::: elf.programHeaders.flatMap(_.resources) ::: context.alignmentFillers(target) ::
+        context.sectionDependencies(target), OffsetDirection.Absolute)
+    else
+      (context.sectionDependencies(target), OffsetDirection.Absolute)
 
   override def toString: String = s"Memory address of section: ${target.name}"
 }
@@ -218,7 +227,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(L
     if (elf.sections.head == target)
       (elf.resources.toList ::: elf.programHeaders.flatMap(_.resources) ::: elf.alignmentFillers(target) :: target.content, OffsetDirection.Absolute)
     else
-      (elf.alignmentFillers(target) :: target.content, OffsetDirection.Absolute)
+      (target.content, OffsetDirection.Absolute)
   }
 
   override def toString: String = s"Size of section: ${target.name}"
