@@ -89,7 +89,6 @@ class StringSectionHeader(elf: Elf)
   val `type`: SectionType = SectionType.StringTable
   val flags: Flags[SectionFlag] = Flags.None
   val sectionAddress: Option[Long] = None
-  val sectionFileOffset: Long = elf.stringTableOffset
   val link: Int = 0
   val info: Int = 0
 

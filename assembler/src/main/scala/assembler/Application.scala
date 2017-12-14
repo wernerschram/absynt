@@ -42,6 +42,8 @@ abstract class Application {
 
   def encodeByte: List[Byte]
 
+  def initialResources: List[Resource]
+
   def encodablesForReferences(references: Seq[DependentResource]): Map[DependentResource, Encodable] = {
     val (totalDependencySizes: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]]) =
       references.foldLeft((Map.empty[DependentResource, DependencySize], Map.empty[DependentResource, Set[Int]])) {

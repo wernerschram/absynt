@@ -98,7 +98,7 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
   override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
     val containingSection: Section = context.sections.filter(s => s.contains(target)).head
     (
-    context.sections.takeWhile(s => !s.contains(target)).flatMap(s => context.alignmentFillers(s) :: s.content) ++
+    context.initialResources ::: context.sections.takeWhile(s => !s.contains(target)).flatMap(s => context.alignmentFillers(s) :: s.content) ++
       (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
        ,OffsetDirection.Absolute
     )

@@ -26,6 +26,8 @@ class Raw(section: Section, override val startOffset: Int)
   override def sectionOffset(section: Section with LastIteration): Long = startOffset
 
   override def encodeByte: List[Byte] = encodableSections.head.encodeByte
+
+  def initialResources: List[Resource] = Nil
 }
 
 object Raw {

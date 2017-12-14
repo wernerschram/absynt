@@ -195,9 +195,11 @@ class ApplicationSuite extends WordSpec with Matchers {
 
     "defined with multiple sections" should {
       case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application {
-        override def encodeByte: List[Byte] = ???
+        override def encodeByte: List[Byte] = Nil
 
         override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
+
+        override def initialResources: List[Resource] = Nil
       }
 
       "align the first section" when {
