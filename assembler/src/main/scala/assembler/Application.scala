@@ -28,7 +28,7 @@ abstract class Application {
     Section.lastIteration(section.sectionType, section.name, (alignmentFillers(section) :: section.content).map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
-    })
+    }, section.alignment)
 
   def getAbsoluteOffset(label: Label): Long =
     encodableSections.filter(s => s.contains(label))

@@ -102,7 +102,7 @@ abstract class Elf(
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
 
   lazy val stringSection = Section(assembler.sections.SectionType.Data, ".shstrtab",
-    EncodedByteList(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil)
+    EncodedByteList(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
 }
 
 case class ElfAlignmentFiller(section: Section) extends AlignmentFiller(Label.noLabel) {

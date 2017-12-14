@@ -5,14 +5,12 @@ import assembler.resource.{Encodable, RelativeReference, Resource}
 
 import scala.language.implicitConversions
 
-abstract class Section {
+abstract class Section(val alignment: Int) {
   def content: List[Resource]
 
   def name: String
 
   def sectionType: SectionType
-
-  val alignment: Int
 
   type EncodableCondition = (Resource)=>Boolean
 
@@ -72,19 +70,17 @@ trait LastIteration {
 
 
 object Section {
-  def apply(`type`: SectionType, sectionName: String, resources: List[Resource]): Section =
-    new Section {
-      val alignment: Int = 16
+  def apply(`type`: SectionType, sectionName: String, resources: List[Resource], alignment: Int = 16): Section =
+    new Section(alignment) {
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val content: List[Resource] =
           resources
     }
 
-  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable]):
+  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], alignment: Int):
   Section with LastIteration =
-    new Section with LastIteration {
-      val alignment: Int = 16
+    new Section(alignment) with LastIteration {
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
       override val finalContent: List[Resource with Encodable] = encodables
