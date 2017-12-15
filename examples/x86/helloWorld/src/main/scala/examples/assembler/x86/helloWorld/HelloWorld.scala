@@ -23,12 +23,14 @@ object HelloWorld extends App {
     val entry: Label = "Entry"
     val hello: Label = "Text"
 
+    val output: String = "Hello World!\n"
+
     val text: Section = Section(SectionType.Text, ".text",
       // use the write Syscall
       { implicit val label: Label = entry; Move(0x04, EAX) } ::
       Move(0x01, EBX) ::
       Move.forLabel(hello, ECX) ::
-      Move(9, EDX) ::
+      Move(output.size, EDX) ::
       Interrupt(0x80.toByte) ::
       // use the _exit Syscall
       Move(0x01, EAX) ::
@@ -38,12 +40,12 @@ object HelloWorld extends App {
     )
 
     val data: Section = Section(SectionType.Data, ".data",
-    { implicit val label: Label = hello; EncodedString("Hi World\n") } ::
+    { implicit val label: Label = hello; EncodedString(output) } ::
       Nil, 4
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
-    val outputPath = path.resolve("x86HellowWorld-output")
+    val outputPath = path.resolve("x86HelloWorld-output")
     Files.createDirectories(outputPath)
     val outputFilePath = outputPath.resolve("test.elf")
     val rawFilePath = outputPath.resolve("test.raw")
