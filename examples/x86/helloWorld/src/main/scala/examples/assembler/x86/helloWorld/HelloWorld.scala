@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.Elf.{Architecture, Executable}
-import assembler.resource.DependentResource
+import assembler.resource.{AbsoluteReference, DependentResource, Encodable, RelativeReference}
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
@@ -54,16 +54,18 @@ object HelloWorld extends App {
     val raw = new FileOutputStream(rawFilePath.toFile)
 
     val exec = Executable(Architecture.X86, text :: data :: Nil, entry, 0x8048000)
-//    val finalSection = exec.encodableSections.head
-//    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
-//    raw.write(finalSection.encodeByte.toArray)
+    (text.content zip exec.encodableSection(text).finalContent).foreach {
+      case (orig: RelativeReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
+      case (orig: AbsoluteReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
+      case (_, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded")
+    }
     Console.println(s"output to file $outputFilePath")
     out.write(exec.encodeByte.toArray)
     raw.flush()
     out.flush()
 
-    //objdump -b binary -D /tmp/x86HellowWorld-output/test.raw -m x86_64 -M intel
-    //objdump -D /tmp/x86HellowWorld-output/test.elf -M intel
+    //objdump -D /tmp/x86HelloWorld-output/test.elf -M intel
+    //readelf /tmp/x86HelloWorld-output/test.elf -a
   }
 
 }

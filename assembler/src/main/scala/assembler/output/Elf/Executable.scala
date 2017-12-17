@@ -92,7 +92,7 @@ abstract class Elf(
       )
 
     encodableResources(initialResources, dependentMap).flatMap(_.encodeByte).toList :::
-      sections.flatMap(s => encodableSection(s, dependentMap).encodeByte) :::
+      sections.flatMap(s => dependentMap(alignmentFillers(s)).encodeByte.toList ::: encodableSection(s, dependentMap).encodeByte) :::
       sectionHeaders.flatMap(p => encodableResources(p.resources, dependentMap)).flatMap(_.encodeByte)
   }
 

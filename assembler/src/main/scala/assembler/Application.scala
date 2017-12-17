@@ -20,7 +20,7 @@ abstract class Application {
     Section.lastIteration(
       section.sectionType,
       section.name,
-      encodableResources(alignmentFillers(section) :: section.content, dependentMap).toList,
+      encodableResources(section.content, dependentMap).toList,
       section.alignment)
 
   def encodableSection(section: Section): Section with LastIteration = {
