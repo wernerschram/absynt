@@ -141,10 +141,10 @@ object Boot extends App {
     val raw = new FileOutputStream(rawFilePath.toFile)
 
     val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry, 0x10000)
-
-    raw.write(exec.encodableSections.head.encodeByte.toArray)
-    println(s"size: ${exec.encodableSections.head.size}")
-    exec.encodableSections.head.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
+//
+//    raw.write(exec.encodableSections.head.encodeByte.toArray)
+//    println(s"size: ${exec.encodableSections.head.size}")
+//    exec.encodableSections.head.finalContent.foreach { x => Console.println(s"${x.encodeByte.bigEndianHexString} $x") }
 
     out.write(exec.encodeByte.toArray)
     out.flush()

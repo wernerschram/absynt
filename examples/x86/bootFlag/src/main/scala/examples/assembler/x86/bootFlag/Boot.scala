@@ -84,8 +84,7 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
 
     val executable = Raw(section, 0)
-    val map = executable.encodablesForReferences(section.content.collect{case r: DependentResource => r})
-    val finalSection = executable.encodableSection(section, map)
+    val finalSection = executable.encodableSection(section)
     finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")

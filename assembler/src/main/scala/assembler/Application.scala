@@ -16,11 +16,16 @@ abstract class Application {
       case encodable: Encodable => encodable
     }
 
-  def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
-    Section.lastIteration(section.sectionType, section.name, (alignmentFillers(section) :: section.content).map {
-      case reference: DependentResource => dependentMap(reference)
-      case encodable: Encodable => encodable
-    }, section.alignment)
+  protected def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
+    Section.lastIteration(
+      section.sectionType,
+      section.name,
+      encodableResources(alignmentFillers(section) :: section.content, dependentMap).toList,
+      section.alignment)
+
+  def encodableSection(section: Section): Section with LastIteration = {
+    encodableSection(section, encodablesForReferences((sectionDependencies(section) ::: alignmentFillers(section) :: section.content).collect{case r: DependentResource => r}))
+  }
 
   def sectionDependencies(section: Section): List[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) :: s.content)
