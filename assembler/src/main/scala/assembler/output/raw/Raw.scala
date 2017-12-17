@@ -28,9 +28,11 @@ class Raw(section: Section, override val startOffset: Int)
     override def section: Section = Raw.this.section
   })
 
-  override def sectionOffset(section: Section with LastIteration): Long = startOffset
-
-  override def encodeByte: List[Byte] = encodableSections.head.encodeByte
+  override def encodeByte: List[Byte] = {
+    val map = encodablesForReferences(section.content.collect{case r: DependentResource => r} ::: alignmentFillers.values.toList)
+    val finalSection = encodableSection(section, map)
+    finalSection.encodeByte
+  }
 
   def initialResources: List[Resource] = Nil
 }

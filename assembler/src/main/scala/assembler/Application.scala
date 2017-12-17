@@ -11,31 +11,16 @@ abstract class Application {
 
   def startOffset: Int
 
-  lazy val encodableSections: List[Section with LastIteration] = {
-    val dependentMap: Map[DependentResource, Encodable] = encodablesForReferences(
-      alignmentFillers.values.toList :::
-      sections.flatMap(s => s.content.collect{case r: DependentResource => r})
-    )
-    sections.map(s => encodableSection(s, dependentMap))
-  }
-
   protected def encodableResources(resources: Seq[Resource], dependentMap: Map[DependentResource, Encodable]): Seq[Encodable] = resources.map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
     }
 
-  protected def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
+  def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
     Section.lastIteration(section.sectionType, section.name, (alignmentFillers(section) :: section.content).map {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
     }, section.alignment)
-
-  def getAbsoluteOffset(label: Label): Long =
-    encodableSections.filter(s => s.contains(label))
-      .map(s => sectionOffset(s) + s.offset(label)).head
-
-  def sectionOffset(section: Section with LastIteration): Long =
-    encodableSections.takeWhile(s => s != section).map(_.size).sum + startOffset
 
   def sectionDependencies(section: Section): List[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) :: s.content)

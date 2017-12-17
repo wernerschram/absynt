@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.raw.Raw
-import assembler.resource.Resource
+import assembler.resource.{DependentResource, Resource}
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
@@ -84,7 +84,9 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
 
     val executable = Raw(section, 0)
-    executable.encodableSections.head.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
+    val map = executable.encodablesForReferences(section.content.collect{case r: DependentResource => r})
+    val finalSection = executable.encodableSection(section, map)
+    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
     out.flush()

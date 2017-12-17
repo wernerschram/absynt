@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.Elf.{Architecture, Executable}
+import assembler.resource.DependentResource
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
@@ -53,9 +54,9 @@ object HelloWorld extends App {
     val raw = new FileOutputStream(rawFilePath.toFile)
 
     val exec = Executable(Architecture.X86, text :: data :: Nil, entry, 0x8048000)
-    val finalSection = exec.encodableSections.head
-    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
-    raw.write(finalSection.encodeByte.toArray)
+//    val finalSection = exec.encodableSections.head
+//    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
+//    raw.write(finalSection.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
     out.write(exec.encodeByte.toArray)
     raw.flush()

@@ -399,7 +399,7 @@ class MoveSuite extends WordSpec with Matchers {
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
-          app.encodableSections.head.encodeByte
+          app.encodablesForReferences(Seq(move))
         }
       }
 
@@ -415,7 +415,7 @@ class MoveSuite extends WordSpec with Matchers {
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
-          app.encodableSections.head.finalContent(1).encodeByte
+          app.encodablesForReferences(Seq(move))
         }
       }
 
@@ -596,7 +596,7 @@ class MoveSuite extends WordSpec with Matchers {
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
-          app.encodableSections.head.finalContent(1).encodeByte
+          app.encodablesForReferences(Seq(move))
         }
       }
 

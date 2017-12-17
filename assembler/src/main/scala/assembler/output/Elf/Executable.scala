@@ -43,9 +43,6 @@ abstract class Elf(
   private val dataOffset: Long =
     programHeaderOffset + applicationSections.size * architecture.processorClass.programHeaderSize
 
-  def sectionFileOffset(section: Section): Long =
-    encodableSections.takeWhile(s => s != section).map(_.size).sum + dataOffset
-
   def stringOffset(strings: List[String]): List[(String, Int)] =
     (strings.head, 0) :: stringOffset(1, strings)
 
