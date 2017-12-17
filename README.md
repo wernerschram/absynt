@@ -15,5 +15,5 @@ The project currently includes 2 example projects:
   This project produces a boot sector that shows the dutch flag (red, white and blue) in mode 0x13 (VGA 320x200x256 colors). 
   Because (MS-,PC-,Free)DOS allows direct interaction with hardware, and a com file has the same memory layout as a boot sector, 
   this example can also be used as an executable that can be run from DOS (or dosbox).
-- [An X86 hello world elf executable](examples/x86/helloWorld/src/main/scala/examples/assembler/x86/helloWorld):
+- [An X86 hello world elf executable](examples/x86/helloWorld32bit/src/main/scala/examples/assembler/x86/helloWorld):
   This project produces a 32bit elf executable that uses linux int 0x80 to print hello world on stdout.

@@ -49,9 +49,7 @@ object HelloWorld extends App {
     val outputPath = path.resolve("x86HelloWorld-output")
     Files.createDirectories(outputPath)
     val outputFilePath = outputPath.resolve("test.elf")
-    val rawFilePath = outputPath.resolve("test.raw")
     val out = new FileOutputStream(outputFilePath.toFile)
-    val raw = new FileOutputStream(rawFilePath.toFile)
 
     val exec = Executable(Architecture.X86, text :: data :: Nil, entry, 0x8048000)
     (text.content zip exec.encodableSection(text).finalContent).foreach {
@@ -61,7 +59,6 @@ object HelloWorld extends App {
     }
     Console.println(s"output to file $outputFilePath")
     out.write(exec.encodeByte.toArray)
-    raw.flush()
     out.flush()
 
     //objdump -D /tmp/x86HelloWorld-output/test.elf -M intel
