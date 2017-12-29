@@ -56,7 +56,10 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
 
   def mnemonic: String
 
-  override def toString = s"$labelPrefix$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
+  override def toString = if (operands.isEmpty)
+      s"$labelPrefix$mnemonic"
+    else
+      s"$labelPrefix$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
 }
 
 object X86Operation {
