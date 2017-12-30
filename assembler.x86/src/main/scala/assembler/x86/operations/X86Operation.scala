@@ -43,11 +43,13 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
 
   def operandSize: OperandSize = OperandSize.Unknown
 
-  private def optionalRexPrefix()(implicit processorMode: ProcessorMode): List[Byte] =
+  private def optionalRexPrefix()(implicit processorMode: ProcessorMode): List[Byte] = {
+    assume(processorMode == ProcessorMode.Long || rexRequirements.isEmpty)
     if (rexRequirements.isEmpty)
       Nil
     else
       rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitMask).toByte) :: Nil
+  }
 
   def rexRequirements: List[RexRequirement] =
     if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
