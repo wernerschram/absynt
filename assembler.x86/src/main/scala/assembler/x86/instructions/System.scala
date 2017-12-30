@@ -36,13 +36,19 @@ object SystemReturn {
   val opcode = "sysret"
 
 
-  def apply()(implicit label: Label, processorMode: ProcessorMode): Static = {
-    assume(processorMode == ProcessorMode.Long)
-    assume(processorMode != ProcessorMode.Real)
-    Static()
+  def apply(returnMode: ProcessorMode)(implicit label: Label, processorMode: ProcessorMode): Static = {
+    assume(processorMode == ProcessorMode.Long && returnMode != ProcessorMode.Real)
+    Static(returnMode)
   }
 
-  private def Static()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0x0F.toByte :: 0x07.toByte :: Nil, opcode)
+  private def Static(returnMode: ProcessorMode)(implicit label: Label, processorMode: ProcessorMode) =
+    new Static(label, 0x0F.toByte :: 0x07.toByte :: Nil, opcode) {
+       override def operandSize: OperandSize = returnMode match {
+        case ProcessorMode.Long => ValueSize.QuadWord
+        case ProcessorMode.Protected => ValueSize.DoubleWord
+        case ProcessorMode.Real => throw new AssertionError
+      }
+    }
 
 }
 
@@ -61,7 +67,7 @@ object SystemExit {
       override def operandSize: OperandSize = returnMode match {
         case ProcessorMode.Long => ValueSize.QuadWord
         case ProcessorMode.Protected => ValueSize.DoubleWord
-        case ProcessorMode.Real => ValueSize.Word
+        case ProcessorMode.Real => throw new AssertionError
       }
     }
 
