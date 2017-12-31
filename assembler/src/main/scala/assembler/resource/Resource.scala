@@ -43,8 +43,7 @@ abstract class DependentResource(label: Label) extends Resource(label) {
   }
 }
 
-abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
-  def section: Section
+case class AlignmentFiller(section: Section) extends DependentResource(Label.noLabel) {
 
   def dependencies(context: Application): (List[Resource], OffsetDirection) =
     (context.initialResources ::: context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
@@ -60,6 +59,20 @@ abstract class AlignmentFiller(label: Label) extends DependentResource(label) {
 
     (totalDependent, totalIndependent + context.startOffset, offsetType)
   }
+
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
+
+  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
+    val alignment = dependencySize % section.alignment
+    if (alignment != 0)
+      section.alignment - alignment
+    else 0
+  }
+
+  override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
+
+  override def toString: String = s"filler for ${section.name}"
 }
 
 abstract class RelativeReference(val target: Label, label: Label) extends DependentResource(label) {

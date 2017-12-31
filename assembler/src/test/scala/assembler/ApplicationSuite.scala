@@ -1,6 +1,5 @@
 package assembler
 
-import assembler.output.Elf.ElfAlignmentFiller
 import assembler.output.raw.Raw
 import assembler.resource._
 import assembler.sections.{Section, SectionType}
@@ -197,7 +196,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application {
         override def encodeByte: List[Byte] = Nil
 
-        override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
+        override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
         override def initialResources: List[Resource] = Nil
       }

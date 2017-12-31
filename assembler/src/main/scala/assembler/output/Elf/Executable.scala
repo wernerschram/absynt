@@ -96,26 +96,10 @@ abstract class Elf(
       sectionHeaders.flatMap(p => encodableResources(p.resources, dependentMap)).flatMap(_.encodeByte)
   }
 
-  override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> ElfAlignmentFiller(s)).toMap
+  override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
   lazy val stringSection = Section(assembler.sections.SectionType.Data, ".shstrtab",
     EncodedByteList(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
-}
-
-case class ElfAlignmentFiller(section: Section) extends AlignmentFiller(Label.noLabel) {
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
-
-  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
-    val alignment = dependencySize % section.alignment
-    if (alignment != 0)
-      section.alignment - alignment
-    else 0
-  }
-
-  override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
-
-  override def toString: String = s"filler for ${section.name}"
 }
 
 class Executable private(

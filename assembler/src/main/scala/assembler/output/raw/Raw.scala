@@ -9,24 +9,7 @@ class Raw(section: Section, override val startOffset: Int)
 
   override val sections: List[Section] = section :: Nil
 
-  override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> new AlignmentFiller(Label.noLabel) {
-
-    override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
-      val alignment = dependencySize % section.alignment
-      if (alignment != 0)
-        section.alignment - alignment
-      else 0
-    }
-
-    override def possibleSizes: Set[Int] = (0 to section.alignment by 1).toSet
-
-    override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-      EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
-
-    override def toString: String = s"filler for ${section.name}"
-
-    override def section: Section = Raw.this.section
-  })
+  override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> AlignmentFiller(section))
 
   override def encodeByte: List[Byte] = {
     val map = encodablesForReferences(section.content.collect{case r: DependentResource => r} ::: alignmentFillers.values.toList)
