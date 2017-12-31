@@ -7,7 +7,7 @@ and an ARM assembler with support for A32 instructions. Neither implements the f
 implement a simple boot sector for both x86 and ARM. 
 
 ## examples
-The project currently includes 2 example projects:
+The project includes the following example projects:
 - [Raspberry PI boot sector](examples/arm/bootRpi/src/main/scala/examples/assembler/arm): 
   A bootsector for the raspberry PI based on the [example on osdev.org](http://wiki.osdev.org/Raspberry_Pi_Bare_Bones) which prints "hello
   world!" to the serial console.
