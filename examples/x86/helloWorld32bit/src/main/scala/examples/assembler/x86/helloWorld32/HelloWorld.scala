@@ -1,4 +1,4 @@
-package examples.assembler.x86.helloWorld
+package examples.assembler.x86.helloWorld32
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
@@ -16,8 +16,6 @@ object HelloWorld extends App {
   createFile()
 
   def createFile(): Unit = {
-
-
 
     import ProcessorMode.Protected._
 
@@ -46,9 +44,9 @@ object HelloWorld extends App {
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
-    val outputPath = path.resolve("x86HelloWorld-output")
+    val outputPath = path.resolve("x86HelloWorld32-output")
     Files.createDirectories(outputPath)
-    val outputFilePath = outputPath.resolve("test.elf")
+    val outputFilePath = outputPath.resolve("helloworld")
     val out = new FileOutputStream(outputFilePath.toFile)
 
     val exec = Executable(Architecture.X86, text :: data :: Nil, entry, 0x8048000)
@@ -61,8 +59,8 @@ object HelloWorld extends App {
     out.write(exec.encodeByte.toArray)
     out.flush()
 
-    //objdump -D /tmp/x86HelloWorld-output/test.elf -M intel
-    //readelf /tmp/x86HelloWorld-output/test.elf -a
+    //objdump -D /tmp/x86HelloWorld32-output/helloworld -M intel
+    //readelf /tmp/x86HelloWorld32-output/helloworld -a
   }
 
 }

@@ -1,6 +1,14 @@
 scalaVersion in ThisBuild := "2.12.0"
 
-lazy val root = project in file(".") aggregate(assembler, assemblerX86, assemblerARM, ARMBootRpiExample, X86BootFlagExample, X86HelloWorldExample)
+lazy val root = project in file(".") aggregate(
+  assembler,
+  assemblerX86,
+  assemblerARM,
+  ARMBootRpiExample,
+  X86BootFlagExample,
+  X86HelloWorld32Example,
+  X86HelloWorld64Example
+)
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
@@ -48,9 +56,16 @@ lazy val X86BootFlagExample = (project in file("examples/x86/bootFlag"))
   coverageEnabled := false
 ).dependsOn(assembler, assemblerX86)
 
-lazy val X86HelloWorldExample = (project in file("examples/x86/helloWorld"))
+lazy val X86HelloWorld32Example = (project in file("examples/x86/helloWorld32bit"))
 .settings(
-  name := "assembler.examples.x86.helloWorld",
+  name := "assembler.examples.x86.helloWorld32bit",
+  version := "1.0",
+  coverageEnabled := false
+).dependsOn(assembler, assemblerX86)
+
+lazy val X86HelloWorld64Example = (project in file("examples/x86/helloWorld64bit"))
+.settings(
+  name := "assembler.examples.x86.helloWorld64bit",
   version := "1.0",
   coverageEnabled := false
 ).dependsOn(assembler, assemblerX86)
