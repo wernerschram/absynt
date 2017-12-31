@@ -17,5 +17,5 @@ The project currently includes 2 example projects:
   this example can also be used as an executable that can be run from DOS (or dosbox).
 - [An 32bit X86 hello world elf executable](examples/x86/helloWorld32bit/src/main/scala/examples/assembler/x86/helloWorld32):
   This project produces a 32bit x86 elf executable that uses linux int 0x80 to print hello world on stdout.
-- [An 32bit X86 hello world elf executable](examples/x86/helloWorld64bit/src/main/scala/examples/assembler/x86/helloWorld64):
+- [An 64bit X86 hello world elf executable](examples/x86/helloWorld64bit/src/main/scala/examples/assembler/x86/helloWorld64):
   This project produces a 64bit x86 elf executable that uses linux syscall to print hello world on stdout.
