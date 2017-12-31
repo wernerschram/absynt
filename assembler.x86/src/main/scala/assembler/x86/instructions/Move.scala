@@ -134,13 +134,11 @@ object Move {
               (implicit processorMode: ProcessorMode, thisLabel: Label): AbsoluteReference = {
 
     new AbsoluteReference(targetLabel, thisLabel) {
-      private def prefixBytes = if (register.getRexRequirements(ParameterPosition.OpcodeReg).isEmpty) 0 else 1
-
       private val size = processorMode match {
           // prefixes + opcode + immediate
         case (ProcessorMode.Real) => 0 + 1 + 2
         case (ProcessorMode.Protected) => 0 + 1 + 4
-        case (ProcessorMode.Long) => prefixBytes + 1 + 8
+        case (ProcessorMode.Long) => 1 + 1 + 8
       }
 
       override def encodableForDistance(distance: Int): Encodable =
