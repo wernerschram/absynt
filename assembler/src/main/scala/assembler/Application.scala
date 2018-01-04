@@ -2,6 +2,7 @@ package assembler
 
 import assembler.resource._
 import assembler.sections.{LastIteration, Section}
+import assembler.resource.EncodableConversion._
 
 abstract class Application {
 
@@ -11,16 +12,11 @@ abstract class Application {
 
   def startOffset: Int
 
-  protected def encodableResources(resources: Seq[Resource], dependentMap: Map[DependentResource, Encodable]): Seq[Encodable] = resources.map {
-      case reference: DependentResource => dependentMap(reference)
-      case encodable: Encodable => encodable
-    }
-
   protected def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
     Section.lastIteration(
       section.sectionType,
       section.name,
-      encodableResources(section.content, dependentMap).toList,
+      section.content.encodables(dependentMap).toList,
       section.alignment)
 
   def encodableSection(section: Section): Section with LastIteration = {

@@ -3,6 +3,7 @@ package assembler.output.Elf
 import assembler._
 import assembler.resource._
 import assembler.sections.Section
+import assembler.resource.EncodableConversion._
 
 abstract class Elf(
   val architecture: Architecture,
@@ -91,9 +92,9 @@ abstract class Elf(
         sectionHeaders.flatMap(p => p.resources.collect{case r: DependentResource => r})
       )
 
-    encodableResources(initialResources, dependentMap).flatMap(_.encodeByte).toList :::
+    initialResources.encodables(dependentMap).flatMap(_.encodeByte).toList :::
       sections.flatMap(s => dependentMap(alignmentFillers(s)).encodeByte.toList ::: encodableSection(s, dependentMap).encodeByte) :::
-      sectionHeaders.flatMap(p => encodableResources(p.resources, dependentMap)).flatMap(_.encodeByte)
+      sectionHeaders.flatMap(p => p.resources.encodables(dependentMap)).flatMap(_.encodeByte)
   }
 
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap

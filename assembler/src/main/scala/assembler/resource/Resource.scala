@@ -142,3 +142,11 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
   }
 }
 
+object EncodableConversion {
+  implicit class ResourcesToEncodables(resources: Seq[Resource]) {
+    def encodables(dependentMap: Map[DependentResource, Encodable]): Seq[Encodable] = resources.map {
+      case reference: DependentResource => dependentMap(reference)
+      case encodable: Encodable => encodable
+    }
+  }
+}
