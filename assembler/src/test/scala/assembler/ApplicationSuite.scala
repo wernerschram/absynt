@@ -192,6 +192,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
     }
 
+
     "defined with multiple sections" should {
       case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application {
         override def encodeByte: List[Byte] = Nil
@@ -199,6 +200,29 @@ class ApplicationSuite extends WordSpec with Matchers {
         override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
         override def initialResources: List[Resource] = Nil
+      }
+
+      "asked to return encodables for absolute references with a linear sizeForDistance function" should {
+
+        "represent a reference that depends on the alignment of a section which depends on the size of the section the reference is in, where there is an obvious solution" in {
+          val (reference, target) = TestEncodable.absoluteReferenceWithTarget
+          val section1 = Section(SectionType.Text, ".text",
+            reference ::
+            filler(15) ::
+            Nil)
+
+          val section2 = Section(SectionType.Data, ".data",
+            target :: Nil)
+
+          val application = MyApplication(List(section1, section2), 0)
+          val fillers = application.alignmentFillers
+          val result = application.encodablesForReferences(reference +: fillers.values.toSeq)
+          val encodable = result(reference).asInstanceOf[AbsoluteTestEncodable]
+          val alignment2 = result(fillers(section2)).asInstanceOf[EncodedByteList]
+
+          encodable.size shouldBe 3
+          alignment2.size shouldBe 14
+        }
       }
 
       "align the first section" when {

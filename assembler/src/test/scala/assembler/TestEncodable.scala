@@ -60,8 +60,8 @@ case class AbsoluteTestEncodable(distance: Int, override val label: Label) exten
 
   override def size: Int =
     if (distance < 10) 1
-    else if (distance < 20) 3
-    else 2
+    else if (distance < 20) 2
+    else 3
 }
 
 case class AbsoluteTestReference(override val target: Label, override val label: Label = Label.noLabel) extends AbsoluteReference(target, label) {
