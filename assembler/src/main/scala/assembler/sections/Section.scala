@@ -12,9 +12,6 @@ abstract class Section(val alignment: Int) {
 
   def sectionType: SectionType
 
-  def contains(label: Label): Boolean = content.exists(_.label == label)
-  def contains(encodable: Resource): Boolean = content.contains(encodable)
-
   def precedingResources(target: Label): List[Resource] = content.takeWhile(_.label != target)
 
   /** returns all resources between a relative reference and it's target. If it is a back reference, it will include the target

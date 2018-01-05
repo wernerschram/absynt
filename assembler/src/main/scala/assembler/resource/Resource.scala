@@ -2,6 +2,7 @@ package assembler.resource
 
 import assembler._
 import assembler.sections.Section
+import EncodableConversion._
 
 sealed abstract class Resource(val label: Label) {
 
@@ -87,7 +88,7 @@ abstract class RelativeReference(val target: Label, label: Label) extends Depend
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
-    val section = context.sections.filter(s => s.contains(this)).head
+    val section = context.sections.filter(s => s.content.contains(this)).head
       (section.intermediateResources(this), section.offsetDirection(this))
   }
 
@@ -121,7 +122,7 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
   }
 
   override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
-    val containingSection: Section = context.sections.filter(s => s.contains(target)).head
+    val containingSection: Section = context.sections.filter(s => s.content.containsLabel(target)).head
     (
     context.initialResources ::: context.sectionDependencies(containingSection) ++
       (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
@@ -150,6 +151,8 @@ object EncodableConversion {
     }
 
     def dependentResources: Seq[DependentResource] = resources.collect{case r: DependentResource => r}
+
+    def containsLabel(label: Label): Boolean = resources.exists(_.label == label)
   }
 
   implicit class Encodables(encodables: Seq[Encodable]) {
