@@ -1,7 +1,7 @@
 package assembler.sections
 
 import assembler._
-import assembler.resource.{DependentResource, RelativeReference, Resource}
+import assembler.resource.{RelativeReference, Resource}
 
 import scala.language.implicitConversions
 
@@ -17,10 +17,10 @@ abstract class Section(val alignment: Int) {
 
   def precedingResources(target: Label): List[Resource] = content.takeWhile(_.label != target)
 
-  /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
+  /** returns all resources between a relative reference and it's target. If it is a back reference, it will include the target
     *
-    * @param from
-    * @return
+    * @param from the source relative reference
+    * @return the intermediate resources
     */
   def intermediateResources(from: RelativeReference): List[Resource] = {
     val trimLeft = content
