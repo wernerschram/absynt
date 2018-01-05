@@ -12,6 +12,7 @@ import assembler.x86.instructions._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.RealX86Offset
 import assembler.{Label, UniqueLabel}
+import assembler.resource.EncodableConversion._
 
 object Boot extends App {
   createFile()
@@ -84,8 +85,8 @@ object Boot extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
 
     val executable = Raw(section, 0)
-    val finalSection = executable.encodableSection(section)
-    finalSection.finalContent.foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
+    section.content.encodables(executable.encodablesForReferences(section.dependentResources))
+      .foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
     Console.println(s"output to file $outputFilePath")
     out.flush()

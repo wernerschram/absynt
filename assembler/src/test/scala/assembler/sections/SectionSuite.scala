@@ -5,6 +5,7 @@ import assembler.output.raw.Raw
 import assembler.resource.{Encodable, RelativeReference, Resource}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
+import assembler.resource.EncodableConversion._
 
 class SectionSuite extends WordSpec with Matchers with MockFactory {
 
@@ -107,7 +108,8 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           EncodedByteList(0xEF.toByte :: 0xFF.toByte :: Nil)))
 
         val application: Application = Raw(section, 0)
-        application.encodableSection(section).encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
+        section.content.encodables(application.encodablesForReferences(section.dependentResources))
+          .encodeByte should be(0x00.toByte :: 0x01.toByte :: 0xEF.toByte :: 0xFF.toByte :: Nil)
       }
     }
 
@@ -124,23 +126,8 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
           two))
 
         val application: Application = Raw(section, 0)
-        application.encodableSection(section).size should be(oneSize + twoSize)
-      }
-    }
-
-    "queried for the relative address of a label" should {
-
-      "correctly provide the section relative address of a label " in {
-        val label = Label.unique
-        val intermediate = EncodedByteList(List.fill(5)(0))
-        val target = EncodedByteList(0.toByte :: Nil)(label)
-
-        val section = Section(SectionType.Text, ".test", List[Resource](
-          intermediate,
-          target))
-
-        val application: Application = Raw(section, 0)
-        application.encodableSection(section).offset(label) should be(5)
+        section.content.encodables(application.encodablesForReferences(section.dependentResources))
+          .encodeByte.length should be(oneSize + twoSize)
       }
     }
   }

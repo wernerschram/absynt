@@ -1,8 +1,9 @@
 package assembler.output.raw
 
 import assembler._
+import assembler.resource.EncodableConversion._
 import assembler.resource._
-import assembler.sections.{LastIteration, Section}
+import assembler.sections.Section
 
 class Raw(section: Section, override val startOffset: Int)
   extends Application {
@@ -12,9 +13,9 @@ class Raw(section: Section, override val startOffset: Int)
   override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> AlignmentFiller(section))
 
   override def encodeByte: List[Byte] = {
-    val map = encodablesForReferences(section.content.collect{case r: DependentResource => r} ::: alignmentFillers.values.toList)
-    val finalSection = encodableSection(section, map)
-    finalSection.encodeByte
+    val map = encodablesForReferences(section.dependentResources)
+    val finalContent = section.content.encodables(map)
+    finalContent.encodeByte.toList
   }
 
   def initialResources: List[Resource] = Nil

@@ -1,8 +1,7 @@
 package assembler
 
 import assembler.resource._
-import assembler.sections.{LastIteration, Section}
-import assembler.resource.EncodableConversion._
+import assembler.sections.Section
 
 abstract class Application {
 
@@ -11,17 +10,6 @@ abstract class Application {
   def alignmentFillers: Map[Section, AlignmentFiller]
 
   def startOffset: Int
-
-  protected def encodableSection(section: Section, dependentMap: Map[DependentResource, Encodable]): Section with LastIteration =
-    Section.lastIteration(
-      section.sectionType,
-      section.name,
-      section.content.encodables(dependentMap).toList,
-      section.alignment)
-
-  def encodableSection(section: Section): Section with LastIteration = {
-    encodableSection(section, encodablesForReferences((sectionDependencies(section) ::: alignmentFillers(section) :: section.content).collect{case r: DependentResource => r}))
-  }
 
   def sectionDependencies(section: Section): List[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) :: s.content)

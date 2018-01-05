@@ -11,6 +11,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
 import assembler.{EncodedString, Label}
+import assembler.resource.EncodableConversion._
 
 object HelloWorld extends App {
   createFile()
@@ -50,7 +51,7 @@ object HelloWorld extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
 
     val exec = Executable(Architecture.X86_64, text :: data :: Nil, entry, 0x8048000)
-    (text.content zip exec.encodableSection(text).finalContent).foreach {
+    (text.content zip text.content.encodables(exec.encodablesForReferences(text.dependentResources))).foreach {
       case (orig: RelativeReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (orig: AbsoluteReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (_, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded")

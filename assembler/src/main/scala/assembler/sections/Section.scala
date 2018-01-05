@@ -1,12 +1,14 @@
 package assembler.sections
 
 import assembler._
-import assembler.resource.{Encodable, RelativeReference, Resource}
+import assembler.resource.{DependentResource, RelativeReference, Resource}
 
 import scala.language.implicitConversions
 
 abstract class Section(val alignment: Int) {
   def content: List[Resource]
+
+  def dependentResources: List[DependentResource] = content.collect{case r: DependentResource => r}
 
   def name: String
 
@@ -54,21 +56,6 @@ abstract class Section(val alignment: Int) {
   }
 }
 
-trait LastIteration {
-  iteration: Section =>
-
-  def finalContent: List[Resource with Encodable]
-
-  def offset(label: Label): Int =
-    finalContent.takeWhile(current => current.label != label)
-      .map(_.size).sum
-
-  lazy val encodeByte: List[Byte] = finalContent.flatMap { x => x.encodeByte }
-
-  lazy val size: Int = encodeByte.length
-}
-
-
 object Section {
   def apply(`type`: SectionType, sectionName: String, resources: List[Resource], alignment: Int = 16): Section =
     new Section(alignment) {
@@ -76,15 +63,6 @@ object Section {
       override val sectionType: SectionType = `type`
       override val content: List[Resource] =
           resources
-    }
-
-  def lastIteration(`type`: SectionType, sectionName: String, encodables: List[Resource with Encodable], alignment: Int):
-  Section with LastIteration =
-    new Section(alignment) with LastIteration {
-      override val name: String = sectionName
-      override val sectionType: SectionType = `type`
-      override val finalContent: List[Resource with Encodable] = encodables
-      override val content: List[Resource] = finalContent
     }
 }
 
