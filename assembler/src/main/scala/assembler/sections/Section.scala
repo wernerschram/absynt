@@ -6,20 +6,20 @@ import assembler.resource.{RelativeReference, Resource}
 import scala.language.implicitConversions
 
 abstract class Section(val alignment: Int) {
-  def content: List[Resource]
+  def content: Seq[Resource]
 
   def name: String
 
   def sectionType: SectionType
 
-  def precedingResources(target: Label): List[Resource] = content.takeWhile(_.label != target)
+  def precedingResources(target: Label): Seq[Resource] = content.takeWhile(_.label != target)
 
   /** returns all resources between a relative reference and it's target. If it is a back reference, it will include the target
     *
     * @param from the source relative reference
     * @return the intermediate resources
     */
-  def intermediateResources(from: RelativeReference): List[Resource] = {
+  def intermediateResources(from: RelativeReference): Seq[Resource] = {
     val trimLeft = content
       .dropWhile(x => !(x == from || x.label.matches(from.target)))
 
@@ -32,7 +32,7 @@ abstract class Section(val alignment: Int) {
     if (trimLeft.head == from)
       trimRight
     else
-      trimLeft.head :: trimRight
+      trimLeft.head +: trimRight
   }
 
   def offsetDirection(from: RelativeReference): OffsetDirection = {

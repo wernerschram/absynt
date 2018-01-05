@@ -11,8 +11,8 @@ abstract class Application {
 
   def startOffset: Int
 
-  def sectionDependencies(section: Section): List[Resource] =
-    sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) :: s.content)
+  def sectionDependencies(section: Section): Seq[Resource] =
+    sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content)
 
   def encodeByte: List[Byte]
 

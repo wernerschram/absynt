@@ -29,7 +29,7 @@ abstract class DependentResource(label: Label) extends Resource(label) {
 
   def possibleSizes: Set[Int]
 
-  def dependencies(context: Application): (List[Resource], OffsetDirection)
+  def dependencies(context: Application): (Seq[Resource], OffsetDirection)
 
   def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
     val (resources, offsetType) = dependencies(context)
@@ -47,7 +47,7 @@ abstract class DependentResource(label: Label) extends Resource(label) {
 case class AlignmentFiller(section: Section) extends DependentResource(Label.noLabel) {
 
   def dependencies(context: Application): (List[Resource], OffsetDirection) =
-    (context.initialResources ::: context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) :: s.content), OffsetDirection.Absolute)
+    (context.initialResources ++ context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
 
   override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
     val (resources, offsetType) = dependencies(context)
@@ -87,7 +87,7 @@ abstract class RelativeReference(val target: Label, label: Label) extends Depend
 
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 
-  override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
+  override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
     val section = context.sections.filter(s => s.content.contains(this)).head
       (section.intermediateResources(this), section.offsetDirection(this))
   }
@@ -124,7 +124,7 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
   override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
     val containingSection: Section = context.sections.filter(s => s.content.containsLabel(target)).head
     (
-    context.initialResources ::: context.sectionDependencies(containingSection) ++
+    context.initialResources ++ context.sectionDependencies(containingSection) ++
       (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
        ,OffsetDirection.Absolute
     )
