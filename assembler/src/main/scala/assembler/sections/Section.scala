@@ -12,14 +12,10 @@ abstract class Section(val alignment: Int) {
 
   def sectionType: SectionType
 
-  type EncodableCondition = (Resource)=>Boolean
+  def contains(label: Label): Boolean = content.exists(_.label == label)
+  def contains(encodable: Resource): Boolean = content.contains(encodable)
 
-  def contains(label: Label): Boolean = contains((current: Resource) => current.label == label)
-  def contains(encodable: Resource): Boolean = contains((current: Resource) => current == encodable)
-  def contains(condition: EncodableCondition): Boolean = content.exists(condition)
-
-  def precedingResources(target: Label): List[Resource] =
-    content.takeWhile(_.label != target)
+  def precedingResources(target: Label): List[Resource] = content.takeWhile(_.label != target)
 
   /** returns all resources between a reference and it's target. If it is a back reference, it will include the target
     *
