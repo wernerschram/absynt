@@ -148,6 +148,8 @@ object EncodableConversion {
       case reference: DependentResource => dependentMap(reference)
       case encodable: Encodable => encodable
     }
+
+    def dependentResources: Seq[DependentResource] = resources.collect{case r: DependentResource => r}
   }
 
   implicit class Encodables(encodables: Seq[Encodable]) {

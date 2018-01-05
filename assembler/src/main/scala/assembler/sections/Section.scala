@@ -8,8 +8,6 @@ import scala.language.implicitConversions
 abstract class Section(val alignment: Int) {
   def content: List[Resource]
 
-  def dependentResources: List[DependentResource] = content.collect{case r: DependentResource => r}
-
   def name: String
 
   def sectionType: SectionType

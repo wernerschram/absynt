@@ -13,7 +13,7 @@ class Raw(section: Section, override val startOffset: Int)
   override val alignmentFillers: Map[Section, AlignmentFiller] = Map(section -> AlignmentFiller(section))
 
   override def encodeByte: List[Byte] = {
-    val map = encodablesForReferences(section.dependentResources)
+    val map = encodablesForReferences(section.content.dependentResources)
     val finalContent = section.content.encodables(map)
     finalContent.encodeByte.toList
   }
