@@ -53,32 +53,28 @@ abstract class Elf(
   }
 
   override def sectionDependencies(section: Section): Seq[Resource] =
-    sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedByteList(Seq.fill(0x1000)(0.toByte)))
-
-  def entryReference: ElfAbsoluteReference = ElfAbsoluteReference(entryLabel, this)
+    sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte)))
 
   override def initialResources: Seq[Resource] =
-    EncodedByteList(
-      magic ++
-      ((architecture.processorClass.id +:
-      endianness.id +:
-      version.id +:
-      architecture.ABI.encodeBytes) ++
-      endianness.encode(elfType.id) ++
-      endianness.encode(architecture.processor.id) ++
-      endianness.encode(version.extended))) +:
-      entryReference +:
-    EncodedByteList(architecture.processorClass.numberBytes(programHeaderOffset)) +:
+    EncodedBytes(magic) +:
+    EncodedBytes(architecture.processorClass.id) +:
+    EncodedBytes(endianness.id) +:
+    EncodedBytes(version.id) +:
+    EncodedBytes(architecture.ABI.encodeBytes) +:
+    EncodedBytes(endianness.encode(elfType.id)) +:
+    EncodedBytes(endianness.encode(architecture.processor.id)) +:
+    EncodedBytes(endianness.encode(version.extended)) +:
+    ElfAbsoluteReference(entryLabel, this) +:
+    EncodedBytes(architecture.processorClass.numberBytes(programHeaderOffset)) +:
     ElfSectionHeaderReference(this) +:
-    EncodedByteList(
-      endianness.encode(architecture.processor.flags) ++
-      endianness.encode(architecture.processorClass.headerSize) ++
-      endianness.encode(architecture.processorClass.programHeaderSize) ++
-      endianness.encode(programHeaders.size.toShort) ++
-      endianness.encode(architecture.processorClass.sectionHeaderSize) ++
-      endianness.encode(sectionHeaders.size.toShort) ++
-      endianness.encode(stringSectionHeaderIndex.toShort)) +:
-      programHeaders.flatMap(_.resources)
+    EncodedBytes(endianness.encode(architecture.processor.flags)) +:
+    EncodedBytes(endianness.encode(architecture.processorClass.headerSize)) +:
+    EncodedBytes(endianness.encode(architecture.processorClass.programHeaderSize)) +:
+    EncodedBytes(endianness.encode(programHeaders.size.toShort)) +:
+    EncodedBytes(endianness.encode(architecture.processorClass.sectionHeaderSize)) +:
+    EncodedBytes(endianness.encode(sectionHeaders.size.toShort)) +:
+    EncodedBytes(endianness.encode(stringSectionHeaderIndex.toShort)) +:
+    programHeaders.flatMap(_.resources)
 
   override def encodeByte: Seq[Byte] = {
 
@@ -98,7 +94,7 @@ abstract class Elf(
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
   lazy val stringSection = Section(assembler.sections.SectionType.Data, ".shstrtab",
-    EncodedByteList(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
+    EncodedBytes(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
 }
 
 class Executable private(
@@ -135,7 +131,7 @@ case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends Ab
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDistance(distance: Int): Encodable =
-    EncodedByteList(elf.architecture.processorClass.numberBytes(distance))
+    EncodedBytes(elf.architecture.processorClass.numberBytes(distance))
 
   override def sizeForDistance(distance: Int): Int = elf.architecture.processorClass.numberSize
 
@@ -148,7 +144,7 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentR
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize))
+    EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
     elf.architecture.processorClass.numberSize
@@ -170,7 +166,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize + elf.startOffset))
+    EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize + elf.startOffset))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
     elf.architecture.processorClass.numberSize
@@ -191,7 +187,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(L
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize))
+    EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
     elf.architecture.processorClass.numberSize
@@ -212,7 +208,7 @@ case class ElfSectionHeaderReference(elf: Elf) extends DependentResource(Label.n
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(elf.architecture.processorClass.numberBytes(dependencySize))
+    EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
     elf.architecture.processorClass.numberSize

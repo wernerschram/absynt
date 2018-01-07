@@ -73,24 +73,24 @@ case class AbsoluteTestReference(override val target: Label, override val label:
 }
 
 object TestEncodable {
-  def linearReferenceWithTarget: (LinearRelativeTestReference, EncodedByteList) = {
+  def linearReferenceWithTarget: (LinearRelativeTestReference, EncodedBytes) = {
     val targetLabel = Label.unique
     val reference = LinearRelativeTestReference(targetLabel)
-    val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
+    val targetResource = EncodedBytes(Seq(0x00.toByte))(targetLabel)
     (reference, targetResource)
   }
 
-  def nonLinearReferenceWithTarget: (NonLinearRelativeTestReference, EncodedByteList) = {
+  def nonLinearReferenceWithTarget: (NonLinearRelativeTestReference, EncodedBytes) = {
     val targetLabel = Label.unique
     val reference = NonLinearRelativeTestReference(targetLabel)
-    val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
+    val targetResource = EncodedBytes(Seq(0x00.toByte))(targetLabel)
     (reference, targetResource)
   }
 
-  def absoluteReferenceWithTarget: (AbsoluteReference, EncodedByteList) = {
+  def absoluteReferenceWithTarget: (AbsoluteReference, EncodedBytes) = {
     val targetLabel = Label.unique
     val reference = AbsoluteTestReference(targetLabel)
-    val targetResource = EncodedByteList(Seq(0x00.toByte))(targetLabel)
+    val targetResource = EncodedBytes(Seq(0x00.toByte))(targetLabel)
     (reference, targetResource)
   }
 }

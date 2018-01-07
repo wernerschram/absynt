@@ -173,8 +173,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
-            EncodedByteList(List.fill(1)(0x00)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
@@ -192,8 +192,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
-          EncodedByteList(List.fill(1)(0x00)),
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
+          EncodedBytes(List.fill(1)(0x00.toByte)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
@@ -208,8 +208,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump = Jump(targetLabel)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
-            EncodedByteList(List.fill(1)(0x00)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+            EncodedBytes(List.fill(1)(0x00.toByte)),
             jump))
 
         val app = Raw(p, 0)
@@ -223,8 +223,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump = JumpIfCountZero(targetLabel)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
-            EncodedByteList(List.fill(1)(0x00)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+            EncodedBytes(List.fill(1)(0x00.toByte)),
             jump))
 
         val app = Raw(p, 0)
@@ -239,8 +239,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
-            EncodedByteList(List.fill(256)(0x00)),
-            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(256)(0x00.toByte)),
+            { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)(jump)
@@ -254,8 +254,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
-            EncodedByteList(List.fill(256)(0x00)),
-            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(256)(0x00.toByte)),
+            { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
 
@@ -267,8 +267,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump = Jump(targetLabel)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
-            EncodedByteList(List.fill(256)(0x00)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+            EncodedBytes(List.fill(256)(0x00.toByte)),
             jump))
 
         val app = Raw(p, 0)
@@ -284,10 +284,10 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(1)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(1)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))},
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump1))
 
         val app = Raw(p, 0)
@@ -304,10 +304,10 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = label1; EncodedByteList(List.fill(1)(0x00))},
+          { implicit val label: UniqueLabel = label1; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(122)(0x00)),
-            { implicit val label: UniqueLabel = label2; EncodedByteList(List.fill(1)(0x00))},
+            EncodedBytes(List.fill(122)(0x00.toByte)),
+            { implicit val label: UniqueLabel = label2; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump1))
 
         val app = Raw(p, 0)
@@ -324,12 +324,12 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(1)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(123)(0x00)),
+            EncodedBytes(List.fill(123)(0x00.toByte)),
             jump1,
-            EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(2)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
@@ -345,12 +345,12 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(1)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(123)(0x00)),
+            EncodedBytes(List.fill(123)(0x00.toByte)),
             jump1,
-            EncodedByteList(List.fill(3)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(3)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
@@ -366,12 +366,12 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(2)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(2)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(123)(0x00)),
+            EncodedBytes(List.fill(123)(0x00.toByte)),
             jump1,
-            EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(2)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: Nil)
@@ -389,15 +389,15 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump3 = Jump(label3)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(1)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(60)(0x00)),
+            EncodedBytes(List.fill(60)(0x00.toByte)),
             jump3,
-            EncodedByteList(List.fill(61)(0x00)),
+            EncodedBytes(List.fill(61)(0x00.toByte)),
             jump1,
-            EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
-            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(2)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(62)(0x00.toByte))},
+            { implicit val label: UniqueLabel =  label3; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: jump3 :: Nil)
@@ -416,15 +416,15 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump3 = Jump(label3)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(1)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(1)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(60)(0x00)),
+            EncodedBytes(List.fill(60)(0x00.toByte)),
             jump3,
-            EncodedByteList(List.fill(61)(0x00)),
+            EncodedBytes(List.fill(61)(0x00.toByte)),
             jump1,
-            EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(63)(0x00))},
-            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(2)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(63)(0x00.toByte))},
+            { implicit val label: UniqueLabel =  label3; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: jump3 :: Nil)
@@ -443,15 +443,15 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump3 = Jump(label3)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  label1; EncodedByteList(List.fill(2)(0x00))},
+          { implicit val label: UniqueLabel =  label1; EncodedBytes(List.fill(2)(0x00.toByte))},
             jump2,
-            EncodedByteList(List.fill(60)(0x00)),
+            EncodedBytes(List.fill(60)(0x00.toByte)),
             jump3,
-            EncodedByteList(List.fill(61)(0x00)),
+            EncodedBytes(List.fill(61)(0x00.toByte)),
             jump1,
-            EncodedByteList(List.fill(2)(0x00)),
-            { implicit val label: UniqueLabel =  label2; EncodedByteList(List.fill(62)(0x00))},
-            { implicit val label: UniqueLabel =  label3; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(2)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  label2; EncodedBytes(List.fill(62)(0x00.toByte))},
+            { implicit val label: UniqueLabel =  label3; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump1 :: jump2 :: jump3 :: Nil)
@@ -585,8 +585,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump = Jump(targetLabel)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
-            EncodedByteList(List.fill(1)(0x00)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+            EncodedBytes(List.fill(1)(0x00.toByte)),
             jump))
 
         val app = Raw(p, 0)
@@ -600,8 +600,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump = Jump(targetLabel)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))},
-            EncodedByteList(List.fill(256)(0x00)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+            EncodedBytes(List.fill(256)(0x00.toByte)),
             jump))
 
         val app = Raw(p, 0)
@@ -616,8 +616,8 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           jump,
-            EncodedByteList(List.fill(256)(0x00)),
-            { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(1)(0x00))}))
+            EncodedBytes(List.fill(256)(0x00.toByte)),
+            { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(jump :: Nil)

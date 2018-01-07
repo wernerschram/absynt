@@ -38,8 +38,8 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val reference = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           reference,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(4)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
         val encodables = application.encodablesForReferences(Seq(reference))
@@ -50,8 +50,8 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel: Label = "Label"
         val reference = Branch(targetLabel, Condition.LowerOrSame)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: Label =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-          EncodedByteList(List.fill(4)(0x00.toByte)),
+          { implicit val label: Label =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))},
+          EncodedBytes(List.fill(4)(0x00.toByte)),
           reference))
 
         val application: Application = Raw(p, 0)
@@ -63,9 +63,9 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val reference = { implicit val label: UniqueLabel =  targetLabel; Branch(targetLabel)}
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(8)(0x00.toByte)),
+          EncodedBytes(List.fill(8)(0x00.toByte)),
           reference,
-          EncodedByteList(List.fill(8)(0x00.toByte))))
+          EncodedBytes(List.fill(8)(0x00.toByte))))
 
         val application: Application = Raw(p, 0)
         val encodables = application.encodablesForReferences(Seq(reference))
@@ -77,10 +77,10 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val reference = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           Branch(targetLabel),
-            EncodedByteList(List.fill(4)(0x00.toByte)),
+            EncodedBytes(List.fill(4)(0x00.toByte)),
             reference,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(4)(0x00.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
         val encodables = application.encodablesForReferences(Seq(reference))
@@ -92,10 +92,10 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val reference1 = Branch(targetLabel)
         val reference2 = Branch(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel = targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-            EncodedByteList(List.fill(4)(0x00.toByte)),
+          { implicit val label: UniqueLabel = targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))},
+            EncodedBytes(List.fill(4)(0x00.toByte)),
             reference1,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
+            EncodedBytes(List.fill(4)(0x00.toByte)),
             reference2))
 
         val application: Application = Raw(p, 0)
@@ -134,8 +134,8 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val reference = BranchLink(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           reference,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(4)(0x00.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
         val encodables = application.encodablesForReferences(Seq(reference))
@@ -174,8 +174,8 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val reference = BranchLinkExchange(targetLabel)
         val p = Section(SectionType.Text, ".test", List[Resource](
           reference,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(4)(0x00.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
         val encodables = application.encodablesForReferences(Seq(reference))

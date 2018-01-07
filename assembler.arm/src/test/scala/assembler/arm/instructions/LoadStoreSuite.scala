@@ -87,7 +87,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
         val reference = LoadRegister(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           reference,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
+            EncodedBytes(List.fill(4)(0x00.toByte)),
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}))
 
         val application = Raw(p, 0)
@@ -99,7 +99,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
         val reference = LoadRegister(targetLabel, R1, Condition.CarrySet)
         val p = Section(SectionType.Text, ".test", List[Resource](
           { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")},
-            EncodedByteList(List.fill(4)(0x00.toByte)),
+            EncodedBytes(List.fill(4)(0x00.toByte)),
             reference))
 
         val application = Raw(p, 0)

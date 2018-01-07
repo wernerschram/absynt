@@ -150,8 +150,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           instruction,
-            EncodedByteList(List.fill(8)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(8)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
@@ -163,9 +163,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(4)(0x00.toByte)),
+          EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
@@ -177,9 +177,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-          EncodedByteList(List.fill(4)(0x00.toByte)),
+          EncodedBytes(List.fill(4)(0x00.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))},
+          EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction))
 
         val app = Raw(p, 0)
@@ -320,8 +320,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           instruction,
-            EncodedByteList(List.fill(4)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(4)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
@@ -333,9 +333,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(4)(0x00.toByte)),
+          EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))}))
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForReferences(instruction :: Nil)
@@ -347,9 +347,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(4)(0x00.toByte))},
-          EncodedByteList(List.fill(4)(0x00.toByte)),
+          EncodedBytes(List.fill(4)(0x00.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))},
+          EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction))
 
         val app = Raw(p, 0)

@@ -62,7 +62,7 @@ case class AlignmentFiller(section: Section) extends DependentResource(Label.noL
   }
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedByteList(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
+    EncodedBytes(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
     val alignment = dependencySize % section.alignment

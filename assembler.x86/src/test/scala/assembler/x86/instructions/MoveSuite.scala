@@ -313,8 +313,8 @@ class MoveSuite extends WordSpec with Matchers {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           move,
-            EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
         val encodables = app.encodablesForReferences(Seq(move))
@@ -391,10 +391,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, R10D)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
 
         an[AssertionError] should be thrownBy {
@@ -408,10 +408,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, R11)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
@@ -424,10 +424,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, ECX)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0x100)
         val encodables = app.encodablesForReferences(Seq(move))
@@ -588,10 +588,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, EBX)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedByteList(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
+            EncodedBytes(List.fill(1)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
 
         an[AssertionError] should be thrownBy {
@@ -605,10 +605,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, R11)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(2)(0x00.toByte)),
+          EncodedBytes(List.fill(2)(0x00.toByte)),
           move,
-            EncodedByteList(List.fill(2)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))}))
+            EncodedBytes(List.fill(2)(0x00.toByte)),
+            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0x10000)
         val encodables = app.encodablesForReferences(Seq(move))
@@ -620,9 +620,9 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, RBX)
 
         val p = Section(SectionType.Text, ".test", List[Resource](
-          EncodedByteList(List.fill(2)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedByteList(List.fill(1)(0x00.toByte))},
-          EncodedByteList(List.fill(2)(0x00.toByte)),
+          EncodedBytes(List.fill(2)(0x00.toByte)),
+          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+          EncodedBytes(List.fill(2)(0x00.toByte)),
           move))
 
         val app = Raw(p, 0x3000000)

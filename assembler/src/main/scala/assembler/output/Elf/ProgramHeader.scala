@@ -1,6 +1,6 @@
 package assembler.output.Elf
 
-import assembler.EncodedByteList
+import assembler.EncodedBytes
 import assembler.resource.Resource
 import assembler.sections.Section
 
@@ -11,24 +11,24 @@ class ProgramHeader(section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
 
   def resources: Seq[Resource] = elf.architecture.processorClass match {
     case ProcessorClass._32Bit =>
-      EncodedByteList(elf.endianness.encode(`type`.id)) ::
+      EncodedBytes(elf.endianness.encode(`type`.id)) ::
       ElfSectionFileReference(section, elf) ::
       ElfSectionReference(section, elf) ::
       ElfSectionReference(section, elf) ::
       ElfSectionSize(section, elf) ::
       ElfSectionSize(section, elf) ::
-      EncodedByteList(elf.endianness.encode(flags.encode.toInt)) ::
-      EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
+      EncodedBytes(elf.endianness.encode(flags.encode.toInt)) ::
+      EncodedBytes(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
       Nil
     case ProcessorClass._64Bit =>
-      EncodedByteList(elf.endianness.encode(`type`.id)) ::
-      EncodedByteList(elf.endianness.encode(flags.encode.toInt)) ::
+      EncodedBytes(elf.endianness.encode(`type`.id)) ::
+      EncodedBytes(elf.endianness.encode(flags.encode.toInt)) ::
       ElfSectionFileReference(section, elf) ::
       ElfSectionReference(section, elf) ::
       ElfSectionReference(section, elf) ::
       ElfSectionSize(section, elf) ::
       ElfSectionSize(section, elf) ::
-      EncodedByteList(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
+      EncodedBytes(elf.architecture.processorClass.numberBytes(elf.fileAlignment)) ::
       Nil
   }
 }

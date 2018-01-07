@@ -11,8 +11,8 @@ class ApplicationSuite extends WordSpec with Matchers {
 
   "an Application" when {
 
-    def filler(count: Int): EncodedByteList =
-      EncodedByteList(Seq.fill(count)(0x00.toByte))
+    def filler(count: Int): EncodedBytes =
+      EncodedBytes(Seq.fill(count)(0x00.toByte))
 
     def encodables[T <: Encodable : ClassTag](content: Seq[Resource], references: Seq[DependentResource]): Map[DependentResource, T] = {
       val application = Raw(Section(SectionType.Text, "Text", content), 0)
@@ -218,7 +218,7 @@ class ApplicationSuite extends WordSpec with Matchers {
           val fillers = application.alignmentFillers
           val result = application.encodablesForReferences(reference +: fillers.values.toSeq)
           val encodable = result(reference).asInstanceOf[AbsoluteTestEncodable]
-          val alignment2 = result(fillers(section2)).asInstanceOf[EncodedByteList]
+          val alignment2 = result(fillers(section2)).asInstanceOf[EncodedBytes]
 
           encodable.size shouldBe 3
           alignment2.size shouldBe 14
@@ -226,7 +226,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "align the first section" when {
-        val section = Section(SectionType.Data, "Test", List(EncodedByteList(Seq(0x00.toByte))))
+        val section = Section(SectionType.Data, "Test", List(EncodedBytes(Seq(0x00.toByte))))
 
         "there is a zero start offset" in {
           val application = MyApplication(List(section), 0)
@@ -244,10 +244,10 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "align the second section" when {
-        val second = Section(SectionType.Data, "Second", List(EncodedByteList(Seq(0x02.toByte))))
+        val second = Section(SectionType.Data, "Second", List(EncodedBytes(Seq(0x02.toByte))))
 
         "there is a zero start offset and a 16 byte first section" in {
-          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(16)(0x01.toByte))))
+          val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(16)(0x01.toByte))))
           val application = MyApplication(List(first, second), 0)
 
           val alignmentFiller = application.alignmentFillers(second)
@@ -256,7 +256,7 @@ class ApplicationSuite extends WordSpec with Matchers {
         }
 
         "there is a zero start offset and a 20 byte first section" in {
-          val first = Section(SectionType.Data, "First", List(EncodedByteList(Seq.fill(20)(0x01.toByte))))
+          val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(20)(0x01.toByte))))
           val application = MyApplication(List(first, second), 0)
 
           val alignmentFiller = application.alignmentFillers(second)
@@ -266,7 +266,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       }
 
       "asked for the intermediate resources" should {
-        def dummyResource = EncodedByteList(Seq(0xdd.toByte))
+        def dummyResource = EncodedBytes(Seq(0xdd.toByte))
 
         val (relative1, targetRelative1) = TestEncodable.linearReferenceWithTarget
         val (relative2, targetRelative2) = TestEncodable.linearReferenceWithTarget

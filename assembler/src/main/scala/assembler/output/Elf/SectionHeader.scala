@@ -1,6 +1,6 @@
 package assembler.output.Elf
 
-import assembler.EncodedByteList
+import assembler.EncodedBytes
 import assembler.resource.Resource
 import assembler.sections.Section
 
@@ -21,14 +21,14 @@ abstract class SectionHeader(elf: Elf) {
   implicit def endianness: Endianness = elf.endianness
 
   def resources: Seq[Resource] =
-    EncodedByteList(
+    EncodedBytes(
       elf.endianness.encode(nameReference) ++
       elf.endianness.encode(`type`.id) ++
       elf.architecture.processorClass.flagBytes(flags)) ::
     sectionReference ::
     sectionFileReference ::
     sectionFileSize ::
-    EncodedByteList(
+    EncodedBytes(
       elf.endianness.encode(link) ++
       elf.endianness.encode(info) ++
       elf.architecture.processorClass.numberBytes(alignBytes) ++
@@ -72,9 +72,9 @@ class NullSectionHeader(elf: Elf)
   val alignBytes: Int = 0
   val entrySize: Int = 0
 
-  override def sectionFileSize: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))
-  override def sectionFileReference: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))
-  override def sectionReference: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))
+  override def sectionFileSize: Resource = EncodedBytes(elf.architecture.processorClass.numberBytes(0))
+  override def sectionFileReference: Resource = EncodedBytes(elf.architecture.processorClass.numberBytes(0))
+  override def sectionReference: Resource = EncodedBytes(elf.architecture.processorClass.numberBytes(0))
 }
 
 object NullSectionHeader {
@@ -98,7 +98,7 @@ class StringSectionHeader(elf: Elf)
 
   override def sectionFileSize: Resource =  ElfSectionSize(elf.stringSection, elf)
   override def sectionFileReference: Resource = ElfSectionFileReference(elf.stringSection, elf)
-  override def sectionReference: Resource = EncodedByteList(elf.architecture.processorClass.numberBytes(0))
+  override def sectionReference: Resource = EncodedBytes(elf.architecture.processorClass.numberBytes(0))
 }
 
 object StringSectionHeader {

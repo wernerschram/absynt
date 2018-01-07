@@ -3,7 +3,7 @@ package assembler
 import assembler.ListExtensions._
 import assembler.resource.Encodable
 
-case class EncodedByteList(bytes: Seq[Byte])(implicit label: Label) extends Encodable(label) {
+case class EncodedBytes(bytes: Seq[Byte])(implicit label: Label) extends Encodable(label) {
 
   def encodeByte: Seq[Byte] = bytes
 
@@ -12,3 +12,6 @@ case class EncodedByteList(bytes: Seq[Byte])(implicit label: Label) extends Enco
   override def toString: String = s"""${labelPrefix}SETB "${bytes.bigEndianHexString}""""
 }
 
+object EncodedBytes {
+  def apply(byte: Byte)(implicit label: Label): EncodedBytes = new EncodedBytes(Seq(byte))
+}
