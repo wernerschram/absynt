@@ -1,11 +1,11 @@
 package assembler.x86.instructions
 
+import assembler._
 import assembler.resource.{AbsoluteReference, Encodable}
+import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
-import assembler.x86.{ParameterPosition, ProcessorMode}
-import assembler._
 
 object Move {
 
@@ -116,7 +116,7 @@ object Move {
     Imm8ToR8(destination, source)
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new RegisterEncoded[ByteRegister](label, register, 0xB0.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
+    new RegisterEncoded[ByteRegister](label, register, Seq(0xB0.toByte), mnemonic) with Immediate with ReversedOperands {
       assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
     }
@@ -125,7 +125,7 @@ object Move {
     Imm16ToR16(destination, source)
 
   private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new RegisterEncoded[WideRegister](label, register, 0xB8.toByte :: Nil, mnemonic) with Immediate with ReversedOperands {
+    new RegisterEncoded[WideRegister](label, register, Seq(0xB8.toByte), mnemonic) with Immediate with ReversedOperands {
       assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
     }

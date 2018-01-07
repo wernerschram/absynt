@@ -12,7 +12,7 @@ object Push {
     R16(register)
 
   private def R16(register: WideRegister)(implicit label: Label, processorMode: ProcessorMode) =
-    new RegisterEncoded[WideRegister](label, register, 0x50.toByte :: Nil, opcode, includeRexW = false) {
+    new RegisterEncoded[WideRegister](label, register, Seq(0x50.toByte), opcode, includeRexW = false) {
       override def validate(): Unit = {
         super.validate()
         processorMode match {

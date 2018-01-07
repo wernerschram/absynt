@@ -6,7 +6,7 @@ import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 class RegisterEncoded[RegisterType <: GeneralPurposeRegister](label: Label,
                                                               register: RegisterType,
-                                                              rawCode: List[Byte],
+                                                              rawCode: Seq[Byte],
                                                               override val mnemonic: String,
                                                               override val includeRexW: Boolean = true)
                                                              (override implicit val processorMode: ProcessorMode)
@@ -16,7 +16,6 @@ class RegisterEncoded[RegisterType <: GeneralPurposeRegister](label: Label,
 
   override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++ register.getRexRequirements(ParameterPosition.OpcodeReg)
 
-  override def code: List[Byte] = {
-    rawCode.take(rawCode.length - 1) ::: (rawCode.last | register.registerCode).toByte :: Nil
-  }
+  override def code: Seq[Byte] =
+    rawCode.take(rawCode.length - 1) :+ (rawCode.last | register.registerCode).toByte
 }
