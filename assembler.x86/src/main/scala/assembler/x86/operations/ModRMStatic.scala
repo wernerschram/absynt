@@ -6,7 +6,7 @@ import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 class ModRMStatic(label: Label, val operandRM: ModRMEncodableOperand,
-                  override val code: List[Byte],
+                  override val code: Seq[Byte],
                   val rValue: Byte,
                   override val mnemonic: String,
                   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)

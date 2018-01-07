@@ -7,7 +7,7 @@ import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 class ModRRMStatic[RegisterType <: GeneralPurposeRegister](label: Label,
                                                            val register: RegisterType,
                                                            operandRM: ModRMEncodableOperand,
-                                                           override val code: List[Byte],
+                                                           override val code: Seq[Byte],
                                                            override val mnemonic: String,
                                                            override val includeRexW: Boolean = true)
                                                           (override implicit val processorMode: ProcessorMode)

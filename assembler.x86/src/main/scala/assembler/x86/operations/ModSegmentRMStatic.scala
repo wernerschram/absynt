@@ -6,7 +6,7 @@ import assembler.x86.operands.{ModRMEncodableOperand, Operand, SegmentRegister}
 
 class ModSegmentRMStatic(label: Label, val register: SegmentRegister,
                          operandRM: ModRMEncodableOperand,
-                         override val code: List[Byte],
+                         override val code: Seq[Byte],
                          override val mnemonic: String,
                          override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends ModRMStatic(label, operandRM, code, register.registerCode, mnemonic, includeRexW) {

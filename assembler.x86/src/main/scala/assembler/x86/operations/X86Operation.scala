@@ -15,10 +15,10 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
   override def encodeByte: Seq[Byte] = {
     validate()
 
-    optionalSegmentOverridePrefix :::
-      optionalAddressSizePrefix :::
-      optionalOperandSizePrefix :::
-      optionalRexPrefix :::
+    optionalSegmentOverridePrefix ++
+      optionalAddressSizePrefix ++
+      optionalOperandSizePrefix ++
+      optionalRexPrefix ++
       code
   }
 
@@ -54,7 +54,7 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
   def rexRequirements: Seq[RexRequirement] =
     if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
 
-  def code: List[Byte]
+  def code: Seq[Byte]
 
   def mnemonic: String
 
