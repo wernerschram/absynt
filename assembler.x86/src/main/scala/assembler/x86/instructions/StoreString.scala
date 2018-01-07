@@ -19,7 +19,7 @@ object StoreString {
 
   private def Static8(destination: RegisterMemoryLocation.DIReference)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAA.toByte :: Nil, mnemonic) with ReversedOperands {
-      override def operands: List[ModRMEncodableOperand] = destination :: Register.AL :: Nil
+      override def operands: Seq[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
       override def operandSize: OperandSize = Register.AL.operandByteSize
 
@@ -29,7 +29,7 @@ object StoreString {
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
                       (implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAB.toByte :: Nil, mnemonic) with ReversedOperands {
-      override def operands: List[ModRMEncodableOperand] = destination :: register :: Nil
+      override def operands: Seq[ModRMEncodableOperand] = destination :: register :: Nil
 
       override def operandSize: OperandSize = register.operandByteSize
 
@@ -38,7 +38,7 @@ object StoreString {
 
   private def RepStatic8(destination: RegisterMemoryLocation.DIReference)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAA.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
-      override def operands: List[ModRMEncodableOperand] = destination :: Register.AL :: Nil
+      override def operands: Seq[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
       override def operandSize: OperandSize = Register.AL.operandByteSize
 
@@ -48,7 +48,7 @@ object StoreString {
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation.DIReference)
                          (implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xAB.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
-      override def operands: List[ModRMEncodableOperand] = destination :: register :: Nil
+      override def operands: Seq[ModRMEncodableOperand] = destination :: register :: Nil
 
       override def operandSize: OperandSize = register.operandByteSize
 
