@@ -14,8 +14,6 @@ trait Immediate extends X86Operation {
     case _ => super.operandSize
   }
 
-  abstract override def encodeByte: List[Byte] = {
+  abstract override def encodeByte: Seq[Byte] =
     super.encodeByte ++ immediate.value
-  }
-
 }

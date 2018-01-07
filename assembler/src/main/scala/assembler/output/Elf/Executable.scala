@@ -82,7 +82,7 @@ abstract class Elf(
       endianness.encode(stringSectionHeaderIndex.toShort)) ::
       programHeaders.flatMap(_.resources)
 
-  override def encodeByte: List[Byte] = {
+  override def encodeByte: Seq[Byte] = {
 
     val dependentMap: Map[DependentResource, Encodable] =
       encodablesForReferences(

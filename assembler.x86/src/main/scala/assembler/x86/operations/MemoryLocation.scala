@@ -17,6 +17,6 @@ trait MemoryLocation extends X86Operation {
     case None => location.segmentOverride
   }
 
-  abstract override def encodeByte: List[Byte] =
+  abstract override def encodeByte: Seq[Byte] =
     super.encodeByte ++ location.displacement
 }

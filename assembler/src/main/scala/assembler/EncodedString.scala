@@ -3,7 +3,7 @@ package assembler
 import assembler.resource.Encodable
 
 case class EncodedString(string: String)(implicit label: Label) extends Encodable(label) {
-  def encodeByte: List[Byte] = string.getBytes.toList
+  def encodeByte: Seq[Byte] = string.getBytes.toList
 
   def size: Int = string.length()
 

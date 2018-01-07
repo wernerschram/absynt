@@ -12,7 +12,7 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
 
   override def size: Int = encodeByte.length
 
-  override def encodeByte: List[Byte] = {
+  override def encodeByte: Seq[Byte] = {
     validate()
 
     optionalSegmentOverridePrefix :::
