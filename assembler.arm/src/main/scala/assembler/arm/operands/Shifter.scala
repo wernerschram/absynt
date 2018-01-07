@@ -2,6 +2,7 @@ package assembler.arm.operands
 
 import assembler.arm.operands.registers.GeneralRegister
 
+import scala.annotation.tailrec
 import scala.language.implicitConversions
 
 trait ShiftValue {
@@ -134,7 +135,7 @@ object Shifter {
     new RightRotateImmediate(Integer.rotateLeft(immediate, rotate).toByte, rotate)
   }
 
-  private def CreateShifters(value: Int, minRotate: Int): List[RightRotateImmediate] = {
+  private def CreateShifters(value: Int, minRotate: Int): Seq[RightRotateImmediate] = {
     if (value == 0)
       return Nil
 
@@ -142,8 +143,8 @@ object Shifter {
     val intermediateValue = value >>> shift
     val rotate: Byte = if (shift == 0) 0 else (32 - shift).toByte
 
-    Shifter.RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) :: CreateShifters(value & (0xFFFFFF00 << shift), shift)
+    Shifter.RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) +: CreateShifters(value & (0xFFFFFF00 << shift), shift)
   }
 
-  implicit def apply(immediate: Int): List[RightRotateImmediate] = CreateShifters(immediate, 0)
+  implicit def apply(immediate: Int): Seq[RightRotateImmediate] = CreateShifters(immediate, 0)
 }

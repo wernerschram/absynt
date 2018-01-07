@@ -2,8 +2,8 @@ package assembler.arm.instructions
 
 import assembler._
 import assembler.arm.operands.Condition._
+import assembler.arm.operands._
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.arm.operands.{Condition => _, _}
 import assembler.arm.operations._
 import assembler.resource.{AbsoluteReference, Encodable, RelativeReference}
 
@@ -57,14 +57,14 @@ object AddCarry extends DataProcessing(0x05.toByte, "adc") {
                  (implicit label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(apply(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(apply(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 }
 
 object Add extends DataProcessing(0x04.toByte, "add") {
-  def forShifters(source1: GeneralRegister, shifters: List[RightRotateImmediate], destination: GeneralRegister,
+  def forShifters(source1: GeneralRegister, shifters: Seq[RightRotateImmediate], destination: GeneralRegister,
     condition: Condition = Always)(implicit label: Label): ResourceCollection = {
     if (shifters.isEmpty) {
       return if (label == Label.noLabel)
@@ -72,7 +72,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
       else
         ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    ResourceCollection(apply(source1, shifters.head, destination, condition) ::
+    ResourceCollection(apply(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 
@@ -104,8 +104,8 @@ object And extends DataProcessing(0x00.toByte, "and") {
                  (implicit label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: List[RightRotateImmediate] = Shifter.apply(~source2)
-    ResourceCollection(BitClear(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(~source2)
+    ResourceCollection(BitClear(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => BitClear(destination, value, destination, condition)))
   }
 }
@@ -119,8 +119,8 @@ object BitClear extends DataProcessing(0x0E.toByte, "bic") {
       else
         ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(BitClear(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(BitClear(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => BitClear(destination, value, destination, condition)))
   }
 }
@@ -138,8 +138,8 @@ object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
       else
         ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(ExclusiveOr(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(ExclusiveOr(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => ExclusiveOr(destination, value, destination, condition)))
   }
 }
@@ -149,8 +149,8 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
     (implicit label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(apply(shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(apply(shifters.head, destination, condition) +:
       shifters.tail.map(value => Or(destination, value, destination, condition)))
   }
 
@@ -176,8 +176,8 @@ object Or extends DataProcessing(0x0C.toByte, "orr") {
       else
         ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(apply(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(apply(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Or(destination, value, destination, condition)))
   }
 }
@@ -187,8 +187,8 @@ object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
                  (implicit label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(ReverseSubtract(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(ReverseSubtract(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 }
@@ -198,8 +198,8 @@ object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
                  (implicit label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Add(destination, value, destination, condition)))
   }
 }
@@ -209,8 +209,8 @@ object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
                  (implicit label: Label): ResourceCollection = {
     if (source2 == 0)
       return ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(SubtractCarry(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(SubtractCarry(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Subtract(destination, value, destination, condition)))
   }
 }
@@ -224,8 +224,8 @@ object Subtract extends DataProcessing(0x02.toByte, "sub") {
       else
         ResourceCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
     }
-    val shifters: List[RightRotateImmediate] = Shifter.apply(source2)
-    ResourceCollection(Subtract(source1, shifters.head, destination, condition) ::
+    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+    ResourceCollection(Subtract(source1, shifters.head, destination, condition) +:
       shifters.tail.map(value => Subtract(destination, value, destination, condition)))
   }
 }

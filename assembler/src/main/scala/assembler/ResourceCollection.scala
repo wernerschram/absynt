@@ -2,7 +2,7 @@ package assembler
 
 import assembler.resource.{Encodable, Resource}
 
-case class ResourceCollection(encodables: List[Resource with Encodable])(implicit override val label: Label) extends Encodable(label) {
+case class ResourceCollection(encodables: Seq[Resource with Encodable])(implicit override val label: Label) extends Encodable(label) {
 
   override def encodeByte: Seq[Byte] = encodables.flatMap(_.encodeByte)
 
