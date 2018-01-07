@@ -4,7 +4,7 @@ import assembler.ListExtensions._
 
 import scala.language.implicitConversions
 
-final class ImmediateValue(val value: List[Byte]) extends Operand with FixedSizeOperand {
+final class ImmediateValue(val value: Seq[Byte]) extends Operand with FixedSizeOperand {
   override val operandByteSize: OperandSize = ValueSize.sizeOfValue(value.length)
 
   val isPositive: Boolean = (value.last & 0x80.toByte) == 0

@@ -22,16 +22,16 @@ abstract class SectionHeader(elf: Elf) {
 
   def resources: Seq[Resource] =
     EncodedByteList(
-      elf.endianness.encode(nameReference) :::
-      elf.endianness.encode(`type`.id) :::
+      elf.endianness.encode(nameReference) ++
+      elf.endianness.encode(`type`.id) ++
       elf.architecture.processorClass.flagBytes(flags)) ::
     sectionReference ::
     sectionFileReference ::
     sectionFileSize ::
     EncodedByteList(
-      elf.endianness.encode(link) :::
-      elf.endianness.encode(info) :::
-      elf.architecture.processorClass.numberBytes(alignBytes) :::
+      elf.endianness.encode(link) ++
+      elf.endianness.encode(info) ++
+      elf.architecture.processorClass.numberBytes(alignBytes) ++
       elf.architecture.processorClass.numberBytes(entrySize)) ::
     Nil
 }

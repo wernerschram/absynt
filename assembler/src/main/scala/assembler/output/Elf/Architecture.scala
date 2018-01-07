@@ -48,10 +48,10 @@ abstract sealed case class ProcessorClass private(id: Byte) {
   def sectionHeaderSize: Short
   def numberSize: Byte
 
-  def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): List[Byte]
-  def numberBytes(number: Long)(implicit  endianness: Endianness): List[Byte]
-  def programHeaderOffsetBytes(implicit endianness: Endianness): List[Byte]
-  def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): List[Byte]
+  def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): Seq[Byte]
+  def numberBytes(number: Long)(implicit  endianness: Endianness): Seq[Byte]
+  def programHeaderOffsetBytes(implicit endianness: Endianness): Seq[Byte]
+  def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): Seq[Byte]
 }
 case object ProcessorClass {
 
@@ -61,10 +61,10 @@ case object ProcessorClass {
     override val sectionHeaderSize: Short = 0x28
     override val numberSize: Byte = 4
 
-    override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): List[Byte] = endianness.encode(flags.encode.toInt)
-    override def numberBytes(number: Long)(implicit  endianness: Endianness): List[Byte] = endianness.encode(number.toInt)
-    override def programHeaderOffsetBytes(implicit endianness: Endianness): List[Byte] = endianness.encode(headerSize.toInt)
-    override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): List[Byte] =
+    override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(flags.encode.toInt)
+    override def numberBytes(number: Long)(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(number.toInt)
+    override def programHeaderOffsetBytes(implicit endianness: Endianness): Seq[Byte] = endianness.encode(headerSize.toInt)
+    override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): Seq[Byte] =
       endianness.encode(headerSize + headerCount * programHeaderSize)
   }
   object _64Bit extends ProcessorClass(0x02.toByte) {
@@ -73,33 +73,33 @@ case object ProcessorClass {
     override val sectionHeaderSize: Short = 0x40
     override val numberSize: Byte = 8
 
-    override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): List[Byte] = endianness.encode(flags.encode)
-    override def numberBytes(Number: Long)(implicit  endianness: Endianness): List[Byte] = endianness.encode(Number)
-    override def programHeaderOffsetBytes(implicit endianness: Endianness): List[Byte] = endianness.encode(headerSize.toLong)
-    override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): List[Byte] =
+    override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(flags.encode)
+    override def numberBytes(Number: Long)(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(Number)
+    override def programHeaderOffsetBytes(implicit endianness: Endianness): Seq[Byte] = endianness.encode(headerSize.toLong)
+    override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): Seq[Byte] =
       endianness.encode((headerSize + headerCount * programHeaderSize).toLong)
   }
 }
 
 abstract case class Endianness private(id: Byte) {
-  def encode(value: Short): List[Byte]
-  def encode(value: Int): List[Byte]
-  def encode(value: Long): List[Byte]
+  def encode(value: Short): Seq[Byte]
+  def encode(value: Int): Seq[Byte]
+  def encode(value: Long): Seq[Byte]
 }
 
 case object Endianness {
 
   import assembler.ListExtensions._
  object LittleEndian extends Endianness(0x01.toByte) {
-    override def encode(value: Short): List[Byte] = value.encodeLittleEndian
-    override def encode(value: Int): List[Byte] = value.encodeLittleEndian
-    override def encode(value: Long): List[Byte] = value.encodeLittleEndian
+    override def encode(value: Short): Seq[Byte] = value.encodeLittleEndian
+    override def encode(value: Int): Seq[Byte] = value.encodeLittleEndian
+    override def encode(value: Long): Seq[Byte] = value.encodeLittleEndian
   }
 
   object BigEndian extends Endianness(0x02.toByte) {
-    override def encode(value: Short): List[Byte] = value.encodeBigEndian
-    override def encode(value: Int): List[Byte] = value.encodeBigEndian
-    override def encode(value: Long): List[Byte] = value.encodeBigEndian
+    override def encode(value: Short): Seq[Byte] = value.encodeBigEndian
+    override def encode(value: Int): Seq[Byte] = value.encodeBigEndian
+    override def encode(value: Long): Seq[Byte] = value.encodeBigEndian
   }
 }
 

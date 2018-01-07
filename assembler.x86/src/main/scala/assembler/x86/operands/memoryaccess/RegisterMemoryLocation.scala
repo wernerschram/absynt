@@ -6,7 +6,7 @@ import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 import scala.language.implicitConversions
 
-sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displacement: List[Byte], segment: SegmentRegister)
+sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displacement: Seq[Byte], segment: SegmentRegister)
   extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
 
@@ -16,7 +16,7 @@ sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displaceme
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 
-  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ::: displacement
+  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ++ displacement
 
   override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
     index.getRexRequirements(ParameterPosition.OperandRM) ::: super.getRexRequirements(position)
@@ -30,28 +30,28 @@ sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displaceme
 
 object RegisterMemoryLocation {
 
-  def apply(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
+  def apply(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte]) =
     new RegisterMemoryLocation(index, displacement, index.defaultSegment)
 
-  def apply(index: DestinationIndex, displacement: List[Byte], segment: SegmentRegister) =
+  def apply(index: DestinationIndex, displacement: Seq[Byte], segment: SegmentRegister) =
     new DIReference(index, displacement, segment)
 
-  def byteSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
+  def byteSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Byte, index.defaultSegment)
 
-  def wordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
+  def wordSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Word, index.defaultSegment)
 
-  def doubleWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
+  def doubleWordSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.DoubleWord, index.defaultSegment)
 
-  def quadWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte]) =
+  def quadWordSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte]) =
     FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.QuadWord, index.defaultSegment)
 
-  final class DIReference private[RegisterMemoryLocation](index: DestinationIndex, displacement: List[Byte], segment: SegmentRegister)
+  final class DIReference private[RegisterMemoryLocation](index: DestinationIndex, displacement: Seq[Byte], segment: SegmentRegister)
     extends RegisterMemoryLocation(index, displacement, segment)
 
-  final class FixedSizeRegisterMemoryLocation private(index: BaseIndexPair, displacement: List[Byte],
+  final class FixedSizeRegisterMemoryLocation private(index: BaseIndexPair, displacement: Seq[Byte],
                                                       override val operandByteSize: OperandSize, segment: SegmentRegister)
     extends RegisterMemoryLocation(index, displacement, segment) with ModRMEncodableOperand with FixedSizeOperand {
 
@@ -59,24 +59,24 @@ object RegisterMemoryLocation {
   }
 
   object withSegmentOverride {
-    def apply(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
+    def apply(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte], segment: SegmentRegister) =
       new RegisterMemoryLocation(index, displacement, segment)
 
-    def byteSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
+    def byteSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte], segment: SegmentRegister) =
       FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Byte, segment)
 
-    def wordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
+    def wordSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte], segment: SegmentRegister) =
       FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Word, segment)
 
-    def doubleWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
+    def doubleWordSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte], segment: SegmentRegister) =
       FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.DoubleWord, segment)
 
-    def quadWordSize(index: BaseIndexPair, displacement: List[Byte] = List.empty[Byte], segment: SegmentRegister) =
+    def quadWordSize(index: BaseIndexPair, displacement: Seq[Byte] = Seq.empty[Byte], segment: SegmentRegister) =
       FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.QuadWord, segment)
   }
 
   private object FixedSizeRegisterMemoryLocation {
-    def apply(index: BaseIndexPair, displacement: List[Byte], operandByteSize: OperandSize, segment: SegmentRegister) =
+    def apply(index: BaseIndexPair, displacement: Seq[Byte], operandByteSize: OperandSize, segment: SegmentRegister) =
       new FixedSizeRegisterMemoryLocation(index, displacement, operandByteSize, segment)
   }
 

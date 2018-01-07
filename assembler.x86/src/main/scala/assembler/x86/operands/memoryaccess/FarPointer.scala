@@ -10,7 +10,7 @@ sealed abstract case class FarPointer[OffsetType <: X86Offset](segment: Short, o
   override def toString =
     s"FAR 0x${segment.encodeLittleEndian.bigEndianHexString}:0x${offset.encode(1).bigEndianHexString}"
 
-  def encodeByte: List[Byte] = offset.encode(1) ::: segment.encodeLittleEndian
+  def encodeByte: Seq[Byte] = offset.encode(1) ++ segment.encodeLittleEndian
 }
 
 object FarPointer {

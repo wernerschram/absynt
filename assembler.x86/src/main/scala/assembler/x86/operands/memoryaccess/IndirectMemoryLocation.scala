@@ -2,7 +2,7 @@ package assembler.x86.operands.memoryaccess
 
 import assembler.x86.operands.{OperandSize, SegmentRegister}
 
-abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: List[Byte] = List.empty[Byte],
+abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Seq[Byte] = Seq.empty[Byte],
                                       addressSize: OperandSize, segment: SegmentRegister)
   extends MemoryLocation(displacement, segment, addressSize) {
 
@@ -10,7 +10,7 @@ abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displa
 }
 
 object IndirectMemoryLocation {
-  private def getModValue(displacement: List[Byte]): Byte = {
+  private def getModValue(displacement: Seq[Byte]): Byte = {
     assume((0 :: 1 :: 2 :: 4 :: Nil).contains(displacement.size))
     displacement.length match {
       case 0 => 0x00

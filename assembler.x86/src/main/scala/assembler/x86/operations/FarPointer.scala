@@ -13,5 +13,5 @@ trait FarPointer[OffsetType <: X86Offset] extends X86Operation {
   abstract override def operandSize: FarPointerSize = pointer.operandByteSize
 
   abstract override def encodeByte: List[Byte] =
-    super.encodeByte ::: pointer.encodeByte
+    super.encodeByte ++ pointer.encodeByte
 }

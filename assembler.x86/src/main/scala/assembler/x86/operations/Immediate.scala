@@ -15,7 +15,7 @@ trait Immediate extends X86Operation {
   }
 
   abstract override def encodeByte: List[Byte] = {
-    super.encodeByte ::: immediate.value
+    super.encodeByte ++ immediate.value
   }
 
 }

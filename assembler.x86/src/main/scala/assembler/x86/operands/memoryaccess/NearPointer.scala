@@ -8,7 +8,7 @@ sealed abstract class NearPointer[OffsetType <: X86Offset](val offset: OffsetTyp
   extends Operand with FixedSizeOperand {
   val operandByteSize: OperandSize
 
-  def encodeBytes: List[Byte]
+  def encodeBytes: Seq[Byte]
 }
 
 object ShortPointer {
@@ -16,7 +16,7 @@ object ShortPointer {
     new NearPointer[OffsetType](offset) {
       val operandByteSize: ValueSize = ValueSize.Byte
 
-      override def encodeBytes: List[Byte] = offset.encodeShort(1)
+      override def encodeBytes: Seq[Byte] = offset.encodeShort(1)
 
       override def toString: String = s"0x${offset.encodeShort(1).bigEndianHexString}"
     }
@@ -27,7 +27,7 @@ object LongPointer {
     new NearPointer[OffsetType](offset) {
       val operandByteSize: OperandSize = offset.operandByteSize
 
-      override def encodeBytes: List[Byte] = offset.encode(1)
+      override def encodeBytes: Seq[Byte] = offset.encode(1)
 
       override def toString: String = s"0x${offset.encode(1).bigEndianHexString}"
     }

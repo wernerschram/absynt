@@ -10,8 +10,8 @@ abstract class X86Offset(val offset: Long) extends Offset {
 
   def operandByteSize: ValueSize
 
-  def encode(sourceInstructionBaseSize: Int): List[Byte]
-  def encodeShort(sourceInstructionBaseSize: Int): List[Byte] = offset.toByte.encodeLittleEndian
+  def encode(sourceInstructionBaseSize: Int): Seq[Byte]
+  def encodeShort(sourceInstructionBaseSize: Int): Seq[Byte] = offset.toByte.encodeLittleEndian
 }
 
 abstract class RealX86Offset(offset: Long) extends X86Offset(offset)
@@ -25,12 +25,12 @@ sealed case class RealRelativeOffset(override val offset: Long) extends RealX86O
   assert(offset>=Short.MinValue)
   assert(offset<=Short.MaxValue)
   val operandByteSize: ValueSize = ValueSize.Word
-  override def encode(sourceInstructionSize: Int): List[Byte] = offset.toShort.encodeLittleEndian
+  override def encode(sourceInstructionSize: Int): Seq[Byte] = offset.toShort.encodeLittleEndian
 }
 
 sealed case class ProtectedRelativeOffset(override val offset: Long) extends ProtectedX86Offset(offset) with X86RelativeOffset {
   val operandByteSize: ValueSize = ValueSize.DoubleWord
-  override def encode(sourceInstructionSize: Int): List[Byte] = offset.toInt.encodeLittleEndian
+  override def encode(sourceInstructionSize: Int): Seq[Byte] = offset.toInt.encodeLittleEndian
 }
 
 object X86RelativeOffset {

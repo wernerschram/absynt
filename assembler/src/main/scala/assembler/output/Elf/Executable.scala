@@ -65,20 +65,20 @@ abstract class Elf(
       architecture.processorClass.id ::
       endianness.id ::
       version.id ::
-      architecture.ABI.encodeBytes :::
-      endianness.encode(elfType.id) :::
-      endianness.encode(architecture.processor.id) :::
+      architecture.ABI.encodeBytes ++
+      endianness.encode(elfType.id).toList ++
+      endianness.encode(architecture.processor.id).toList ++
       endianness.encode(version.extended)) ::
     entryReference ::
     EncodedByteList(architecture.processorClass.numberBytes(programHeaderOffset)) ::
     ElfSectionHeaderReference(this) ::
     EncodedByteList(
-      endianness.encode(architecture.processor.flags) :::
-      endianness.encode(architecture.processorClass.headerSize) :::
-      endianness.encode(architecture.processorClass.programHeaderSize) :::
-      endianness.encode(programHeaders.size.toShort) :::
-      endianness.encode(architecture.processorClass.sectionHeaderSize) :::
-      endianness.encode(sectionHeaders.size.toShort) :::
+      endianness.encode(architecture.processor.flags) ++
+      endianness.encode(architecture.processorClass.headerSize) ++
+      endianness.encode(architecture.processorClass.programHeaderSize) ++
+      endianness.encode(programHeaders.size.toShort) ++
+      endianness.encode(architecture.processorClass.sectionHeaderSize) ++
+      endianness.encode(sectionHeaders.size.toShort) ++
       endianness.encode(stringSectionHeaderIndex.toShort)) ::
       programHeaders.flatMap(_.resources)
 

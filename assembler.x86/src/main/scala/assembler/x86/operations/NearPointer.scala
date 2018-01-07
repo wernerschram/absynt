@@ -18,5 +18,5 @@ trait NearPointer[OffsetType <: X86Offset] extends X86Operation {
   }
 
   abstract override def encodeByte: List[Byte] =
-    super.encodeByte ::: pointer.encodeBytes
+    super.encodeByte ++ pointer.encodeBytes
 }
