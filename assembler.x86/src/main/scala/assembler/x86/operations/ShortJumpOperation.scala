@@ -6,7 +6,7 @@ import assembler.x86.X86OffsetFactory
 import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 
 abstract class ShortJumpOperation[OffsetType <: X86Offset]
-  (label: Label, val shortOpcode: List[Byte], mnemonic: String, target: Label)
+  (label: Label, val shortOpcode: Seq[Byte], mnemonic: String, target: Label)
   (implicit val offsetFactory: X86OffsetFactory[OffsetType])
     extends RelativeReference(target, label) {
 

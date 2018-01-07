@@ -7,7 +7,7 @@ import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperat
 import assembler.x86.{ProcessorMode, X86OffsetFactory}
 import assembler.Label
 
-abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemonic: String) {
+abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
   def apply[OffsetType <: X86Offset](nearPointer: NearPointer[OffsetType])(implicit label: Label, processorMode: ProcessorMode):
     Static with NearPointerOperation[OffsetType] = Rel8(nearPointer)
@@ -28,7 +28,7 @@ abstract class ShortRelativeJump(val shortOpcode: List[Byte], implicit val mnemo
   }
 }
 
-abstract class ShortOrLongRelativeJump(shortOpcode: List[Byte], val longOpcode: List[Byte], mnemonic: String)
+abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
   extends ShortRelativeJump(shortOpcode, mnemonic) {
 
   override def apply[OffsetType <: X86Offset](nearPointer: NearPointer[OffsetType])(implicit label: Label, processorMode: ProcessorMode):
@@ -102,55 +102,55 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
 }
 
 private[instructions] class JumpIfOverflow(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x70.toByte :: Nil, 0x0F.toByte :: 0x80.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x70.toByte), Seq(0x0F.toByte, 0x80.toByte), mnemonic)
 
 private[instructions] class JumpIfNotOverflow(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x71.toByte :: Nil, 0x0F.toByte :: 0x81.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x71.toByte), Seq(0x0F.toByte, 0x81.toByte), mnemonic)
 
 private[instructions] class JumpIfCarry(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x72.toByte :: Nil, 0x0F.toByte :: 0x82.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), mnemonic)
 
 private[instructions] class JumpIfNoCarry(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x73.toByte :: Nil, 0x0F.toByte :: 0x83.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x73.toByte), Seq(0x0F.toByte, 0x83.toByte), mnemonic)
 
 private[instructions] class JumpIfZero(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x74.toByte :: Nil, 0x0F.toByte :: 0x84.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), mnemonic)
 
 private[instructions] class JumpIfNotZero(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x75.toByte :: Nil, 0x0F.toByte :: 0x85.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x75.toByte), Seq(0x0F.toByte, 0x85.toByte), mnemonic)
 
 private[instructions] class JumpIfCarryOrZero(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x76.toByte :: Nil, 0x0F.toByte :: 0x86.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x76.toByte), Seq(0x0F.toByte, 0x86.toByte), mnemonic)
 
 private[instructions] class JumpIfNoCarryAndNoZero(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x77.toByte :: Nil, 0x0F.toByte :: 0x87.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x77.toByte), Seq(0x0F.toByte, 0x87.toByte), mnemonic)
 
 private[instructions] class JumpIfSigned(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x78.toByte :: Nil, 0x0F.toByte :: 0x88.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x78.toByte), Seq(0x0F.toByte, 0x88.toByte), mnemonic)
 
 private[instructions] class JumpIfNotSigned(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x79.toByte :: Nil, 0x0F.toByte :: 0x8B.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x79.toByte), Seq(0x0F.toByte, 0x8B.toByte), mnemonic)
 
 private[instructions] class JumpIfParity(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x7A.toByte :: Nil, 0x0F.toByte :: 0x8A.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x7A.toByte), Seq(0x0F.toByte, 0x8A.toByte), mnemonic)
 
 private[instructions] class JumpIfNotParity(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x7B.toByte :: Nil, 0x0F.toByte :: 0x8B.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x7B.toByte), Seq(0x0F.toByte, 0x8B.toByte), mnemonic)
 
 private[instructions] class JumpIfSignedNotEqualsOverflow(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x7C.toByte :: Nil, 0x0F.toByte :: 0x8C.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x7C.toByte), Seq(0x0F.toByte, 0x8C.toByte), mnemonic)
 
 private[instructions] class JumpIfSignedEqualsOverflow(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x7D.toByte :: Nil, 0x0F.toByte :: 0x8D.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x7D.toByte), Seq(0x0F.toByte, 0x8D.toByte), mnemonic)
 
 private[instructions] class JumpIfZeroAndSignedNotEqualsOverflow(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x7E.toByte :: Nil, 0x0F.toByte :: 0x8E.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x7E.toByte), Seq(0x0F.toByte, 0x8E.toByte), mnemonic)
 
 private[instructions] class JumpIfNotZeroAndSignedEqualsOverflow(mnemonic: String)
-  extends ShortOrLongRelativeJump(0x7F.toByte :: Nil, 0x0F.toByte :: 0x8F.toByte :: Nil, mnemonic)
+  extends ShortOrLongRelativeJump(Seq(0x7F.toByte), Seq(0x0F.toByte, 0x8F.toByte), mnemonic)
 
 private[instructions] class JumpIfCountZero
-  extends ShortRelativeJump(0xE3.toByte :: Nil, "jcx")
+  extends ShortRelativeJump(Seq(0xE3.toByte), "jcx")
 
 object JumpIfAbove extends JumpIfNoCarryAndNoZero("ja")
 object JumpIfAboveOrEqual extends JumpIfNoCarry("jae")

@@ -5,7 +5,7 @@ import assembler.resource.{Encodable, Resource}
 import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 import assembler.x86.{ProcessorMode, X86OffsetFactory}
 
-abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](label: Label, shortOpcode: List[Byte], longOpcode: List[Byte], mnemonic: String, target: Label)
+abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](label: Label, shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
   extends ShortJumpOperation[OffsetType](label, shortOpcode, mnemonic, target) {
 
