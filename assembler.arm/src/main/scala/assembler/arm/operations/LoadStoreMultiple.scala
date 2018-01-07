@@ -3,7 +3,6 @@ package assembler.arm.operations
 import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.sections.Section
 
 class LoadStoreMultipleDirection(val bitMask: Int)
 
@@ -15,7 +14,7 @@ object LoadStoreMultipleDirection {
 }
 
 class LoadStoreMultiple(label: Label, direction: LoadStoreMultipleDirection, val condition: Condition, val registers:
-                        List[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, val opcode: String)
+                        Seq[GeneralRegister], val baseRegister: GeneralRegister, val addressingMode: UpdateMode, val opcode: String)
   extends Conditional(label) {
   assume(registers.nonEmpty)
   assume(baseRegister != GeneralRegister.R15)
@@ -24,9 +23,9 @@ class LoadStoreMultiple(label: Label, direction: LoadStoreMultipleDirection, val
     super.encodeWord | 0x08000000 |
       addressingMode.bitMask | direction.bitMask |
       (baseRegister.registerCode << 16) |
-      toRegisterBits(registers)
+      registerBits
 
-  def toRegisterBits(registers: List[GeneralRegister]): Int =
+  val registerBits: Int =
     registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
 
   override def toString = s"$labelPrefix$mnemonicString${addressingMode.mnemonicExtension} $baseRegisterString, $registerString"
