@@ -34,7 +34,7 @@ class ModRMStatic(label: Label, val operandRM: ModRMEncodableOperand,
     case _ => None
   }
 
-  override def rexRequirements: List[RexRequirement] = super.rexRequirements :::
+  override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++
     operandRM.getRexRequirements(ParameterPosition.OperandRM)
 
   override def encodeByte: Seq[Byte] =

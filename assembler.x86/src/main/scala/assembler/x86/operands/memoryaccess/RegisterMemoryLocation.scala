@@ -18,8 +18,8 @@ sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displaceme
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ displacement
 
-  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
-    index.getRexRequirements(ParameterPosition.OperandRM) ::: super.getRexRequirements(position)
+  override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
+    index.getRexRequirements(ParameterPosition.OperandRM) ++ super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = (index, processorMode) match {
     case (_: BaseIndexPair, ProcessorMode.Real | ProcessorMode.Protected) => true

@@ -14,7 +14,7 @@ class RegisterEncoded[RegisterType <: GeneralPurposeRegister](label: Label,
 
   override def operands: List[Operand] = register :: Nil
 
-  override def rexRequirements: List[RexRequirement] = super.rexRequirements ::: register.getRexRequirements(ParameterPosition.OpcodeReg)
+  override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++ register.getRexRequirements(ParameterPosition.OpcodeReg)
 
   override def code: List[Byte] = {
     rawCode.take(rawCode.length - 1) ::: (rawCode.last | register.registerCode).toByte :: Nil

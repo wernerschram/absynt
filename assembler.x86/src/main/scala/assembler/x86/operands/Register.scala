@@ -12,8 +12,8 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
-  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
-    position.rexRequirement.toList ::: super.getRexRequirements(position)
+  override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
+    position.rexRequirement.toList ++ super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }

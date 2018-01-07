@@ -26,9 +26,9 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
     ((scaleCode << 6) | (indexCode << 3) | baseCode).toByte
   }
 
-  override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
-    super.getRexRequirements(position) :::
-      base.getRexRequirements(ParameterPosition.Base) :::
+  override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
+    super.getRexRequirements(position) ++
+      base.getRexRequirements(ParameterPosition.Base) ++
       index.getRexRequirements(ParameterPosition.Index)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean =

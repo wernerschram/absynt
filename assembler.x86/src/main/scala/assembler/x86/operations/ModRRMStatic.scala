@@ -25,7 +25,7 @@ class ModRRMStatic[RegisterType <: GeneralPurposeRegister](label: Label,
     case _ => super.operandSize
   }
 
-  override def rexRequirements: List[RexRequirement] = super.rexRequirements :::
-    register.getRexRequirements(ParameterPosition.OperandR) :::
+  override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++
+    register.getRexRequirements(ParameterPosition.OperandR) ++
     operandRM.getRexRequirements(ParameterPosition.OperandRM)
 }

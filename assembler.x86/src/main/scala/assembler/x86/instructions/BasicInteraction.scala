@@ -69,8 +69,8 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     new ModRMStatic(label, operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
 
-      override def rexRequirements: List[RexRequirement] =
-        operand.getRexRequirements(ParameterPosition.NotEncoded) ::: super.rexRequirements
+      override def rexRequirements: Seq[RexRequirement] =
+        operand.getRexRequirements(ParameterPosition.NotEncoded) ++ super.rexRequirements
     }
 
   def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =

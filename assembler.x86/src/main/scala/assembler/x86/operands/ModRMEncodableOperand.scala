@@ -10,7 +10,7 @@ trait ModRMEncodableOperand extends Operand {
 
   private def getModRM(rValue: Byte): Byte = (((modValue & 3) << 6) | ((rValue & 7) << 3) | (registerOrMemoryModeCode & 7)).toByte
 
-  def getRexRequirements(position: ParameterPosition): List[RexRequirement] = Nil // linter:ignore UnusedParameter
+  def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] = Seq.empty // linter:ignore UnusedParameter
 }
 
 trait FixedSizeOperand {

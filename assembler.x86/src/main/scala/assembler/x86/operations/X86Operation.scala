@@ -51,7 +51,7 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
       rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitMask).toByte) :: Nil
   }
 
-  def rexRequirements: List[RexRequirement] =
+  def rexRequirements: Seq[RexRequirement] =
     if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
 
   def code: List[Byte]

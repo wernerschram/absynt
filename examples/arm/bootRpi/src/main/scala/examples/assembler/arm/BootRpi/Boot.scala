@@ -3,7 +3,6 @@ package examples.assembler.arm.BootRpi
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
-import assembler.ListExtensions._
 import assembler._
 import assembler.arm.ProcessorMode
 import assembler.arm.instructions._
