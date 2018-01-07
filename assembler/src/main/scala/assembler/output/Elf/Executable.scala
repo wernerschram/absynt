@@ -7,13 +7,13 @@ import assembler.resource.EncodableConversion._
 
 abstract class Elf(
   val architecture: Architecture,
-  val applicationSections: List[Section],
+  val applicationSections: Seq[Section],
   val entryLabel: Label)
   extends Application {
 
-  lazy val sections: List[Section] = applicationSections ::: stringSection :: Nil
+  lazy val sections: Seq[Section] = applicationSections :+ stringSection
 
-  val magic: List[Byte] = 0x7F.toByte :: "ELF".toCharArray.map(_.toByte).toList
+  val magic: Seq[Byte] = 0x7F.toByte :: "ELF".toCharArray.map(_.toByte).toList
 
   val version: ElfVersion = ElfVersion.Original
 
@@ -24,15 +24,15 @@ abstract class Elf(
   val fileAlignment: Int = 0x1000
 
   val stringMap: Map[String, Int] =
-    stringOffset(("" :: applicationSections.map(s => s.name) ::: StringSectionHeader.name :: Nil).distinct).toMap
+    stringOffset(("" +: applicationSections.map(s => s.name) :+ StringSectionHeader.name).distinct).toMap
 
-  def programHeaders: List[ProgramHeader] =
+  def programHeaders: Seq[ProgramHeader] =
     sections.init.map(s => ProgramHeader(s, this))
 
-  def sectionHeaders: List[SectionHeader] =
-    NullSectionHeader(this) ::
-    sections.init.map(s => new SectionSectionHeader(s, this)) :::
-    new StringSectionHeader(this) :: Nil
+  def sectionHeaders: Seq[SectionHeader] =
+    NullSectionHeader(this) +:
+    sections.init.map(s => new SectionSectionHeader(s, this)) :+
+    new StringSectionHeader(this)
 
   val stringSectionHeaderIndex: Int = applicationSections.size + 1
 
@@ -41,37 +41,35 @@ abstract class Elf(
   val programHeaderOffset: Long =
     architecture.processorClass.headerSize
 
-  private val dataOffset: Long =
-    programHeaderOffset + applicationSections.size * architecture.processorClass.programHeaderSize
+  def stringOffset(strings: Seq[String]): Seq[(String, Int)] =
+    (strings.head, 0) +: stringOffset(1, strings)
 
-  def stringOffset(strings: List[String]): List[(String, Int)] =
-    (strings.head, 0) :: stringOffset(1, strings)
-
-  private def stringOffset(startOffset: Int, strings: List[String]): List[(String, Int)] = strings match {
+  //TODO remove toList
+  private def stringOffset(startOffset: Int, strings: Seq[String]): Seq[(String, Int)] = strings.toList match {
     case Nil => Nil
     case head :: Nil => (head, startOffset) :: Nil
     case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
-    case head :: neck :: tail => (neck, startOffset + head.length) :: stringOffset(startOffset + head.length + 1, neck :: tail)
+    case head :: neck :: tail => (neck, startOffset + head.length) +: stringOffset(startOffset + head.length + 1, neck :: tail)
   }
 
-  override def sectionDependencies(section: Section): List[Resource] =
+  override def sectionDependencies(section: Section): Seq[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedByteList(Seq.fill(0x1000)(0.toByte)))
 
   def entryReference: ElfAbsoluteReference = ElfAbsoluteReference(entryLabel, this)
 
-  override def initialResources: List[Resource] =
+  override def initialResources: Seq[Resource] =
     EncodedByteList(
-      magic :::
-      architecture.processorClass.id ::
-      endianness.id ::
-      version.id ::
-      architecture.ABI.encodeBytes ++
-      endianness.encode(elfType.id).toList ++
-      endianness.encode(architecture.processor.id).toList ++
-      endianness.encode(version.extended)) ::
-    entryReference ::
-    EncodedByteList(architecture.processorClass.numberBytes(programHeaderOffset)) ::
-    ElfSectionHeaderReference(this) ::
+      magic ++
+      ((architecture.processorClass.id +:
+      endianness.id +:
+      version.id +:
+      architecture.ABI.encodeBytes) ++
+      endianness.encode(elfType.id) ++
+      endianness.encode(architecture.processor.id) ++
+      endianness.encode(version.extended))) +:
+      entryReference +:
+    EncodedByteList(architecture.processorClass.numberBytes(programHeaderOffset)) +:
+    ElfSectionHeaderReference(this) +:
     EncodedByteList(
       endianness.encode(architecture.processor.flags) ++
       endianness.encode(architecture.processorClass.headerSize) ++
@@ -79,21 +77,21 @@ abstract class Elf(
       endianness.encode(programHeaders.size.toShort) ++
       endianness.encode(architecture.processorClass.sectionHeaderSize) ++
       endianness.encode(sectionHeaders.size.toShort) ++
-      endianness.encode(stringSectionHeaderIndex.toShort)) ::
+      endianness.encode(stringSectionHeaderIndex.toShort)) +:
       programHeaders.flatMap(_.resources)
 
   override def encodeByte: Seq[Byte] = {
 
     val dependentMap: Map[DependentResource, Encodable] =
       encodablesForReferences(
-        alignmentFillers.values.toList :::
-        initialResources.collect{case r: DependentResource => r} :::
-        sections.flatMap(s => s.content.collect{case r: DependentResource => r}) :::
+        alignmentFillers.values.toSeq ++
+        initialResources.collect{case r: DependentResource => r} ++
+        sections.flatMap(s => s.content.collect{case r: DependentResource => r}) ++
         sectionHeaders.flatMap(p => p.resources.collect{case r: DependentResource => r})
       )
 
-    initialResources.encodables(dependentMap).flatMap(_.encodeByte).toList :::
-      sections.flatMap(s => dependentMap(alignmentFillers(s)).encodeByte.toList ::: s.content.encodables(dependentMap).encodeByte.toList) :::
+    initialResources.encodables(dependentMap).flatMap(_.encodeByte) ++
+      sections.flatMap(s => dependentMap(alignmentFillers(s)).encodeByte ++ s.content.encodables(dependentMap).encodeByte) ++
       sectionHeaders.flatMap(p => p.resources.encodables(dependentMap)).flatMap(_.encodeByte)
   }
 
@@ -105,7 +103,7 @@ abstract class Elf(
 
 class Executable private(
   architecture: Architecture,
-  sections: List[Section],
+  sections: Seq[Section],
   entryLabel: Label,
   override val startOffset: Int)
   extends Elf(architecture, sections, entryLabel) {
@@ -157,9 +155,9 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentR
 
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
-  override def dependencies(context: Application): (List[Resource], OffsetDirection) =
+  override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     if (elf.sections.head != target)
-      (elf.initialResources ::: context.alignmentFillers(target) ::
+      ((elf.initialResources :+ context.alignmentFillers(target)) ++
         context.sections.takeWhile(_ != target).flatMap(s => context.alignmentFillers(s) +: s.content)
         , OffsetDirection.Absolute)
     else
@@ -179,7 +177,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
 
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
-  override def dependencies(context: Application): (List[Resource], OffsetDirection) =
+  override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     if (elf.sections.head != target)
       ((elf.initialResources :+ context.alignmentFillers(target)) ++
         context.sectionDependencies(target), OffsetDirection.Absolute)
@@ -221,7 +219,7 @@ case class ElfSectionHeaderReference(elf: Elf) extends DependentResource(Label.n
 
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
-  override def dependencies(context: Application): (List[Resource], OffsetDirection) =
+  override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     (elf.initialResources ++ context.sections.flatMap(s => elf.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
 
   override def toString: String = s"Section header reference"

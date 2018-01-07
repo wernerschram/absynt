@@ -14,7 +14,7 @@ class ApplicationSuite extends WordSpec with Matchers {
     def filler(count: Int): EncodedByteList =
       EncodedByteList(Seq.fill(count)(0x00.toByte))
 
-    def encodables[T <: Encodable : ClassTag](content: List[Resource], references: Seq[DependentResource]): Map[DependentResource, T] = {
+    def encodables[T <: Encodable : ClassTag](content: Seq[Resource], references: Seq[DependentResource]): Map[DependentResource, T] = {
       val application = Raw(Section(SectionType.Text, "Text", content), 0)
 
       val result = application.encodablesForReferences(references)
@@ -25,12 +25,12 @@ class ApplicationSuite extends WordSpec with Matchers {
     "asked to return encodables for relative references with a linear sizeForDistance function" should {
 
 
-      def myEncodables(content: List[Resource], references: Seq[DependentResource]) =
+      def myEncodables(content: Seq[Resource], references: Seq[DependentResource]) =
         encodables[LinearRelativeTestEncodable](content, references)
 
       "calculate the correct distance and size for a forward relative reference with a nearby target" in {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           reference ::
             filler(5) ::
             target ::
@@ -43,7 +43,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
       "calculate the correct distance and size for a backward relative reference with a farther target" in {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           target ::
             filler(15) ::
             reference ::
@@ -56,7 +56,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
       "represent a forward reference by a forward representation" in {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           reference ::
             filler(5) ::
             target ::
@@ -68,7 +68,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
       "represent a backward reference by a backward representation" in {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           target ::
             filler(5) ::
             reference ::
@@ -81,7 +81,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       "represent two forward references with a nearby target where one depends on the other for its size" in {
         val (reference1, target1) = TestEncodable.linearReferenceWithTarget
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           reference1 ::
             filler(2) ::
             reference2 ::
@@ -99,7 +99,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       "represent two forward references with a farther target where one depends on the other for its size" in {
         val (reference1, target1) = TestEncodable.linearReferenceWithTarget
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           reference1 ::
             filler(2) ::
             reference2 ::
@@ -117,7 +117,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       "represent two references with a farther target which both depend on each other for their size where there is an obvious single resolution" in {
         val (reference1, target1) = TestEncodable.linearReferenceWithTarget
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           target2 ::
             filler(12) ::
             reference1 ::
@@ -135,7 +135,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       "represent two references with a farther target which both depend on each other for their size where there are multiple resolutions from which the optimal (smallest) one should be chosen" in {
         val (reference1, target1) = TestEncodable.linearReferenceWithTarget
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           target2 ::
             filler(4) ::
             reference1 ::
@@ -153,13 +153,13 @@ class ApplicationSuite extends WordSpec with Matchers {
 
     "asked to return encodables for relative references with a non-linear sizeForDistance function" should {
 
-     def myEncodables(content: List[Resource], references: Seq[DependentResource]) =
+     def myEncodables(content: Seq[Resource], references: Seq[DependentResource]) =
         encodables[NonLinearRelativeTestEncodable](content, references)
 
       "represent two references with a farther target which both depend on each other for their size where there is an obvious single resolution" in {
         val (reference1, target1) = TestEncodable.nonLinearReferenceWithTarget
         val (reference2, target2) = TestEncodable.nonLinearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           target2 ::
             filler(12) ::
             reference1 ::
@@ -178,7 +178,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       "(currently) not represent two references with a farther target which both depend on each other for their size where there is no optimal resolution" in {
         val (reference1, target1) = TestEncodable.nonLinearReferenceWithTarget
         val (reference2, target2) = TestEncodable.nonLinearReferenceWithTarget
-        val content: List[Resource] =
+        val content: Seq[Resource] =
           target2 ::
             filler(14) ::
             reference1 ::
@@ -194,7 +194,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
 
     "defined with multiple sections" should {
-      case class MyApplication(override val sections: List[Section], override val startOffset: Int) extends Application {
+      case class MyApplication(override val sections: Seq[Section], override val startOffset: Int) extends Application {
         override def encodeByte: Seq[Byte] = Seq.empty
 
         override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap

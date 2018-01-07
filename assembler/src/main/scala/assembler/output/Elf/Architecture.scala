@@ -31,7 +31,7 @@ object Architecture {
 }
 
 abstract case class OSABI private(id: Byte, version: Byte) {
-  val encodeBytes: List[Byte] = id :: version :: List.fill(7)(0x00.toByte)
+  val encodeBytes: Seq[Byte] = id +: version +: Seq.fill(7)(0x00.toByte)
 }
 
 case object OSABI {

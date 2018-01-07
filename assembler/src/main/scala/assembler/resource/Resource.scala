@@ -46,7 +46,7 @@ abstract class DependentResource(label: Label) extends Resource(label) {
 
 case class AlignmentFiller(section: Section) extends DependentResource(Label.noLabel) {
 
-  def dependencies(context: Application): (List[Resource], OffsetDirection) =
+  def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     (context.initialResources ++ context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
 
   override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
@@ -121,7 +121,7 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
     sizeForDistance(dependencySize)
   }
 
-  override def dependencies(context: Application): (List[Resource], OffsetDirection) = {
+  override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
     val containingSection: Section = context.sections.filter(s => s.content.containsLabel(target)).head
     (
     context.initialResources ++ context.sectionDependencies(containingSection) ++

@@ -48,11 +48,11 @@ abstract class Section(val alignment: Int) {
 }
 
 object Section {
-  def apply(`type`: SectionType, sectionName: String, resources: List[Resource], alignment: Int = 16): Section =
+  def apply(`type`: SectionType, sectionName: String, resources: Seq[Resource], alignment: Int = 16): Section =
     new Section(alignment) {
       override val name: String = sectionName
       override val sectionType: SectionType = `type`
-      override val content: List[Resource] =
+      override val content: Seq[Resource] =
           resources
     }
 }

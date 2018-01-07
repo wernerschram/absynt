@@ -5,7 +5,7 @@ import assembler.sections.Section
 
 abstract class Application {
 
-  def sections: List[Section]
+  def sections: Seq[Section]
 
   def alignmentFillers: Map[Section, AlignmentFiller]
 
@@ -16,7 +16,7 @@ abstract class Application {
 
   def encodeByte: Seq[Byte]
 
-  def initialResources: List[Resource]
+  def initialResources: Seq[Resource]
 
   def encodablesForReferences(references: Seq[DependentResource]): Map[DependentResource, Encodable] = {
     val (totalDependencySizes: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]]) =
