@@ -16,7 +16,7 @@ sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displaceme
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 
-  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ++ displacement
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ displacement
 
   override def getRexRequirements(position: ParameterPosition): List[RexRequirement] =
     index.getRexRequirements(ParameterPosition.OperandRM) ::: super.getRexRequirements(position)

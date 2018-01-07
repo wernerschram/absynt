@@ -11,7 +11,7 @@ sealed class MemoryAddress private(address: Seq[Byte], segment: SegmentRegister 
   override val registerOrMemoryModeCode: Byte = if (address.lengthCompare(2) == 0) 0x06.toByte else 0x05.toByte
   override val defaultSegment: SegmentRegister = Register.DS
 
-  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ++ displacement
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ displacement
 
   override def toString = s"$segmentPrefix[${address.decimalString}]"
 }

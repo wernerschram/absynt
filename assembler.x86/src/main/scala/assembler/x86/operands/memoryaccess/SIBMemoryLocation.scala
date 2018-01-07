@@ -14,7 +14,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
   val baseCode: Byte = base.SIBBaseCode
   val indexCode: Byte = index.SIBIndexCode
 
-  override def getExtendedBytes(rValue: Byte): List[Byte] = super.getExtendedBytes(rValue) ++ (getSIB +: displacement)
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ (getSIB +: displacement)
 
   def getSIB: Byte = {
     val scaleCode = scale match {
