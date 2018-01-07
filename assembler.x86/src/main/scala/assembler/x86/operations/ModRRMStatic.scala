@@ -13,7 +13,7 @@ class ModRRMStatic[RegisterType <: GeneralPurposeRegister](label: Label,
                                                           (override implicit val processorMode: ProcessorMode)
   extends ModRMStatic(label, operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
-  override def operands: List[Operand] = register :: super.operands
+  override def operands: Seq[Operand] = register +: super.operands
 
   override def validate(): Unit = {
     super.validate()

@@ -42,7 +42,7 @@ object Move {
 
   private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: List[Operand] = Register.AL :: super.operands
+      override def operands: Seq[Operand] = Register.AL +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
@@ -65,7 +65,7 @@ object Move {
 
   private def AXToMOffs16(accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: List[Operand] = accumulatorRegister :: super.operands
+      override def operands: Seq[Operand] = accumulatorRegister +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
@@ -85,7 +85,7 @@ object Move {
 
   private def MOffs8ToAL(memoryLocation: MemoryLocation)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
-      override def operands: List[Operand] = Register.AL :: super.operands
+      override def operands: Seq[Operand] = Register.AL +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
@@ -105,7 +105,7 @@ object Move {
 
   private def MOffs16ToAX(memoryLocation: MemoryLocation, accumulatorRegister: AccumulatorRegister)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
-      override def operands: List[Operand] = accumulatorRegister :: super.operands
+      override def operands: Seq[Operand] = accumulatorRegister +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 

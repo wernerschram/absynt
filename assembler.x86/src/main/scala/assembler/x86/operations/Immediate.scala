@@ -7,7 +7,7 @@ trait Immediate extends X86Operation {
   self: X86Operation =>
   def immediate: ImmediateValue
 
-  abstract override def operands: List[Operand] = super.operands ::: immediate :: Nil
+  abstract override def operands: Seq[Operand] = super.operands :+ immediate
 
   abstract override def operandSize: OperandSize = super.operandSize match {
     case OperandSize.Unknown => immediate.operandByteSize

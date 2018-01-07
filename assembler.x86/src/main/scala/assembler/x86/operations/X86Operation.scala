@@ -8,7 +8,7 @@ import assembler.resource.Encodable
 abstract class X86Operation(label: Label) extends Encodable(label) {
   val includeRexW: Boolean = true
 
-  def operands: List[Operand]
+  def operands: Seq[Operand]
 
   override def size: Int = encodeByte.length
 

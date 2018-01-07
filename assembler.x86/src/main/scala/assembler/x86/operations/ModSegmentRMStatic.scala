@@ -11,7 +11,7 @@ class ModSegmentRMStatic(label: Label, val register: SegmentRegister,
                          override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends ModRMStatic(label, operandRM, code, register.registerCode, mnemonic, includeRexW) {
 
-  override def operands: List[Operand] = register :: super.operands
+  override def operands: Seq[Operand] = register +: super.operands
 
   override def validate(): Unit = {
     super.validate()

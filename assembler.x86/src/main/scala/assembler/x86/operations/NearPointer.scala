@@ -8,7 +8,7 @@ trait NearPointer[OffsetType <: X86Offset] extends X86Operation {
   self: X86Operation =>
   def pointer: NearPointerType[OffsetType]
 
-  abstract override def operands: List[Operand] = super.operands ::: pointer :: Nil
+  abstract override def operands: Seq[Operand] = super.operands :+ pointer
 
   abstract override def operandSize: OperandSize = pointer.operandByteSize
 

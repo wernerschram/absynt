@@ -21,7 +21,7 @@ object Input {
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xE4.toByte :: Nil, opcode) with Immediate with ReversedOperands {
-      override def operands: List[Operand] = Register.AL :: super.operands
+      override def operands: Seq[Operand] = Register.AL +: super.operands
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -33,7 +33,7 @@ object Input {
 
   private def Imm8ToAX(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xE5.toByte :: Nil, opcode) with Immediate with ReversedOperands {
-      override def operands: List[Operand] = Register.AX :: super.operands
+      override def operands: Seq[Operand] = Register.AX +: super.operands
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -86,7 +86,7 @@ object Output {
 
   private def ALToImm8(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xE6.toByte :: Nil, opcode) with Immediate {
-      override def operands: List[Operand] = Register.AL :: super.operands
+      override def operands: Seq[Operand] = Register.AL +: super.operands
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -98,7 +98,7 @@ object Output {
 
   private def AXToImm8(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
     new Static(label, 0xE7.toByte :: Nil, opcode) with Immediate {
-      override def operands: List[Operand] = Register.AX :: super.operands
+      override def operands: Seq[Operand] = Register.AX +: super.operands
 
       override val immediate: ImmediateValue = immediateValue
 

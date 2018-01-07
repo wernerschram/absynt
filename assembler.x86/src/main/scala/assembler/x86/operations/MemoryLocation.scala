@@ -8,7 +8,7 @@ trait MemoryLocation extends X86Operation {
   self: X86Operation =>
   def location: MemoryLocationType
 
-  abstract override def operands: List[Operand] = super.operands ::: location :: Nil
+  abstract override def operands: Seq[Operand] = super.operands :+ location
 
   abstract override def addressSize: OperandSize = location.addressSize
 

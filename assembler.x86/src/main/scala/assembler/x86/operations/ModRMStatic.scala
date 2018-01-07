@@ -12,7 +12,7 @@ class ModRMStatic(label: Label, val operandRM: ModRMEncodableOperand,
                   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends X86Operation(label) {
 
-  override def operands: List[Operand] = operandRM :: Nil
+  override def operands: Seq[Operand] = Seq(operandRM)
 
   override def validate(): Unit = {
     super.validate()

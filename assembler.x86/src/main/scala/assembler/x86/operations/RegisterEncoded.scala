@@ -12,7 +12,7 @@ class RegisterEncoded[RegisterType <: GeneralPurposeRegister](label: Label,
                                                              (override implicit val processorMode: ProcessorMode)
   extends X86Operation(label) {
 
-  override def operands: List[Operand] = register :: Nil
+  override def operands: Seq[Operand] = Seq(register)
 
   override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++ register.getRexRequirements(ParameterPosition.OpcodeReg)
 
