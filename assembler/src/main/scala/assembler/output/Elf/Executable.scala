@@ -23,8 +23,9 @@ abstract class Elf(
 
   val fileAlignment: Int = 0x1000
 
-  val stringMap: Map[String, Int] =
-    stringOffset(("" +: applicationSections.map(s => s.name) :+ StringSectionHeader.name).distinct).toMap
+  val stringMap: Map[String, Int] = (applicationSections.map(s => s.name) :+ StringSectionHeader.name)
+    .distinct.foldLeft(Seq(("", 0)))((accumulated, current) =>
+      (current, accumulated.head._2 + accumulated.head._1.length + 1) +: accumulated).toMap
 
   def programHeaders: Seq[ProgramHeader] =
     sections.init.map(s => ProgramHeader(s, this))
@@ -36,21 +37,10 @@ abstract class Elf(
 
   val stringSectionHeaderIndex: Int = applicationSections.size + 1
 
-  val stringTableSize: Int = stringMap.keys.toList.map(k => k.length + 1).sum // + 1 because they are null terminated
+  val stringTableSize: Int = stringMap.keys.map(k => k.length + 1).sum // + 1 because they are null terminated
 
   val programHeaderOffset: Long =
     architecture.processorClass.headerSize
-
-  def stringOffset(strings: Seq[String]): Seq[(String, Int)] =
-    (strings.head, 0) +: stringOffset(1, strings)
-
-  //TODO remove toList
-  private def stringOffset(startOffset: Int, strings: Seq[String]): Seq[(String, Int)] = strings.toList match {
-    case Nil => Nil
-    case head :: Nil => (head, startOffset) :: Nil
-    case head :: neck :: Nil => (neck, startOffset + head.length) :: Nil
-    case head :: neck :: tail => (neck, startOffset + head.length) +: stringOffset(startOffset + head.length + 1, neck :: tail)
-  }
 
   override def sectionDependencies(section: Section): Seq[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte)))
@@ -94,7 +84,7 @@ abstract class Elf(
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
   lazy val stringSection = Section(assembler.sections.SectionType.Data, ".shstrtab",
-    EncodedBytes(stringMap.keys.toList.flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
+    EncodedBytes(stringMap.toSeq.sortBy(_._2).map(_._1).flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
 }
 
 class Executable private(
