@@ -40,7 +40,7 @@ abstract class DependentResource(label: Label) extends Resource(label) {
         case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
       }
 
-    (totalDependent, totalIndependent, offsetType)
+    (totalDependent, totalIndependent + context.startOffset, offsetType)
   }
 }
 
@@ -48,18 +48,6 @@ case class AlignmentFiller(section: Section) extends DependentResource(Label.noL
 
   def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     (context.initialResources ++ context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
-
-  override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
-    val (resources, offsetType) = dependencies(context)
-
-    val (totalDependent, totalIndependent) = resources
-      .foldLeft((Seq.empty[DependentResource], 0)) {
-        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
-        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
-      }
-
-    (totalDependent, totalIndependent + context.startOffset, offsetType)
-  }
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedBytes(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
@@ -128,18 +116,6 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
       (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
        ,OffsetDirection.Absolute
     )
-  }
-
-  override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
-    val (resources, offsetType) = dependencies(context)
-
-    val (totalDependent, totalIndependent) = resources
-      .foldLeft((Seq.empty[DependentResource], 0)) {
-        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
-        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
-      }
-
-    (totalDependent, totalIndependent + context.startOffset, offsetType)
   }
 }
 
