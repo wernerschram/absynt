@@ -51,7 +51,7 @@ object HelloWorld extends App {
     val out = new FileOutputStream(outputFilePath.toFile)
 
     val exec = Executable(Architecture.X86_64, text :: data :: Nil, entry, 0x8048000)
-    (text.content zip text.content.encodables(exec.encodablesForReferences(text.content.dependentResources))).foreach {
+    (text.content zip text.content.encodables(exec.encodablesForDependencies(text.content.dependentResources))).foreach {
       case (orig: RelativeReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (orig: AbsoluteReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (_, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded")

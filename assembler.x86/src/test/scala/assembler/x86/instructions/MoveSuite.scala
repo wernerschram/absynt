@@ -317,7 +317,7 @@ class MoveSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0)
-        val encodables = app.encodablesForReferences(Seq(move))
+        val encodables = app.encodablesForDependencies(Seq(move))
         withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("B8 04 00")) }
       }
 
@@ -399,7 +399,7 @@ class MoveSuite extends WordSpec with Matchers {
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
-          app.encodablesForReferences(Seq(move))
+          app.encodablesForDependencies(Seq(move))
         }
       }
 
@@ -415,7 +415,7 @@ class MoveSuite extends WordSpec with Matchers {
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
-          app.encodablesForReferences(Seq(move))
+          app.encodablesForDependencies(Seq(move))
         }
       }
 
@@ -430,7 +430,7 @@ class MoveSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0x100)
-        val encodables = app.encodablesForReferences(Seq(move))
+        val encodables = app.encodablesForDependencies(Seq(move))
         withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
       }
 
@@ -596,7 +596,7 @@ class MoveSuite extends WordSpec with Matchers {
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
-          app.encodablesForReferences(Seq(move))
+          app.encodablesForDependencies(Seq(move))
         }
       }
 
@@ -611,7 +611,7 @@ class MoveSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
 
         val app = Raw(p, 0x10000)
-        val encodables = app.encodablesForReferences(Seq(move))
+        val encodables = app.encodablesForDependencies(Seq(move))
         withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("49 BB 0E 00 01 00 00 00 00 00")) }
       }
 
@@ -626,7 +626,7 @@ class MoveSuite extends WordSpec with Matchers {
           move))
 
         val app = Raw(p, 0x3000000)
-        val encodables = app.encodablesForReferences(Seq(move))
+        val encodables = app.encodablesForDependencies(Seq(move))
         withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
       }
 

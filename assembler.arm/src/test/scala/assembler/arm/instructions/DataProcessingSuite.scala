@@ -154,7 +154,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
-        val encodable = app.encodablesForReferences(instruction :: Nil)
+        val encodable = app.encodablesForDependencies(instruction :: Nil)
 
         encodable(instruction).encodeByte should be(Hex.msb("e2801f01"))
       }
@@ -168,7 +168,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
-        val encodable = app.encodablesForReferences(instruction :: Nil)
+        val encodable = app.encodablesForDependencies(instruction :: Nil)
 
         encodable(instruction).encodeByte should be(Hex.msb("e2801fff e2811bff e28117ff e281133f"))
       }
@@ -183,7 +183,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction))
 
         val app = Raw(p, 0)
-        val encodable = app.encodablesForReferences(instruction :: Nil)
+        val encodable = app.encodablesForDependencies(instruction :: Nil)
 
         encodable(instruction).encodeByte should be(Hex.msb("e2801eff e2811aff e28116ff e281120f"))
       }
@@ -324,7 +324,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
-        val encodable = app.encodablesForReferences(instruction :: Nil)
+        val encodable = app.encodablesForDependencies(instruction :: Nil)
 
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
@@ -338,7 +338,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val app = Raw(p, 0)
-        val encodable = app.encodablesForReferences(instruction :: Nil)
+        val encodable = app.encodablesForDependencies(instruction :: Nil)
 
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
@@ -353,7 +353,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
           instruction))
 
         val app = Raw(p, 0)
-        val encodable = app.encodablesForReferences(instruction :: Nil)
+        val encodable = app.encodablesForDependencies(instruction :: Nil)
         encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 

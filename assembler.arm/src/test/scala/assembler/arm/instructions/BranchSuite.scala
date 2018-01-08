@@ -42,7 +42,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference))
+        val encodables = application.encodablesForDependencies(Seq(reference))
         encodables(reference).encodeByte shouldBe Hex.msb("EA000000")
       }
 
@@ -55,7 +55,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           reference))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference))
+        val encodables = application.encodablesForDependencies(Seq(reference))
         encodables(reference).encodeByte shouldBe Hex.msb("9AFFFFFC")
       }
 
@@ -68,7 +68,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           EncodedBytes(List.fill(8)(0x00.toByte))))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference))
+        val encodables = application.encodablesForDependencies(Seq(reference))
         encodables(reference).encodeByte shouldBe Hex.msb("EAFFFFFE")
       }
 
@@ -83,7 +83,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference))
+        val encodables = application.encodablesForDependencies(Seq(reference))
         encodables(reference).encodeByte shouldBe Hex.msb("EA000000")
       }
 
@@ -99,7 +99,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
             reference2))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference1, reference2))
+        val encodables = application.encodablesForDependencies(Seq(reference1, reference2))
         encodables(reference1).encodeByte shouldBe Hex.msb("EAFFFFFC")
         encodables(reference2).encodeByte shouldBe Hex.msb("EAFFFFFA")
       }
@@ -138,7 +138,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference))
+        val encodables = application.encodablesForDependencies(Seq(reference))
         encodables(reference).encodeByte shouldBe Hex.msb("EB000000")
       }
     }
@@ -178,7 +178,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
           { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
 
         val application: Application = Raw(p, 0)
-        val encodables = application.encodablesForReferences(Seq(reference))
+        val encodables = application.encodablesForDependencies(Seq(reference))
         encodables(reference).encodeByte shouldBe Hex.msb("FA000000")
       }
     }

@@ -13,7 +13,7 @@ abstract class Elf(
 
   lazy val sections: Seq[Section] = applicationSections :+ stringSection
 
-  val magic: Seq[Byte] = 0x7F.toByte :: "ELF".toCharArray.map(_.toByte).toList
+  val magic: Seq[Byte] = 0x7F.toByte +: "ELF".toCharArray.map(_.toByte)
 
   val version: ElfVersion = ElfVersion.Original
 
@@ -27,10 +27,10 @@ abstract class Elf(
     .distinct.foldLeft(Seq(("", 0)))((accumulated, current) =>
       (current, accumulated.head._2 + accumulated.head._1.length + 1) +: accumulated).toMap
 
-  def programHeaders: Seq[ProgramHeader] =
+  val programHeaders: Seq[ProgramHeader] =
     sections.init.map(s => ProgramHeader(s, this))
 
-  def sectionHeaders: Seq[SectionHeader] =
+  val sectionHeaders: Seq[SectionHeader] =
     NullSectionHeader(this) +:
     sections.init.map(s => new SectionSectionHeader(s, this)) :+
     new StringSectionHeader(this)
@@ -45,41 +45,38 @@ abstract class Elf(
   override def sectionDependencies(section: Section): Seq[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte)))
 
-  override def initialResources: Seq[Resource] =
-    EncodedBytes(magic) +:
-    EncodedBytes(architecture.processorClass.id) +:
-    EncodedBytes(endianness.id) +:
-    EncodedBytes(version.id) +:
-    EncodedBytes(architecture.ABI.encodeBytes) +:
-    EncodedBytes(endianness.encode(elfType.id)) +:
-    EncodedBytes(endianness.encode(architecture.processor.id)) +:
-    EncodedBytes(endianness.encode(version.extended)) +:
-    ElfAbsoluteReference(entryLabel, this) +:
-    EncodedBytes(architecture.processorClass.numberBytes(programHeaderOffset)) +:
-    ElfSectionHeaderReference(this) +:
-    EncodedBytes(endianness.encode(architecture.processor.flags)) +:
-    EncodedBytes(endianness.encode(architecture.processorClass.headerSize)) +:
-    EncodedBytes(endianness.encode(architecture.processorClass.programHeaderSize)) +:
-    EncodedBytes(endianness.encode(programHeaders.size.toShort)) +:
-    EncodedBytes(endianness.encode(architecture.processorClass.sectionHeaderSize)) +:
-    EncodedBytes(endianness.encode(sectionHeaders.size.toShort)) +:
-    EncodedBytes(endianness.encode(stringSectionHeaderIndex.toShort)) +:
-    programHeaders.flatMap(_.resources)
+  val applicationHeader: Seq[Resource] =
+    Seq(
+      EncodedBytes(magic),
+      EncodedBytes(architecture.processorClass.id),
+      EncodedBytes(endianness.id),
+      EncodedBytes(version.id),
+      EncodedBytes(architecture.ABI.encodeBytes),
+      EncodedBytes(endianness.encode(elfType.id)),
+      EncodedBytes(endianness.encode(architecture.processor.id)),
+      EncodedBytes(endianness.encode(version.extended)),
+      ElfAbsoluteReference(entryLabel, this),
+      EncodedBytes(architecture.processorClass.numberBytes(programHeaderOffset)),
+      ElfSectionHeaderReference(this),
+      EncodedBytes(endianness.encode(architecture.processor.flags)),
+      EncodedBytes(endianness.encode(architecture.processorClass.headerSize)),
+      EncodedBytes(endianness.encode(architecture.processorClass.programHeaderSize)),
+      EncodedBytes(endianness.encode(programHeaders.size.toShort)),
+      EncodedBytes(endianness.encode(architecture.processorClass.sectionHeaderSize)),
+      EncodedBytes(endianness.encode(sectionHeaders.size.toShort)),
+      EncodedBytes(endianness.encode(stringSectionHeaderIndex.toShort))
+    )
 
-  override def encodeByte: Seq[Byte] = {
+  override val initialResources: Seq[Resource] =
+    applicationHeader ++ programHeaders.flatMap(_.resources)
 
-    val dependentMap: Map[DependentResource, Encodable] =
-      encodablesForReferences(
-        alignmentFillers.values.toSeq ++
-        initialResources.collect{case r: DependentResource => r} ++
-        sections.flatMap(s => s.content.collect{case r: DependentResource => r}) ++
-        sectionHeaders.flatMap(p => p.resources.collect{case r: DependentResource => r})
-      )
+  val resources: Seq[Resource] =
+   initialResources ++
+      sections.flatMap(s => alignmentFillers(s) +: s.content) ++
+      sectionHeaders.flatMap(p => p.resources)
 
-    initialResources.encodables(dependentMap).flatMap(_.encodeByte) ++
-      sections.flatMap(s => dependentMap(alignmentFillers(s)).encodeByte ++ s.content.encodables(dependentMap).encodeByte) ++
-      sectionHeaders.flatMap(p => p.resources.encodables(dependentMap)).flatMap(_.encodeByte)
-  }
+  override lazy val encodeByte: Seq[Byte] =
+    resources.encodables(encodablesForDependencies(resources.collect{case r: DependentResource => r})).encodeByte
 
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 

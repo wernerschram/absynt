@@ -17,7 +17,7 @@ class ApplicationSuite extends WordSpec with Matchers {
     def encodables[T <: Encodable : ClassTag](content: Seq[Resource], references: Seq[DependentResource]): Map[DependentResource, T] = {
       val application = Raw(Section(SectionType.Text, "Text", content), 0)
 
-      val result = application.encodablesForReferences(references)
+      val result = application.encodablesForDependencies(references)
       result.foreach(_._2 shouldBe a[T])
       result.mapValues(_.asInstanceOf[T])
     }
@@ -216,7 +216,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
           val application = MyApplication(List(section1, section2), 0)
           val fillers = application.alignmentFillers
-          val result = application.encodablesForReferences(reference +: fillers.values.toSeq)
+          val result = application.encodablesForDependencies(reference +: fillers.values.toSeq)
           val encodable = result(reference).asInstanceOf[AbsoluteTestEncodable]
           val alignment2 = result(fillers(section2)).asInstanceOf[EncodedBytes]
 
@@ -231,14 +231,14 @@ class ApplicationSuite extends WordSpec with Matchers {
         "there is a zero start offset" in {
           val application = MyApplication(List(section), 0)
           val alignmentFiller = application.alignmentFillers(section)
-          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
+          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 0
         }
 
         "there is a start offset of 1" in {
           val application = MyApplication(List(section), 1)
           val alignmentFiller = application.alignmentFillers(section)
-          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
+          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 15
         }
       }
@@ -251,7 +251,7 @@ class ApplicationSuite extends WordSpec with Matchers {
           val application = MyApplication(List(first, second), 0)
 
           val alignmentFiller = application.alignmentFillers(second)
-          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
+          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 0
         }
 
@@ -260,7 +260,7 @@ class ApplicationSuite extends WordSpec with Matchers {
           val application = MyApplication(List(first, second), 0)
 
           val alignmentFiller = application.alignmentFillers(second)
-          val filler = application.encodablesForReferences(Seq(alignmentFiller))(alignmentFiller)
+          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
           filler.size shouldBe 12
         }
       }

@@ -47,7 +47,8 @@ abstract class DependentResource(label: Label) extends Resource(label) {
 case class AlignmentFiller(section: Section) extends DependentResource(Label.noLabel) {
 
   def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
-    (context.initialResources ++ context.sections.takeWhile(s => s != section).flatMap(s => context.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
+    (context.initialResources ++ context.sections.takeWhile(s => s != section)
+      .flatMap(s => context.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedBytes(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
