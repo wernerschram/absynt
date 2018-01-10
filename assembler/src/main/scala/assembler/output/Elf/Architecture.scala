@@ -94,12 +94,16 @@ case object Endianness {
     override def encode(value: Short): Seq[Byte] = value.encodeLittleEndian
     override def encode(value: Int): Seq[Byte] = value.encodeLittleEndian
     override def encode(value: Long): Seq[Byte] = value.encodeLittleEndian
+
+   override def toString: String = "LittleEndian"
   }
 
   object BigEndian extends Endianness(0x02.toByte) {
     override def encode(value: Short): Seq[Byte] = value.encodeBigEndian
     override def encode(value: Int): Seq[Byte] = value.encodeBigEndian
     override def encode(value: Long): Seq[Byte] = value.encodeBigEndian
+
+    override def toString: String = "BigEndian"
   }
 }
 

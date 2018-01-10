@@ -4,7 +4,7 @@ import assembler.EncodedBytes
 import assembler.resource.Resource
 import assembler.sections.Section
 
-class ProgramHeader(section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
+class ProgramHeader(val section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
 
   implicit def endianness: Endianness = elf.endianness

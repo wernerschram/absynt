@@ -108,13 +108,15 @@ case object ElfVersion {
   object Original extends ElfVersion(0x01.toByte, 0x01)
 }
 
-case class ElfType private(id: Short)
+case class ElfType private(id: Short, name: String) {
+  override def toString: String = name
+}
 
 case object ElfType {
-  object Relocatable extends ElfType(0x01.toShort)
-  object Executable extends ElfType(0x02.toShort)
-  object Shared extends ElfType(0x03.toShort)
-  object Core extends ElfType(0x04.toShort)
+  object Relocatable extends ElfType(0x01.toShort, "Relocatable")
+  object Executable extends ElfType(0x02.toShort, "Executable")
+  object Shared extends ElfType(0x03.toShort, "Shared")
+  object Core extends ElfType(0x04.toShort, "Core")
 }
 
 case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {

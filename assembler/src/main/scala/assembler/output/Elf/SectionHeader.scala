@@ -36,7 +36,7 @@ abstract class SectionHeader(elf: Elf) {
     Nil
 }
 
-class SectionSectionHeader(section: Section, elf: Elf) extends SectionHeader(elf) {
+class SectionSectionHeader(val section: Section, elf: Elf) extends SectionHeader(elf) {
 
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
