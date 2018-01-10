@@ -47,9 +47,7 @@ abstract class Elf(
       sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte)))
 
   override def alignedSectionDependencies(section: Section): Seq[Resource] =
-    applicationHeader ++ programHeaders.flatMap(_.resources) ++
-      (alignmentFillers(section) +:
-        sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte))))
+    sectionDependencies(section) :+ alignmentFillers(section)
 
   val applicationHeader: Seq[Resource] =
     Seq(
