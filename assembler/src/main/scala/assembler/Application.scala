@@ -11,12 +11,21 @@ abstract class Application {
 
   def startOffset: Int
 
+  val startFiller: Encodable = new Encodable(Label.noLabel) {
+    override def encodeByte: Seq[Byte] = Seq.empty
+
+    override def size: Int = startOffset
+
+    override def toString: String = "start offset filler"
+  }
+
   def sectionDependencies(section: Section): Seq[Resource] =
     sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content)
 
-  def encodeByte: Seq[Byte]
+  def alignedSectionDependencies(section: Section): Seq[Resource] =
+    sectionDependencies(section) :+ alignmentFillers(section)
 
-  def initialResources: Seq[Resource]
+  def encodeByte: Seq[Byte]
 
   def encodablesForDependencies(references: Seq[DependentResource]): Map[DependentResource, Encodable] = {
     val (totalDependencySizes: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]]) =

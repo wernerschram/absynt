@@ -198,8 +198,6 @@ class ApplicationSuite extends WordSpec with Matchers {
         override def encodeByte: Seq[Byte] = Seq.empty
 
         override def alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
-
-        override def initialResources: List[Resource] = Nil
       }
 
       "asked to return encodables for absolute references with a linear sizeForDistance function" should {
@@ -282,6 +280,8 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         val application: MyApplication = MyApplication(List(first, second), 100)
 
+        val startFiller = application.startFiller
+
         val filler1 = application.alignmentFillers(first)
         val filler2 = application.alignmentFillers(second)
 
@@ -294,20 +294,20 @@ class ApplicationSuite extends WordSpec with Matchers {
         }
 
         "return the intermediate resources for an absolute reference in the first section" in {
-          absolute1.dependencies(application) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
+          absolute1.dependencies(application) shouldBe (Seq(startFiller, filler1, relative1, absolute1, dummy1in1,
             targetAbsolute2, targetRelative1, dummy2in1, filler2, absolute2, dummy1in2, targetRelative2, dummy2in2, relative2), OffsetDirection.Absolute)
         }
 
         "return the intermediate resources for an absolute reference in the second section" in {
-          absolute2.dependencies(application) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1), OffsetDirection.Absolute)
+          absolute2.dependencies(application) shouldBe (Seq(startFiller, filler1, relative1, absolute1, dummy1in1), OffsetDirection.Absolute)
         }
 
         "return the intermediate resources for the filler in the first section" in {
-          filler1.dependencies(application) shouldBe(Seq.empty, OffsetDirection.Absolute)
+          filler1.dependencies(application) shouldBe(Seq(startFiller), OffsetDirection.Absolute)
         }
 
         "return the intermediate resources for the filler in the second section" in {
-          filler2.dependencies(application) shouldBe (Seq(filler1, relative1, absolute1, dummy1in1,
+          filler2.dependencies(application) shouldBe (Seq(startFiller, filler1, relative1, absolute1, dummy1in1,
             targetAbsolute2, targetRelative1, dummy2in1), OffsetDirection.Absolute)
         }
       }

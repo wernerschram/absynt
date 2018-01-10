@@ -17,7 +17,7 @@ abstract class Elf(
 
   val version: ElfVersion = ElfVersion.Original
 
-  implicit def endianness: Endianness = architecture.endianness
+  implicit val endianness: Endianness = architecture.endianness
 
   def elfType: ElfType
 
@@ -43,7 +43,13 @@ abstract class Elf(
     architecture.processorClass.headerSize
 
   override def sectionDependencies(section: Section): Seq[Resource] =
-    sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte)))
+    applicationHeader ++ programHeaders.flatMap(_.resources) ++
+      sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte)))
+
+  override def alignedSectionDependencies(section: Section): Seq[Resource] =
+    applicationHeader ++ programHeaders.flatMap(_.resources) ++
+      (alignmentFillers(section) +:
+        sections.takeWhile(_ != section).flatMap(s => alignmentFillers(s) +: s.content :+ EncodedBytes(Seq.fill(0x1000)(0.toByte))))
 
   val applicationHeader: Seq[Resource] =
     Seq(
@@ -67,11 +73,8 @@ abstract class Elf(
       EncodedBytes(endianness.encode(stringSectionHeaderIndex.toShort))
     )
 
-  override val initialResources: Seq[Resource] =
-    applicationHeader ++ programHeaders.flatMap(_.resources)
-
   val resources: Seq[Resource] =
-   initialResources ++
+    applicationHeader ++ programHeaders.flatMap(_.resources) ++
       sections.flatMap(s => alignmentFillers(s) +: s.content) ++
       sectionHeaders.flatMap(p => p.resources)
 
@@ -140,9 +143,9 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentR
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     if (elf.sections.head != target)
-      ((elf.initialResources :+ context.alignmentFillers(target)) ++
+      (((elf.applicationHeader ++ elf.programHeaders.flatMap(_.resources)) :+ context.alignmentFillers(target)) ++
         context.sections.takeWhile(_ != target).flatMap(s => context.alignmentFillers(s) +: s.content)
-        , OffsetDirection.Absolute)
+      , OffsetDirection.Absolute)
     else
      (Nil, OffsetDirection.Absolute)
 
@@ -153,7 +156,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize + elf.startOffset))
+    EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
     elf.architecture.processorClass.numberSize
@@ -162,16 +165,15 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     if (elf.sections.head != target)
-      ((elf.initialResources :+ context.alignmentFillers(target)) ++
-        context.sectionDependencies(target), OffsetDirection.Absolute)
+      (context.startFiller +: context.alignedSectionDependencies(target), OffsetDirection.Absolute)
     else
-      (Nil, OffsetDirection.Absolute)
+      (Seq(context.startFiller), OffsetDirection.Absolute)
 
   override def toString: String = s"Memory address of section: ${target.name}"
 }
 
 case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
-  implicit def endianness: Endianness = elf.endianness
+  implicit val endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
@@ -183,7 +185,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(L
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
     if (elf.sections.head == target)
-      ((elf.initialResources :+ elf.alignmentFillers(target)) ++ target.content, OffsetDirection.Absolute)
+      (elf.applicationHeader ++ elf.programHeaders.flatMap(_.resources) ++ target.content :+ elf.alignmentFillers(target), OffsetDirection.Absolute)
     else
       (target.content, OffsetDirection.Absolute)
   }
@@ -203,7 +205,8 @@ case class ElfSectionHeaderReference(elf: Elf) extends DependentResource(Label.n
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
-    (elf.initialResources ++ context.sections.flatMap(s => elf.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
+    (elf.applicationHeader ++ (elf.programHeaders.flatMap(_.resources) ++
+      elf.sections.flatMap(s => elf.alignmentFillers(s) +: s.content)), OffsetDirection.Absolute)
 
   override def toString: String = s"Section header reference"
 }

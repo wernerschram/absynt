@@ -17,8 +17,6 @@ class Raw(section: Section, override val startOffset: Int)
     val finalContent = section.content.encodables(map)
     finalContent.encodeByte.toList
   }
-
-  def initialResources: List[Resource] = Nil
 }
 
 object Raw {

@@ -40,15 +40,14 @@ abstract class DependentResource(label: Label) extends Resource(label) {
         case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
       }
 
-    (totalDependent, totalIndependent + context.startOffset, offsetType)
+    (totalDependent, totalIndependent, offsetType)
   }
 }
 
 case class AlignmentFiller(section: Section) extends DependentResource(Label.noLabel) {
 
   def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
-    (context.initialResources ++ context.sections.takeWhile(s => s != section)
-      .flatMap(s => context.alignmentFillers(s) +: s.content), OffsetDirection.Absolute)
+    (context.startFiller +: context.sectionDependencies(section), OffsetDirection.Absolute)
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     EncodedBytes(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))(label)
@@ -80,18 +79,6 @@ abstract class RelativeReference(val target: Label, label: Label) extends Depend
     val section = context.sections.filter(s => s.content.contains(this)).head
       (section.intermediateResources(this), section.offsetDirection(this))
   }
-
-  override def applicationContextProperties(context: Application): (Seq[DependentResource], Int, OffsetDirection) = {
-    val (resources, offsetType) = dependencies(context)
-
-    val (totalDependent, totalIndependent) = resources
-      .foldLeft((Seq.empty[DependentResource], 0)) {
-        case ((dependent, independent), reference: DependentResource) => (dependent :+ reference, independent)
-        case ((dependent, independent), encodable: Encodable) => (dependent, independent + encodable.size)
-      }
-
-    (totalDependent, totalIndependent, offsetType)
-  }
 }
 
 abstract class AbsoluteReference(val target: Label, label: Label) extends DependentResource(label) {
@@ -113,8 +100,8 @@ abstract class AbsoluteReference(val target: Label, label: Label) extends Depend
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
     val containingSection: Section = context.sections.filter(s => s.content.containsLabel(target)).head
     (
-    context.initialResources ++ context.sectionDependencies(containingSection) ++
-      (context.alignmentFillers(containingSection) +: containingSection.precedingResources(target))
+      context.startFiller +: (context.alignedSectionDependencies(containingSection) ++
+      containingSection.precedingResources(target))
        ,OffsetDirection.Absolute
     )
   }
