@@ -1,8 +1,6 @@
 package assembler.elf
 
-import assembler.output.Elf
-import assembler.{sections, _}
-import assembler.output.Elf.SectionType.Null
+import assembler._
 import assembler.output.Elf._
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
@@ -47,5 +45,118 @@ class ElfSuite extends WordSpec with Matchers {
       executable.sectionHeaders.collect{case x: StringSectionHeader => x}.size shouldBe 1
     }
 
+    "return all resources in the correct order" in {
+      executable.encodeByte shouldBe List(
+        //program header
+        127, 69, 76, 70,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0, 0, 0, 0, 0, 0, 0,
+        2, 0,
+        3, 0,
+        1, 0, 0, 0,
+        -128, 0, 0, 0,
+        52, 0, 0, 0,
+        -82, 0, 0, 0,
+        0, 0, 0, 0,
+        52, 0,
+        32, 0,
+        2, 0,
+        40, 0,
+        4, 0,
+        3, 0,
+
+        // application header (section1)
+        1, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        -127, 0, 0, 0,
+        -127, 0, 0, 0,
+        5, 0, 0, 0,
+        0, 16, 0, 0,
+
+        // application header (section2)
+        1, 0, 0, 0,
+        -112, 0, 0, 0,
+        -112, 16, 0, 0,
+        -112, 16, 0, 0,
+        1, 0, 0, 0,
+        1, 0, 0, 0,
+        6, 0, 0, 0,
+        0, 16, 0, 0,
+
+        // allignment, section1, alignment, section2
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0,
+
+        // string section
+        // null string
+        0,
+        // "TextName"
+        84, 101, 120, 116, 78, 97, 109, 101, 0,
+        // "DataName"
+        68, 97, 116, 97, 78, 97, 109, 101, 0,
+        // ".shstrtab"
+        46, 115, 104, 115, 116, 114, 116, 97, 98, 0,
+
+        // section header (null section)
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+
+        // section header (section1)
+        1, 0, 0, 0,
+        1, 0, 0, 0,
+        6, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        -127, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        16, 0, 0, 0,
+        0, 0, 0, 0,
+
+        // section header (section2)
+        10, 0, 0, 0,
+        1, 0, 0, 0,
+        3, 0, 0, 0,
+        -112, 16, 0, 0,
+        -112, 0, 0, 0,
+        1, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        16, 0, 0, 0,
+        0, 0, 0, 0,
+
+        // section header (string section)
+        19, 0, 0, 0,
+        3, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        -111, 0, 0, 0,
+        29, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        1, 0, 0, 0,
+        1, 0, 0, 0
+      )
+    }
   }
 }
