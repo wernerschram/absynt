@@ -77,7 +77,7 @@ abstract class Elf(
       sectionHeaders.flatMap(p => p.resources)
 
   override lazy val encodeByte: Seq[Byte] =
-    resources.encodables(encodablesForDependencies(resources.collect{case r: DependentResource => r})).encodeByte
+    resources.encodables(encodablesForDependencies(resources.dependentResources)).encodeByte
 
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
@@ -164,10 +164,10 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
-    if (elf.sections.head != target)
-      (context.startFiller +: context.alignedSectionDependencies(target), OffsetDirection.Absolute)
-    else
+    if (elf.sections.head == target) // First section includes the application header and the program headers
       (Seq(context.startFiller), OffsetDirection.Absolute)
+    else
+      (context.startFiller +: context.alignedSectionDependencies(target), OffsetDirection.Absolute)
 
   override def toString: String = s"Memory address of section: ${target.name}"
 }
@@ -184,7 +184,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(L
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
-    if (elf.sections.head == target)
+    if (elf.sections.head == target) // First section includes the application header and the program headers
       (elf.applicationHeader ++ elf.programHeaders.flatMap(_.resources) ++ target.content :+ elf.alignmentFillers(target), OffsetDirection.Absolute)
     else
       (target.content, OffsetDirection.Absolute)
