@@ -23,7 +23,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val reference = new MyReference(targetLabel, Label.noLabel)
         val intermediate = EncodedBytes(Seq.fill(5)(0.toByte))
-        val target = EncodedBytes(0.toByte :: Nil)(targetLabel)
+        val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
@@ -37,7 +37,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val reference = new MyReference(targetLabel, Label.noLabel)
         val intermediate = EncodedBytes(List.fill(5)(0.toByte))
-        val target = EncodedBytes(0.toByte :: Nil)(targetLabel)
+        val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           target,
@@ -50,12 +50,13 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
         val reference = new MyReference(targetLabel, targetLabel)
+        val referenceWithLabel = reference.label(targetLabel)
         val prefix = EncodedBytes(List.fill(2)(0.toByte))
         val postfix = EncodedBytes(List.fill(3)(0.toByte))
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           prefix,
-          reference,
+          referenceWithLabel,
           postfix))
 
         section.intermediateResources(reference) should be(Nil)
@@ -67,7 +68,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       "know when a indirect reference is a forward reference" in {
         val targetLabel = Label.unique
         val reference = new MyReference(targetLabel, Label.noLabel)
-        val target = EncodedBytes(0.toByte :: Nil)(targetLabel)
+        val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           reference,
@@ -79,7 +80,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       "know when a indirect reference is a backward reference" in {
         val targetLabel = Label.unique
         val reference = new MyReference(targetLabel, Label.noLabel)
-        val target = EncodedBytes(0.toByte :: Nil)(targetLabel)
+        val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
           target,
@@ -91,9 +92,10 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
       "know when a indirect reference is a reference to self" in {
         val targetLabel = Label.unique
         val reference = new MyReference(targetLabel, targetLabel)
+        val referenceWithLabel = reference.label(targetLabel)
 
         val section = Section(SectionType.Text, ".test", List[Resource](
-          reference))
+          referenceWithLabel))
 
         section.offsetDirection(reference) shouldBe OffsetDirection.Self
       }

@@ -20,7 +20,7 @@ class ElfSuite extends WordSpec with Matchers {
     )
 
     val sections = sectionProperties.map { case (sectionType, name, content, label) =>
-      Section(sectionType, name, EncodedBytes(content)(label) :: Nil)
+      Section(sectionType, name, EncodedBytes(content).label(label) :: Nil)
     }
 
     val executable = Executable(Architecture.X86, sections.toList, entry, 0)

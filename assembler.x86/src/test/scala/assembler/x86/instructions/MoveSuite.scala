@@ -313,8 +313,9 @@ class MoveSuite extends WordSpec with Matchers {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           move,
-            EncodedBytes(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
+          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0)
         val encodables = app.encodablesForDependencies(Seq(move))
@@ -393,8 +394,9 @@ class MoveSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedBytes(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
+          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+        ))
 
 
         an[AssertionError] should be thrownBy {
@@ -410,8 +412,9 @@ class MoveSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedBytes(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
+          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+        ))
 
         an[AssertionError] should be thrownBy {
           val app = Raw(p, 0x100)
@@ -426,8 +429,9 @@ class MoveSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedBytes(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
+          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0x100)
         val encodables = app.encodablesForDependencies(Seq(move))
@@ -590,8 +594,9 @@ class MoveSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)),
           move,
-            EncodedBytes(List.fill(1)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
+          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+        ))
 
 
         an[AssertionError] should be thrownBy {
@@ -607,8 +612,9 @@ class MoveSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(2)(0x00.toByte)),
           move,
-            EncodedBytes(List.fill(2)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))}))
+          EncodedBytes(List.fill(2)(0x00.toByte)),
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0x10000)
         val encodables = app.encodablesForDependencies(Seq(move))
@@ -621,9 +627,10 @@ class MoveSuite extends WordSpec with Matchers {
 
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(2)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(1)(0x00.toByte))},
+          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(2)(0x00.toByte)),
-          move))
+          move
+        ))
 
         val app = Raw(p, 0x3000000)
         val encodables = app.encodablesForDependencies(Seq(move))

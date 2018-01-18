@@ -26,7 +26,7 @@ class Branch(code: Byte, val opcode: String) {
   def apply(targetLabel: Label)(implicit label: Label): BranchReference =
     new BranchReference(label, opcode, targetLabel, Always) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
-        Immediate(label, RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Always)
+        Immediate(l, RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Always)
     }
 
   private def Immediate[AddressType<:RelativePointer](label: Label, destination: AddressType, condition: Condition = Always) =
@@ -35,7 +35,7 @@ class Branch(code: Byte, val opcode: String) {
   def apply(targetLabel: Label, condition: Condition)(implicit label: Label): RelativeReference =
     new BranchReference(label, opcode, targetLabel, condition) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
-        Immediate(label, RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), condition)
+        Immediate(l, RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), condition)
     }
 }
 
@@ -57,7 +57,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
   def apply(targetLabel: Label)(implicit label: Label): BranchReference =
     new BranchReference(label, opcode, targetLabel, Unpredictable) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
-        Immediate(label, RelativeThumbPointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Unpredictable)
+        Immediate(l, RelativeThumbPointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Unpredictable)
     }
 }
 

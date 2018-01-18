@@ -87,8 +87,9 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
         val reference = LoadRegister(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           reference,
-            EncodedBytes(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")}))
+          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedString("Test").label(targetLabel)
+        ))
 
         val application = Raw(p, 0)
         application.encodablesForDependencies(Seq(reference))(reference).encodeByte should be(Hex.msb("e59f1000"))
@@ -98,9 +99,10 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val reference = LoadRegister(targetLabel, R1, Condition.CarrySet)
         val p = Section(SectionType.Text, ".test", List[Resource](
-          { implicit val label: UniqueLabel =  targetLabel; EncodedString("Test")},
-            EncodedBytes(List.fill(4)(0x00.toByte)),
-            reference))
+          EncodedString("Test").label(targetLabel),
+          EncodedBytes(List.fill(4)(0x00.toByte)),
+          reference
+        ))
 
         val application = Raw(p, 0)
         application.encodablesForDependencies(Seq(reference))(reference).encodeByte should be(Hex.msb("251F1010"))

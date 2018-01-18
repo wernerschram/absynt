@@ -151,7 +151,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           instruction,
             EncodedBytes(List.fill(8)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
+            EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
@@ -165,7 +166,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
+          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
@@ -178,7 +180,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))},
+          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction))
 
@@ -320,8 +322,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           instruction,
-            EncodedBytes(List.fill(4)(0x00.toByte)),
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
+          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
@@ -335,7 +338,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction,
-            { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))}))
+          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+        ))
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
@@ -348,7 +352,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section(SectionType.Text, ".test", List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)),
-          { implicit val label: UniqueLabel =  targetLabel; EncodedBytes(List.fill(4)(0x00.toByte))},
+          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
           instruction))
 

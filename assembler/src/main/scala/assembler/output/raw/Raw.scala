@@ -15,7 +15,7 @@ class Raw(section: Section, override val startOffset: Int)
   override def encodeByte: Seq[Byte] = {
     val map = encodablesForDependencies(section.content.dependentResources)
     val finalContent = section.content.encodables(map)
-    finalContent.encodeByte.toList
+    finalContent.encodeByte
   }
 }
 
