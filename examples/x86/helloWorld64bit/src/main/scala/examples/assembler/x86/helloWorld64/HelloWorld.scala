@@ -27,10 +27,10 @@ object HelloWorld extends App {
 
     val text: Section = Section(SectionType.Text, ".text",
       // use the write Syscall
-      { implicit val label: Label = entry; Move(0x01.toLong, RAX) } ::
+      Move(0x01.toLong, RAX).label(entry) ::
       Move(0x01.toLong, RDI) ::
       Move.forLabel(hello, RSI) ::
-      Move(output.size, EDX) ::
+      Move(output.length, EDX) ::
       SystemCall() ::
       // use the _exit Syscall
       Move(0x3C.toLong, RAX) ::
@@ -40,7 +40,7 @@ object HelloWorld extends App {
     )
 
     val data: Section = Section(SectionType.Data, ".data",
-    { implicit val label: Label = hello; EncodedString(output) } ::
+      EncodedString(output).label(hello) ::
       Nil, 4
     )
 

@@ -10,6 +10,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.output.Elf.{Architecture, Executable}
+import assembler.output.raw.Raw
 import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 
@@ -69,7 +70,7 @@ object Boot extends App {
     val section: Section = Section(SectionType.Text, ".text",
 
       // Disable UART0
-      { implicit val label: Label = entry; Move.forConstant(UART0.Base, R0) } ::
+      Move.forConstant(UART0.Base, R0).label(entry) ::
       Move.forConstant(0, R1) ::
       StoreRegister(R1, R0, UART0.CR) ::
       //
@@ -118,7 +119,7 @@ object Boot extends App {
       Add.forRelativeLabel(PC, text, R7) ::
       Move.forConstant(0.toByte, R6) ::
         //
-      { implicit val label: Label = putString; LoadRegister(R4, R0, UART0.FR)} ::
+      LoadRegister(R4, R0, UART0.FR).label(putString) ::
       And.setFlags(R4, 0x20.toByte, R4) ::
       Branch(putString, ZeroClear) ::
       //
@@ -132,7 +133,8 @@ object Boot extends App {
       halt() ::
       //
       // Resources
-      { implicit val label: Label = text; EncodedString("Hello World!\r\n\u0000") } :: Nil)
+      EncodedString("Hello World!\r\n\u0000").label(text) ::
+      Nil)
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
     val outputPath = path.resolve("bootRpi-output")
@@ -143,6 +145,7 @@ object Boot extends App {
     val raw = new FileOutputStream(rawFilePath.toFile)
 
     val exec = Executable(Architecture.RaspberryPi2, section :: Nil, entry, 0x10000)
+    val rawExec = Raw(section, 0x10000)
 //
 //    raw.write(exec.encodableSections.head.encodeByte.toArray)
 //    println(s"size: ${exec.encodableSections.head.size}")
@@ -150,6 +153,9 @@ object Boot extends App {
 
     out.write(exec.encodeByte.toArray)
     out.flush()
+
+    raw.write(rawExec.encodeByte.toArray)
+    raw.flush()
   }
 
   createFile()

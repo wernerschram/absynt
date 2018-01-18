@@ -20,14 +20,14 @@ object Boot extends App {
   case class Color(r: Byte, g: Byte, b: Byte)
 
   def setColor(col: Color)(implicit processorMode: ProcessorMode): List[Resource] =
-        Move(0x3c9.toShort, DX) ::
-        Move(col.r, AL) ::
-        Output(AL, DX) ::
-        Move(col.g, AL) ::
-        Output(AL, DX) ::
-        Move(col.b, AL) ::
-        Output(AL, DX) ::
-        Nil
+    Move(0x3c9.toShort, DX) ::
+    Move(col.r, AL) ::
+    Output(AL, DX) ::
+    Move(col.g, AL) ::
+    Output(AL, DX) ::
+    Move(col.b, AL) ::
+    Output(AL, DX) ::
+    Nil
 
   def createFile(): Unit = {
 
@@ -37,15 +37,7 @@ object Boot extends App {
     val middleColor = Color(63, 63, 63)
     val bottomColor = Color(0, 0, 63)
 
-    val targetLabel = Label.unique
     val section: Section = Section(SectionType.Text, ".text",
-
-
-      JumpIfCountZero(targetLabel) ::
-        Interrupt(0x03) ::
-      { implicit val label: UniqueLabel = targetLabel; Interrupt(0x04.toByte)} ::
-
-
 
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
@@ -74,7 +66,7 @@ object Boot extends App {
       Move((320*67).toShort, CX) ::
       StoreString.Repeat(AL, DI) ::
 
-      { implicit val label: UniqueLabel = Label.unique; Jump(label) } ::
+      { val label: UniqueLabel = Label.unique; Jump(label).label(label) } ::
       Nil
     )
 
@@ -84,7 +76,7 @@ object Boot extends App {
     val outputFilePath = outputPath.resolve("test.com")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val executable = Raw(section, 0)
+    val executable = Raw(section, 0x100)
     section.content.encodables(executable.encodablesForDependencies(section.content.dependentResources))
       .foreach { x => Console.println(s"${x.encodeByte.hexString} $x") }
     out.write(executable.encodeByte.toArray)
