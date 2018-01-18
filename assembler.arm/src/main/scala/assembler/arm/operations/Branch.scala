@@ -1,30 +1,28 @@
 package assembler.arm.operations
 
-import assembler.Label
 import assembler.arm.operands.Condition._
-import assembler.arm.operands.{ArmRelativeOffset, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 import assembler.arm.operands.registers.GeneralRegister
+import assembler.arm.operands.{RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 
-class BranchImmediate[AddressType<:RelativePointer](label: Label, destination: AddressType, val condition: Condition, val code: Byte, val opcode: String)
-  extends Conditional(label) {
+class BranchImmediate[AddressType<:RelativePointer](destination: AddressType, val condition: Condition, val code: Byte, val opcode: String)
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord | ((code & 0xF0) << 20) | destination.encode
 
-  //override def toString = s"$labelPrefix$mnemonicString ${(destination + ArmOffset(8)).toString}"
-  override def toString = {
+  override def toString: String = {
     destination match {
       case p: RelativeA32Pointer =>
-        s"$labelPrefix$mnemonicString ${p.toString}"
+        s"$mnemonicString ${p.toString}"
       case p: RelativeThumbPointer =>
-        s"$labelPrefix$mnemonicString ${p.toString}"
+        s"$mnemonicString ${p.toString}"
     }
   }
 }
 
-class BranchRegister(label: Label, destination: GeneralRegister, val condition: Condition, val code: Byte, val opcode: String)
-  extends Conditional(label) {
+class BranchRegister(destination: GeneralRegister, val condition: Condition, val code: Byte, val opcode: String)
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord | 0x012FFF00 | ((code & 0x0F) << 4) | destination.registerCode
 
-  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}"
+  override def toString = s"$mnemonicString ${destination.toString}"
 }

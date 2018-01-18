@@ -1,12 +1,11 @@
 package assembler.arm.operations
 
-import assembler.Label
 import assembler.arm.operands.Condition._
 
 import scala.language.implicitConversions
 
-class Miscellaneous(label: Label, val code: Byte, override val opcode: String, value: Short, condition: Condition)
-  extends ARMOperation(label) {
+class Miscellaneous(val code: Byte, override val opcode: String, value: Short, condition: Condition)
+  extends ARMOperation {
   override def encodeWord: Int = {
     val valuePart1: Byte = (value & 0x0f).toByte
     val valuePart2: Short = ((value & 0xfff0) >> 4).toShort
@@ -15,7 +14,7 @@ class Miscellaneous(label: Label, val code: Byte, override val opcode: String, v
     result
   }
 
-  override def toString = s"$labelPrefix$mnemonicString $value"
+  override def toString = s"$mnemonicString $value"
 }
 
 sealed abstract class Effect(val iMod: Byte, val mnemonicExtension: String)
@@ -59,26 +58,26 @@ object InterruptDisableFlags extends Enumeration {
   }
 }
 
-class ProcessorState(label: Label, val code: Byte, val opcode: String, val condition: Condition,
+class ProcessorState(val code: Byte, val opcode: String, val condition: Condition,
                      iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, postFixString: String)
-  extends Conditional(label) {
+  extends Conditional {
 
-  def this(label: Label, code: Byte, opcode: String, mode: ExecutionMode) =
-    this(label, code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")
+  def this(code: Byte, opcode: String, mode: ExecutionMode) =
+    this(code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")
 
-  def this(label: Label, code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
-    this(label, code: Byte, opcode: String, Unpredictable, effect.iMod, 0x01.toByte,
+  def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
+    this(code: Byte, opcode: String, Unpredictable, effect.iMod, 0x01.toByte,
       interruptDisableFlags.toBitMask(0).toInt << 6, 0x00,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
 
-  def this(label: Label, code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet,
+  def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet,
            mode: ExecutionMode) =
-    this(label, code, opcode, Unpredictable, effect.iMod, 0x01.toByte,
+    this(code, opcode, Unpredictable, effect.iMod, 0x01.toByte,
       interruptDisableFlags.toBitMask(0).toInt << 6, mode.mode,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #$mode")
 
   override def encodeWord: Int =
     super.encodeWord | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
 
-  override def toString = s"$labelPrefix$mnemonicString$postFixString"
+  override def toString = s"$mnemonicString$postFixString"
 }

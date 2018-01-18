@@ -1,16 +1,14 @@
 package assembler.x86.operations
 
-import assembler.Label
 import assembler.x86.operands.{GeneralPurposeRegister, Operand}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class RegisterEncoded[RegisterType <: GeneralPurposeRegister](label: Label,
-                                                              register: RegisterType,
+class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register: RegisterType,
                                                               rawCode: Seq[Byte],
                                                               override val mnemonic: String,
                                                               override val includeRexW: Boolean = true)
                                                              (override implicit val processorMode: ProcessorMode)
-  extends X86Operation(label) {
+  extends X86Operation {
 
   override def operands: Seq[Operand] = Seq(register)
 

@@ -1,11 +1,10 @@
 package assembler.x86.operations
 
-import assembler.Label
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.resource.Encodable
 
-abstract class X86Operation(label: Label) extends Encodable(label) {
+abstract class X86Operation extends Encodable {
   val includeRexW: Boolean = true
 
   def operands: Seq[Operand]
@@ -58,10 +57,10 @@ abstract class X86Operation(label: Label) extends Encodable(label) {
 
   def mnemonic: String
 
-  override def toString = if (operands.isEmpty)
-      s"$labelPrefix$mnemonic"
+  override def toString: String = if (operands.isEmpty)
+      s"$mnemonic"
     else
-      s"$labelPrefix$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
+      s"$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
 }
 
 object X86Operation {

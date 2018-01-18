@@ -117,7 +117,7 @@ case object ElfType {
   object Core extends ElfType(0x04.toShort, "Core")
 }
 
-case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target, Label.noLabel) {
+case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends AbsoluteReference(target) {
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDistance(distance: Int): Encodable =
@@ -130,7 +130,7 @@ case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends Ab
   override def toString: String = s"Memory address of label: $target"
 }
 
-case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentResource {
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
@@ -152,7 +152,7 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends DependentR
   override def toString: String = s"File address of section: ${target.name}"
 }
 
-case class ElfSectionReference(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+case class ElfSectionReference(target: Section, elf: Elf) extends DependentResource {
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
@@ -172,7 +172,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends DependentResou
   override def toString: String = s"Memory address of section: ${target.name}"
 }
 
-case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(Label.noLabel) {
+case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource {
   implicit val endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
@@ -193,7 +193,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends DependentResource(L
   override def toString: String = s"Size of section: ${target.name}"
 }
 
-case class ElfSectionHeaderReference(elf: Elf) extends DependentResource(Label.noLabel) {
+case class ElfSectionHeaderReference(elf: Elf) extends DependentResource {
   implicit def endianness: Endianness = elf.endianness
 
   override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =

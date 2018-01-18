@@ -1,17 +1,15 @@
 package assembler.x86.operations
 
-import assembler.Label
 import assembler.x86.operands._
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class ModRRMStatic[RegisterType <: GeneralPurposeRegister](label: Label,
-                                                           val register: RegisterType,
+class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register: RegisterType,
                                                            operandRM: ModRMEncodableOperand,
                                                            override val code: Seq[Byte],
                                                            override val mnemonic: String,
                                                            override val includeRexW: Boolean = true)
                                                           (override implicit val processorMode: ProcessorMode)
-  extends ModRMStatic(label, operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
+  extends ModRMStatic(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
   override def operands: Seq[Operand] = register +: super.operands
 

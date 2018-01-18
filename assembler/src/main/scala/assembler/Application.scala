@@ -11,7 +11,7 @@ abstract class Application {
 
   def startOffset: Int
 
-  val startFiller: Encodable = new Encodable(Label.noLabel) {
+  val startFiller: Encodable = new Encodable {
     override def encodeByte: Seq[Byte] = Seq.empty
 
     override def size: Int = startOffset

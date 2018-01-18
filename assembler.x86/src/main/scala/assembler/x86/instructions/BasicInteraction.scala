@@ -1,13 +1,12 @@
 package assembler.x86.instructions
 
-import assembler.Label
 import assembler.x86.operands._
 import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, Static}
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
-  def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): Immediate =
+  def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): Immediate =
     (destination, immediate.operandByteSize) match {
       case (Register.AL, ValueSize.Byte) =>
         Imm8ToAL(immediate)
@@ -29,79 +28,79 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       case _ => throw new AssertionError
     }
 
-  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, (OpcodeBase + 0x04).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
     }
 
-  private def Imm16ToAX(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, (OpcodeBase + 0x05).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
 
       override def operandSize: OperandSize = ValueSize.Word
     }
 
-  private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, (OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
 
       override def operandSize: OperandSize = ValueSize.DoubleWord
     }
 
-  private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new Static(label, (OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
+  private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
 
       override def operandSize: OperandSize = ValueSize.QuadWord
     }
 
-  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRMStatic(label, operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new ModRMStatic(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
     }
 
-  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRMStatic(label, operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new ModRMStatic(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
     }
 
-  private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRMStatic(label, operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+  private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+    new ModRMStatic(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediate: ImmediateValue = immediateValue
 
       override def rexRequirements: Seq[RexRequirement] =
         operand.getRexRequirements(ParameterPosition.NotEncoded) ++ super.rexRequirements
     }
 
-  def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
+  def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
     R8ToRM8(source, destination)
 
-  private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](label, operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic)
+  private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic)
 
-  def apply(source: ByteRegister, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
+  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
     R8ToRM8(source, destination)
 
-  def apply(source: WideRegister, destination: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
+  def apply(source: WideRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
     R16ToRM16(source, destination)
 
-  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](label, operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic)
+  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic)
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
+  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
     R16ToRM16(destination, source)
 
-  def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
+  def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
     RM8ToR8(destination, source)
 
-  private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](label, operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic)
+  private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic)
 
-  def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit label: Label, processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
+  def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
     RM16ToR16(destination, source)
 
-  private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](label, operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic)
+  private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic)
 
 }
 
@@ -117,15 +116,15 @@ object Xor extends BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
 object Not {
   implicit val opcode: String = "not"
 
-  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit label: Label, processorMode: ProcessorMode): ModRMStatic =
+  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
     operand.operandByteSize match {
       case ValueSize.Byte => RM8(operand)
       case _ => RM16(operand)
     }
 
-  private def RM8(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRMStatic(label, operand, 0xF6.toByte :: Nil, 2, opcode)
+  private def RM8(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStatic(operand, 0xF6.toByte :: Nil, 2, opcode)
 
-  private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit label: Label, processorMode: ProcessorMode) =
-    new ModRMStatic(label, operand, 0xF7.toByte :: Nil, 2, opcode)
+  private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+    new ModRMStatic(operand, 0xF7.toByte :: Nil, 2, opcode)
 }

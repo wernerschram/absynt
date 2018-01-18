@@ -1,6 +1,5 @@
 package assembler.arm.operations
 
-import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operands.{ImmediateShiftValue, ShiftRegisterWithShift}
@@ -94,7 +93,7 @@ abstract sealed class LoadStoreMiscellaneousOffset private(val updateDirection: 
 }
 
 object LoadStoreMiscellaneousOffset {
-  def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection) =
+  def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection): LoadStoreMiscellaneousOffset =
     new LoadStoreMiscellaneousOffset(updateDirection) {
       override val encode: Int = 0x00400090 | updateDirection.bitMask | ((offset & 0xf0) << 4) | (offset & 0x0f)
 
@@ -106,7 +105,7 @@ object LoadStoreMiscellaneousOffset {
   else
     apply((-offset).toByte, UpdateDirection.Decrement)
 
-  def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection) =
+  def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection): LoadStoreMiscellaneousOffset =
     new LoadStoreMiscellaneousOffset(updateDirection) {
       override val encode: Int = 0x00000090 | offsetRegister.registerCode | updateDirection.bitMask
 
@@ -151,23 +150,23 @@ object LoadStoreMiscellaneousOperation {
 
 }
 
-class LoadStore(label: Label, val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+class LoadStore(val opcode: String, val condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
                 offset: LoadStoreOffset, addressingType: LoadStoreAddressingType, operation: LoadStoreOperation.LoadStoreOperation)
-  extends Conditional(label) {
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord |
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
   override def toString =
-    s"$labelPrefix$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
+    s"$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
 
 }
 
-class LoadStoreMiscelaneous(label: Label, val opcode: String, val condition: Condition, register: GeneralRegister,
+class LoadStoreMiscelaneous(val opcode: String, val condition: Condition, register: GeneralRegister,
                             baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType,
                             operation: LoadStoreMiscellaneousOperation.LoadStoreMiscellaneousOperation)
-  extends Conditional(label) {
+  extends Conditional {
 
   override def encodeWord: Int =
     super.encodeWord |
@@ -175,5 +174,5 @@ class LoadStoreMiscelaneous(label: Label, val opcode: String, val condition: Con
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
   override def toString =
-    s"$labelPrefix$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
+    s"$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
 }

@@ -1,21 +1,18 @@
 package assembler.arm.operations
 
-import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.RightRotateImmediate
 import assembler.arm.operands.registers._
-import assembler.arm.operations
-import assembler.sections.Section
 
 import scala.language.implicitConversions
 
-class MoveFromStatusRegister(label: Label, override val opcode: String, source: StatusRegister, destination: GeneralRegister,
+class MoveFromStatusRegister(override val opcode: String, source: StatusRegister, destination: GeneralRegister,
                              override val condition: Condition)
-  extends Conditional(label) {
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12)
 
-  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}, ${source.toString}"
+  override def toString = s"$mnemonicString ${destination.toString}, ${source.toString}"
 }
 
 object Fields extends Enumeration {
@@ -31,20 +28,20 @@ object Fields extends Enumeration {
   }
 }
 
-class MoveToStatusRegister private(label: Label, override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,
+class MoveToStatusRegister private(override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,
                                    override val condition: Condition, val sourceString: String, val sourceValue: Int)
-  extends Conditional(label) {
+  extends Conditional {
 
-  def this(label: Label, opcode: String, source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet,
+  def this(opcode: String, source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet,
            condition: Condition) =
-    this(label, opcode, destination, fields, condition, source.toString, source.registerCode)
+    this(opcode, destination, fields, condition, source.toString, source.registerCode)
 
-  def this(label: Label, opcode: String, source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet,
+  def this(opcode: String, source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet,
            condition: Condition) =
-    this(label, opcode, destination, fields, condition, source.toString, source.encode)
+    this(opcode, destination, fields, condition, source.toString, source.encode)
 
   override def encodeWord: Int =
     super.encodeWord | 0x0120f000 | (destination.registerCode << 22 | fields.toBitMask(0).toInt | sourceValue)
 
-  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
+  override def toString = s"$mnemonicString ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
 }

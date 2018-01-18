@@ -6,15 +6,15 @@ import assembler.x86.X86OffsetFactory
 import assembler.x86.operands.memoryaccess.{ShortPointer, X86Offset, NearPointer => NearPointerOperand}
 
 abstract class ShortJumpOperation[OffsetType <: X86Offset]
-  (label: Label, val shortOpcode: Seq[Byte], mnemonic: String, target: Label)
+  (val shortOpcode: Seq[Byte], mnemonic: String, target: Label)
   (implicit val offsetFactory: X86OffsetFactory[OffsetType])
-    extends RelativeReference(target, label) {
+    extends RelativeReference(target) {
 
   val shortJumpSize: Int = shortOpcode.length + 1
 
   def encodableForShortPointer(pointer: NearPointerOperand[OffsetType]): Resource with Encodable
 
-  override def toString = s"$labelPrefix$mnemonic $target"
+  override def toString = s"$mnemonic $target"
 
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with Encodable =
     encodableForShortPointer(ShortPointer[OffsetType](offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)))

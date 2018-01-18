@@ -7,17 +7,17 @@ import assembler.x86.operations.Static
 object ClearInterruptFlag {
   implicit val opcode: String = "cli"
 
-  def apply()(implicit label: Label, processorMode: ProcessorMode): Static =
+  def apply()(implicit processorMode: ProcessorMode): Static =
     Static()
 
-  private def Static()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0xFA.toByte :: Nil, opcode)
+  private def Static()(implicit processorMode: ProcessorMode) = new Static(0xFA.toByte :: Nil, opcode)
 }
 
 object SetInterruptFlag {
   implicit val mnemonic: String = "sti"
 
-  def apply()(implicit label: Label, processorMode: ProcessorMode): Static =
+  def apply()(implicit processorMode: ProcessorMode): Static =
     Static()
 
-  private def Static()(implicit label: Label, processorMode: ProcessorMode) = new Static(label, 0xFB.toByte :: Nil, mnemonic)
+  private def Static()(implicit processorMode: ProcessorMode) = new Static(0xFB.toByte :: Nil, mnemonic)
 }

@@ -1,34 +1,32 @@
 package assembler.arm.operations
 
-import assembler.Label
 import assembler.arm.operands.Condition.Condition
 import assembler.arm.operands.Shifter
 import assembler.arm.operands.registers.GeneralRegister
-import assembler.sections.Section
 
-class DataProcessingOperation(label: Label, val opcode: String, code: Byte, val condition: Condition, register1: GeneralRegister,
+class DataProcessingOperation(val opcode: String, code: Byte, val condition: Condition, register1: GeneralRegister,
                               operand2: Shifter, destination: GeneralRegister)
-  extends Conditional(label) {
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord | (code << 21) | (register1.registerCode << 16) | (destination.registerCode << 12) | operand2.encode
 
-  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}, ${register1.toString}, ${operand2.toString}"
+  override def toString = s"$mnemonicString ${destination.toString}, ${register1.toString}, ${operand2.toString}"
 }
 
-class DataProcessingNoDestinationInstruction(label: Label, val opcode: String, code: Byte, val condition: Condition,
+class DataProcessingNoDestinationInstruction(val opcode: String, code: Byte, val condition: Condition,
                                              register1: GeneralRegister, operand2: Shifter)
-  extends Conditional(label) {
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord | 0x00100000 | (code << 21) | (register1.registerCode << 16) | operand2.encode
 
-  override def toString = s"$labelPrefix$mnemonicString ${register1.toString}, ${operand2.toString}"
+  override def toString = s"$mnemonicString ${register1.toString}, ${operand2.toString}"
 }
 
-class DataProcessingNoRegisterInstruction(label: Label, val opcode: String, code: Byte, val condition: Condition, operand2: Shifter,
+class DataProcessingNoRegisterInstruction(val opcode: String, code: Byte, val condition: Condition, operand2: Shifter,
                                           destination: GeneralRegister)
-  extends Conditional(label) {
+  extends Conditional {
   override def encodeWord: Int =
     super.encodeWord | (code << 21) | (destination.registerCode << 12) | operand2.encode
 
-  override def toString = s"$labelPrefix$mnemonicString ${destination.toString}, ${operand2.toString}"
+  override def toString = s"$mnemonicString ${destination.toString}, ${operand2.toString}"
 }
