@@ -6,7 +6,7 @@ import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands._
 import assembler.output.raw.Raw
-import assembler.resource.{Encodable, Resource}
+import assembler.resource.{UnlabeledEncodable, Resource}
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 
@@ -329,7 +329,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
 
-        encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+        encodable(instruction).asInstanceOf[Resource with UnlabeledEncodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
@@ -344,7 +344,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
 
-        encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f02"))
+        encodable(instruction).asInstanceOf[Resource with UnlabeledEncodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
       "correctly encode a move of a labeled address to a register when the target is before the move instruction" in {
@@ -358,7 +358,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
 
         val app = Raw(p, 0)
         val encodable = app.encodablesForDependencies(instruction :: Nil)
-        encodable(instruction).asInstanceOf[Resource with Encodable].encodeByte should be(Hex.msb("e3a01f01"))
+        encodable(instruction).asInstanceOf[Resource with UnlabeledEncodable].encodeByte should be(Hex.msb("e3a01f01"))
       }
 
     }

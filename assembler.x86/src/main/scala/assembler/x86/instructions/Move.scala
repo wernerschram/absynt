@@ -1,7 +1,7 @@
 package assembler.x86.instructions
 
 import assembler._
-import assembler.resource.{AbsoluteReference, Encodable}
+import assembler.resource.{AbsoluteReference, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
@@ -141,7 +141,7 @@ object Move {
         case (ProcessorMode.Long) => 1 + 1 + 8
       }
 
-      override def encodableForDistance(distance: Int): Encodable =
+      override def encodableForDistance(distance: Int): UnlabeledEncodable =
        (processorMode, register) match {
           case (ProcessorMode.Real | ProcessorMode.Protected, _: GeneralPurposeRexRegister) =>
             throw new AssertionError

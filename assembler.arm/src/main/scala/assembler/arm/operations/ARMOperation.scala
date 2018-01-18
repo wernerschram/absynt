@@ -2,7 +2,7 @@ package assembler.arm.operations
 
 import assembler.ListExtensions._
 import assembler.arm.operands.Condition.Condition
-import assembler.resource.Encodable
+import assembler.resource.UnlabeledEncodable
 
 trait NamedOperation {
   val opcode: String
@@ -13,7 +13,7 @@ trait NamedOperation {
 
 }
 
-abstract class ARMOperation extends Encodable with NamedOperation {
+abstract class ARMOperation extends UnlabeledEncodable with NamedOperation {
   override def size = 4
 
   override def encodeByte: Seq[Byte] = encodeWord.encodeLittleEndian

@@ -1,9 +1,9 @@
 package assembler
 
 import assembler.ListExtensions._
-import assembler.resource.Encodable
+import assembler.resource.UnlabeledEncodable
 
-case class EncodedBytes(bytes: Seq[Byte])(implicit label: Label) extends Encodable {
+case class EncodedBytes(bytes: Seq[Byte])(implicit label: Label) extends UnlabeledEncodable {
 
   def encodeByte: Seq[Byte] = bytes
 

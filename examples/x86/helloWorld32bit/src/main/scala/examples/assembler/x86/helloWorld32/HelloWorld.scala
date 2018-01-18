@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.Elf.{Architecture, Executable}
-import assembler.resource.{AbsoluteReference, DependentResource, Encodable, RelativeReference}
+import assembler.resource.{AbsoluteReference, UnlabeledDependentResource, UnlabeledEncodable, RelativeReference}
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._

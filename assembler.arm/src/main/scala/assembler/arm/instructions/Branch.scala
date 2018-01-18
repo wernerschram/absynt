@@ -4,7 +4,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands.{ArmRelativeOffset, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations.{BranchImmediate, BranchRegister, NamedConditional}
-import assembler.resource.{Encodable, RelativeReference}
+import assembler.resource.{UnlabeledEncodable, RelativeReference}
 import assembler.{Label, OffsetDirection, RelativeOffsetDirection}
 
 abstract class BranchReference(val opcode: String, target: Label, val condition: Condition)
@@ -23,7 +23,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label): BranchReference =
     new BranchReference(opcode, targetLabel, Always) {
-      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
         Immediate(RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Always)
     }
 
@@ -32,7 +32,7 @@ class Branch(code: Byte, val opcode: String) {
 
   def apply(targetLabel: Label, condition: Condition)(): RelativeReference =
     new BranchReference(opcode, targetLabel, condition) {
-      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
         Immediate(RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), condition)
     }
 }
@@ -54,7 +54,7 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
 
   def apply(targetLabel: Label): BranchReference =
     new BranchReference(opcode, targetLabel, Unpredictable) {
-      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
         Immediate(RelativeThumbPointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Unpredictable)
     }
 }

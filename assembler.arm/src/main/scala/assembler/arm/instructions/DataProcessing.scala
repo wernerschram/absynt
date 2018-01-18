@@ -5,7 +5,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations._
-import assembler.resource.{AbsoluteReference, Encodable, RelativeReference}
+import assembler.resource.{AbsoluteReference, UnlabeledEncodable, RelativeReference}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always): DataProcessingOperation =
@@ -80,7 +80,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
       override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
 
       override def toString = s"$mnemonicString $target"
-          override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable =
+          override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
             forConstant(source1, ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset, destination, condition)
 
       override val condition: Condition = Always
@@ -140,7 +140,7 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
     new AbsoluteReference(targetLabel) {
       override def sizeForDistance(distance: Int): Int = encodableForDistance(distance).size
 
-      override def encodableForDistance(distance: Int): Encodable = forConstant(distance, destination, condition)
+      override def encodableForDistance(distance: Int): UnlabeledEncodable = forConstant(distance, destination, condition)
 
       override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
     }

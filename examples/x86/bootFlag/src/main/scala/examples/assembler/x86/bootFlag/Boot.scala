@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.raw.Raw
-import assembler.resource.{DependentResource, Resource}
+import assembler.resource.{UnlabeledDependentResource, Resource}
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._

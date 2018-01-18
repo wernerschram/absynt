@@ -11,7 +11,7 @@ abstract class Application {
 
   def startOffset: Int
 
-  val startFiller: Encodable = new Encodable {
+  val startFiller: UnlabeledEncodable = new UnlabeledEncodable {
     override def encodeByte: Seq[Byte] = Seq.empty
 
     override def size: Int = startOffset
@@ -27,13 +27,13 @@ abstract class Application {
 
   def encodeByte: Seq[Byte]
 
-  def encodablesForDependencies(references: Seq[TempDependentResource]): Map[TempDependentResource, Encodable] = {
-    val (totalDependencySizes: Map[TempDependentResource, DependencySize], restrictions: Map[TempDependentResource, Set[Int]]) =
-      references.foldLeft((Map.empty[TempDependentResource, DependencySize], Map.empty[TempDependentResource, Set[Int]])) {
+  def encodablesForDependencies(references: Seq[DependentResource]): Map[DependentResource, UnlabeledEncodable] = {
+    val (totalDependencySizes: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]]) =
+      references.foldLeft((Map.empty[DependentResource, DependencySize], Map.empty[DependentResource, Set[Int]])) {
         case ((
-            currentDependencySizeFunctions: Map[TempDependentResource, DependencySize],
-            currentRestrictions: Map[TempDependentResource, Set[Int]]),
-            currentReference: TempDependentResource) =>
+            currentDependencySizeFunctions: Map[DependentResource, DependencySize],
+            currentRestrictions: Map[DependentResource, Set[Int]]),
+            currentReference: DependentResource) =>
           val (newDependencySizeFunctions, newRestrictions) =
             dependencySizes(Set.empty, currentDependencySizeFunctions, currentRestrictions)(currentReference)
 
@@ -57,7 +57,7 @@ abstract class Application {
       .toMap
   }
 
-  private def possibleSizeCombinations(references: Map[TempDependentResource, Set[Int]]): Set[Map[TempDependentResource, Int]]  =
+  private def possibleSizeCombinations(references: Map[DependentResource, Set[Int]]): Set[Map[DependentResource, Int]]  =
     if (references.isEmpty)
       Set(Map.empty)
     else
@@ -68,23 +68,23 @@ abstract class Application {
         t + (references.head._1 -> h)
 
   private sealed abstract class DependencySize(val offsetDirection: OffsetDirection) {
-    def size(assumptions: Map[TempDependentResource, Int]): Int
+    def size(assumptions: Map[DependentResource, Int]): Int
   }
 
   private case class KnownDependencySize(size: Int, override val offsetDirection: OffsetDirection) extends DependencySize(offsetDirection) {
-    override def size(assumptions: Map[TempDependentResource, Int]): Int = size
+    override def size(assumptions: Map[DependentResource, Int]): Int = size
   }
 
   private case class UnknownDependencySize(
-    sizeFunction: Map[TempDependentResource, Int] => Int,
+    sizeFunction: Map[DependentResource, Int] => Int,
     override val offsetDirection: OffsetDirection
   ) extends DependencySize(offsetDirection) {
-    override def size(assumptions: Map[TempDependentResource, Int]): Int = sizeFunction(assumptions)
+    override def size(assumptions: Map[DependentResource, Int]): Int = sizeFunction(assumptions)
   }
 
-  private final def dependencySizes(visiting: Set[TempDependentResource],
-    visited: Map[TempDependentResource, DependencySize], restrictions: Map[TempDependentResource, Set[Int]])(current: TempDependentResource):
-      (Map[TempDependentResource, DependencySize], Map[TempDependentResource, Set[Int]]) = {
+  private final def dependencySizes(visiting: Set[DependentResource],
+    visited: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]])(current: DependentResource):
+      (Map[DependentResource, DependencySize], Map[DependentResource, Set[Int]]) = {
 
     if (visited.contains(current))
       // this reference has been evaluated in an earlier call (in a prior branch)
@@ -93,15 +93,15 @@ abstract class Application {
       val (references, independentSizes, offsetDirection) = current.applicationContextProperties(this)
 
       val (totalDependencySizes, fixedSize, childSizeFunctions, totalRestrictions) =
-        references.foldLeft((visited, independentSizes, Seq.empty[Map[TempDependentResource, Int] => Int], Map.empty[TempDependentResource, Set[Int]])) {
-          case ((previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions, previousRestrictions), child: TempDependentResource) =>
+        references.foldLeft((visited, independentSizes, Seq.empty[Map[DependentResource, Int] => Int], Map.empty[DependentResource, Set[Int]])) {
+          case ((previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions, previousRestrictions), child: DependentResource) =>
             childDependencies(visiting, current)(previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions, previousRestrictions)(child)
         }
 
       if (childSizeFunctions.isEmpty)
         (totalDependencySizes + (current -> KnownDependencySize(fixedSize, offsetDirection)), restrictions ++ totalRestrictions)
       else {
-        val dependencySize = (assumptions: Map[TempDependentResource, Int]) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
+        val dependencySize = (assumptions: Map[DependentResource, Int]) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
         // TODO: Deactivated optimization. investigation needed.
 //        if (totalRestrictions.contains(current)) {
 //          val combinations = possibleSizeCombinations(totalRestrictions)
@@ -115,17 +115,17 @@ abstract class Application {
 
   @inline // inline to reduce stack size of the recursive dependencySizes call
   private final def childDependencies
-    (visiting: Set[TempDependentResource],
-      current: TempDependentResource)
-    (previousDependencySizeFunctions: Map[TempDependentResource, DependencySize],
+    (visiting: Set[DependentResource],
+      current: DependentResource)
+    (previousDependencySizeFunctions: Map[DependentResource, DependencySize],
       previousFixedSize: Int,
-      previousChildSizeFunctions: Seq[Map[TempDependentResource, Int] => Int],
-      previousRestrictions: Map[TempDependentResource, Set[Int]])
-    (child: TempDependentResource) = {
+      previousChildSizeFunctions: Seq[Map[DependentResource, Int] => Int],
+      previousRestrictions: Map[DependentResource, Set[Int]])
+    (child: DependentResource) = {
 
     if (visiting.contains(child))
     // cyclic dependency: add a dependency which can be resolved at a higher level
-      (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ ((assumptions: Map[TempDependentResource, Int]) =>
+      (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ ((assumptions: Map[DependentResource, Int]) =>
         assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
     else {
       val (childSizeFunctions, childRestrictions) = dependencySizes(visiting + current, previousDependencySizeFunctions, previousRestrictions)(child)
@@ -137,7 +137,7 @@ abstract class Application {
           val size = child.sizeForDependencySize(known.size, known.offsetDirection)
           (newDependencySizes, previousFixedSize + size, previousChildSizeFunctions, newRestrictions)
         case unknown: UnknownDependencySize =>
-          val size = (assumptions: Map[TempDependentResource, Int]) => assumptions.getOrElse(child,
+          val size = (assumptions: Map[DependentResource, Int]) => assumptions.getOrElse(child,
             child.sizeForDependencySize(unknown.sizeFunction(assumptions), unknown.offsetDirection))
           (newDependencySizes, previousFixedSize, previousChildSizeFunctions :+ size, newRestrictions)
       }

@@ -2,7 +2,7 @@ package assembler.sections
 
 import assembler._
 import assembler.output.raw.Raw
-import assembler.resource.{Encodable, RelativeReference, Resource}
+import assembler.resource.{UnlabeledEncodable, RelativeReference, Resource}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 import assembler.resource.EncodableConversion._
@@ -13,7 +13,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
     class MyReference(targetLabel: Label) extends RelativeReference(targetLabel) {
       override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = ???
-      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Encodable = ???
+      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable = ???
       override def possibleSizes: Set[Int] = ???
     }
 

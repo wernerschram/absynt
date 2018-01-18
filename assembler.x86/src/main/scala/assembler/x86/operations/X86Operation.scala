@@ -2,9 +2,9 @@ package assembler.x86.operations
 
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
-import assembler.resource.Encodable
+import assembler.resource.UnlabeledEncodable
 
-abstract class X86Operation extends Encodable {
+abstract class X86Operation extends UnlabeledEncodable {
   val includeRexW: Boolean = true
 
   def operands: Seq[Operand]
