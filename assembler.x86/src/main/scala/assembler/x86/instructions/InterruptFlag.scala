@@ -1,6 +1,5 @@
 package assembler.x86.instructions
 
-import assembler.Label
 import assembler.x86.ProcessorMode
 import assembler.x86.operations.Static
 

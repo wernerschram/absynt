@@ -8,8 +8,8 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ElfSuite extends WordSpec with Matchers {
 
-  def filler(count: Int, label: Label = Label.noLabel): EncodedBytes =
-    EncodedBytes(Seq.fill(count)(0x00.toByte))(label)
+  def filler(count: Int): EncodedBytes =
+    EncodedBytes(Seq.fill(count)(0x00.toByte))
 
   "an X86 (32-bit) Elf file with some sections" should {
     val entry: Label = Label.unique

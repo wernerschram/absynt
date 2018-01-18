@@ -45,16 +45,19 @@ object Boot extends App {
     val TDR: Short = 0x8C.toShort
   }
 
-  private def naiveDelay(delay: Int, register: GeneralRegister)(implicit label: Label): List[Resource] = {
+  private def naiveDelay(delay: Int, register: GeneralRegister): List[Resource] = {
     val targetLabel = Label.unique
 
     Move.forConstant(delay, register) ::
-    { implicit val label: UniqueLabel = targetLabel; Subtract.setFlags(register, 1.toByte, register) } ::
+    Subtract.setFlags(register, 1.toByte, register).label(targetLabel) ::
     Branch(targetLabel, NotEqual) ::
     Nil
   }
 
-  private def halt()(implicit label: Label) = { implicit val label: UniqueLabel = Label.unique; Branch(label) }
+  private def halt() = {
+    val label: UniqueLabel = Label.unique
+    Branch(label).label(label)
+  }
 
   def createFile(): Unit = {
     import ProcessorMode.A32._

@@ -3,7 +3,7 @@ package assembler
 import assembler.ListExtensions._
 import assembler.resource.UnlabeledEncodable
 
-case class EncodedBytes(bytes: Seq[Byte])(implicit label: Label) extends UnlabeledEncodable {
+case class EncodedBytes(bytes: Seq[Byte]) extends UnlabeledEncodable {
 
   def encodeByte: Seq[Byte] = bytes
 
@@ -13,5 +13,5 @@ case class EncodedBytes(bytes: Seq[Byte])(implicit label: Label) extends Unlabel
 }
 
 object EncodedBytes {
-  def apply(byte: Byte)(implicit label: Label): EncodedBytes = new EncodedBytes(Seq(byte))
+  def apply(byte: Byte): EncodedBytes = new EncodedBytes(Seq(byte))
 }
