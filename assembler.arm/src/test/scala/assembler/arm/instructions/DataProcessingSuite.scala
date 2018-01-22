@@ -175,6 +175,12 @@ class DataProcessingSuite extends WordSpec with Matchers {
         encodable(instruction).encodeByte should be(Hex.msb("e2801f01"))
       }
 
+      "correctly represent an add of a register and a labeled relative address as a string" in {
+        val targetLabel = Label("testLabel")
+        val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
+        instruction.toString shouldBe "add r1, r0, testLabel"
+      }
+
       "correctly encode an add of a register and a labeled relative address to a register when the instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)

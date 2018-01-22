@@ -76,7 +76,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
 
       override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
 
-      override def toString = s"$mnemonicString $target"
+      override def toString = s"$mnemonicString $destination, $source1, $target"
           override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
             forConstant(source1, ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset, destination, condition)
 
