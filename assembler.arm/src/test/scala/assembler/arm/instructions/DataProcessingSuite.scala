@@ -6,7 +6,7 @@ import assembler.arm.operands.Shifter._
 import assembler.arm.operands.registers.GeneralRegister._
 import assembler.arm.operands._
 import assembler.output.raw.Raw
-import assembler.resource.{UnlabeledEncodable, Resource}
+import assembler.resource.{Labeled, Resource, UnlabeledEncodable}
 import assembler.sections.{Section, SectionType}
 import org.scalatest.{Matchers, WordSpec}
 
@@ -132,6 +132,21 @@ class DataProcessingSuite extends WordSpec with Matchers {
 
       "correctly encode add r4, r5, 0x0" in {
         Add.forConstant(R5, 0x0, R4).encodeByte should be(Nil)
+      }
+
+      "create an empty resource for add r4, r5, 0x0 with a label" in {
+        val resource = Add.forConstant(R5, 0x0, R4).label("test")
+
+        resource shouldBe a [Labeled]
+
+        val labeled = resource.asInstanceOf[Labeled]
+
+        labeled.resource shouldBe a [EncodableCollection]
+
+        val collection = labeled.resource.asInstanceOf[EncodableCollection]
+
+        collection.encodables shouldBe empty
+        resource.encodeByte shouldBe Nil
       }
 
       "correctly encode add r4, r5, 0x10011001" in {

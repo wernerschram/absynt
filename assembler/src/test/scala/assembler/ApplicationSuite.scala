@@ -32,9 +32,9 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           reference ::
-            filler(5) ::
-            target ::
-            Nil
+          filler(5) ::
+          target ::
+          Nil
 
         val result = myEncodables(content, Seq(reference))
         result(reference).distance shouldBe 5
@@ -45,9 +45,9 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           target ::
-            filler(15) ::
-            reference ::
-            Nil
+          filler(15) ::
+          reference ::
+          Nil
 
         val result = myEncodables(content, Seq(reference))
         result(reference).distance shouldBe 16
@@ -58,9 +58,9 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           reference ::
-            filler(5) ::
-            target ::
-            Nil
+          filler(5) ::
+          target ::
+          Nil
 
         val result = myEncodables(content, Seq(reference))
         result(reference).offsetDirection shouldBe OffsetDirection.Forward
@@ -70,9 +70,9 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference, target) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           target ::
-            filler(5) ::
-            reference ::
-            Nil
+          filler(5) ::
+          reference ::
+          Nil
 
         val result = myEncodables(content, Seq(reference))
         result(reference).offsetDirection shouldBe OffsetDirection.Backward
@@ -83,13 +83,13 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           reference1 ::
-            filler(2) ::
-            reference2 ::
-            filler(2) ::
-            target1 ::
-            filler(2) ::
-            target2 ::
-            Nil
+          filler(2) ::
+          reference2 ::
+          filler(2) ::
+          target1 ::
+          filler(2) ::
+          target2 ::
+          Nil
 
         val result = myEncodables(content, Seq(reference1, reference2))
         result(reference1).distance shouldBe 5
@@ -101,13 +101,13 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           reference1 ::
-            filler(2) ::
-            reference2 ::
-            filler(12) ::
-            target1 ::
-            filler(2) ::
-            target2 ::
-            Nil
+          filler(2) ::
+          reference2 ::
+          filler(12) ::
+          target1 ::
+          filler(2) ::
+          target2 ::
+          Nil
 
         val result = myEncodables(content, Seq(reference1, reference2))
         result(reference1).distance shouldBe 16
@@ -119,13 +119,13 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           target2 ::
-            filler(12) ::
-            reference1 ::
-            filler(12) ::
-            reference2 ::
-            filler(2) ::
-            target1 ::
-            Nil
+          filler(12) ::
+          reference1 ::
+          filler(12) ::
+          reference2 ::
+          filler(2) ::
+          target1 ::
+          Nil
 
         val result = myEncodables(content, Seq(reference1, reference2))
         result(reference1).distance shouldBe 17
@@ -137,17 +137,37 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference2, target2) = TestEncodable.linearReferenceWithTarget
         val content: Seq[Resource] =
           target2 ::
-            filler(4) ::
-            reference1 ::
-            filler(12) ::
-            reference2 ::
-            filler(5) ::
-            target1 ::
-            Nil
+          filler(4) ::
+          reference1 ::
+          filler(12) ::
+          reference2 ::
+          filler(5) ::
+          target1 ::
+          Nil
 
         val result = myEncodables(content, Seq(reference1, reference2))
         result(reference1).distance shouldBe 19
         result(reference2).distance shouldBe 19
+      }
+
+      "be able to calculate a reference to an empty virtual instruction (for example a meta assembler instruction which represents a NOP and results in no instruction)" in {
+        val label: Label = Label.unique
+        val target = EncodableCollection(Nil).label(label)
+        val reference = LinearRelativeTestReference(label)
+
+        val content: Seq[Resource] =
+          reference ::
+          filler(2) ::
+          target ::
+          filler(2) ::
+          Nil
+
+        val application = Raw(Section(SectionType.Text, "Text", content), 0)
+        val result = application.encodablesForDependencies(Seq(reference))
+
+        result(reference).asInstanceOf[LinearRelativeTestEncodable].distance shouldBe 2
+        target.encodeByte shouldBe Nil
+        application.encodeByte shouldBe Hex.lsb("ff 00 00 00 00")
       }
     }
 
@@ -161,13 +181,13 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference2, target2) = TestEncodable.nonLinearReferenceWithTarget
         val content: Seq[Resource] =
           target2 ::
-            filler(12) ::
-            reference1 ::
-            filler(12) ::
-            reference2 ::
-            filler(2) ::
-            target1 ::
-            Nil
+          filler(12) ::
+          reference1 ::
+          filler(12) ::
+          reference2 ::
+          filler(2) ::
+          target1 ::
+          Nil
 
         val result = myEncodables(content, Seq(reference1, reference2))
         result(reference1).distance shouldBe 16
@@ -180,20 +200,20 @@ class ApplicationSuite extends WordSpec with Matchers {
         val (reference2, target2) = TestEncodable.nonLinearReferenceWithTarget
         val content: Seq[Resource] =
           target2 ::
-            filler(14) ::
-            reference1 ::
-            filler(2) ::
-            reference2 ::
-            filler(5) ::
-            target1 ::
-            Nil
+          filler(14) ::
+          reference1 ::
+          filler(2) ::
+          reference2 ::
+          filler(5) ::
+          target1 ::
+          Nil
 
         an[AssertionError] shouldBe thrownBy { myEncodables(content, Seq(reference1, reference2)) }
       }
     }
 
 
-    "defined with multiple sections" should {
+    "defined with multiple sections" when {
       case class MyApplication(override val sections: Seq[Section], override val startOffset: Int) extends Application {
         override def encodeByte: Seq[Byte] = Seq.empty
 
@@ -223,43 +243,46 @@ class ApplicationSuite extends WordSpec with Matchers {
         }
       }
 
-      "align the first section" when {
-        val section = Section(SectionType.Data, "Test", List(EncodedBytes(Seq(0x00.toByte))))
+      "asked for the size of an alignment filler" should {
 
-        "there is a zero start offset" in {
-          val application = MyApplication(List(section), 0)
-          val alignmentFiller = application.alignmentFillers(section)
-          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
-          filler.size shouldBe 0
+        "align the first section" when {
+          val section = Section(SectionType.Data, "Test", List(EncodedBytes(Seq(0x00.toByte))))
+
+          "there is a zero start offset" in {
+            val application = MyApplication(List(section), 0)
+            val alignmentFiller = application.alignmentFillers(section)
+            val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
+            filler.size shouldBe 0
+          }
+
+          "there is a start offset of 1" in {
+            val application = MyApplication(List(section), 1)
+            val alignmentFiller = application.alignmentFillers(section)
+            val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
+            filler.size shouldBe 15
+          }
         }
 
-        "there is a start offset of 1" in {
-          val application = MyApplication(List(section), 1)
-          val alignmentFiller = application.alignmentFillers(section)
-          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
-          filler.size shouldBe 15
-        }
-      }
+        "align the second section" when {
+          val second = Section(SectionType.Data, "Second", List(EncodedBytes(Seq(0x02.toByte))))
 
-      "align the second section" when {
-        val second = Section(SectionType.Data, "Second", List(EncodedBytes(Seq(0x02.toByte))))
+          "there is a zero start offset and a 16 byte first section" in {
+            val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(16)(0x01.toByte))))
+            val application = MyApplication(List(first, second), 0)
 
-        "there is a zero start offset and a 16 byte first section" in {
-          val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(16)(0x01.toByte))))
-          val application = MyApplication(List(first, second), 0)
+            val alignmentFiller = application.alignmentFillers(second)
+            val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
+            filler.size shouldBe 0
+          }
 
-          val alignmentFiller = application.alignmentFillers(second)
-          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
-          filler.size shouldBe 0
-        }
+          "there is a zero start offset and a 20 byte first section" in {
+            val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(20)(0x01.toByte))))
+            val application = MyApplication(List(first, second), 0)
 
-        "there is a zero start offset and a 20 byte first section" in {
-          val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(20)(0x01.toByte))))
-          val application = MyApplication(List(first, second), 0)
-
-          val alignmentFiller = application.alignmentFillers(second)
-          val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
-          filler.size shouldBe 12
+            val alignmentFiller = application.alignmentFillers(second)
+            val filler = application.encodablesForDependencies(Seq(alignmentFiller))(alignmentFiller)
+            filler.size shouldBe 12
+          }
         }
       }
 

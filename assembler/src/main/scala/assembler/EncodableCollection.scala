@@ -1,8 +1,8 @@
 package assembler
 
-import assembler.resource.{UnlabeledEncodable, Resource}
+import assembler.resource.UnlabeledEncodable
 
-case class ResourceCollection(encodables: Seq[Resource with UnlabeledEncodable]) extends UnlabeledEncodable {
+case class EncodableCollection(encodables: Seq[UnlabeledEncodable]) extends UnlabeledEncodable {
 
   override def encodeByte: Seq[Byte] = encodables.flatMap(_.encodeByte)
 
