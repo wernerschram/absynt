@@ -353,6 +353,13 @@ class DataProcessingSuite extends WordSpec with Matchers {
         encodable(instruction).asInstanceOf[Resource with UnlabeledEncodable].encodeByte should be(Hex.msb("e3a01f02"))
       }
 
+      "correctly represent an mov of a register and a labeled absolute address as a string" in {
+        val targetLabel = Label("testLabel")
+        val instruction = Move.forLabel(targetLabel, R1)
+        instruction.toString shouldBe "mov r1, testLabel"
+      }
+
+
       "correctly encode a move of a labeled address to a register when the move instruction is not at position 0" in {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)

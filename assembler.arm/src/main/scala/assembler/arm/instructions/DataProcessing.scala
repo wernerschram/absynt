@@ -69,7 +69,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
         shifters.tail.map(value => Add(destination, value, destination, condition)))
     }
 
-  def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always): RelativeReference =
+  def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, encodableCondition: Condition = Always): RelativeReference =
     new RelativeReference(targetLabel) with NamedConditional {
       override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
         encodableForDependencySize(distance, offsetDirection).size
@@ -80,7 +80,7 @@ object Add extends DataProcessing(0x04.toByte, "add") {
           override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
             forConstant(source1, ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset, destination, condition)
 
-      override val condition: Condition = Always
+      override val condition: Condition = encodableCondition
 
       override val opcode: String = "add"
     }
@@ -133,13 +133,19 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
         shifters.tail.map(value => Or(destination, value, destination, condition)))
     }
 
-  def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always): AbsoluteReference =
-    new AbsoluteReference(targetLabel) {
+  def forLabel(targetLabel: Label, destination: GeneralRegister, internalCondition: Condition = Always): AbsoluteReference =
+    new AbsoluteReference(targetLabel) with NamedConditional {
       override def sizeForDistance(distance: Int): Int = encodableForDistance(distance).size
 
       override def encodableForDistance(distance: Int): UnlabeledEncodable = forConstant(distance, destination, condition)
 
       override def possibleSizes: Set[Int] = Set(4, 8, 12, 16)
+
+      override def toString = s"$mnemonicString $destination, $target"
+
+      override val condition: Condition = internalCondition
+
+      override val opcode: String = "mov"
     }
 }
 
