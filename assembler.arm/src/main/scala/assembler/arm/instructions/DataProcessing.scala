@@ -5,7 +5,7 @@ import assembler.arm.operands.Condition._
 import assembler.arm.operands._
 import assembler.arm.operands.registers.GeneralRegister
 import assembler.arm.operations._
-import assembler.resource.{AbsoluteReference, UnlabeledEncodable, RelativeReference}
+import assembler.resource.{AbsoluteReference, Encodable, RelativeReference, UnlabeledEncodable}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always): DataProcessingOperation =
@@ -48,28 +48,26 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
 }
 
 object AddCarry extends DataProcessing(0x05.toByte, "adc") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
-      return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(apply(source1, shifters.head, destination, condition) +:
-      shifters.tail.map(value => Add(destination, value, destination, condition)))
-  }
+      AddCarry(source1, 0, destination, condition)
+    else {
+      val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+      EncodableCollection(apply(source1, shifters.head, destination, condition) +:
+        shifters.tail.map(value => Add(destination, value, destination, condition)))
+    }
 }
 
 object Add extends DataProcessing(0x04.toByte, "add") {
-  def forShifters(source1: GeneralRegister, shifters: Seq[RightRotateImmediate], destination: GeneralRegister,
-    condition: Condition = Always): EncodableCollection = {
-    if (shifters.isEmpty)
-        EncodableCollection(Nil)
-    else
+
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
+    if (source2 == 0)
+      EncodableCollection(Nil)
+    else {
+      val shifters = Shifter.apply(source2)
       EncodableCollection(apply(source1, shifters.head, destination, condition) +:
         shifters.tail.map(value => Add(destination, value, destination, condition)))
-  }
-
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection =
-    forShifters(source1, Shifter.apply(source2), destination, condition)
-
+    }
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, condition: Condition = Always): RelativeReference =
     new RelativeReference(targetLabel) with NamedConditional {
@@ -89,17 +87,18 @@ object Add extends DataProcessing(0x04.toByte, "add") {
 }
 
 object And extends DataProcessing(0x00.toByte, "and") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
-      return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: Seq[RightRotateImmediate] = Shifter.apply(~source2)
-    EncodableCollection(BitClear(source1, shifters.head, destination, condition) +:
-      shifters.tail.map(value => BitClear(destination, value, destination, condition)))
-  }
+      And(source1, 0, destination, condition)
+    else {
+      val shifters: Seq[RightRotateImmediate] = Shifter.apply(~source2)
+      EncodableCollection(BitClear(source1, shifters.head, destination, condition) +:
+        shifters.tail.map(value => BitClear(destination, value, destination, condition)))
+    }
 }
 
 object BitClear extends DataProcessing(0x0E.toByte, "bic") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
         EncodableCollection(Nil)
     else {
@@ -107,7 +106,6 @@ object BitClear extends DataProcessing(0x0E.toByte, "bic") {
       EncodableCollection(BitClear(source1, shifters.head, destination, condition) +:
         shifters.tail.map(value => BitClear(destination, value, destination, condition)))
     }
-  }
 }
 
 object CompareNegative extends DataProcessingNoDestination(0x0B.toByte, "cmn")
@@ -115,7 +113,7 @@ object CompareNegative extends DataProcessingNoDestination(0x0B.toByte, "cmn")
 object Compare extends DataProcessingNoDestination(0x0A.toByte, "cmp")
 
 object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
         EncodableCollection(Nil)
     else {
@@ -123,17 +121,17 @@ object ExclusiveOr extends DataProcessing(0x01.toByte, "eor") {
       EncodableCollection(ExclusiveOr(source1, shifters.head, destination, condition) +:
         shifters.tail.map(value => ExclusiveOr(destination, value, destination, condition)))
     }
-  }
 }
 
 object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
-  def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
-      return EncodableCollection(apply(Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(apply(shifters.head, destination, condition) +:
-      shifters.tail.map(value => Or(destination, value, destination, condition)))
-  }
+      Move(0, destination, condition)
+    else {
+      val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+      EncodableCollection(apply(shifters.head, destination, condition) +:
+        shifters.tail.map(value => Or(destination, value, destination, condition)))
+    }
 
   def forLabel(targetLabel: Label, destination: GeneralRegister, condition: Condition = Always): AbsoluteReference =
     new AbsoluteReference(targetLabel) {
@@ -148,7 +146,7 @@ object Move extends DataProcessingNoRegister(0x0D.toByte, "mov") {
 object MoveNot extends DataProcessingNoRegister(0x0F.toByte, "mvn")
 
 object Or extends DataProcessing(0x0C.toByte, "orr") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
         EncodableCollection(Nil)
     else {
@@ -156,41 +154,43 @@ object Or extends DataProcessing(0x0C.toByte, "orr") {
       EncodableCollection(apply(source1, shifters.head, destination, condition) +:
         shifters.tail.map(value => Or(destination, value, destination, condition)))
     }
-  }
 }
 
 object ReverseSubtract extends DataProcessing(0x03.toByte, "rsb") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
-      return EncodableCollection(ReverseSubtract(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(ReverseSubtract(source1, shifters.head, destination, condition) +:
-      shifters.tail.map(value => Add(destination, value, destination, condition)))
-  }
+      ReverseSubtract(source1, 0, destination, condition)
+    else {
+      val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+      EncodableCollection(ReverseSubtract(source1, shifters.head, destination, condition) +:
+        shifters.tail.map(value => Add(destination, value, destination, condition)))
+    }
 }
 
 object ReverseSubtractCarry extends DataProcessing(0x07.toByte, "rsc") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
-      return EncodableCollection(ReverseSubtractCarry(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) +:
-      shifters.tail.map(value => Add(destination, value, destination, condition)))
-  }
+      ReverseSubtractCarry(source1, 0, destination, condition)
+    else {
+      val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+      EncodableCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) +:
+        shifters.tail.map(value => Add(destination, value, destination, condition)))
+    }
 }
 
 object SubtractCarry extends DataProcessing(0x06.toByte, "sbc") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
-      return EncodableCollection(apply(source1, Shifter.RightRotateImmediate(0, 0), destination, condition) :: Nil)
-    val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
-    EncodableCollection(SubtractCarry(source1, shifters.head, destination, condition) +:
-      shifters.tail.map(value => Subtract(destination, value, destination, condition)))
-  }
+      SubtractCarry(source1, 0, destination, condition)
+    else {
+      val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+      EncodableCollection(SubtractCarry(source1, shifters.head, destination, condition) +:
+        shifters.tail.map(value => Subtract(destination, value, destination, condition)))
+    }
 }
 
 object Subtract extends DataProcessing(0x02.toByte, "sub") {
-  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): EncodableCollection = {
+  def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
     if (source2 == 0)
       EncodableCollection(Nil)
     else {
@@ -198,7 +198,6 @@ object Subtract extends DataProcessing(0x02.toByte, "sub") {
       EncodableCollection(Subtract(source1, shifters.head, destination, condition) +:
         shifters.tail.map(value => Subtract(destination, value, destination, condition)))
     }
-  }
 }
 
 object TestEquivalence extends DataProcessingNoDestination(0x09.toByte, "teq")
