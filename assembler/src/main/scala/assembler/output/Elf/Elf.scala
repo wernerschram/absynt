@@ -133,7 +133,7 @@ case class ElfAbsoluteReference(override val target: Label, elf: Elf) extends Ab
 case class ElfSectionFileReference(target: Section, elf: Elf) extends UnlabeledDependentResource {
   implicit def endianness: Endianness = elf.endianness
 
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
+  override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
     EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
@@ -155,7 +155,7 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends UnlabeledD
 case class ElfSectionReference(target: Section, elf: Elf) extends UnlabeledDependentResource {
   implicit def endianness: Endianness = elf.endianness
 
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
+  override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
     EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
@@ -175,7 +175,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends UnlabeledDepen
 case class ElfSectionSize(target: Section, elf: Elf) extends UnlabeledDependentResource {
   implicit val endianness: Endianness = elf.endianness
 
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
+  override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
     EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
@@ -196,7 +196,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends UnlabeledDependentR
 case class ElfSectionHeaderReference(elf: Elf) extends UnlabeledDependentResource {
   implicit def endianness: Endianness = elf.endianness
 
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
+  override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
     EncodedBytes(elf.architecture.processorClass.numberBytes(dependencySize))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =

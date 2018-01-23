@@ -32,7 +32,7 @@ final class LabeledEncodable(encodable: UnlabeledEncodable, override val label: 
 
 abstract class DependentResource extends Resource {
 
-  def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable
+  def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
   def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int
 
@@ -55,13 +55,20 @@ abstract class DependentResource extends Resource {
 
 abstract class UnlabeledDependentResource extends DependentResource {
   def label(label: Label): LabeledDependentResource = new LabeledDependentResource(this, label)
+
+  final override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    unlabeledForDependencySize(dependencySize, offsetDirection)
+
+  def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable
 }
 
+
 final class LabeledDependentResource(dependent: UnlabeledDependentResource, override val label: Label) extends DependentResource with Labeled {
+
   override val resource: Resource = dependent
 
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
-    dependent.encodableForDependencySize(dependencySize, offsetDirection) // TODO add label
+  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+    dependent.unlabeledForDependencySize(dependencySize, offsetDirection).label(label)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
     dependent.sizeForDependencySize(dependencySize, offsetDirection)
@@ -76,7 +83,7 @@ case class AlignmentFiller(section: Section) extends UnlabeledDependentResource 
   def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     (context.startFiller +: context.sectionDependencies(section), OffsetDirection.Absolute)
 
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
+  override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
     EncodedBytes(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
@@ -93,7 +100,7 @@ case class AlignmentFiller(section: Section) extends UnlabeledDependentResource 
 
 abstract class RelativeReference(val target: Label) extends UnlabeledDependentResource {
 
-  final def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable = {
+  final def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable = {
     assume(offsetDirection.isInstanceOf[RelativeOffsetDirection])
     encodableForDistance(dependencySize, offsetDirection.asInstanceOf[RelativeOffsetDirection])
   }
@@ -117,7 +124,7 @@ abstract class AbsoluteReference(val target: Label) extends UnlabeledDependentRe
 
   def encodableForDistance(distance: Int): UnlabeledEncodable
 
-  final override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable = {
+  final override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable = {
     assume(offsetDirection == OffsetDirection.Absolute)
     encodableForDistance(dependencySize)
   }
