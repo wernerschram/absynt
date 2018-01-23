@@ -4,33 +4,36 @@ import assembler._
 import assembler.sections.Section
 import EncodableConversion._
 
-sealed abstract class Resource {
-}
+sealed abstract class Resource
 
 sealed trait Labeled {
   def label: Label
   def resource: Resource
 }
 
-abstract class Encodable extends Resource {
+sealed trait Labelable[T<:Resource] {
+  def label(label: Label): T with Labeled
+}
+
+sealed abstract class Encodable extends Resource {
   def encodeByte: Seq[Byte]
 
   def size: Int
 }
 
-abstract class UnlabeledEncodable extends Encodable {
-  def label(label: Label): LabeledEncodable = new LabeledEncodable(this, label)
+abstract class UnlabeledEncodable extends Encodable with Labelable[Encodable] {
+  override def label(newLabel: Label): Encodable with Labeled = new Encodable with Labeled {
+    override def encodeByte: Seq[Byte] = UnlabeledEncodable.this.encodeByte
+
+    override def size: Int = UnlabeledEncodable.this.size
+
+    override def label: Label = newLabel
+
+    override def resource: Resource = UnlabeledEncodable.this
+  }
 }
 
-final class LabeledEncodable(encodable: UnlabeledEncodable, override val label: Label) extends Encodable with Labeled {
-  override val resource: Resource = encodable
-
-  override def encodeByte: Seq[Byte] = encodable.encodeByte
-
-  override def size: Int = encodable.size
-}
-
-abstract class DependentResource extends Resource {
+sealed abstract class DependentResource extends Resource {
 
   def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable
 
@@ -53,8 +56,25 @@ abstract class DependentResource extends Resource {
   }
 }
 
-abstract class UnlabeledDependentResource extends DependentResource {
-  def label(label: Label): LabeledDependentResource = new LabeledDependentResource(this, label)
+abstract class UnlabeledDependentResource extends DependentResource with Labelable[DependentResource] {
+
+  override def label(newLabel: Label): DependentResource with Labeled = new DependentResource with Labeled {
+
+    override def label: Label = newLabel
+
+    override val resource: Resource = UnlabeledDependentResource.this
+
+    override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
+      UnlabeledDependentResource.this.unlabeledForDependencySize(dependencySize, offsetDirection).label(label)
+
+    override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
+      UnlabeledDependentResource.this.sizeForDependencySize(dependencySize, offsetDirection)
+
+    override def possibleSizes: Set[Int] = UnlabeledDependentResource.this.possibleSizes
+
+    override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
+      UnlabeledDependentResource.this.dependencies(context)
+  }
 
   final override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
     unlabeledForDependencySize(dependencySize, offsetDirection)
@@ -62,23 +82,7 @@ abstract class UnlabeledDependentResource extends DependentResource {
   def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable
 }
 
-
-final class LabeledDependentResource(dependent: UnlabeledDependentResource, override val label: Label) extends DependentResource with Labeled {
-
-  override val resource: Resource = dependent
-
-  override def encodableForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Encodable =
-    dependent.unlabeledForDependencySize(dependencySize, offsetDirection).label(label)
-
-  override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
-    dependent.sizeForDependencySize(dependencySize, offsetDirection)
-
-  override def possibleSizes: Set[Int] = dependent.possibleSizes
-
-  override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = dependent.dependencies(context)
-}
-
-case class AlignmentFiller(section: Section) extends UnlabeledDependentResource {
+final case class AlignmentFiller(section: Section) extends UnlabeledDependentResource {
 
   def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
     (context.startFiller +: context.sectionDependencies(section), OffsetDirection.Absolute)
