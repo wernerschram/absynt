@@ -7,7 +7,7 @@ import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import scala.language.implicitConversions
 
 sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displacement: Seq[Byte], segment: SegmentRegister)
-  extends IndirectMemoryLocation(index.indexCode, displacement, index.operandByteSize, segment)
+  extends IndirectMemoryLocation(index.indexCode, if (displacement.isEmpty && index.onlyWithDisplacement) Seq(0.toByte) else displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
@@ -16,7 +16,10 @@ sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displaceme
 
   private def displacementString = if (displacement == Nil) "" else s"+${displacement.decimalString}"
 
-  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ displacement
+  val actualDisplacement: Seq[Byte] =
+    if (displacement.isEmpty && index.onlyWithDisplacement) Seq(0.toByte) else displacement
+
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
 
   override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
     index.getRexRequirements(ParameterPosition.OperandRM) ++ super.getRexRequirements(position)

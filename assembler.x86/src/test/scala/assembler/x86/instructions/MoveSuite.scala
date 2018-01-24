@@ -67,6 +67,16 @@ class MoveSuite extends WordSpec with Matchers {
         }
       }
 
+     "correctly encode mov [bp], bp" in {
+        Move(BP, RegisterMemoryLocation(BP)).encodeByte should be(Hex.lsb("89 6E 00"))
+      }
+
+      "correctly represent mov [bp], bp as a string" in {
+        Move(BP, RegisterMemoryLocation(BP)).toString should be("mov [bp], bp")
+      }
+
+      // TODO: mov [ebp], ebp should not be possible in real mode
+
       "correctly encode mov [bp]+0x1234, cl" in {
         Move(CL, RegisterMemoryLocation(BP, 0x1234.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("88 8E 34 12"))
       }
@@ -385,7 +395,13 @@ class MoveSuite extends WordSpec with Matchers {
         Move(EBP, RegisterMemoryLocation(EDX)).toString should be("mov [edx], ebp")
       }
 
-      // TODO: mov [ebp], ebp is not allowed in protected/long mode
+     "correctly encode mov [ebp], ebp" in {
+        Move(EBP, RegisterMemoryLocation(EBP)).encodeByte should be(Hex.lsb("89 6D 00"))
+      }
+
+      "correctly represent mov [ebp], ebp as a string" in {
+        Move(EBP, RegisterMemoryLocation(EBP)).toString should be("mov [ebp], ebp")
+      }
 
       "throw an AssertionError for mov r10d, [label]" in {
         val targetLabel = Label.unique

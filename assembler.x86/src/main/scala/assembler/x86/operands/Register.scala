@@ -43,6 +43,8 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
 sealed trait BaseIndexPair extends ModRMEncodableOperand with FixedSizeOperand {
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte = registerOrMemoryModeCode
+
+  def onlyWithDisplacement: Boolean = false
 }
 
 sealed trait IndexRegister extends Register with BaseIndexPair
@@ -152,6 +154,8 @@ object Register {
   case object BP extends BasePointer with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
     override val indexCode: Byte = 0x06.toByte
 
+    override val onlyWithDisplacement: Boolean = true
+
     def getBaseCode(index: RealModeIndexRegister): Byte = {
       index match {
         case SI => 0x02
@@ -176,7 +180,9 @@ object Register {
   case object EDX extends DataRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object EBX extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object ESP extends SourcePointer with DoubleWordRegister
-  case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister
+  case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister {
+    override val onlyWithDisplacement: Boolean = true
+  }
   case object ESI extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment: SegmentRegister = Register.ES
   }
