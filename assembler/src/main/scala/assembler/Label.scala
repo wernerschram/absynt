@@ -7,8 +7,6 @@ abstract class Label {
 }
 
 object Label {
-  implicit val label: Label = noLabel
-
   implicit def apply(value: String): Label = StringLabel(value)
 
   def unique: UniqueLabel = synchronized {
@@ -16,15 +14,7 @@ object Label {
     UniqueLabel(lastId)
   }
 
-  def noLabel: Label = NoLabel()
-
   private var lastId = 0
-}
-
-case class NoLabel private() extends Label {
-  def matches(label: Label): Boolean = false
-
-  override def toString: String = ""
 }
 
 case class StringLabel private (value: String) extends Label {

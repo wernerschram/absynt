@@ -14,13 +14,17 @@ class ElfSuite extends WordSpec with Matchers {
   "an X86 (32-bit) Elf file with some sections" should {
     val entry: Label = Label.unique
 
+
     val sectionProperties = Seq(
-      (SectionType.Text, "TextName", Seq[Byte](0), entry),
-      (SectionType.Data, "DataName", Seq[Byte](0), Label.noLabel)
+      (SectionType.Text, "TextName", Seq[Byte](0), Some(entry)),
+      (SectionType.Data, "DataName", Seq[Byte](0), None)
     )
 
     val sections = sectionProperties.map { case (sectionType, name, content, label) =>
-      Section(sectionType, name, EncodedBytes(content).label(label) :: Nil)
+      Section(sectionType, name, (label match {
+        case Some(l) =>  EncodedBytes(content).label(l)
+        case None =>  EncodedBytes(content)
+      }) :: Nil)
     }
 
     val executable = Executable(Architecture.X86, sections.toList, entry, 0)
