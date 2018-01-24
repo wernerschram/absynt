@@ -75,8 +75,6 @@ class MoveSuite extends WordSpec with Matchers {
         Move(BP, RegisterMemoryLocation(BP)).toString should be("mov [bp], bp")
       }
 
-      // TODO: mov [ebp], ebp should not be possible in real mode
-
       "correctly encode mov [bp]+0x1234, cl" in {
         Move(CL, RegisterMemoryLocation(BP, 0x1234.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("88 8E 34 12"))
       }
@@ -355,8 +353,6 @@ class MoveSuite extends WordSpec with Matchers {
       "correctly represent mov [bx+16], 22102 as a string" in {
         Move(0x5656.toShort, RegisterMemoryLocation(BX, 0x10.toByte.encodeLittleEndian)).toString should be("mov [bx+16], 22102")
       }
-
-      // FIXME: SIB instructions are not allowed in real mode: These should throw an exception or just not be allowed
 
       "correctly encode mov [eax+ebx*2+0x11111111], 0x99999999" in {
         Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111.encodeLittleEndian, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
