@@ -18,5 +18,5 @@ trait MemoryLocation extends X86Operation {
   }
 
   abstract override def encodeByte: Seq[Byte] =
-    super.encodeByte ++ location.displacement
+    super.encodeByte ++ location.displacement.encode
 }

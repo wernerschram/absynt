@@ -3,7 +3,7 @@ package assembler.x86.instructions
 import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
+import assembler.x86.operands.memoryaccess.{Displacement, RegisterMemoryLocation}
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation.indexWrapper
 import org.scalatest.{Matchers, WordSpec}
 
@@ -60,7 +60,7 @@ class StoreStringSuite extends WordSpec with Matchers {
 
 
       "correctly represent rep stos cs:[edi], ax as a string" in {
-        StoreString.Repeat(AX, RegisterMemoryLocation(EDI, List.empty[Byte], CS)).toString should be("rep stos cs:[edi], ax")
+        StoreString.Repeat(AX, RegisterMemoryLocation(EDI, Displacement.None, segment = CS)).toString should be("rep stos cs:[edi], ax")
       }
     }
 

@@ -1,17 +1,16 @@
 package assembler.x86.instructions
 
-import assembler.ListExtensions._
+import assembler._
+import assembler.output.raw.Raw
+import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess._
-import assembler._
-import assembler.output.raw.Raw
-import assembler.resource.Resource
-import org.scalatest.{Matchers, WordSpec}
 import assembler.x86.operands.memoryaccess.Displacement._
+import assembler.x86.operands.memoryaccess._
+import org.scalatest.{Matchers, WordSpec}
 
 class MoveSuite extends WordSpec with Matchers {
 
@@ -141,11 +140,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [edi+edx*8+0x0110], ecx" in {
-        Move(ECX, SIBMemoryLocation(EDX, EDI, 0x0110.encodeLittleEndian, 8)).encodeByte should be(Hex.lsb("67 66 89 8C D7 10 01 00 00"))
+        Move(ECX, SIBMemoryLocation(EDX, EDI, 0x0110, 8)).encodeByte should be(Hex.lsb("67 66 89 8C D7 10 01 00 00"))
       }
 
       "correctly represent mov [edi+edx*8+272], ecx as a string" in {
-        Move(ECX, SIBMemoryLocation(EDX, EDI, 0x0110.encodeLittleEndian, 8)).toString should be("mov [edi+edx*8+272], ecx")
+        Move(ECX, SIBMemoryLocation(EDX, EDI, 0x0110, 8)).toString should be("mov [edi+edx*8+272], ecx")
       }
 
       "correctly encode mov [bx+3D], bp" in {
@@ -261,43 +260,43 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov al, [0x0022]" in {
-        Move(MemoryAddress(0x0022.toShort.encodeLittleEndian), AL).encodeByte should be(Hex.lsb("A0 22 00"))
+        Move(MemoryAddress(0x0022.toShort), AL).encodeByte should be(Hex.lsb("A0 22 00"))
       }
 
       "correctly represent mov al, [34] as a string" in {
-        Move(MemoryAddress(0x0022.toShort.encodeLittleEndian), AL).toString should be("mov al, [34]")
+        Move(MemoryAddress(0x0022.toShort), AL).toString should be("mov al, [34]")
       }
 
       "correctly encode mov ax, [0x6677]" in {
-        Move(MemoryAddress(0x6677.toShort.encodeLittleEndian), AX).encodeByte should be(Hex.lsb("A1 77 66"))
+        Move(MemoryAddress(0x6677.toShort), AX).encodeByte should be(Hex.lsb("A1 77 66"))
       }
 
       "correctly represent mov ax, [26231] as a string" in {
-        Move(MemoryAddress(0x6677.toShort.encodeLittleEndian), AX).toString should be("mov ax, [26231]")
+        Move(MemoryAddress(0x6677.toShort), AX).toString should be("mov ax, [26231]")
       }
 
       "correctly encode mov ax, ss:[0x6677]" in {
-        Move(MemoryAddress(0x6677.toShort.encodeLittleEndian, SS), AX).encodeByte should be(Hex.lsb("36 A1 77 66"))
+        Move(MemoryAddress(0x6677.toShort, SS), AX).encodeByte should be(Hex.lsb("36 A1 77 66"))
       }
 
       "correctly represent mov ax, ss:[26231] as a string" in {
-        Move(MemoryAddress(0x6677.toShort.encodeLittleEndian, SS), AX).toString should be("mov ax, ss:[26231]")
+        Move(MemoryAddress(0x6677.toShort, SS), AX).toString should be("mov ax, ss:[26231]")
       }
 
       "correctly encode mov [0xDEAF], al" in {
-        Move(AL, MemoryAddress(0xDEAF.toShort.encodeLittleEndian)).encodeByte should be(Hex.lsb("A2 AF DE"))
+        Move(AL, MemoryAddress(0xDEAF.toShort)).encodeByte should be(Hex.lsb("A2 AF DE"))
       }
 
       "correctly represent mov [57007], al as a string" in {
-        Move(AL, MemoryAddress(0xDEAF.toShort.encodeLittleEndian)).toString should be("mov [57007], al")
+        Move(AL, MemoryAddress(0xDEAF.toShort)).toString should be("mov [57007], al")
       }
 
       "correctly encode mov [0x2D], ax" in {
-        Move(AX, MemoryAddress(0x2D.toByte.encodeLittleEndian)).encodeByte should be(Hex.lsb("A3 2D"))
+        Move(AX, MemoryAddress(0x2D.toByte)).encodeByte should be(Hex.lsb("A3 2D"))
       }
 
       "correctly represent mov [45], ax as a string" in {
-        Move(AX, MemoryAddress(0x2D.toByte.encodeLittleEndian)).toString should be("mov [45], ax")
+        Move(AX, MemoryAddress(0x2D.toByte)).toString should be("mov [45], ax")
       }
 
       "correctly encode mov dl, 0x12" in {
@@ -356,11 +355,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [eax+ebx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111.encodeLittleEndian, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
+        Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov [eax+ebx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111.encodeLittleEndian, 2)).toString should be("mov [eax+ebx*2+286331153], 2576980377")
+        Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111, 2)).toString should be("mov [eax+ebx*2+286331153], 2576980377")
       }
     }
 
@@ -369,19 +368,19 @@ class MoveSuite extends WordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode mov [0xDEADBEEF], eax" in {
-        Move(EAX, MemoryAddress(0xDEADBEEF.encodeLittleEndian)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
+        Move(EAX, MemoryAddress(0xDEADBEEF)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
       }
 
       "correctly represent mov [3735928559], eax as a string" in {
-        Move(EAX, MemoryAddress(0xDEADBEEF.encodeLittleEndian)).toString should be("mov [3735928559], eax")
+        Move(EAX, MemoryAddress(0xDEADBEEF)).toString should be("mov [3735928559], eax")
       }
 
       "correctly encode mov eax, [0xFAFAFAFA]" in {
-        Move(MemoryAddress(0xFAFAFAFA.encodeLittleEndian), EAX).encodeByte should be(Hex.lsb("A1 FA FA FA FA"))
+        Move(MemoryAddress(0xFAFAFAFA), EAX).encodeByte should be(Hex.lsb("A1 FA FA FA FA"))
       }
 
       "correctly represent mov eax, [4210752250] as a string" in {
-        Move(MemoryAddress(0xFAFAFAFA.encodeLittleEndian), EAX).toString should be("mov eax, [4210752250]")
+        Move(MemoryAddress(0xFAFAFAFA), EAX).toString should be("mov eax, [4210752250]")
       }
 
       "correctly encode mov [edx], ebp" in {
@@ -573,19 +572,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov rax, [0xA4A3A2A1F4F3F2F1]" in {
-        Move(MemoryAddress(0xA4A3A2A1F4F3F2F1L.encodeLittleEndian), RAX).encodeByte should be(Hex.lsb("48 A1 F1 F2 F3 F4 A1 A2 A3 A4"))
+        Move(MemoryAddress(0xA4A3A2A1F4F3F2F1L), RAX).encodeByte should be(Hex.lsb("48 A1 F1 F2 F3 F4 A1 A2 A3 A4"))
       }
 
       "correctly represent mov rax, [-6583239413802470671] as a string" in {
-        Move(MemoryAddress(0xA4A3A2A1F4F3F2F1L.encodeLittleEndian), RAX).toString should be("mov rax, [-6583239413802470671]")
+        Move(MemoryAddress(0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, [-6583239413802470671]")
       }
 
       "correctly encode mov [0xDEADBEEF], rax" in {
-        Move(RAX, MemoryAddress(0xDEADBEEF.encodeLittleEndian)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
+        Move(RAX, MemoryAddress(0xDEADBEEF)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
       }
 
       "correctly represent mov [3735928559], rax as a string" in {
-        Move(RAX, MemoryAddress(0xDEADBEEF.encodeLittleEndian)).toString should be("mov [3735928559], rax")
+        Move(RAX, MemoryAddress(0xDEADBEEF)).toString should be("mov [3735928559], rax")
       }
 
       "correctly encode mov r15l, 0x12" in {
@@ -663,19 +662,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [rax+rbx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, SIBMemoryLocation(RBX, RAX, 0x11111111.encodeLittleEndian, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
+        Move(0x99999999, SIBMemoryLocation(RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov [rax+rbx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation(RBX, RAX, 0x11111111.encodeLittleEndian, 2)).toString should be("mov [rax+rbx*2+286331153], 2576980377")
+        Move(0x99999999, SIBMemoryLocation(RBX, RAX, 0x11111111, 2)).toString should be("mov [rax+rbx*2+286331153], 2576980377")
       }
 
       "correctly encode mov [r8+r9*2], ebp" in {
-        Move(EBP, SIBMemoryLocation(R9, R8, 0.encodeLittleEndian, 2)).encodeByte should be(Hex.lsb("43 89 ac 48 00 00 00 00"))
+        Move(EBP, SIBMemoryLocation(R9, R8, 0, 2)).encodeByte should be(Hex.lsb("43 89 ac 48 00 00 00 00"))
       }
 
       "correctly represent mov [r8+r9*2+0], ebp as a string" in {
-        Move(EBP, SIBMemoryLocation(R9, R8, 0.encodeLittleEndian, 2)).toString should be("mov [r8+r9*2+0], ebp")
+        Move(EBP, SIBMemoryLocation(R9, R8, 0, 2)).toString should be("mov [r8+r9*2+0], ebp")
       }
 
       "throw an exception for mov 0x001122, rax" in {
