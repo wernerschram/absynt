@@ -46,49 +46,20 @@ object SIBMemoryLocation {
   def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1) =
     new SIBMemoryLocation(index, base, displacement, scale, index.defaultSIBSegment)
 
-  def byteSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.Byte, index.defaultSIBSegment)
-
-  def wordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.Word, index.defaultSIBSegment)
-
-  def doubleWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.DoubleWord, index.defaultSIBSegment)
-
-  def quadWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1) =
-    FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.QuadWord, index.defaultSIBSegment)
-
-  final class FixedSizeSIBMemoryLocation private(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int,
-                                                 val operandByteSize: OperandSize, segment: SegmentRegister)
-    extends SIBMemoryLocation(index, base, displacement, scale, segment) with ModRMEncodableOperand with FixedSizeOperand
+  def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
+    new SIBMemoryLocation(index, base, displacement, scale, index.defaultSIBSegment) with FixedSizeOperand {
+      override val operandByteSize: OperandSize = size
+    }
 
   object withSegmentOverride {
     def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
               segment: SegmentRegister) =
       new SIBMemoryLocation(index, base, displacement, scale, segment)
 
-    def byteSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
-                 segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.Byte, segment)
-
-    def wordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
-                 segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.Word, segment)
-
-    def doubleWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
-                       segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.DoubleWord, segment)
-
-    def quadWordSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
-                     segment: SegmentRegister) =
-      FixedSizeSIBMemoryLocation(index, base, displacement, scale, ValueSize.QuadWord, segment)
-
+    def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
+      segment: SegmentRegister)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
+        new SIBMemoryLocation(index, base, displacement, scale, segment) with FixedSizeOperand {
+      override val operandByteSize: OperandSize = size
+    }
   }
-
-  private object FixedSizeSIBMemoryLocation {
-    def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int, operandByteSize: OperandSize,
-              segment: SegmentRegister) =
-      new FixedSizeSIBMemoryLocation(index, base, displacement, scale, operandByteSize, segment)
-  }
-
 }
