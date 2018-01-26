@@ -6,7 +6,7 @@ import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 import scala.language.implicitConversions
 
-sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displacement: Displacement, segment: SegmentRegister)
+sealed class RegisterMemoryLocation[T <: BaseIndexPair] private(val index: T, displacement: Displacement, segment: SegmentRegister)
   extends IndirectMemoryLocation(index.indexCode,
     if (displacement == Displacement.None && index.onlyWithDisplacement) Displacement(0.toByte) else displacement, index.operandByteSize, segment)
     with ModRMEncodableOperand {
@@ -34,42 +34,28 @@ sealed class RegisterMemoryLocation private(val index: BaseIndexPair, displaceme
 
 object RegisterMemoryLocation {
 
-  def apply(index: BaseIndexPair, displacement: Displacement = Displacement.None)=
+  def apply[T<:BaseIndexPair](index: T, displacement: Displacement = Displacement.None)=
     new RegisterMemoryLocation(index, displacement, index.defaultSegment)
 
-  def apply(index: DestinationIndex, displacement: Displacement) =
-    new DIReference(index, displacement, index.defaultSegment)
-
-  def withSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)(size: ValueSize): RegisterMemoryLocation with FixedSizeOperand =
-    new RegisterMemoryLocation(index, displacement, index.defaultSegment) with FixedSizeOperand {
+  def withSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)(size: ValueSize): RegisterMemoryLocation[BaseIndexPair] with FixedSizeOperand =
+    new RegisterMemoryLocation[BaseIndexPair](index, displacement, index.defaultSegment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
 
       override def toString = s"$operandByteSize PTR ${super.toString()}"
     }
 
-  // TODO: Restrictions on types with generics look nicer
-  final class DIReference private[RegisterMemoryLocation](index: DestinationIndex, displacement: Displacement, segment: SegmentRegister)
-    extends RegisterMemoryLocation(index, displacement, segment)
-
   object withSegmentOverride {
-    def apply(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
+    def apply[T<:BaseIndexPair](index: T, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
       new RegisterMemoryLocation(index, displacement, segment)
 
-  def apply(index: DestinationIndex, displacement: Displacement, segment: SegmentRegister) =
-    new DIReference(index, displacement, segment)
-
-    def withSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister)(size: ValueSize): RegisterMemoryLocation with FixedSizeOperand =
-      new RegisterMemoryLocation(index, displacement, segment) with FixedSizeOperand {
+    def withSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister)(size: ValueSize): RegisterMemoryLocation[BaseIndexPair] with FixedSizeOperand =
+      new RegisterMemoryLocation[BaseIndexPair](index, displacement, segment) with FixedSizeOperand {
         override val operandByteSize: OperandSize = size
 
         override def toString = s"$operandByteSize PTR ${super.toString()}"
       }
   }
 
-  def apply(index: DestinationIndex) =
-    new DIReference(index, Displacement.None, index.defaultSegment)
-
-  implicit def indexWrapper(index: DestinationIndex): DIReference = apply(index)
-
-
+  implicit def indexWrapper(index: DestinationIndex): RegisterMemoryLocation[DestinationIndex] =
+    new RegisterMemoryLocation[DestinationIndex](index, Displacement.None, index.defaultSegment)
 }
