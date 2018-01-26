@@ -60,7 +60,7 @@ class StoreStringSuite extends WordSpec with Matchers {
 
 
       "correctly represent rep stos cs:[edi], ax as a string" in {
-        StoreString.Repeat(AX, RegisterMemoryLocation(EDI, Displacement.None, segment = CS)).toString should be("rep stos cs:[edi], ax")
+        StoreString.Repeat(AX, RegisterMemoryLocation.withSegmentOverride(EDI, Displacement.None, segment = CS)).toString should be("rep stos cs:[edi], ax")
       }
     }
 

@@ -21,25 +21,8 @@ object MemoryAddress {
   def apply(address: Displacement, segment: SegmentRegister = Register.DS) =
     new MemoryAddress(address, segment)
 
-  def byteSize(address: Displacement, segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, ValueSize.Byte)
-
-  def wordSize(address: Displacement, segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, ValueSize.Word)
-
-  def doubleWordSize(address: Displacement, segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, ValueSize.DoubleWord)
-
-  def quadWordSize(address: Displacement, segment: SegmentRegister = Register.DS) =
-    FixedSizeMemoryAddress(address, segment, ValueSize.QuadWord)
-
-  final class FixedSizeMemoryAddress private(address: Displacement, segment: SegmentRegister = Register.DS, val operandByteSize: OperandSize)
-    extends MemoryAddress(address, segment) with ModRMEncodableOperand with FixedSizeOperand {
-  }
-
-  private object FixedSizeMemoryAddress {
-    def apply(address: Displacement, segment: SegmentRegister = Register.DS, operandByteSize: OperandSize) =
-      new FixedSizeMemoryAddress(address, segment, operandByteSize)
-  }
-
+  def withSize(address: Displacement, segment: SegmentRegister = Register.DS)(size: ValueSize): MemoryAddress with FixedSizeOperand =
+    new MemoryAddress(address, segment) with FixedSizeOperand {
+      override val operandByteSize: OperandSize = size
+    }
 }

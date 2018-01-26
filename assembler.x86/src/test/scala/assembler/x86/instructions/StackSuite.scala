@@ -1,10 +1,10 @@
 package assembler.x86.instructions
 
 import assembler.Hex
-import assembler.ListExtensions.ShortEncoder
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
+import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess._
 import org.scalatest.{Matchers, WordSpec}
 
@@ -17,16 +17,16 @@ class StackSuite extends WordSpec with Matchers {
 
       "throw an AssertionError for push BYTE PTR [bp]" in {
         an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.byteSize(BP)).encodeByte
+          Push(RegisterMemoryLocation.withSize(BP)(ValueSize.Byte)).encodeByte
         }
       }
 
       "correctly encode push WORD PTR [0x0001]" in {
-        Push(MemoryAddress.wordSize(0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
+        Push(MemoryAddress.withSize(0x0001.toShort)(ValueSize.Word)).encodeByte should be(Hex.lsb("FF 36 01 00"))
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
-        Push(RegisterMemoryLocation.doubleWordSize(BX.combinedIndex(SI))).encodeByte should be(0x66.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
+        Push(RegisterMemoryLocation.withSize(BX.combinedIndex(SI))(ValueSize.DoubleWord)).encodeByte should be(0x66.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
       }
 
       "throw an AssertionError for push cl" in {
@@ -84,9 +84,9 @@ class StackSuite extends WordSpec with Matchers {
         Push(GS).encodeByte should be(0x0F.toByte :: 0xA8.toByte :: Nil)
       }
 
-      "throw an AssertionError for push BYTE PTR [bp]" in {
+      "throw an AssertionError for push QWORD PTR [bp]" in {
         an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.quadWordSize(BP)).encodeByte
+          Push(RegisterMemoryLocation.withSize(BP)(ValueSize.QuadWord)).encodeByte
         }
       }
     }
@@ -96,12 +96,12 @@ class StackSuite extends WordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode push QWORD PTR [rax]" in {
-        Push(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
+        Push(RegisterMemoryLocation.withSize(RAX)(ValueSize.QuadWord)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
       }
 
       "throw an AssertionError for push DWORD PTR [rax]" in {
         an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.doubleWordSize(RAX)).encodeByte
+          Push(RegisterMemoryLocation.withSize(RAX)(ValueSize.DoubleWord)).encodeByte
         }
       }
 

@@ -79,11 +79,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode not BYTE PTR [0x01]" in {
-        Not(MemoryAddress.byteSize(0x0001.toShort)).encodeByte should be(Hex.lsb("F6 16 01 00"))
+        Not(MemoryAddress.withSize(0x0001.toShort)(ValueSize.Byte)).encodeByte should be(Hex.lsb("F6 16 01 00"))
       }
 
       "correctly encode not WORD PTR [0x0001]" in {
-        Not(MemoryAddress.wordSize(0x0001.toShort)).encodeByte should be(Hex.lsb("F7 16 01 00"))
+        Not(MemoryAddress.withSize(0x0001.toShort)(ValueSize.Word)).encodeByte should be(Hex.lsb("F7 16 01 00"))
       }
     }
     "in protected mode" should {
@@ -100,7 +100,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode not QWORD PTR [rax]" in {
-        Not(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(Hex.lsb("48 F7 10"))
+        Not(RegisterMemoryLocation.withSize(RAX)(ValueSize.QuadWord)).encodeByte should be(Hex.lsb("48 F7 10"))
       }
     }
   }
@@ -186,7 +186,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
       }
 
       "correctly encode xor [bx], 0x3412" in {
-        Xor(0x3412.toShort, RegisterMemoryLocation.wordSize(BX)).encodeByte should be(Hex.lsb("81 37 12 34"))
+        Xor(0x3412.toShort, RegisterMemoryLocation.withSize(BX)(ValueSize.Word)).encodeByte should be(Hex.lsb("81 37 12 34"))
       }
 
       "correctly encode xor [bx], al" in {
@@ -203,11 +203,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode xor DWORD PTR [0x11111111], 0x44332211" in {
-        Xor(0x44332211, MemoryAddress.doubleWordSize(0x11111111)).encodeByte should be(Hex.lsb("81 35 11 11 11 11 11 22 33 44"))
+        Xor(0x44332211, MemoryAddress.withSize(0x11111111)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("81 35 11 11 11 11 11 22 33 44"))
       }
 
       "correctly encode xor WORD PTR [0x11111111], 0x44" in {
-        Xor(0x44.toByte, MemoryAddress.wordSize(0x11111111)).encodeByte should be(Hex.lsb("66 83 35 11 11 11 11 44"))
+        Xor(0x44.toByte, MemoryAddress.withSize(0x11111111)(ValueSize.Word)).encodeByte should be(Hex.lsb("66 83 35 11 11 11 11 44"))
       }
 
       "correctly encode xor [0x1234], edx" in {
@@ -224,12 +224,12 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode xor QWORD PTR [0x11111111], 0x44332211" in {
-        Xor(0x44332211, MemoryAddress.quadWordSize(0x11111111)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
+        Xor(0x44332211, MemoryAddress.withSize(0x11111111)(ValueSize.QuadWord)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
       }
 
       "throw an AssertionError for xor WORD PTR [0x11111111], 0x44332211" in {
         an[AssertionError] should be thrownBy {
-          Xor(0x44332211, MemoryAddress.wordSize(0x11111111))
+          Xor(0x44332211, MemoryAddress.withSize(0x11111111)(ValueSize.Word))
         }
       }
 
@@ -277,19 +277,19 @@ class ArithmeticSuite extends WordSpec with Matchers {
       }
 
       "correctly encode xor QWORD PTR cs:[eax], 0x44332211" in {
-        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride.quadWordSize(EAX, segment = CS)).encodeByte should be(Hex.lsb("2e 67 48 81 30 11 22 33 44"))
+        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride.withSize(EAX, segment = CS)(ValueSize.QuadWord)).encodeByte should be(Hex.lsb("2e 67 48 81 30 11 22 33 44"))
       }
 
       "correctly encode xor DWORD PTR cs:[rbx], 0x44332211" in {
-        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride.doubleWordSize(RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 81 33 11 22 33 44"))
+        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride.withSize(RBX, segment = CS)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("2e 81 33 11 22 33 44"))
       }
 
       "correctly encode xor WORD PTR cs:[rbx], 0x2211" in {
-        Xor(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride.wordSize(RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 66 81 33 11 22"))
+        Xor(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride.withSize(RBX, segment = CS)(ValueSize.Word)).encodeByte should be(Hex.lsb("2e 66 81 33 11 22"))
       }
 
       "correctly encode xor BYTE PTR cs:[rbx], 0x11" in {
-        Xor(0x11.toByte, RegisterMemoryLocation.withSegmentOverride.byteSize(RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 80 33 11"))
+        Xor(0x11.toByte, RegisterMemoryLocation.withSegmentOverride.withSize(RBX, segment = CS)(ValueSize.Byte)).encodeByte should be(Hex.lsb("2e 80 33 11"))
       }
 
       "correctly encode xor rbx, 0x44332211" in {

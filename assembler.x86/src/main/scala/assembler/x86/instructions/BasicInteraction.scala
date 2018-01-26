@@ -16,6 +16,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
         Imm32ToEAX(immediate)
       case (Register.RAX, ValueSize.DoubleWord) =>
         Imm32ToRAX(immediate)
+        //TODO this is too strict, calling without a fixedsize modr/m encodable should also be possible (byteSize is implied by the size of the immediate)
       case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.Byte) if destination.operandByteSize == ValueSize.Byte =>
         Imm8ToRM8(destination, immediate)
       case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.Word | ValueSize.DoubleWord)

@@ -37,51 +37,33 @@ object RegisterMemoryLocation {
   def apply(index: BaseIndexPair, displacement: Displacement = Displacement.None)=
     new RegisterMemoryLocation(index, displacement, index.defaultSegment)
 
-  def apply(index: DestinationIndex, displacement: Displacement, segment: SegmentRegister) =
-    new DIReference(index, displacement, segment)
+  def apply(index: DestinationIndex, displacement: Displacement) =
+    new DIReference(index, displacement, index.defaultSegment)
 
-  def byteSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)=
-    new FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Byte, index.defaultSegment)
+  def withSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)(size: ValueSize): RegisterMemoryLocation with FixedSizeOperand =
+    new RegisterMemoryLocation(index, displacement, index.defaultSegment) with FixedSizeOperand {
+      override val operandByteSize: OperandSize = size
 
-  def wordSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)=
-    new FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Word, index.defaultSegment)
+      override def toString = s"$operandByteSize PTR ${super.toString()}"
+    }
 
-  def doubleWordSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)=
-    new FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.DoubleWord, index.defaultSegment)
-
-  def quadWordSize(index: BaseIndexPair, displacement: Displacement = Displacement.None)=
-    new FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.QuadWord, index.defaultSegment)
-
+  // TODO: Restrictions on types with generics look nicer
   final class DIReference private[RegisterMemoryLocation](index: DestinationIndex, displacement: Displacement, segment: SegmentRegister)
     extends RegisterMemoryLocation(index, displacement, segment)
-
-  final class FixedSizeRegisterMemoryLocation private[RegisterMemoryLocation](index: BaseIndexPair, displacement: Displacement,
-                                                      override val operandByteSize: OperandSize, segment: SegmentRegister)
-    extends RegisterMemoryLocation(index, displacement, segment) with ModRMEncodableOperand with FixedSizeOperand {
-
-    override def toString = s"$operandByteSize PTR ${super.toString()}"
-  }
 
   object withSegmentOverride {
     def apply(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
       new RegisterMemoryLocation(index, displacement, segment)
 
-    def byteSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Byte, segment)
+  def apply(index: DestinationIndex, displacement: Displacement, segment: SegmentRegister) =
+    new DIReference(index, displacement, segment)
 
-    def wordSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.Word, segment)
+    def withSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister)(size: ValueSize): RegisterMemoryLocation with FixedSizeOperand =
+      new RegisterMemoryLocation(index, displacement, segment) with FixedSizeOperand {
+        override val operandByteSize: OperandSize = size
 
-    def doubleWordSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.DoubleWord, segment)
-
-    def quadWordSize(index: BaseIndexPair, displacement: Displacement = Displacement.None, segment: SegmentRegister) =
-      FixedSizeRegisterMemoryLocation(index, displacement, ValueSize.QuadWord, segment)
-  }
-
-  private object FixedSizeRegisterMemoryLocation {
-    def apply(index: BaseIndexPair, displacement: Displacement, operandByteSize: OperandSize, segment: SegmentRegister) =
-      new FixedSizeRegisterMemoryLocation(index, displacement, operandByteSize, segment)
+        override def toString = s"$operandByteSize PTR ${super.toString()}"
+      }
   }
 
   def apply(index: DestinationIndex) =
