@@ -248,6 +248,18 @@ class ArithmeticSuite extends WordSpec with Matchers {
         }
       }
 
+      "correctly encode xor [rax+rbx*2], 0x11" in {
+        Xor(0x11.toByte, SIBMemoryLocation(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("80 34 58 11"))
+      }
+
+      "correctly encode xor [rax+rbx*2], 0x2211" in {
+        Xor(0x2211.toShort, SIBMemoryLocation(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("66 81 34 58 11 22"))
+      }
+
+      "correctly encode xor [rax+rbx*2], 0x44332211" in {
+        Xor(0x44332211, SIBMemoryLocation(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("81 34 58 11 22 33 44"))
+      }
+
       "correctly encode xor BYTE PTR [rax+rbx*2], 0x11" in {
         Xor(0x11.toByte, SIBMemoryLocation.withSize(RBX, RAX, scale = 2)(ValueSize.Byte)).encodeByte should be(Hex.lsb("80 34 58 11"))
       }
@@ -258,6 +270,10 @@ class ArithmeticSuite extends WordSpec with Matchers {
 
       "correctly encode xor DWORD PTR [rax+rbx*2], 0x44332211" in {
         Xor(0x44332211, SIBMemoryLocation.withSize(RBX, RAX, scale = 2)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("81 34 58 11 22 33 44"))
+      }
+
+      "correctly encode xor QWORD PTR [rax+rbx*2], 0x44332211" in {
+        Xor(0x44332211, SIBMemoryLocation.withSize(RBX, RAX, scale = 2)(ValueSize.QuadWord)).encodeByte should be(Hex.lsb("48 81 34 58 11 22 33 44"))
       }
 
       "correctly encode xor BYTE PTR gs:[rax+rbx*2], 0x11" in {
@@ -291,6 +307,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
       "correctly encode xor BYTE PTR cs:[rbx], 0x11" in {
         Xor(0x11.toByte, RegisterMemoryLocation.withSegmentOverride.withSize(RBX, segment = CS)(ValueSize.Byte)).encodeByte should be(Hex.lsb("2e 80 33 11"))
       }
+
 
       "correctly encode xor rbx, 0x44332211" in {
         Xor(0x44332211, RBX).encodeByte should be(Hex.lsb("48 81 F3 11 22 33 44"))
