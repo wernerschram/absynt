@@ -8,7 +8,7 @@ trait FarPointer[OffsetType <: X86Offset] extends X86Operation {
   self: X86Operation =>
   def pointer: FarPointerType[OffsetType]
 
-  abstract override def operands: Seq[Operand] = super.operands :+ pointer
+  abstract override def operands: Seq[OperandInfo] = super.operands :+ OperandInfo.pointer(pointer)
 
   abstract override def operandSize: FarPointerSize = pointer.operandByteSize
 

@@ -5,7 +5,7 @@ import assembler.resource.{AbsoluteReference, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
-import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
+import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, OperandInfo, RegisterEncoded, ReversedOperands, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 
 object Move {
 
@@ -42,7 +42,7 @@ object Move {
 
   private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[Operand] = Register.AL +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
@@ -65,7 +65,7 @@ object Move {
 
   private def AXToMOffs16(accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[Operand] = accumulatorRegister +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
@@ -85,7 +85,7 @@ object Move {
 
   private def MOffs8ToAL(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
-      override def operands: Seq[Operand] = Register.AL +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
@@ -105,7 +105,7 @@ object Move {
 
   private def MOffs16ToAX(memoryLocation: MemoryLocation, accumulatorRegister: AccumulatorRegister)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with ReversedOperands {
-      override def operands: Seq[Operand] = accumulatorRegister +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 

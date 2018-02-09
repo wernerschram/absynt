@@ -4,10 +4,35 @@ import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.resource.UnlabeledEncodable
 
+abstract class OperandInfo(operand: Operand) {
+  override def toString: String = operand.toString
+}
+
+object OperandInfo {
+  def pointer(pointer: memoryaccess.FarPointer[_]): OperandInfo = new OperandInfo(pointer) {} //ptrXX
+
+  def relative(pointer: memoryaccess.NearPointer[_]): OperandInfo = new OperandInfo(pointer) {} //relXX
+
+  def immediate(immediate: ImmediateValue): OperandInfo = new OperandInfo(immediate) {} //immXX
+
+  def implicitOperand(operand: Operand): OperandInfo = new OperandInfo(operand) {} //XX
+
+  def encodedRegister(register: GeneralPurposeRegister): OperandInfo = new OperandInfo(register) {} //rX
+
+  def memoryOffset(offset: memoryaccess.MemoryLocation): OperandInfo = new OperandInfo(offset) {} //moffsXX
+
+  def rmRegisterOrMemory(rm: ModRMEncodableOperand): OperandInfo = new OperandInfo(rm) {} //r/mXX
+
+  def rmRegister(register: GeneralPurposeRegister): OperandInfo = new OperandInfo(register) {} //rXX
+
+  def rmSegment(register: SegmentRegister): OperandInfo = new OperandInfo(register) {} //SregXX
+
+}
+
 abstract class X86Operation extends UnlabeledEncodable {
   val includeRexW: Boolean = true
 
-  def operands: Seq[Operand]
+  def operands: Seq[OperandInfo]
 
   override def size: Int = encodeByte.length
 

@@ -11,7 +11,7 @@ class ModRMStatic(val operandRM: ModRMEncodableOperand,
                   override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends X86Operation {
 
-  override def operands: Seq[Operand] = Seq(operandRM)
+  override def operands: Seq[OperandInfo] = Seq(OperandInfo.rmRegisterOrMemory(operandRM))
 
   override def validate(): Unit = {
     super.validate()

@@ -1,13 +1,13 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.{ImmediateValue, Operand, OperandSize}
+import assembler.x86.operands.{ImmediateValue, OperandSize}
 
 trait Immediate extends X86Operation {
 
   self: X86Operation =>
   def immediate: ImmediateValue
 
-  abstract override def operands: Seq[Operand] = super.operands :+ immediate
+  abstract override def operands: Seq[OperandInfo] = super.operands :+ OperandInfo.immediate(immediate)
 
   abstract override def operandSize: OperandSize = super.operandSize match {
     case OperandSize.Unknown => immediate.operandByteSize

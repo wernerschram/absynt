@@ -1,14 +1,14 @@
 package assembler.x86.operations
 
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
-import assembler.x86.operands.{Operand, OperandSize, SegmentRegister}
+import assembler.x86.operands.{OperandSize, SegmentRegister}
 
 trait MemoryLocation extends X86Operation {
 
   self: X86Operation =>
   def location: MemoryLocationType
 
-  abstract override def operands: Seq[Operand] = super.operands :+ location
+  abstract override def operands: Seq[OperandInfo] = super.operands :+ OperandInfo.memoryOffset(location)
 
   abstract override def addressSize: OperandSize = location.addressSize
 

@@ -11,7 +11,7 @@ class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register: Registe
                                                           (override implicit val processorMode: ProcessorMode)
   extends ModRMStatic(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
-  override def operands: Seq[Operand] = register +: super.operands
+  override def operands: Seq[OperandInfo] = OperandInfo.rmRegister(register) +: super.operands
 
   override def validate(): Unit = {
     super.validate()
