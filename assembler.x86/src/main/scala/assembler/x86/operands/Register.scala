@@ -24,8 +24,8 @@ sealed abstract class DataRegister extends GeneralPurposeRegister(0x02, "dx")
 sealed abstract class BaseRegister extends GeneralPurposeRegister(0x03, "bx")
 sealed abstract class SourcePointer extends GeneralPurposeRegister(0x04, "sp")
 sealed abstract class BasePointer extends GeneralPurposeRegister(0x05, "bp")
-sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si") with IndexRegister
-sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di") with IndexRegister
+sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si")
+sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di")
 
 sealed abstract class Rex8 extends GeneralPurposeRexRegister(0x00, "r8")
 sealed abstract class Rex9 extends GeneralPurposeRexRegister(0x01, "r9")

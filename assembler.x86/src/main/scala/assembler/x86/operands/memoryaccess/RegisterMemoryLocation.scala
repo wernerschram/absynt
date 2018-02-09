@@ -56,6 +56,6 @@ object RegisterMemoryLocation {
       }
   }
 
-  implicit def indexWrapper(index: DestinationIndex): RegisterMemoryLocation[DestinationIndex] =
-    new RegisterMemoryLocation[DestinationIndex](index, Displacement.None, index.defaultSegment)
+  implicit def indexWrapper(index: DestinationIndex with IndexRegister): RegisterMemoryLocation[DestinationIndex with IndexRegister] =
+    new RegisterMemoryLocation[DestinationIndex with IndexRegister](index, Displacement.None, index.defaultSegment)
 }

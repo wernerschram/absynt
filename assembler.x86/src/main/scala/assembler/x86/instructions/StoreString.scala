@@ -8,14 +8,14 @@ import assembler.x86.operations.{Repeated, ReversedOperands, Static}
 object StoreString {
   implicit val mnemonic: String = "stos"
 
-  def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex])
+  def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
            (implicit processorMode: ProcessorMode): Static with ReversedOperands =
     (register, destination) match {
       case (Register.AL, _) => Static8(destination)
       case _ => Static16(register, destination)
     }
 
-  private def Static8(destination: RegisterMemoryLocation[DestinationIndex])(implicit processorMode: ProcessorMode) =
+  private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands: Seq[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
@@ -24,7 +24,7 @@ object StoreString {
       override def addressSize: OperandSize = destination.addressSize
     }
 
-  private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex])
+  private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                       (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with ReversedOperands {
       override def operands: Seq[ModRMEncodableOperand] = destination :: register :: Nil
@@ -34,7 +34,7 @@ object StoreString {
       override def addressSize: OperandSize = destination.addressSize
     }
 
-  private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex])(implicit processorMode: ProcessorMode) =
+  private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands: Seq[ModRMEncodableOperand] = destination :: Register.AL :: Nil
 
@@ -43,7 +43,7 @@ object StoreString {
       override def addressSize: OperandSize = destination.addressSize
     }
 
-  private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex])
+  private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                          (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
       override def operands: Seq[ModRMEncodableOperand] = destination :: register :: Nil
@@ -54,7 +54,7 @@ object StoreString {
     }
 
   object Repeat {
-    def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex])
+    def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
              (implicit processorMode: ProcessorMode): Static with Repeated with ReversedOperands =
       (register, destination) match {
         case (Register.AL, _) => RepStatic8(destination)
