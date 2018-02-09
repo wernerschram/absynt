@@ -4,6 +4,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.operations.{OperandInfo, Repeated, ReversedOperands, Static}
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
 object StoreString {
   implicit val mnemonic: String = "stos"
@@ -19,7 +20,7 @@ object StoreString {
 
   private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with ReversedOperands {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(destination) :: OperandInfo.implicitOperand(Register.AL) :: Nil
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(destination, first), OperandInfo.implicitOperand(Register.AL, second))
 
       override def operandSize: OperandSize = Register.AL.operandByteSize
 
@@ -29,7 +30,7 @@ object StoreString {
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                       (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with ReversedOperands {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(destination) :: OperandInfo.implicitOperand(register) :: Nil
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(destination, first), OperandInfo.implicitOperand(register, second))
 
       override def operandSize: OperandSize = register.operandByteSize
 
@@ -38,7 +39,7 @@ object StoreString {
 
   private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(destination) :: OperandInfo.implicitOperand(Register.AL) :: Nil
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(destination, first), OperandInfo.implicitOperand(Register.AL, second))
 
       override def operandSize: OperandSize = Register.AL.operandByteSize
 
@@ -48,7 +49,7 @@ object StoreString {
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                          (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with Repeated with ReversedOperands {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(destination) :: OperandInfo.implicitOperand(register) :: Nil
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(destination, first), OperandInfo.implicitOperand(register, second))
 
       override def operandSize: OperandSize = register.operandByteSize
 

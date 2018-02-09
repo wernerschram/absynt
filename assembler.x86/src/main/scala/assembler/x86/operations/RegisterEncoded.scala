@@ -1,16 +1,19 @@
 package assembler.x86.operations
 
 import assembler.x86.operands.GeneralPurposeRegister
+import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
-class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register: RegisterType,
+abstract class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register: RegisterType,
                                                               rawCode: Seq[Byte],
                                                               override val mnemonic: String,
                                                               override val includeRexW: Boolean = true)
                                                              (override implicit val processorMode: ProcessorMode)
   extends X86Operation {
 
-  override def operands: Seq[OperandInfo] = Seq(OperandInfo.encodedRegister(register))
+  def registerOrder: OperandOrder
+
+  override def operands: Seq[OperandInfo] = Seq(OperandInfo.encodedRegister(register, registerOrder))
 
   override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++ register.getRexRequirements(ParameterPosition.OpcodeReg)
 

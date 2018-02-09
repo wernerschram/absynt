@@ -3,6 +3,7 @@ package assembler.x86.instructions
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operations.{Immediate, OperandInfo, ReversedOperands, Static}
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
 object Input {
   implicit val opcode: String = "in"
@@ -19,7 +20,9 @@ object Input {
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE4.toByte :: Nil, opcode) with Immediate with ReversedOperands {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, first) +: super.operands
+
+      override def immediateOrder: OperandOrder = second
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -27,11 +30,14 @@ object Input {
         super.validate()
         assume(immediate.operandByteSize == ValueSize.Byte)
       }
+
     }
 
   private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE5.toByte :: Nil, opcode) with Immediate with ReversedOperands {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX, first) +: super.operands
+
+      override def immediateOrder: OperandOrder = second
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -52,19 +58,19 @@ object Input {
   }
 
   private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) {
-    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX), OperandInfo.implicitOperand(Register.AL))
+    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, first), OperandInfo.implicitOperand(Register.AL, second))
 
     override def operandSize: OperandSize = Register.AL.operandByteSize
   }
 
   private def DXToAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
-    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX), OperandInfo.implicitOperand(Register.AX))
+    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, first), OperandInfo.implicitOperand(Register.AX, second))
 
     override def operandSize: OperandSize = Register.AX.operandByteSize
   }
 
   private def DXToEAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
-    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX), OperandInfo.implicitOperand(Register.EAX))
+    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, first), OperandInfo.implicitOperand(Register.EAX, second))
 
     override def operandSize: OperandSize = Register.EAX.operandByteSize
   }
@@ -84,7 +90,9 @@ object Output {
 
   private def ALToImm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE6.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, first) +: super.operands
+
+      override def immediateOrder: OperandOrder = second
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -96,7 +104,9 @@ object Output {
 
   private def AXToImm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE7.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX, first) +: super.operands
+
+      override def immediateOrder: OperandOrder = second
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -118,21 +128,21 @@ object Output {
 
   private def ALToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEE.toByte :: Nil, opcode) with ReversedOperands {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX), OperandInfo.implicitOperand(Register.AL))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, second), OperandInfo.implicitOperand(Register.AL, first))
 
       override def operandSize: OperandSize = Register.AL.operandByteSize
     }
 
   private def AXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with ReversedOperands {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX), OperandInfo.implicitOperand(Register.AX))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, second), OperandInfo.implicitOperand(Register.AX, first))
 
       override def operandSize: OperandSize = Register.AX.operandByteSize
     }
 
   private def EAXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with ReversedOperands {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX), OperandInfo.implicitOperand(Register.EAX))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, second), OperandInfo.implicitOperand(Register.EAX, first))
 
       override def operandSize: OperandSize = Register.EAX.operandByteSize
     }

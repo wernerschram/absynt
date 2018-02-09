@@ -1,11 +1,12 @@
 package assembler.x86.instructions
 
-import assembler.resource.{UnlabeledEncodable, Resource}
+import assembler.resource.{Resource, UnlabeledEncodable}
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{FixedSizeOperand, ModRMEncodableOperand, ValueSize}
 import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 import assembler.x86.{ProcessorMode, X86OffsetFactory}
 import assembler.Label
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
 abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
@@ -24,6 +25,8 @@ abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemon
     assert(nearPointer.offset.isShort(shortOpcode.length))
     new Static(shortOpcode, mnemonic) with NearPointerOperation[OffsetType] {
       override val pointer: NearPointer[OffsetType] = nearPointer
+
+      override def pointerOrder: OperandOrder = first
     }
   }
 }
@@ -49,6 +52,8 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
           case ProcessorMode.Real => assume(pointer.operandByteSize == ValueSize.Word)
         }
       }
+
+      override def pointerOrder: OperandOrder = first
     }
   }
 
@@ -75,6 +80,8 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
           if fixed.operandByteSize == ValueSize.QuadWord => false
         case _ => true
       })
+
+      override def operandRMOrder: OperandOrder = first
     }
 
   private def Ptr1616[OffsetType <: X86Offset](farPointer: FarPointer[OffsetType])(implicit processorMode: ProcessorMode) =
@@ -89,6 +96,8 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
           if fixed.operandByteSize == ValueSize.QuadWord => false
         case _ => true
       })
+
+      override def operandRMOrder: OperandOrder = first
     }
 
   object Far {

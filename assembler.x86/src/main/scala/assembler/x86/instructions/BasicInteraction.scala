@@ -1,8 +1,9 @@
 package assembler.x86.instructions
 
 import assembler.x86.operands._
-import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, Static}
+import assembler.x86.operations._
 import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
@@ -31,11 +32,13 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with Immediate {
+      override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with Immediate {
+      override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
 
       override def operandSize: OperandSize = ValueSize.Word
@@ -43,6 +46,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
 
   private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
+      override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
 
       override def operandSize: OperandSize = ValueSize.DoubleWord
@@ -50,6 +54,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
 
   private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with Immediate {
+      override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
 
       override def operandSize: OperandSize = ValueSize.QuadWord
@@ -57,16 +62,22 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+      override val immediateOrder: OperandOrder = first
+      override val operandRMOrder: OperandOrder = second
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+      override val immediateOrder: OperandInfo.OperandOrder.Value = first
+      override val operandRMOrder: OperandOrder = second
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+      override val immediateOrder: OperandInfo.OperandOrder.Value = first
+      override val operandRMOrder: OperandOrder = second
       override val immediate: ImmediateValue = immediateValue
 
       override def rexRequirements: Seq[RexRequirement] =
@@ -77,7 +88,9 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     R8ToRM8(source, destination)
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic)
+    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic) {
+      override val operandRMOrder: OperandOrder = second
+    }
 
   def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
     R8ToRM8(source, destination)
@@ -86,7 +99,9 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     R16ToRM16(source, destination)
 
   private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic)
+    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic) {
+      override val operandRMOrder: OperandOrder = second
+    }
 
   def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
     R16ToRM16(destination, source)
@@ -95,13 +110,17 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     RM8ToR8(destination, source)
 
   private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic)
+    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic) {
+      override val operandRMOrder: OperandOrder = first
+    }
 
   def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
     RM16ToR16(destination, source)
 
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic)
+    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic) {
+      override val operandRMOrder: OperandOrder = first
+    }
 
 }
 
@@ -124,8 +143,12 @@ object Not {
     }
 
   private def RM8(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xF6.toByte :: Nil, 2, opcode)
+    new ModRMStatic(operand, 0xF6.toByte :: Nil, 2, opcode) {
+      override val operandRMOrder: OperandOrder = first
+    }
 
   private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xF7.toByte :: Nil, 2, opcode)
+    new ModRMStatic(operand, 0xF7.toByte :: Nil, 2, opcode) {
+      override val operandRMOrder: OperandOrder = first
+    }
 }

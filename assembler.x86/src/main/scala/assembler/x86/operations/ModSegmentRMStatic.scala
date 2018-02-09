@@ -2,15 +2,19 @@ package assembler.x86.operations
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.{ModRMEncodableOperand, SegmentRegister}
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
-class ModSegmentRMStatic(val register: SegmentRegister,
+abstract class ModSegmentRMStatic(val register: SegmentRegister,
                          operandRM: ModRMEncodableOperand,
                          override val code: Seq[Byte],
                          override val mnemonic: String,
                          override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends ModRMStatic(operandRM, code, register.registerCode, mnemonic, includeRexW) {
 
-  override def operands: Seq[OperandInfo] = OperandInfo.rmSegment(register) +: super.operands
+  def operandSegmentOrder: OperandOrder =
+    if (operandRMOrder == first) second else first
+
+  override def operands: Seq[OperandInfo] = OperandInfo.rmSegment(register, operandSegmentOrder) +: super.operands
 
   override def validate(): Unit = {
     super.validate()

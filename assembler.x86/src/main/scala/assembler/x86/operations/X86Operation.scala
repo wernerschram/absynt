@@ -4,28 +4,48 @@ import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.resource.UnlabeledEncodable
 
-abstract class OperandInfo(operand: Operand) {
+sealed abstract class OperandInfo(operand: Operand, val order: OperandInfo.OperandOrder.Value) extends Ordered[OperandInfo] {
   override def toString: String = operand.toString
+
+  override def compare(that: OperandInfo): Int = order compare that.order
 }
 
+
+
 object OperandInfo {
-  def pointer(pointer: memoryaccess.FarPointer[_]): OperandInfo = new OperandInfo(pointer) {} //ptrXX
+  object OperandOrder extends Enumeration {
+    type OperandOrder = Value
+    val first, second, third = Value
+  }
 
-  def relative(pointer: memoryaccess.NearPointer[_]): OperandInfo = new OperandInfo(pointer) {} //relXX
+  import OperandOrder._
 
-  def immediate(immediate: ImmediateValue): OperandInfo = new OperandInfo(immediate) {} //immXX
+  def pointer(pointer: memoryaccess.FarPointer[_], operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(pointer, operandOrder) {} //ptrXX
 
-  def implicitOperand(operand: Operand): OperandInfo = new OperandInfo(operand) {} //XX
+  def relative(pointer: memoryaccess.NearPointer[_], operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(pointer, operandOrder) {} //relXX
 
-  def encodedRegister(register: GeneralPurposeRegister): OperandInfo = new OperandInfo(register) {} //rX
+  def immediate(immediate: ImmediateValue, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(immediate, operandOrder) {} //immXX
 
-  def memoryOffset(offset: memoryaccess.MemoryLocation): OperandInfo = new OperandInfo(offset) {} //moffsXX
+  def implicitOperand(operand: Operand, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(operand, operandOrder) {} //XX
 
-  def rmRegisterOrMemory(rm: ModRMEncodableOperand): OperandInfo = new OperandInfo(rm) {} //r/mXX
+  def encodedRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(register, operandOrder) {} //rX
 
-  def rmRegister(register: GeneralPurposeRegister): OperandInfo = new OperandInfo(register) {} //rXX
+  def memoryOffset(offset: memoryaccess.MemoryLocation, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(offset, operandOrder) {} //moffsXX
 
-  def rmSegment(register: SegmentRegister): OperandInfo = new OperandInfo(register) {} //SregXX
+  def rmRegisterOrMemory(rm: ModRMEncodableOperand, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(rm, operandOrder) {} //r/mXX
+
+  def rmRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(register, operandOrder) {} //rXX
+
+  def rmSegment(register: SegmentRegister, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(register, operandOrder) {} //SregXX
 
 }
 

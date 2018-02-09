@@ -3,6 +3,7 @@ package assembler.x86.instructions
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operations.{Immediate, ModRMStatic, RegisterEncoded, Static}
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
 object Push {
   implicit val opcode: String = "push"
@@ -20,6 +21,8 @@ object Push {
           case _ => assume(register.operandByteSize != ValueSize.Byte)
         }
       }
+
+      override def registerOrder: OperandOrder = first
     }
 
   def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
@@ -35,6 +38,8 @@ object Push {
           case _ => assume(operand.operandByteSize != ValueSize.Byte)
         }
       }
+
+      override def operandRMOrder: OperandOrder = first
     }
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate = immediate.operandByteSize match {
@@ -46,6 +51,8 @@ object Push {
   private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0x6A.toByte :: Nil, opcode) with Immediate {
       override def immediate: ImmediateValue = immediateValue
+
+      override def immediateOrder: OperandOrder = first
     }
 
   private def Imm16(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -56,6 +63,8 @@ object Push {
         super.validate()
         assume(immediate.operandByteSize != ValueSize.QuadWord)
       }
+
+      override def immediateOrder: OperandOrder = first
     }
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode): Static = segment match {
