@@ -105,7 +105,7 @@ abstract class X86Operation extends UnlabeledEncodable {
   override def toString: String = if (operands.isEmpty)
       s"$mnemonic"
     else
-      s"$mnemonic ${operands.reverseMap { operand => operand.toString }.mkString(", ")}"
+      s"$mnemonic ${operands.sorted.map{ _.toString }.mkString(", ")}"
 }
 
 object X86Operation {
