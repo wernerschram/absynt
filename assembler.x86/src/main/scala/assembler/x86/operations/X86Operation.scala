@@ -1,8 +1,8 @@
 package assembler.x86.operations
 
+import assembler.resource.UnlabeledEncodable
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
-import assembler.resource.UnlabeledEncodable
 
 sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.OperandOrder.Value) extends Ordered[OperandInfo] {
   override def toString: String = operand.toString
@@ -10,6 +10,8 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
   override def compare(that: OperandInfo): Int = order compare that.order
 
   def requiresOperandSize(processorMode: ProcessorMode): Boolean = false
+
+  def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
 }
 
 object OperandInfo {
@@ -38,14 +40,27 @@ object OperandInfo {
         immediate.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
     } //immXX
 
-  def implicitOperand(operand: Operand, operandOrder: OperandOrder, ignoreSize: Boolean = false): OperandInfo =
+  def implicitOperand(operand: Operand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(operand, operandOrder) {
-     override def requiresOperandSize(processorMode: ProcessorMode): Boolean = !ignoreSize && (operand match {
+     override def requiresOperandSize(processorMode: ProcessorMode): Boolean = operand match {
         case f: FixedSizeOperand =>
           f.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
           f.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
         case _ => false
-      })
+      }
+    } //XX
+
+  def implicitPort(operand: Operand, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(operand, operandOrder) { } //XX
+
+  def implicitAddress(operand: Operand, operandOrder: OperandOrder): OperandInfo =
+    new OperandInfo(operand, operandOrder) {
+     override def requiresAddressSize(processorMode: ProcessorMode): Boolean = operand match {
+        case f: memoryaccess.MemoryLocation =>
+          f.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
+          f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
+        case _ => false
+      }
     } //XX
 
   def encodedRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
@@ -56,7 +71,11 @@ object OperandInfo {
     } //rX
 
   def memoryOffset(offset: memoryaccess.MemoryLocation, operandOrder: OperandOrder): OperandInfo =
-    new OperandInfo(offset, operandOrder) {} //moffsXX
+    new OperandInfo(offset, operandOrder) {
+      override def requiresAddressSize(processorMode: ProcessorMode): Boolean =
+          offset.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
+          offset.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
+    } //moffsXX
 
   def rmRegisterOrMemory(rm: ModRMEncodableOperand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(rm, operandOrder) {
@@ -67,6 +86,12 @@ object OperandInfo {
         case _ => false
       }
 
+      override def requiresAddressSize(processorMode: ProcessorMode): Boolean = rm match {
+          case f: memoryaccess.MemoryLocation =>
+            f.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
+            f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
+          case _ => false
+        }
     } //r/mXX
 
   def rmRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
@@ -110,7 +135,7 @@ abstract class X86Operation extends UnlabeledEncodable {
   def segmentOverride: Option[SegmentRegister] = None
 
   private def optionalAddressSizePrefix: List[Byte] =
-    if (addressSize.requiresAddressSizePrefix(processorMode)) X86Operation.AddressSizeCode :: Nil else Nil
+    if (operands.exists(o => o.requiresAddressSize(processorMode))) X86Operation.AddressSizeCode :: Nil else Nil
 
   def addressSize: OperandSize = OperandSize.Unknown
 

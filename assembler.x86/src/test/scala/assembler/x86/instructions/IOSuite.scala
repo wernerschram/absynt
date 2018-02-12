@@ -27,18 +27,20 @@ class IOSuite extends WordSpec with Matchers {
         }
       }
 
-      "throw an Exception for in eax, 0x10" in {
-        an[AssertionError] should be thrownBy {
-          Input(0x10.toByte, EAX)
-        }
+      "correctly encode in ax, 0x20" in {
+        Input(0x20.toByte, AX).encodeByte should be(Hex.lsb("E5 20"))
       }
 
-      "correctly encode in ax, 0x40" in {
-        Input(0x20.toByte, AX).encodeByte should be(Hex.lsb("E5 20"))
+      "correctly encode in eax, 0x20" in {
+        Input(0x20.toByte, EAX).encodeByte should be(Hex.lsb("66 E5 20"))
       }
 
       "correctly represent in ax, 0x40 as a string" in {
         Input(0x40.toByte, AX).toString should be("in ax, 64")
+      }
+
+      "correctly represent in eax, 0x40 as a string" in {
+        Input(0x40.toByte, EAX).toString should be("in eax, 64")
       }
 
       "correctly encode in al, dx" in {
@@ -73,7 +75,11 @@ class IOSuite extends WordSpec with Matchers {
       }
 
       "correctly encode in ax, 0x40" in {
-        Input(0x20.toByte, AX).encodeByte should be(Hex.lsb("E5 20"))
+        Input(0x20.toByte, AX).encodeByte should be(Hex.lsb("66 E5 20"))
+      }
+
+      "correctly encode in eax, 0x40" in {
+        Input(0x20.toByte, EAX).encodeByte should be(Hex.lsb("E5 20"))
       }
 
       "correctly encode in al, dx" in {
@@ -98,7 +104,11 @@ class IOSuite extends WordSpec with Matchers {
       }
 
       "correctly encode in ax, 0x40" in {
-        Input(0x20.toByte, AX).encodeByte should be(Hex.lsb("E5 20"))
+        Input(0x20.toByte, AX).encodeByte should be(Hex.lsb("66 E5 20"))
+      }
+
+      "correctly encode in eax, 0x40" in {
+        Input(0x20.toByte, EAX).encodeByte should be(Hex.lsb("E5 20"))
       }
 
       "correctly encode in al, dx" in {
@@ -140,14 +150,12 @@ class IOSuite extends WordSpec with Matchers {
         }
       }
 
-      "throw an Exception for out 0x10, eax" in {
-        an[AssertionError] should be thrownBy {
-          Output(EAX, 0x10.toByte)
-        }
-      }
-
       "correctly encode out 0x20, ax" in {
         Output(AX, 0x20.toByte).encodeByte should be(Hex.lsb("E7 20"))
+      }
+
+      "correctly encode out 0x20, eax" in {
+        Output(EAX, 0x20.toByte).encodeByte should be(Hex.lsb("66 E7 20"))
       }
 
       "correctly represent out 0x20, ax as a string" in {
@@ -185,8 +193,12 @@ class IOSuite extends WordSpec with Matchers {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))
       }
 
-      "correctly encode out 0x40, al" in {
-        Output(AX, 0x20.toByte).encodeByte should be(Hex.lsb("E7 20"))
+      "correctly encode out 0x20, ax" in {
+        Output(AX, 0x20.toByte).encodeByte should be(Hex.lsb("66 E7 20"))
+      }
+
+      "correctly encode out 0x40, eax" in {
+        Output(EAX, 0x40.toByte).encodeByte should be(Hex.lsb("E7 40"))
       }
 
       "correctly encode out dx, al" in {
@@ -211,7 +223,11 @@ class IOSuite extends WordSpec with Matchers {
       }
 
       "correctly encode out 0x20, ax" in {
-        Output(AX, 0x20.toByte).encodeByte should be(Hex.lsb("E7 20"))
+        Output(AX, 0x20.toByte).encodeByte should be(Hex.lsb("66 E7 20"))
+      }
+
+      "correctly encode out 0x40, eax" in {
+        Output(EAX, 0x40.toByte).encodeByte should be(Hex.lsb("E7 40"))
       }
 
       "correctly encode out dx, al" in {
