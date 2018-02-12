@@ -3,6 +3,7 @@ package assembler.x86.instructions
 import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
+import assembler.x86.operands.ReturnMode
 import org.scalatest.{Matchers, WordSpec}
 
 class SystemSuite extends WordSpec with Matchers {
@@ -21,11 +22,11 @@ class SystemSuite extends WordSpec with Matchers {
       }
 
       "throw an AssertionError for sysret" in {
-        an [AssertionError] should be thrownBy { SystemReturn(ProcessorMode.Protected).encodeByte }
+        an [AssertionError] should be thrownBy { SystemReturn(ReturnMode.Protected).encodeByte }
       }
 
       "throw an AssertionError for sysexit" in {
-        an [AssertionError] should be thrownBy { SystemExit(ProcessorMode.Protected).encodeByte }
+        an [AssertionError] should be thrownBy { SystemExit(ReturnMode.Protected).encodeByte }
       }
     }
 
@@ -42,19 +43,19 @@ class SystemSuite extends WordSpec with Matchers {
       }
 
       "correctly encode sysexit to protected mode" in {
-        SystemExit(ProcessorMode.Protected).encodeByte should be (Hex.lsb("0F 35"))
+        SystemExit(ReturnMode.Protected).encodeByte should be (Hex.lsb("0F 35"))
       }
 
       "throw an AssertionError for sysexit to long mode" in {
-        an [AssertionError] should be thrownBy { SystemExit(ProcessorMode.Long).encodeByte }
+        an [AssertionError] should be thrownBy { SystemExit(ReturnMode.Long).encodeByte }
       }
 
       "throw an AssertionError for sysret to protected mode" in {
-        an [AssertionError] should be thrownBy { SystemReturn(ProcessorMode.Protected).encodeByte }
+        an [AssertionError] should be thrownBy { SystemReturn(ReturnMode.Protected).encodeByte }
       }
 
       "throw an AssertionError for sysret to long mode" in {
-        an [AssertionError] should be thrownBy { SystemReturn(ProcessorMode.Long).encodeByte }
+        an [AssertionError] should be thrownBy { SystemReturn(ReturnMode.Long).encodeByte }
       }
 
     }
@@ -80,29 +81,28 @@ class SystemSuite extends WordSpec with Matchers {
       }
 
       "correctly encode sysexit to protected mode" in {
-        SystemExit(ProcessorMode.Protected).encodeByte should be (Hex.lsb("0F 35"))
+        SystemExit(ReturnMode.Protected).encodeByte should be (Hex.lsb("0F 35"))
       }
 
       "correctly encode sysexit to long mode" in {
-        SystemExit(ProcessorMode.Long).encodeByte should be (Hex.lsb("48 0F 35"))
+        SystemExit(ReturnMode.Long).encodeByte should be (Hex.lsb("48 0F 35"))
       }
 
       "correctly represent sysexit as a string" in {
-        SystemExit(ProcessorMode.Protected).toString should be("sysexit")
+        SystemExit(ReturnMode.Protected).toString should be("sysexit ")
       }
 
       "correctly encode sysret to protected mode" in {
-        SystemReturn(ProcessorMode.Protected).encodeByte should be (Hex.lsb("0F 07"))
+        SystemReturn(ReturnMode.Protected).encodeByte should be (Hex.lsb("0F 07"))
       }
 
       "correctly encode sysret to long mode" in {
-        SystemReturn(ProcessorMode.Long).encodeByte should be (Hex.lsb("48 0F 07"))
+        SystemReturn(ReturnMode.Long).encodeByte should be (Hex.lsb("48 0F 07"))
       }
 
       "correctly represent sysret as a string" in {
-        SystemReturn(ProcessorMode.Protected).toString should be("sysret")
+        SystemReturn(ReturnMode.Protected).toString should be("sysret ")
       }
-
     }
   }
 }

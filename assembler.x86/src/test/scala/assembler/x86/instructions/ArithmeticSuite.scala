@@ -237,6 +237,8 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(0x78776655, RAX).encodeByte should be(Hex.lsb("48 35 55 66 77 78"))
       }
 
+      // TODO test toString of xor rax, 0x78776655
+
       // Note that the GNU assembler (and likely others) denotes this as xor RAX, 0xFFFFFFFF88776655 and doens't accept this notation.
       "correctly encode xor rax, 0x88776655" in {
         Xor(0x88776655, RAX).encodeByte should be(Hex.lsb("48 35 55 66 77 88"))

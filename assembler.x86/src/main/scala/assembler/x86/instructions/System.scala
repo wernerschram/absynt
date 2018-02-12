@@ -1,8 +1,9 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.{OperandSize, ValueSize}
-import assembler.x86.operations.Static
+import assembler.x86.operands.{OperandSize, ReturnMode, ValueSize}
+import assembler.x86.operations.{OperandInfo, Static}
+import assembler.x86.operations.OperandInfo.OperandOrder._
 
 object SystemCall {
   val opcode = "syscall"
@@ -34,18 +35,19 @@ object SystemReturn {
   val opcode = "sysret"
 
 
-  def apply(returnMode: ProcessorMode)(implicit processorMode: ProcessorMode): Static = {
+  def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = {
     assume(processorMode == ProcessorMode.Long && returnMode != ProcessorMode.Real)
     Static(returnMode)
   }
 
-  private def Static(returnMode: ProcessorMode)(implicit processorMode: ProcessorMode) =
+  private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) {
+      override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, first))
+
        override def operandSize: OperandSize = returnMode match {
-        case ProcessorMode.Long => ValueSize.QuadWord
-        case ProcessorMode.Protected => ValueSize.DoubleWord
-        case ProcessorMode.Real => throw new AssertionError
-      }
+         case ReturnMode.Long => ValueSize.QuadWord
+         case ReturnMode.Protected => ValueSize.DoubleWord
+     }
     }
 
 }
@@ -54,18 +56,18 @@ object SystemExit {
   val opcode = "sysexit"
 
 
-  def apply(returnMode: ProcessorMode)(implicit processorMode: ProcessorMode): Static = {
-    assume(processorMode != ProcessorMode.Real && returnMode != ProcessorMode.Real)
-    assume(processorMode == ProcessorMode.Protected && returnMode == ProcessorMode.Protected || processorMode == ProcessorMode.Long)
+  def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = {
+    assume(processorMode == ProcessorMode.Protected && returnMode == ReturnMode.Protected || processorMode == ProcessorMode.Long)
     Static(returnMode)
   }
 
-  private def Static(returnMode: ProcessorMode)(implicit processorMode: ProcessorMode) =
+  private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) {
+      override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, first))
+
       override def operandSize: OperandSize = returnMode match {
-        case ProcessorMode.Long => ValueSize.QuadWord
-        case ProcessorMode.Protected => ValueSize.DoubleWord
-        case ProcessorMode.Real => throw new AssertionError
+        case ReturnMode.Long => ValueSize.QuadWord
+        case ReturnMode.Protected => ValueSize.DoubleWord
       }
     }
 
