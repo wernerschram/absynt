@@ -12,8 +12,6 @@ trait MemoryLocation extends X86Operation {
 
   abstract override def operands: Seq[OperandInfo] = super.operands :+ OperandInfo.memoryOffset(location, offsetOrder)
 
-  abstract override def addressSize: OperandSize = location.addressSize
-
   override def segmentOverride: Option[SegmentRegister] = super.segmentOverride match {
     case register: Some[SegmentRegister] => register
     case None => location.segmentOverride

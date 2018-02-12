@@ -137,8 +137,6 @@ abstract class X86Operation extends UnlabeledEncodable {
   private def optionalAddressSizePrefix: List[Byte] =
     if (operands.exists(o => o.requiresAddressSize(processorMode))) X86Operation.AddressSizeCode :: Nil else Nil
 
-  def addressSize: OperandSize = OperandSize.Unknown
-
   private def optionalOperandSizePrefix: List[Byte] =
       if (operands.exists(o => o.requiresOperandSize(processorMode))) X86Operation.OperandSizeCode :: Nil else Nil
 
