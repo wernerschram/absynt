@@ -59,20 +59,14 @@ object Input {
 
   private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) {
     override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, second, ignoreSize = true), OperandInfo.implicitOperand(Register.AL, first))
-
-    override def operandSize: OperandSize = Register.AL.operandByteSize
   }
 
   private def DXToAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
     override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, second, ignoreSize = true), OperandInfo.implicitOperand(Register.AX, first))
-
-    override def operandSize: OperandSize = Register.AX.operandByteSize
   }
 
   private def DXToEAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
     override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, second, ignoreSize = true), OperandInfo.implicitOperand(Register.EAX, first))
-
-    override def operandSize: OperandSize = Register.EAX.operandByteSize
   }
 }
 
@@ -129,21 +123,15 @@ object Output {
   private def ALToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEE.toByte :: Nil, opcode) with ReversedOperands {
       override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, first, ignoreSize = true), OperandInfo.implicitOperand(Register.AL, second))
-
-      override def operandSize: OperandSize = Register.AL.operandByteSize
     }
 
   private def AXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with ReversedOperands {
       override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, first, ignoreSize = true), OperandInfo.implicitOperand(Register.AX, second))
-
-      override def operandSize: OperandSize = Register.AX.operandByteSize
     }
 
   private def EAXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with ReversedOperands {
       override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.DX, first, ignoreSize = true), OperandInfo.implicitOperand(Register.EAX, second))
-
-      override def operandSize: OperandSize = Register.EAX.operandByteSize
     }
 }

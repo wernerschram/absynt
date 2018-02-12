@@ -40,8 +40,6 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with Immediate {
       override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
-
-      override def operandSize: OperandSize = ValueSize.Word
     }
 
   private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -49,8 +47,6 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(Register.EAX, second))
       override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
-
-      override def operandSize: OperandSize = ValueSize.DoubleWord
     }
 
   private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -59,8 +55,6 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
 
       override val immediateOrder: OperandOrder = first
       override val immediate: ImmediateValue = immediateValue
-
-      override def operandSize: OperandSize = ValueSize.QuadWord
     }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =

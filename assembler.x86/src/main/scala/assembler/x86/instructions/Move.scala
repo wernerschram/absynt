@@ -53,8 +53,6 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize: OperandSize = ValueSize.Byte
-
       override def offsetOrder: OperandOrder = first
     }
 
@@ -80,8 +78,6 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize: OperandSize = accumulatorRegister.operandByteSize
-
       override def offsetOrder: OperandOrder = first
     }
 
@@ -104,8 +100,6 @@ object Move {
 
       override val location: MemoryLocation = memoryLocation
 
-      override def operandSize: OperandSize = ValueSize.Byte
-
       override def offsetOrder: OperandOrder = first
     }
 
@@ -127,8 +121,6 @@ object Move {
       override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, second) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
-
-      override def operandSize: OperandSize = accumulatorRegister.operandByteSize
 
       override def offsetOrder: OperandOrder = first
     }

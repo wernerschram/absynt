@@ -21,14 +21,9 @@ abstract class ModRMStatic(val operandRM: ModRMEncodableOperand,
     assume(operandRM.isValidForMode(processorMode))
   }
 
-  override def operandSize: OperandSize = (super.operandSize, operandRM) match {
-    case (OperandSize.Unknown, fixed: FixedSizeOperand) => fixed.operandByteSize
-    case _ => super.operandSize
-  }
-
   override def addressSize: OperandSize = (super.addressSize, operandRM) match {
     case (OperandSize.Unknown, address: MemoryLocationType) => address.addressSize
-    case _ => super.operandSize
+    case _ => super.addressSize
   }
 
   override def segmentOverride: Option[SegmentRegister] = operandRM match {

@@ -36,20 +36,14 @@ object SystemReturn {
 
 
   def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = {
-    assume(processorMode == ProcessorMode.Long && returnMode != ProcessorMode.Real)
+    assume(processorMode == ProcessorMode.Long)
     Static(returnMode)
   }
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) {
       override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, first))
-
-       override def operandSize: OperandSize = returnMode match {
-         case ReturnMode.Long => ValueSize.QuadWord
-         case ReturnMode.Protected => ValueSize.DoubleWord
-     }
     }
-
 }
 
 object SystemExit {
@@ -64,11 +58,5 @@ object SystemExit {
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) {
       override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, first))
-
-      override def operandSize: OperandSize = returnMode match {
-        case ReturnMode.Long => ValueSize.QuadWord
-        case ReturnMode.Protected => ValueSize.DoubleWord
-      }
     }
-
 }

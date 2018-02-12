@@ -117,8 +117,6 @@ abstract class X86Operation extends UnlabeledEncodable {
   private def optionalOperandSizePrefix: List[Byte] =
       if (operands.exists(o => o.requiresOperandSize(processorMode))) X86Operation.OperandSizeCode :: Nil else Nil
 
-  def operandSize: OperandSize = OperandSize.Unknown
-
   private def optionalRexPrefix: List[Byte] = {
     assume(processorMode == ProcessorMode.Long || rexRequirements.isEmpty)
     if (rexRequirements.isEmpty)
@@ -128,7 +126,6 @@ abstract class X86Operation extends UnlabeledEncodable {
   }
 
   def rexRequirements: Seq[RexRequirement] =
-//    if (includeRexW && operandSize == ValueSize.QuadWord) RexRequirement.quadOperand :: Nil else Nil
     if (includeRexW && operands.exists(o => o.operand match {
       case f: FixedSizeOperand => f.operandByteSize == ValueSize.QuadWord
       case _ => false

@@ -22,11 +22,6 @@ abstract class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register
     assume(register.isValidForMode(processorMode))
   }
 
-  override def operandSize: OperandSize = (super.operandSize, register) match {
-    case (OperandSize.Unknown, fixed: FixedSizeOperand) => fixed.operandByteSize
-    case _ => super.operandSize
-  }
-
   override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++
     register.getRexRequirements(ParameterPosition.OperandR) ++
     operandRM.getRexRequirements(ParameterPosition.OperandRM)
