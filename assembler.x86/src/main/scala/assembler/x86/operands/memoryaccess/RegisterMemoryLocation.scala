@@ -1,8 +1,8 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
+import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 import scala.language.implicitConversions
 
@@ -21,9 +21,6 @@ sealed class RegisterMemoryLocation[T <: RegisterReference] private(val index: T
     if (displacement == Displacement.None && index.onlyWithDisplacement) Seq(0.toByte) else displacement.encode
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
-
-  override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
-    index.getRexRequirements(ParameterPosition.OperandRM) ++ super.getRexRequirements(position)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean = (index, processorMode) match {
     case (_: RegisterReference, ProcessorMode.Real | ProcessorMode.Protected) => true

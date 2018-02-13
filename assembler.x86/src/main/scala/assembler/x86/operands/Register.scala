@@ -1,6 +1,6 @@
 package assembler.x86.operands
 
-import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
+import assembler.x86.ProcessorMode
 
 sealed abstract class Register extends Operand
 
@@ -12,9 +12,6 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
-  override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
-    position.rexRequirement.toList ++ super.getRexRequirements(position)
-
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
 }
 
@@ -44,8 +41,6 @@ sealed trait RegisterReference extends FixedSizeOperand {
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte
 
-  def getRexRequirements(parameterPosition: ParameterPosition): Seq[RexRequirement]
-
   def onlyWithDisplacement: Boolean = false
 }
 
@@ -69,9 +64,6 @@ sealed abstract class BaseIndexReference(
   val index: CombinableRealModeIndexRegister,
   override val indexCode: Byte)
   extends RegisterReference {
-
-  override def getRexRequirements(parameterPosition: ParameterPosition): Seq[RexRequirement] =
-    base.getRexRequirements(ParameterPosition.Base) ++ index.getRexRequirements(ParameterPosition.Index)
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
 

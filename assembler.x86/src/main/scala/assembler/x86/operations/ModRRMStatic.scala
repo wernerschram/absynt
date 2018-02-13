@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
+import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
 abstract class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register: RegisterType,
@@ -21,8 +21,4 @@ abstract class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register
     super.validate()
     assume(register.isValidForMode(processorMode))
   }
-
-  override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++
-    register.getRexRequirements(ParameterPosition.OperandR) ++
-    operandRM.getRexRequirements(ParameterPosition.OperandRM)
 }

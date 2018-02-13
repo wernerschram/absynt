@@ -1,9 +1,9 @@
 package assembler.x86.operations
 
+import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
-import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 abstract class ModRMStatic(val operandRM: ModRMEncodableOperand,
                   override val code: Seq[Byte],
@@ -25,9 +25,6 @@ abstract class ModRMStatic(val operandRM: ModRMEncodableOperand,
     case location: MemoryLocationType => location.segmentOverride
     case _ => None
   }
-
-  override def rexRequirements: Seq[RexRequirement] = super.rexRequirements ++
-    operandRM.getRexRequirements(ParameterPosition.OperandRM)
 
   override def encodeByte: Seq[Byte] =
     super.encodeByte ++ operandRM.getExtendedBytes(rValue)

@@ -2,6 +2,7 @@ package assembler.x86.operations
 
 import assembler.resource.UnlabeledEncodable
 import assembler.x86.operands._
+import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.{ProcessorMode, RexRequirement}
 
 sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.OperandOrder.Value) extends Ordered[OperandInfo] {
@@ -106,7 +107,10 @@ object OperandInfo {
 
       override def rexRequirements: Seq[RexRequirement] = {
         val operandRequirements = rm match {
-          case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceOperandRM)
+          case _: GeneralPurposeRexRegister =>
+            Seq(RexRequirement.instanceOperandRM)
+          case r: RegisterMemoryLocation[_] if r.index.isInstanceOf[GeneralPurposeRexRegister with ProtectedModeIndexRegister] =>
+            Seq(RexRequirement.instanceOperandRM)
           case r: memoryaccess.SIBMemoryLocation =>
             val addressRequirements: Seq[RexRequirement] = Seq(
               r.index match {

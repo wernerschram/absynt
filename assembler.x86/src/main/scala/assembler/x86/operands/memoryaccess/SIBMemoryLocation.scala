@@ -1,8 +1,8 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
+import assembler.x86.ProcessorMode
 import assembler.x86.operands.{ModRMEncodableOperand, _}
-import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 
 sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister, displacement: Displacement = Displacement.None, val scale: Int,
                                segment: SegmentRegister)
@@ -25,11 +25,6 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
     }
     ((scaleCode << 6) | (indexCode << 3) | baseCode).toByte
   }
-
-  override def getRexRequirements(position: ParameterPosition): Seq[RexRequirement] =
-    super.getRexRequirements(position) ++
-      base.getRexRequirements(ParameterPosition.Base) ++
-      index.getRexRequirements(ParameterPosition.Index)
 
   override def isValidForMode(processorMode: ProcessorMode): Boolean =
     base.isValidForMode(processorMode) && index.isValidForMode(processorMode)

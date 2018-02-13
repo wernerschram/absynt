@@ -1,9 +1,9 @@
 package assembler.x86.instructions
 
+import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.operations._
-import assembler.x86.{ParameterPosition, ProcessorMode, RexRequirement}
 import assembler.x86.operations.OperandInfo.OperandOrder._
+import assembler.x86.operations._
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
@@ -76,9 +76,6 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       override val immediateOrder: OperandInfo.OperandOrder.Value = first
       override val operandRMOrder: OperandOrder = second
       override val immediate: ImmediateValue = immediateValue
-
-      override def rexRequirements: Seq[RexRequirement] =
-        operand.getRexRequirements(ParameterPosition.NotEncoded) ++ super.rexRequirements
     }
 
   def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
