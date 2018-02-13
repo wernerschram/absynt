@@ -6,23 +6,23 @@ import assembler.x86.operands._
 
 import scala.language.implicitConversions
 
-sealed class RegisterMemoryLocation[T <: RegisterReference] private(val index: T, displacement: Displacement, segment: SegmentRegister)
-  extends IndirectMemoryLocation(index.indexCode,
-    if (displacement == Displacement.None && index.onlyWithDisplacement) Displacement(0.toByte) else displacement, index.operandByteSize, segment)
+sealed class RegisterMemoryLocation[T <: RegisterReference] private(val reference: T, displacement: Displacement, segment: SegmentRegister)
+  extends IndirectMemoryLocation(reference.indexCode,
+    if (displacement == Displacement.None && reference.onlyWithDisplacement) Displacement(0.toByte) else displacement, reference.operandByteSize, segment)
     with ModRMEncodableOperand {
 
-  override val defaultSegment: SegmentRegister = index.defaultSegment
+  override val defaultSegment: SegmentRegister = reference.defaultSegment
 
-  override def toString: String = s"$segmentPrefix[$index$displacementString]"
+  override def toString: String = s"$segmentPrefix[$reference$displacementString]"
 
   private def displacementString = if (displacement == Displacement.None) "" else s"+${displacement.encode.decimalString}"
 
   val actualDisplacement: Seq[Byte] =
-    if (displacement == Displacement.None && index.onlyWithDisplacement) Seq(0.toByte) else displacement.encode
+    if (displacement == Displacement.None && reference.onlyWithDisplacement) Seq(0.toByte) else displacement.encode
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
 
-  override def isValidForMode(processorMode: ProcessorMode): Boolean = (index, processorMode) match {
+  override def isValidForMode(processorMode: ProcessorMode): Boolean = (reference, processorMode) match {
     case (_: RegisterReference, ProcessorMode.Real | ProcessorMode.Protected) => true
     case (_: ProtectedModeIndexRegister, _) => true
     case _ => false

@@ -109,7 +109,7 @@ object OperandInfo {
         val operandRequirements = rm match {
           case _: GeneralPurposeRexRegister =>
             Seq(RexRequirement.instanceOperandRM)
-          case r: RegisterMemoryLocation[_] if r.index.isInstanceOf[GeneralPurposeRexRegister with ProtectedModeIndexRegister] =>
+          case r: RegisterMemoryLocation[_] if r.reference.isInstanceOf[GeneralPurposeRexRegister with ProtectedModeIndexRegister] =>
             Seq(RexRequirement.instanceOperandRM)
           case r: memoryaccess.SIBMemoryLocation =>
             val addressRequirements: Seq[RexRequirement] = Seq(
