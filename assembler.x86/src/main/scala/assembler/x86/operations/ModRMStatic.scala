@@ -14,7 +14,7 @@ abstract class ModRMStatic(val operandRM: ModRMEncodableOperand,
 
   def operandRMOrder: OperandOrder
 
-  override def operands: Seq[OperandInfo] = Seq(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder))
+  override def operands: Seq[OperandInfo] = Seq(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW))
 
   override def validate(): Unit = {
     super.validate()
