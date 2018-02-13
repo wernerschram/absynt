@@ -1,22 +1,10 @@
 package assembler.x86.operands
 
-import assembler.x86.ProcessorMode
-
-sealed class OperandSize {
-  def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = false // linter:ignore UnusedParameter
-
-  def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = false // linter:ignore UnusedParameter
-}
+sealed class OperandSize
 
 sealed class ValueSize(override val toString: String) extends OperandSize
 
 sealed class FarPointerSize(override val toString: String) extends OperandSize
-
-object OperandSize {
-
-  case object Unknown extends OperandSize
-
-}
 
 object ValueSize {
 
@@ -30,29 +18,9 @@ object ValueSize {
 
   case object Byte extends ValueSize("BYTE")
 
-  case object Word extends ValueSize("WORD") {
-    override def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = processorMode match {
-      case ProcessorMode.Protected | ProcessorMode.Long => true
-      case _ => false
-    }
+  case object Word extends ValueSize("WORD")
 
-    override def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = processorMode match {
-      case ProcessorMode.Protected => true
-      case _ => false
-    }
-  }
-
-  case object DoubleWord extends ValueSize("DWORD") {
-    override def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = processorMode match {
-      case ProcessorMode.Real => true
-      case _ => false
-    }
-
-    override def requiresAddressSizePrefix(processorMode: ProcessorMode): Boolean = processorMode match {
-      case ProcessorMode.Real | ProcessorMode.Long => true
-      case _ => false
-    }
-  }
+  case object DoubleWord extends ValueSize("DWORD")
 
   case object QuadWord extends ValueSize("QWORD")
 
@@ -66,18 +34,8 @@ object FarPointerSize {
     case _ => throw new AssertionError
   }
 
-  case object DoubleWord extends FarPointerSize("DWORD") {
-    override def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = processorMode match {
-      case ProcessorMode.Real => false
-      case _ => true
-    }
-  }
+  case object DoubleWord extends FarPointerSize("DWORD")
 
-  case object FarWord extends FarPointerSize("FWORD") {
-    override def requiresOperandSizePrefix(processorMode: ProcessorMode): Boolean = processorMode match {
-      case ProcessorMode.Real => true
-      case _ => false
-    }
-  }
+  case object FarWord extends FarPointerSize("FWORD")
 
 }
