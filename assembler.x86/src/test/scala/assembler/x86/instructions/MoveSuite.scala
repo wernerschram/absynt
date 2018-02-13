@@ -48,23 +48,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [bp+si+0x7D], bh" in {
-        Move(BH, RegisterMemoryLocation(BP.combinedIndex(SI), 0x7D.toByte)).encodeByte should be(Hex.lsb("88 7A 7D"))
+        Move(BH, RegisterMemoryLocation(BP+SI, 0x7D.toByte)).encodeByte should be(Hex.lsb("88 7A 7D"))
       }
 
       "correctly represent mov [bp+si+0x7D], bh as a string" in {
-        Move(BH, RegisterMemoryLocation(BP.combinedIndex(SI), 0x7D.toByte)).toString should be("mov [bp+si+125], bh")
-      }
-
-      "throw an AssertionError for mov [bp+bx], bh" in {
-        an[AssertionError] should be thrownBy {
-          Move(BH, RegisterMemoryLocation(BP.combinedIndex(BX)))
-        }
-      }
-
-      "throw an AssertionError for mov [bx+bp], bh" in {
-        an[AssertionError] should be thrownBy {
-          Move(BH, RegisterMemoryLocation(BX.combinedIndex(BP)))
-        }
+        Move(BH, RegisterMemoryLocation(SI+BP, 0x7D.toByte)).toString should be("mov [bp+si+125], bh")
       }
 
      "correctly encode mov [bp], bp" in {
@@ -156,27 +144,27 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [bp+di+0xDEAD], cx" in {
-        Move(CX, RegisterMemoryLocation(BP.combinedIndex(DI), 0xDEAD.toShort)).encodeByte should be(Hex.lsb("89 8B AD DE"))
+        Move(CX, RegisterMemoryLocation(BP+DI, 0xDEAD.toShort)).encodeByte should be(Hex.lsb("89 8B AD DE"))
       }
 
       "correctly represent mov [bp+di+57005], cx as a string" in {
-        Move(CX, RegisterMemoryLocation(BP.combinedIndex(DI), 0xDEAD.toShort)).toString should be("mov [bp+di+57005], cx")
+        Move(CX, RegisterMemoryLocation(BP+DI, 0xDEAD.toShort)).toString should be("mov [bp+di+57005], cx")
       }
 
       "correctly encode mov cl, [bp+si]" in {
-        Move(RegisterMemoryLocation(BP.combinedIndex(SI)), CL).encodeByte should be(Hex.lsb("8A 0A"))
+        Move(RegisterMemoryLocation(BP+SI), CL).encodeByte should be(Hex.lsb("8A 0A"))
       }
 
       "correctly represent mov cl, [bp+si] as a string" in {
-        Move(RegisterMemoryLocation(BP.combinedIndex(SI)), CL).toString should be("mov cl, [bp+si]")
+        Move(RegisterMemoryLocation(BP+SI), CL).toString should be("mov cl, [bp+si]")
       }
 
       "correctly encode mov dl, [bx+di+0xA0]" in {
-        Move(RegisterMemoryLocation(BX.combinedIndex(DI), 0xA0.toByte), DL).encodeByte should be(Hex.lsb("8A 51 A0"))
+        Move(RegisterMemoryLocation(BX+DI, 0xA0.toByte), DL).encodeByte should be(Hex.lsb("8A 51 A0"))
       }
 
       "correctly represent mov dl, [bx+di+160] as a string" in {
-        Move(RegisterMemoryLocation(BX.combinedIndex(DI), 0xA0.toByte), DL).toString should be("mov dl, [bx+di+160]")
+        Move(RegisterMemoryLocation(BX+DI, 0xA0.toByte), DL).toString should be("mov dl, [bx+di+160]")
       }
 
       "correctly encode mov dh, [bp]+0xABBA" in {
@@ -196,11 +184,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov sp, [bp+di+0x12]" in {
-        Move(RegisterMemoryLocation(BP.combinedIndex(DI), 0x12.toByte), SP).encodeByte should be(Hex.lsb("8B 63 12"))
+        Move(RegisterMemoryLocation(BP+DI, 0x12.toByte), SP).encodeByte should be(Hex.lsb("8B 63 12"))
       }
 
       "correctly represent mov sp, [bp+di+18] as a string" in {
-        Move(RegisterMemoryLocation(BP.combinedIndex(DI), 0x12.toByte), SP).toString should be("mov sp, [bp+di+18]")
+        Move(RegisterMemoryLocation(BP+DI, 0x12.toByte), SP).toString should be("mov sp, [bp+di+18]")
       }
 
       "correctly encode mov di, [di+0xBEEF]" in {
@@ -244,11 +232,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov ss, [bp+si]" in {
-        Move(RegisterMemoryLocation(BP.combinedIndex(SI)), SS).encodeByte should be(Hex.lsb("8E 12"))
+        Move(RegisterMemoryLocation(BP+SI), SS).encodeByte should be(Hex.lsb("8E 12"))
       }
 
       "correctly represent mov ss, [bp+si] as a string" in {
-        Move(RegisterMemoryLocation(BP.combinedIndex(SI)), SS).toString should be("mov ss, [bp+si]")
+        Move(RegisterMemoryLocation(BP+SI), SS).toString should be("mov ss, [bp+si]")
       }
 
       "correctly encode mov ds, [bx+0x99]" in {
@@ -339,11 +327,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [bp+di], 0x13" in {
-        Move(0x13.toByte, RegisterMemoryLocation(BP.combinedIndex(DI))).encodeByte should be(Hex.lsb("C6 03 13"))
+        Move(0x13.toByte, RegisterMemoryLocation(BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
       }
 
       "correctly represent mov [bp+di], 19 as a string" in {
-        Move(0x13.toByte, RegisterMemoryLocation(BP.combinedIndex(DI))).toString should be("mov [bp+di], 19")
+        Move(0x13.toByte, RegisterMemoryLocation(BP+DI)).toString should be("mov [bp+di], 19")
       }
 
       "correctly encode mov [bx+0x10], 0x5656" in {
@@ -510,7 +498,7 @@ class MoveSuite extends WordSpec with Matchers {
 
       "throw an exception for mov r13l, [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Move(RegisterMemoryLocation(BP.combinedIndex(SI)), R13L).encodeByte
+          Move(RegisterMemoryLocation(BP+SI), R13L).encodeByte
         }
       }
 

@@ -40,35 +40,65 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
   override def toString: String = mnemonic
 }
 
-sealed trait BaseIndexPair extends ModRMEncodableOperand with FixedSizeOperand {
+sealed trait RegisterReference extends FixedSizeOperand {
   val defaultSegment: SegmentRegister = Register.DS
-  val indexCode: Byte = registerOrMemoryModeCode
+  val indexCode: Byte
+
+  def getRexRequirements(parameterPosition: ParameterPosition): Seq[RexRequirement]
 
   def onlyWithDisplacement: Boolean = false
 }
 
-sealed trait IndexRegister extends Register with BaseIndexPair
+sealed trait IndexRegister extends RegisterReference {
+  self: GeneralPurposeRegister =>
+}
 
-sealed trait RealModeIndexRegister extends IndexRegister
+sealed trait RealModeIndexRegister extends IndexRegister {
+  self: GeneralPurposeRegister =>
+}
 
-sealed trait ProtectedModeIndexRegister extends IndexRegister
+sealed trait CombinableRealModeIndexRegister extends RealModeIndexRegister {
+  self: GeneralPurposeRegister =>
 
-sealed trait EncodedBaseRegister extends ModRMEncodableOperand with FixedSizeOperand {
-  self: Register =>
+  def +(base: BaseRegisterReference): BaseIndexReference =
+    base.combinedIndex(this)
+}
 
-  def getBaseCode(index: RealModeIndexRegister): Byte
+sealed abstract class BaseIndexReference(
+  val base: BaseRegisterReference,
+  val index: CombinableRealModeIndexRegister,
+  override val indexCode: Byte)
+  extends RegisterReference {
 
-  def combinedIndex(index: RealModeIndexRegister): BaseIndexPair = new BaseIndexPair {
-    override val defaultSegment: SegmentRegister = index.defaultSegment
-    override val indexCode: Byte = getBaseCode(index)
+  override def getRexRequirements(parameterPosition: ParameterPosition): Seq[RexRequirement] =
+    base.getRexRequirements(ParameterPosition.Base) ++ index.getRexRequirements(ParameterPosition.Index)
 
-    val operandByteSize: OperandSize = index.operandByteSize
+  override val defaultSegment: SegmentRegister = index.defaultSegment
 
-    val modValue: Byte = index.modValue
-    val registerOrMemoryModeCode: Byte = getBaseCode(index)
+  val operandByteSize: OperandSize = index.operandByteSize
 
-    override def toString = s"${EncodedBaseRegister.this}+$index"
-  }
+  override def toString = s"$base+$index"
+}
+
+object BaseIndexReference {
+  object BX_SI extends BaseIndexReference(Register.BX, Register.SI, 0x00)
+  object BX_DI extends BaseIndexReference(Register.BX, Register.DI, 0x01)
+  object BP_SI extends BaseIndexReference(Register.BP, Register.SI, 0x02)
+  object BP_DI extends BaseIndexReference(Register.BP, Register.DI, 0x03)
+}
+
+sealed trait BaseRegisterReference extends ModRMEncodableOperand with FixedSizeOperand {
+  self: GeneralPurposeRegister =>
+
+  def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference
+
+  final def +(index: CombinableRealModeIndexRegister): BaseIndexReference =
+    combinedIndex(index)
+}
+
+sealed trait ProtectedModeIndexRegister extends IndexRegister {
+  self: GeneralPurposeRegister =>
+  override val indexCode: Byte = self.registerOrMemoryModeCode
 }
 
 sealed trait SIBIndexRegister extends ModRMEncodableOperand with FixedSizeOperand {
@@ -138,38 +168,36 @@ object Register {
   case object AX extends AccumulatorRegister with WordRegister
   case object CX extends CountRegister with WordRegister
   case object DX extends DataRegister with WordRegister
-  case object BX extends BaseRegister with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
+  case object BX extends BaseRegister with WordRegister with BaseRegisterReference with RealModeIndexRegister {
     override val indexCode: Byte = 0x07.toByte
 
-    def getBaseCode(index: RealModeIndexRegister): Byte = {
+    override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
       index match {
-        case SI => 0x00
-        case DI => 0x01
-        case _ => throw new AssertionError
+        case SI => BaseIndexReference.BX_SI
+        case DI => BaseIndexReference.BX_DI
       }
-    }
+
   }
 
   case object SP extends SourcePointer with WordRegister
-  case object BP extends BasePointer with WordRegister with EncodedBaseRegister with RealModeIndexRegister {
+  case object BP extends BasePointer with WordRegister with BaseRegisterReference with RealModeIndexRegister {
     override val indexCode: Byte = 0x06.toByte
 
     override val onlyWithDisplacement: Boolean = true
 
-    def getBaseCode(index: RealModeIndexRegister): Byte = {
+    override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
       index match {
-        case SI => 0x02
-        case DI => 0x03
-        case _ => throw new AssertionError
+        case SI => BaseIndexReference.BP_SI
+        case DI => BaseIndexReference.BP_DI
       }
-    }
+
   }
 
-  final case object SI extends SourceIndex with WordRegister with RealModeIndexRegister {
+  final case object SI extends SourceIndex with WordRegister with CombinableRealModeIndexRegister {
     override val indexCode: Byte = 0x04.toByte
   }
 
-  final case object DI extends DestinationIndex with WordRegister with RealModeIndexRegister {
+  final case object DI extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
     override val defaultSegment: SegmentRegister = Register.ES
     override val indexCode: Byte = 0x05.toByte
   }
