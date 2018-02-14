@@ -7,6 +7,15 @@ sealed class ValueSize(override val toString: String) extends OperandSize
 sealed class FarPointerSize(override val toString: String) extends OperandSize
 
 object ValueSize {
+
+  def sizeOfValue(size: Int): ValueSize = size match {
+    case 1 => Byte
+    case 2 => Word
+    case 4 => DoubleWord
+    case 8 => QuadWord
+    case _ => throw new AssertionError
+  }
+
   case object Byte extends ValueSize("BYTE")
 
   case object Word extends ValueSize("WORD")

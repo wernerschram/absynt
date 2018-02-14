@@ -664,12 +664,6 @@ class MoveSuite extends WordSpec with Matchers {
       "correctly represent mov [r8+r9*2+0], ebp as a string" in {
         Move(EBP, SIBMemoryLocation(R9, R8, 0, 2)).toString should be("mov [r8+r9*2+0], ebp")
       }
-
-      "throw an exception for mov 0x001122, rax" in {
-        an[AssertionError] should be thrownBy {
-          Move(new ImmediateValue(0x00.toByte :: 0x11.toByte :: 0x22.toByte :: Nil), RAX).encodeByte
-        }
-      }
     }
   }
 }
