@@ -9,8 +9,6 @@ import assembler.x86.operations.{OperandInfo, Repeated, Static}
 object StoreString {
   implicit val mnemonic: String = "stos"
 
-  // TODO: implement STOS m8 and STOS m16
-
   def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
            (implicit processorMode: ProcessorMode): Static =
     (register, destination) match {
