@@ -24,5 +24,7 @@ object MemoryAddress {
   def withSize(address: Displacement, segment: SegmentRegister = Register.DS)(size: ValueSize): MemoryAddress with FixedSizeOperand =
     new MemoryAddress(address, segment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
+
+      override def toString = s"$operandByteSize PTR ${super.toString}"
     }
 }

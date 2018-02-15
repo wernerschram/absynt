@@ -44,6 +44,7 @@ object SIBMemoryLocation {
   def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
     new SIBMemoryLocation(index, base, displacement, scale, index.defaultSIBSegment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
+      override def toString = s"$operandByteSize PTR ${super.toString}"
     }
 
   object withSegmentOverride {
@@ -55,6 +56,7 @@ object SIBMemoryLocation {
       segment: SegmentRegister)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
         new SIBMemoryLocation(index, base, displacement, scale, segment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
+      override def toString = s"$operandByteSize PTR ${super.toString}"
     }
   }
 }
