@@ -4,14 +4,14 @@ import assembler.ListExtensions.ListToImmediate
 import assembler.x86.operands._
 
 sealed class MemoryAddress private(address: Displacement, segment: SegmentRegister = Register.DS)
-  extends MemoryLocation(address, segment, ValueSize.sizeOfValue(address.encode.size)) with ModRMEncodableOperand {
+  extends MemoryLocation(Some(address), segment, ValueSize.sizeOfValue(address.encode.size)) with ModRMEncodableOperand {
 
   override val modValue: Byte = 0x00.toByte
 
-  override val registerOrMemoryModeCode: Byte = if (address.encode.lengthCompare(2) == 0) 0x06.toByte else 0x05.toByte
+  override val registerOrMemoryModeCode: Byte = if (addressSize == ValueSize.Word) 0x06.toByte else 0x05.toByte
   override val defaultSegment: SegmentRegister = Register.DS
 
-  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ displacement.encode
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ address.encode
 
   override def toString = s"$segmentPrefix[${address.encode.decimalString}]"
 }

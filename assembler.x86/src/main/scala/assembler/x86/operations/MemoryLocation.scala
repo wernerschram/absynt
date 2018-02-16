@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
+import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
-import assembler.x86.operands.{OperandSize, SegmentRegister}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
 trait MemoryLocation extends X86Operation {
@@ -18,5 +18,5 @@ trait MemoryLocation extends X86Operation {
   }
 
   abstract override def encodeByte: Seq[Byte] =
-    super.encodeByte ++ location.displacement.encode
+    super.encodeByte ++ location.displacement.toSeq.flatMap(_.encode)
 }

@@ -5,7 +5,6 @@ import assembler.output.raw.Raw
 import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.ImmediateValue
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.Displacement._
@@ -96,11 +95,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov [ecx+ebx*1], edx" in {
-        Move(EDX, SIBMemoryLocation(EBX, ECX)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
+        Move(EDX, SIBMemoryLocation(EBX, ECX, 1)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
       }
 
       "correctly represent mov [ecx+ebx*1], edx as a string" in {
-        Move(EDX, SIBMemoryLocation(EBX, ECX)).toString should be("mov [ecx+ebx*1], edx")
+        Move(EDX, SIBMemoryLocation(EBX, ECX, 1)).toString should be("mov [ecx+ebx*1], edx")
       }
 
       "correctly encode mov [ecx+ebx*4], edx" in {

@@ -4,9 +4,11 @@ import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.{ModRMEncodableOperand, _}
 
-sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister, displacement: Displacement = Displacement.None, val scale: Int,
-                               segment: SegmentRegister)
+//TODO: of Page 2-7 of the intel software development manual (325383-sdm-vol-2abcd.pdf) Notes: 1. and Scaled Index == none are not implemented
+sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseRegister,
+  displacement: Option[Displacement] = None, val scale: Int, segment: SegmentRegister)
   extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize, segment) with ModRMEncodableOperand {
+
   assume(index.operandByteSize == base.operandByteSize)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
@@ -14,7 +16,7 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
   val baseCode: Byte = base.SIBBaseCode
   val indexCode: Byte = index.SIBIndexCode
 
-  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ (getSIB +: displacement.encode)
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ (getSIB +: displacement.toSeq.flatMap(_.encode))
 
   def getSIB: Byte = {
     val scaleCode = scale match {
@@ -33,28 +35,51 @@ sealed class SIBMemoryLocation(val index: SIBIndexRegister, val base: SIBBaseReg
 
   private def scaleString = s"*$scale"
 
-  private def displacementString = if (displacement == Displacement.None) "" else s"+${displacement.encode.decimalString}"
+  private def displacementString = displacement match {
+    case None => ""
+    case Some(d) => s"+${d.encode.decimalString}"
+  }
 }
 
 object SIBMemoryLocation {
 
-  def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1) =
-    new SIBMemoryLocation(index, base, displacement, scale, index.defaultSIBSegment)
+  def apply(index: SIBIndexRegister, base: SIBBaseRegister, scale: Int) =
+    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment)
 
-  def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
-    new SIBMemoryLocation(index, base, displacement, scale, index.defaultSIBSegment) with FixedSizeOperand {
+  def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement, scale: Int) =
+    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment)
+
+  def withSize(index: SIBIndexRegister, base: SIBBaseRegister, scale: Int)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
+    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment) with FixedSizeOperand {
+      override val operandByteSize: OperandSize = size
+      override def toString = s"$operandByteSize PTR ${super.toString}"
+    }
+
+  def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement, scale: Int)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
+    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
       override def toString = s"$operandByteSize PTR ${super.toString}"
     }
 
   object withSegmentOverride {
-    def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
+    def apply(index: SIBIndexRegister, base: SIBBaseRegister, scale: Int,
               segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, displacement, scale, segment)
+      new SIBMemoryLocation(index, base, None, scale, segment)
 
-    def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement = Displacement.None, scale: Int = 1,
+    def apply(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement, scale: Int,
+              segment: SegmentRegister) =
+      new SIBMemoryLocation(index, base, Some(displacement), scale, segment)
+
+    def withSize(index: SIBIndexRegister, base: SIBBaseRegister, scale: Int,
       segment: SegmentRegister)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
-        new SIBMemoryLocation(index, base, displacement, scale, segment) with FixedSizeOperand {
+        new SIBMemoryLocation(index, base, None, scale, segment) with FixedSizeOperand {
+      override val operandByteSize: OperandSize = size
+      override def toString = s"$operandByteSize PTR ${super.toString}"
+    }
+
+    def withSize(index: SIBIndexRegister, base: SIBBaseRegister, displacement: Displacement, scale: Int,
+      segment: SegmentRegister)(size: ValueSize): SIBMemoryLocation with FixedSizeOperand =
+        new SIBMemoryLocation(index, base, Some(displacement), scale, segment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
       override def toString = s"$operandByteSize PTR ${super.toString}"
     }
