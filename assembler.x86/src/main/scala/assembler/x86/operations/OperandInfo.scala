@@ -19,6 +19,25 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
   }
 }
 
+trait OperandSizePrefix {
+  self: OperandInfo =>
+  override def requiresOperandSize(processorMode: ProcessorMode): Boolean = operand match {
+    case f: FixedSizeOperand =>
+      f.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
+      f.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
+    case _ => false
+  }
+}
+
+trait FixedSizeOperandSizePrefix {
+  self: OperandInfo =>
+
+  val fixedSizeOperand: Operand with FixedSizeOperand
+  override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
+    fixedSizeOperand.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
+    fixedSizeOperand.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
+}
+
 object OperandInfo {
   object OperandOrder extends Enumeration {
     type OperandOrder = Value
@@ -35,33 +54,21 @@ object OperandInfo {
     } //ptrXX
 
   def relative(pointer: memoryaccess.NearPointer, operandOrder: OperandOrder): OperandInfo =
-    new OperandInfo(pointer, operandOrder) {
-   } //relXX
+    new OperandInfo(pointer, operandOrder) { } //relXX
 
   def immediate(immediate: ImmediateValue, operandOrder: OperandOrder): OperandInfo =
-    new OperandInfo(immediate, operandOrder) {
-      override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
-        immediate.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
-        immediate.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
+    new OperandInfo(immediate, operandOrder) with FixedSizeOperandSizePrefix  {
+      override val fixedSizeOperand: Operand with FixedSizeOperand = immediate
     } //immXX
 
   def implicitOperand(operand: Operand, operandOrder: OperandOrder): OperandInfo =
-    new OperandInfo(operand, operandOrder) {
-
-     override def requiresOperandSize(processorMode: ProcessorMode): Boolean = operand match {
-        case f: FixedSizeOperand =>
-          f.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
-          f.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
-        case _ => false
-      }
-    } //XX
+    new OperandInfo(operand, operandOrder) with OperandSizePrefix { } //XX
 
   def implicitPort(operand: Operand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(operand, operandOrder) { } //XX
 
   def implicitAddress(operand: Operand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(operand, operandOrder) {
-
       override def addressOperands: Seq[AddressOperandInfo] = operand match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
         case _ => Seq.empty
@@ -69,10 +76,8 @@ object OperandInfo {
     } //XX
 
   def encodedRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
-    new OperandInfo(register, operandOrder) {
-      override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
-        register.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
-        register.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
+    new OperandInfo(register, operandOrder) with FixedSizeOperandSizePrefix {
+      override val fixedSizeOperand: Operand with FixedSizeOperand = register
 
       override def rexRequirements: Seq[RexRequirement] = register match {
         case r: GeneralPurposeRexRegister => Seq(RexRequirement.instanceOpcodeReg) // +: super.rexRequirements
@@ -91,14 +96,7 @@ object OperandInfo {
     } //moffsXX
 
   def rmRegisterOrMemory(rm: ModRMEncodableOperand, operandOrder: OperandOrder, includeRexW: Boolean): OperandInfo =
-    new OperandInfo(rm, operandOrder) {
-      override def requiresOperandSize(processorMode: ProcessorMode): Boolean = rm match {
-        case f: FixedSizeOperand =>
-          f.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
-            f.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
-        case _ => false
-      }
-
+    new OperandInfo(rm, operandOrder) with OperandSizePrefix {
       override def addressOperands: Seq[AddressOperandInfo] = rm match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
         case _ => Seq.empty
@@ -132,10 +130,8 @@ object OperandInfo {
     }//r/mXX
 
   def rmRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
-    new OperandInfo(register, operandOrder) {
-      override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
-        register.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
-        register.operandByteSize == ValueSize.DoubleWord && processorMode == ProcessorMode.Real
+    new OperandInfo(register, operandOrder) with FixedSizeOperandSizePrefix {
+      override val fixedSizeOperand: Operand with FixedSizeOperand = register
 
       override def rexRequirements: Seq[RexRequirement] = register match {
         case r: GeneralPurposeRexRegister => RexRequirement.instanceOperandR +: super.rexRequirements
