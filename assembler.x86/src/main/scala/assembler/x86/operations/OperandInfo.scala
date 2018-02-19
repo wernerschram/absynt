@@ -1,7 +1,6 @@
 package assembler.x86.operations
 
 import assembler.x86.operands._
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.{ProcessorMode, RexRequirement}
 
 sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.OperandOrder.Value) extends Ordered[OperandInfo] {
@@ -106,20 +105,6 @@ object OperandInfo {
         val operandRequirements = rm match {
           case _: GeneralPurposeRexRegister =>
             Seq(RexRequirement.instanceOperandRM)
-//          case r: RegisterMemoryLocation[_] if r.reference.isInstanceOf[GeneralPurposeRexRegister with ProtectedModeIndexRegister] =>
-//            Seq(RexRequirement.instanceOperandRM)
-//          case r: memoryaccess.SIBMemoryLocation =>
-//            val addressRequirements: Seq[RexRequirement] = Seq(
-//              r.index match {
-//                case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceIndex)
-//                case _ => Seq.empty[RexRequirement]
-//              },
-//              r.base match {
-//                case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceBase)
-//                case _ => Seq.empty[RexRequirement]
-//              }).flatten
-//
-//            addressRequirements
           case _ => Seq.empty
         }
         if (includeRexW)
@@ -134,7 +119,7 @@ object OperandInfo {
       override val fixedSizeOperand: Operand with FixedSizeOperand = register
 
       override def rexRequirements: Seq[RexRequirement] = register match {
-        case r: GeneralPurposeRexRegister => RexRequirement.instanceOperandR +: super.rexRequirements
+        case _: GeneralPurposeRexRegister => RexRequirement.instanceOperandR +: super.rexRequirements
         case _ => super.rexRequirements
       }
     } //rXX

@@ -10,8 +10,9 @@ trait MemoryLocation extends X86Operation {
   def location: MemoryLocationType
   def offsetOrder: OperandOrder
 
-  abstract override def operands: Seq[OperandInfo] =
-    super.operands :+ OperandInfo.memoryOffset(location, offsetOrder)
+  abstract override def operands: Set[OperandInfo] =
+    super.operands +
+      OperandInfo.memoryOffset(location, offsetOrder)
 
   def addressOperands: Seq[AddressOperandInfo] =
     location.addressOperands

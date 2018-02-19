@@ -14,7 +14,7 @@ class X86OperationSuite extends WordSpec with Matchers {
 
         override def mnemonic = "mis"
 
-        override def operands: Seq[OperandInfo] = Seq.empty
+        override def operands: Set[OperandInfo] = Set.empty
 
         override implicit val processorMode: ProcessorMode = ProcessorMode.Protected
       }

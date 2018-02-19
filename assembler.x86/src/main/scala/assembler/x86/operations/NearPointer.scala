@@ -10,7 +10,7 @@ trait NearPointer extends X86Operation {
 
   def pointerOrder: OperandOrder
 
-  abstract override def operands: Seq[OperandInfo] = super.operands :+ OperandInfo.relative(pointer, pointerOrder)
+  abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.relative(pointer, pointerOrder)
 
   override def validate(): Unit = {
     super.validate()

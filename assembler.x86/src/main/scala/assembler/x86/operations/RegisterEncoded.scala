@@ -13,7 +13,7 @@ abstract class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register:
 
   def registerOrder: OperandOrder
 
-  override def operands: Seq[OperandInfo] = Seq(OperandInfo.encodedRegister(register, registerOrder))
+  override def operands: Set[OperandInfo] = Set(OperandInfo.encodedRegister(register, registerOrder))
 
   override def code: Seq[Byte] =
     rawCode.take(rawCode.length - 1) :+ (rawCode.last | register.registerCode).toByte

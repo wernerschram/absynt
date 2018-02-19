@@ -8,7 +8,7 @@ import assembler.x86.{ProcessorMode, RexRequirement}
 abstract class X86Operation extends UnlabeledEncodable {
   val includeRexW: Boolean = true
 
-  def operands: Seq[OperandInfo]
+  def operands: Set[OperandInfo]
 
   override def size: Int = encodeByte.length
 
@@ -47,7 +47,7 @@ abstract class X86Operation extends UnlabeledEncodable {
       rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitMask).toByte) :: Nil
   }
 
-  def rexRequirements: Seq[RexRequirement] =
+  def rexRequirements: Set[RexRequirement] =
     operands.flatMap(o => o.rexRequirements ++ o.addressOperands.flatMap(_.rexRequirements))
 
   def code: Seq[Byte]
@@ -57,7 +57,7 @@ abstract class X86Operation extends UnlabeledEncodable {
   override def toString: String = if (operands.isEmpty)
       s"$mnemonic"
     else
-      s"$mnemonic ${operands.sorted.map{ _.toString }.mkString(", ")}"
+      s"$mnemonic ${operands.toSeq.sorted.map{ _.toString }.mkString(", ")}"
 }
 
 object X86Operation {

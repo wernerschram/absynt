@@ -49,7 +49,7 @@ object Move {
 
   private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, source) +: super.operands
+      override def operands: Set[OperandInfo] =  super.operands + OperandInfo.implicitOperand(Register.AL, source)
 
       override val location: MemoryLocation = memoryLocation
 
@@ -74,7 +74,7 @@ object Move {
 
   private def AXToMOffs16(accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, source) +: super.operands
+      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(accumulatorRegister, source)
 
       override val location: MemoryLocation = memoryLocation
 
@@ -96,7 +96,7 @@ object Move {
 
   private def MOffs8ToAL(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, destination) +: super.operands
+      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(Register.AL, destination)
 
       override val location: MemoryLocation = memoryLocation
 
@@ -118,7 +118,7 @@ object Move {
 
   private def MOffs16ToAX(memoryLocation: MemoryLocation, accumulatorRegister: AccumulatorRegister)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, destination) +: super.operands
+      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(accumulatorRegister, destination)
 
       override val location: MemoryLocation = memoryLocation
 
