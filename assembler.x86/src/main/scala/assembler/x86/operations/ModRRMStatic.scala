@@ -13,7 +13,7 @@ abstract class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register
   extends ModRMStatic(operandRM, code, register.registerOrMemoryModeCode, mnemonic, includeRexW) {
 
   def operandROrder: OperandOrder =
-    if (operandRMOrder == first) second else first
+    if (operandRMOrder == destination) source else destination
 
   override def operands: Seq[OperandInfo] = OperandInfo.rmRegister(register, operandROrder) +: super.operands
 

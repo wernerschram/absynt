@@ -22,9 +22,9 @@ object Input {
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE4.toByte :: Nil, opcode) with Immediate {
       // FIXME: Technically the immediate value here represents an OperandInfo.implicitPort and not an OperandInfo.immediate although it doesn't make a difference in practice
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, first) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, destination) +: super.operands
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -37,9 +37,9 @@ object Input {
 
   private def Imm8ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE5.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX, first) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX, destination) +: super.operands
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -51,9 +51,9 @@ object Input {
 
   private def Imm8ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE5.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.EAX, first) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.EAX, destination) +: super.operands
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -74,15 +74,15 @@ object Input {
   }
 
   private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) {
-    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, second), OperandInfo.implicitOperand(Register.AL, first))
+    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, source), OperandInfo.implicitOperand(Register.AL, destination))
   }
 
   private def DXToAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
-    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, second), OperandInfo.implicitOperand(Register.AX, first))
+    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, source), OperandInfo.implicitOperand(Register.AX, destination))
   }
 
   private def DXToEAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) {
-    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, second), OperandInfo.implicitOperand(Register.EAX, first))
+    override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, source), OperandInfo.implicitOperand(Register.EAX, destination))
   }
 }
 
@@ -101,9 +101,9 @@ object Output {
 
   private def ALToImm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE6.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, second) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, source) +: super.operands
 
-      override def immediateOrder: OperandOrder = first
+      override def immediateOrder: OperandOrder = destination
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -115,9 +115,9 @@ object Output {
 
   private def AXToImm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE7.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX, second) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AX, source) +: super.operands
 
-      override def immediateOrder: OperandOrder = first
+      override def immediateOrder: OperandOrder = destination
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -129,9 +129,9 @@ object Output {
 
   private def EAXToImm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static(0xE7.toByte :: Nil, opcode) with Immediate {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.EAX, second) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.EAX, source) +: super.operands
 
-      override def immediateOrder: OperandOrder = first
+      override def immediateOrder: OperandOrder = destination
 
       override val immediate: ImmediateValue = immediateValue
 
@@ -153,16 +153,16 @@ object Output {
 
   private def ALToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEE.toByte :: Nil, opcode) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, first), OperandInfo.implicitOperand(Register.AL, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, destination), OperandInfo.implicitOperand(Register.AL, source))
     }
 
   private def AXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, first), OperandInfo.implicitOperand(Register.AX, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, destination), OperandInfo.implicitOperand(Register.AX, source))
     }
 
   private def EAXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, first), OperandInfo.implicitOperand(Register.EAX, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitPort(Register.DX, destination), OperandInfo.implicitOperand(Register.EAX, source))
     }
 }

@@ -22,7 +22,7 @@ object Push {
         }
       }
 
-      override def registerOrder: OperandOrder = first
+      override def registerOrder: OperandOrder = destination
     }
 
   def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
@@ -39,7 +39,7 @@ object Push {
         }
       }
 
-      override def operandRMOrder: OperandOrder = first
+      override def operandRMOrder: OperandOrder = destination
     }
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate = immediate.operandByteSize match {
@@ -52,7 +52,7 @@ object Push {
     new Static(0x6A.toByte :: Nil, opcode) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
-      override def immediateOrder: OperandOrder = first
+      override def immediateOrder: OperandOrder = destination
     }
 
   private def Imm16(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -64,7 +64,7 @@ object Push {
         assume(immediate.operandByteSize != ValueSize.QuadWord)
       }
 
-      override def immediateOrder: OperandOrder = first
+      override def immediateOrder: OperandOrder = destination
     }
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode): Static = segment match {

@@ -26,7 +26,7 @@ abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemon
     new Static(shortOpcode, mnemonic) with NearPointerOperation {
       override val pointer: NearPointer = nearPointer
 
-      override def pointerOrder: OperandOrder = first
+      override def pointerOrder: OperandOrder = destination
     }
   }
 }
@@ -53,7 +53,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
         }
       }
 
-      override def pointerOrder: OperandOrder = first
+      override def pointerOrder: OperandOrder = destination
     }
   }
 
@@ -81,7 +81,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
         case _ => true
       })
 
-      override def operandRMOrder: OperandOrder = first
+      override def operandRMOrder: OperandOrder = destination
     }
 
   private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
@@ -97,7 +97,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
         case _ => true
       })
 
-      override def operandRMOrder: OperandOrder = first
+      override def operandRMOrder: OperandOrder = destination
     }
 
   object Far {

@@ -18,24 +18,24 @@ object StoreString {
 
   private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, first), OperandInfo.implicitOperand(Register.AL, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(Register.AL, source))
     }
 
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                       (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, first), OperandInfo.implicitOperand(register, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(register, source))
     }
 
   private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with Repeated {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, first), OperandInfo.implicitOperand(Register.AL, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(Register.AL, source))
     }
 
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                          (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with Repeated {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, first), OperandInfo.implicitOperand(register, second))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(register, source))
     }
 
   object Repeat {

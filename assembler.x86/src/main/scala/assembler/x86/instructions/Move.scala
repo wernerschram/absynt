@@ -17,7 +17,7 @@ object Move {
 
   private def RM16ToSReg(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModSegmentRMStatic(operand1, operand2, 0x8E.toByte :: Nil, mnemonic) {
-      override val operandRMOrder: OperandOrder = second
+      override val operandRMOrder: OperandOrder = source
     }
 
   def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModSegmentRMStatic =
@@ -25,7 +25,7 @@ object Move {
 
   private def SRegToRM16(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModSegmentRMStatic(operand1, operand2, 0x8C.toByte :: Nil, mnemonic) {
-      override val operandRMOrder: OperandOrder = first
+      override val operandRMOrder: OperandOrder = destination
     }
 
   def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation = {
@@ -44,16 +44,16 @@ object Move {
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRRMStatic[ByteRegister](operand1, operand2, 0x88.toByte :: Nil, mnemonic) {
-      override val operandRMOrder: OperandOrder = first
+      override val operandRMOrder: OperandOrder = destination
     }
 
   private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, second) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, source) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
-      override def offsetOrder: OperandOrder = first
+      override def offsetOrder: OperandOrder = destination
     }
 
   def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): X86Operation =
@@ -69,16 +69,16 @@ object Move {
 
   private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRRMStatic[WideRegister](operand1, operand2, 0x89.toByte :: Nil, mnemonic) {
-      override def operandRMOrder: OperandOrder = first
+      override def operandRMOrder: OperandOrder = destination
     }
 
   private def AXToMOffs16(accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, second) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, source) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
-      override def offsetOrder: OperandOrder = first
+      override def offsetOrder: OperandOrder = destination
     }
 
   def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
@@ -91,16 +91,16 @@ object Move {
 
   private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRRMStatic[ByteRegister](operand1, operand2, 0x8A.toByte :: Nil, mnemonic) {
-      override def operandRMOrder: OperandOrder = second
+      override def operandRMOrder: OperandOrder = source
     }
 
   private def MOffs8ToAL(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, first) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(Register.AL, destination) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
-      override def offsetOrder: OperandOrder = second
+      override def offsetOrder: OperandOrder = source
     }
 
   def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode): X86Operation =
@@ -113,16 +113,16 @@ object Move {
 
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRRMStatic[WideRegister](operand1, operand2, 0x8B.toByte :: Nil, mnemonic) {
-      override def operandRMOrder: OperandOrder = second
+      override def operandRMOrder: OperandOrder = source
     }
 
   private def MOffs16ToAX(memoryLocation: MemoryLocation, accumulatorRegister: AccumulatorRegister)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation {
-      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, first) +: super.operands
+      override def operands: Seq[OperandInfo] = OperandInfo.implicitOperand(accumulatorRegister, destination) +: super.operands
 
       override val location: MemoryLocation = memoryLocation
 
-      override def offsetOrder: OperandOrder = second
+      override def offsetOrder: OperandOrder = source
     }
 
   def apply(source: ImmediateValue, destination: ByteRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate =
@@ -133,9 +133,9 @@ object Move {
       assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
 
-      override def registerOrder: OperandOrder = first
+      override def registerOrder: OperandOrder = destination
     }
 
   def apply(source: ImmediateValue, destination: WideRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[WideRegister] with Immediate =
@@ -146,9 +146,9 @@ object Move {
       assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
 
-      override def registerOrder: OperandOrder = first
+      override def registerOrder: OperandOrder = destination
     }
 
   def forLabel(targetLabel: Label, register: WideRegister)
@@ -195,17 +195,17 @@ object Move {
     new ModRMStatic(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
-      override def operandRMOrder: OperandOrder = first
+      override def operandRMOrder: OperandOrder = destination
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
     }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
-      override def operandRMOrder: OperandOrder = first
+      override def operandRMOrder: OperandOrder = destination
 
-      override def immediateOrder: OperandOrder = second
+      override def immediateOrder: OperandOrder = source
     }
 }

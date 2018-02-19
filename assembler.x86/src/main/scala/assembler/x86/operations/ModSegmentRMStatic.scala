@@ -12,7 +12,7 @@ abstract class ModSegmentRMStatic(val register: SegmentRegister,
   extends ModRMStatic(operandRM, code, register.registerCode, mnemonic, includeRexW) {
 
   def operandSegmentOrder: OperandOrder =
-    if (operandRMOrder == first) second else first
+    if (operandRMOrder == destination) source else destination
 
   override def operands: Seq[OperandInfo] = OperandInfo.rmSegment(register, operandSegmentOrder) +: super.operands
 

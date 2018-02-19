@@ -41,7 +41,7 @@ trait FixedSizeOperandSizePrefix {
 object OperandInfo {
   object OperandOrder extends Enumeration {
     type OperandOrder = Value
-    val first, second, third = Value
+    val destination, source, third = Value
   }
 
   import OperandOrder._
@@ -80,8 +80,8 @@ object OperandInfo {
       override val fixedSizeOperand: Operand with FixedSizeOperand = register
 
       override def rexRequirements: Seq[RexRequirement] = register match {
-        case r: GeneralPurposeRexRegister => Seq(RexRequirement.instanceOpcodeReg) // +: super.rexRequirements
-        case _ => Seq.empty//super.rexRequirements
+        case r: GeneralPurposeRexRegister => Seq(RexRequirement.instanceOpcodeReg)
+        case _ => Seq.empty
       }
 
     } //rX

@@ -42,7 +42,7 @@ object SystemReturn {
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) {
-      override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, first))
+      override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, destination))
     }
 }
 
@@ -57,6 +57,6 @@ object SystemExit {
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) {
-      override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, first))
+      override val operands: Seq[OperandInfo] = Seq(OperandInfo.implicitOperand(returnMode, destination))
     }
 }
