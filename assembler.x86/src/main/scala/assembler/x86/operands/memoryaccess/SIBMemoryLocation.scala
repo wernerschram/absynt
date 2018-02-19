@@ -13,7 +13,7 @@ sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRe
   assume(index.operandByteSize == base.operandByteSize)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
-  override val addressOperands: Seq[AddressOperandInfo] = Seq(AddressOperandInfo.SIBBase(base), AddressOperandInfo.SIBIndex(index))
+  override val addressOperands: Set[AddressOperandInfo] = Set(AddressOperandInfo.SIBBase(base), AddressOperandInfo.SIBIndex(index))
 
   override val defaultSegment: SegmentRegister = index.defaultSIBSegment
   val baseCode: Byte = base.SIBBaseCode

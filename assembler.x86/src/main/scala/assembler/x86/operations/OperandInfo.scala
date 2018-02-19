@@ -10,7 +10,7 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
 
   def requiresOperandSize(processorMode: ProcessorMode): Boolean = false
 
-  def addressOperands: Seq[AddressOperandInfo] = Seq.empty
+  def addressOperands: Set[AddressOperandInfo] = Set.empty
 
   def rexRequirements: Seq[RexRequirement] = operand match {
     case f: FixedSizeOperand if f.operandByteSize == ValueSize.QuadWord => Seq(RexRequirement.quadOperand)
@@ -68,9 +68,9 @@ object OperandInfo {
 
   def implicitAddress(operand: Operand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(operand, operandOrder) {
-      override def addressOperands: Seq[AddressOperandInfo] = operand match {
+      override def addressOperands: Set[AddressOperandInfo] = operand match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
-        case _ => Seq.empty
+        case _ => Set.empty
       }
     } //XX
 
@@ -88,17 +88,17 @@ object OperandInfo {
   def memoryOffset(offset: memoryaccess.MemoryLocation, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(offset, operandOrder) {
 
-      override def addressOperands: Seq[AddressOperandInfo] = operand match {
+      override def addressOperands: Set[AddressOperandInfo] = operand match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
-        case _ => Seq.empty
+        case _ => Set.empty
       }
     } //moffsXX
 
   def rmRegisterOrMemory(rm: ModRMEncodableOperand, operandOrder: OperandOrder, includeRexW: Boolean): OperandInfo =
     new OperandInfo(rm, operandOrder) with OperandSizePrefix {
-      override def addressOperands: Seq[AddressOperandInfo] = rm match {
+      override def addressOperands: Set[AddressOperandInfo] = rm match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
-        case _ => Seq.empty
+        case _ => Set.empty
       }
 
       override def rexRequirements: Seq[RexRequirement] = {

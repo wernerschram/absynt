@@ -6,7 +6,7 @@ import assembler.x86.operations.AddressOperandInfo
 abstract class MemoryLocation(val displacement: Option[ImmediateValue], val segment: SegmentRegister)
   extends ModRMEncodableOperand {
 
-  def addressOperands: Seq[AddressOperandInfo] = Seq.empty
+  def addressOperands: Set[AddressOperandInfo] = Set.empty
 
   lazy val segmentOverride: Option[SegmentRegister] = if (segment == defaultSegment) None else Some(segment)
   val defaultSegment: SegmentRegister
