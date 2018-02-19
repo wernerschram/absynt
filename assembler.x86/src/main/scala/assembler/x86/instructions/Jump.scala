@@ -101,7 +101,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   object Far {
-    def apply[OffsetType <: X86Offset](farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =
+    def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =
       Ptr1616(farPointer)
 
     def apply(pointer: MemoryLocation)(implicit processorMode: ProcessorMode): ModRMStatic =

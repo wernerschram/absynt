@@ -151,7 +151,7 @@ object Move {
       override def registerOrder: OperandOrder = first
     }
 
-  def forLabel[OffsetType<:X86Offset with AbsoluteOffset](targetLabel: Label, register: WideRegister)
+  def forLabel(targetLabel: Label, register: WideRegister)
               (implicit processorMode: ProcessorMode): AbsoluteReference = {
 
     new AbsoluteReference(targetLabel) {
