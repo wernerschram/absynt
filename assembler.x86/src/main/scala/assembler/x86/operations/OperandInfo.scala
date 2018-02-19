@@ -12,9 +12,9 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
 
   def addressOperands: Set[AddressOperandInfo] = Set.empty
 
-  def rexRequirements: Seq[RexRequirement] = operand match {
-    case f: FixedSizeOperand if f.operandByteSize == ValueSize.QuadWord => Seq(RexRequirement.quadOperand)
-    case _ => Seq.empty
+  def rexRequirements: Set[RexRequirement] = operand match {
+    case f: FixedSizeOperand if f.operandByteSize == ValueSize.QuadWord => Set(RexRequirement.quadOperand)
+    case _ => Set.empty
   }
 }
 
@@ -78,9 +78,9 @@ object OperandInfo {
     new OperandInfo(register, operandOrder) with FixedSizeOperandSizePrefix {
       override val fixedSizeOperand: Operand with FixedSizeOperand = register
 
-      override def rexRequirements: Seq[RexRequirement] = register match {
-        case r: GeneralPurposeRexRegister => Seq(RexRequirement.instanceOpcodeReg)
-        case _ => Seq.empty
+      override def rexRequirements: Set[RexRequirement] = register match {
+        case r: GeneralPurposeRexRegister => Set(RexRequirement.instanceOpcodeReg)
+        case _ => Set.empty
       }
 
     } //rX
@@ -101,14 +101,14 @@ object OperandInfo {
         case _ => Set.empty
       }
 
-      override def rexRequirements: Seq[RexRequirement] = {
+      override def rexRequirements: Set[RexRequirement] = {
         val operandRequirements = rm match {
           case _: GeneralPurposeRexRegister =>
-            Seq(RexRequirement.instanceOperandRM)
-          case _ => Seq.empty
+            Set(RexRequirement.instanceOperandRM)
+          case _ => Set.empty[RexRequirement]
         }
         if (includeRexW)
-          operandRequirements ++ super.rexRequirements
+          super.rexRequirements ++ operandRequirements
         else
           operandRequirements
       }
@@ -118,8 +118,8 @@ object OperandInfo {
     new OperandInfo(register, operandOrder) with FixedSizeOperandSizePrefix {
       override val fixedSizeOperand: Operand with FixedSizeOperand = register
 
-      override def rexRequirements: Seq[RexRequirement] = register match {
-        case _: GeneralPurposeRexRegister => RexRequirement.instanceOperandR +: super.rexRequirements
+      override def rexRequirements: Set[RexRequirement] = register match {
+        case _: GeneralPurposeRexRegister => super.rexRequirements + RexRequirement.instanceOperandR
         case _ => super.rexRequirements
       }
     } //rXX
@@ -134,7 +134,7 @@ sealed abstract class AddressOperandInfo(val operand: Operand with FixedSizeOper
 
   def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
 
-  def rexRequirements: Seq[RexRequirement] = Seq.empty
+  def rexRequirements: Set[RexRequirement] = Set.empty
 }
 
 trait AddressSizePrefix {
@@ -147,9 +147,9 @@ trait AddressSizePrefix {
 object AddressOperandInfo {
   def rmIndex(register: GeneralPurposeRegister with IndexRegister): AddressOperandInfo =
     new AddressOperandInfo(register) with AddressSizePrefix {
-      override def rexRequirements: Seq[RexRequirement] = register match {
+      override def rexRequirements: Set[RexRequirement] = register match {
         case _: GeneralPurposeRexRegister =>
-          Seq(RexRequirement.instanceOperandRM) ++ super.rexRequirements
+          super.rexRequirements + RexRequirement.instanceOperandRM
         case _ =>
           super.rexRequirements
       }
@@ -163,21 +163,21 @@ object AddressOperandInfo {
 
   def SIBBase(register: GeneralPurposeRegister with SIBBaseRegister): AddressOperandInfo =
     new AddressOperandInfo(register) with AddressSizePrefix {
-      override def rexRequirements: Seq[RexRequirement] = register match {
+      override def rexRequirements: Set[RexRequirement] = register match {
         case _: GeneralPurposeRexRegister =>
-          Seq(RexRequirement.instanceBase)
+          Set(RexRequirement.instanceBase)
         case _ =>
-          Seq.empty
+          Set.empty
       }
     }
 
   def SIBIndex(register: GeneralPurposeRegister with SIBIndexRegister): AddressOperandInfo =
     new AddressOperandInfo(register) with AddressSizePrefix {
-      override def rexRequirements: Seq[RexRequirement] = register match {
+      override def rexRequirements: Set[RexRequirement] = register match {
         case _: GeneralPurposeRexRegister =>
-          Seq(RexRequirement.instanceIndex)
+          Set(RexRequirement.instanceIndex)
         case _ =>
-          Seq.empty
+          Set.empty
       }
     }
 
