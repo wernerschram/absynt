@@ -60,8 +60,8 @@ sealed trait CombinableRealModeIndexRegister extends RealModeIndexRegister {
 }
 
 sealed abstract class BaseIndexReference(
-  val base: BaseRegisterReference,
-  val index: CombinableRealModeIndexRegister,
+  val base: GeneralPurposeRegister with BaseRegisterReference,
+  val index: GeneralPurposeRegister with CombinableRealModeIndexRegister,
   override val indexCode: Byte)
   extends RegisterReference {
 

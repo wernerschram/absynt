@@ -3,6 +3,7 @@ package assembler.x86.operands.memoryaccess
 import assembler.ListExtensions._
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
+import assembler.x86.operations.AddressOperandInfo
 
 import scala.language.implicitConversions
 
@@ -14,6 +15,11 @@ sealed class RegisterMemoryLocation[T <: RegisterReference] private(val referenc
       displacement
   , reference.operandByteSize, segment)
     with ModRMEncodableOperand {
+
+  override val addressOperands: Seq[AddressOperandInfo] = reference match {
+    case bi: BaseIndexReference => Seq(AddressOperandInfo.rmBase(bi.base), AddressOperandInfo.rmIndex(bi.index))
+    case o: GeneralPurposeRegister with IndexRegister => Seq(AddressOperandInfo.rmIndex(o))
+  }
 
   override val defaultSegment: SegmentRegister = reference.defaultSegment
 

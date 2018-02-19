@@ -34,10 +34,10 @@ abstract class X86Operation extends UnlabeledEncodable {
   def segmentOverride: Option[SegmentRegister] = None
 
   private def optionalAddressSizePrefix: List[Byte] =
-    if (operands.exists(o => o.requiresAddressSize(processorMode))) X86Operation.AddressSizeCode :: Nil else Nil
+    if (operands.flatMap(_.addressOperands).exists(_.requiresAddressSize(processorMode))) X86Operation.AddressSizeCode :: Nil else Nil
 
   private def optionalOperandSizePrefix: List[Byte] =
-    if (operands.exists(o => o.requiresOperandSize(processorMode))) X86Operation.OperandSizeCode :: Nil else Nil
+    if (operands.exists(_.requiresOperandSize(processorMode))) X86Operation.OperandSizeCode :: Nil else Nil
 
   private def optionalRexPrefix: List[Byte] = {
     assume(processorMode == ProcessorMode.Long || rexRequirements.isEmpty)

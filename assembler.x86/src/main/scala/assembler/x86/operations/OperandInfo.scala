@@ -2,7 +2,7 @@ package assembler.x86.operations
 
 import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.x86.operands._
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
+import assembler.x86.operands.memoryaccess.{IndirectMemoryLocation, RegisterMemoryLocation}
 
 sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.OperandOrder.Value) extends Ordered[OperandInfo] {
   override def toString: String = operand.toString
@@ -12,6 +12,8 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
   def requiresOperandSize(processorMode: ProcessorMode): Boolean = false
 
   def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
+
+  def addressOperands: Seq[AddressOperandInfo] = Seq.empty
 
   def rexRequirements: Seq[RexRequirement] = operand match {
     case f: FixedSizeOperand if f.operandByteSize == ValueSize.QuadWord => Seq(RexRequirement.quadOperand)
@@ -47,6 +49,7 @@ object OperandInfo {
 
   def implicitOperand(operand: Operand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(operand, operandOrder) {
+
      override def requiresOperandSize(processorMode: ProcessorMode): Boolean = operand match {
         case f: FixedSizeOperand =>
           f.operandByteSize == ValueSize.Word && processorMode != ProcessorMode.Real ||
@@ -60,7 +63,13 @@ object OperandInfo {
 
   def implicitAddress(operand: Operand, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(operand, operandOrder) {
-     override def requiresAddressSize(processorMode: ProcessorMode): Boolean = operand match {
+
+      override def addressOperands: Seq[AddressOperandInfo] = operand match {
+        case l: memoryaccess.MemoryLocation => l.addressOperands
+        case _ => Seq.empty
+      }
+
+      override def requiresAddressSize(processorMode: ProcessorMode): Boolean = operand match {
         case f: memoryaccess.MemoryLocation =>
           f.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
           f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
@@ -83,6 +92,12 @@ object OperandInfo {
 
   def memoryOffset(offset: memoryaccess.MemoryLocation, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(offset, operandOrder) {
+
+      override def addressOperands: Seq[AddressOperandInfo] = operand match {
+        case l: memoryaccess.MemoryLocation => l.addressOperands
+        case _ => Seq.empty
+      }
+
       override def requiresAddressSize(processorMode: ProcessorMode): Boolean =
           offset.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
           offset.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
@@ -97,10 +112,15 @@ object OperandInfo {
         case _ => false
       }
 
+      override def addressOperands: Seq[AddressOperandInfo] = rm match {
+        case l: memoryaccess.MemoryLocation => l.addressOperands
+        case _ => Seq.empty
+      }
+
       override def requiresAddressSize(processorMode: ProcessorMode): Boolean = rm match {
         case f: memoryaccess.MemoryLocation =>
           f.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
-            f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
+          f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
         case _ => false
       }
 
@@ -148,3 +168,41 @@ object OperandInfo {
 
 }
 
+sealed abstract class AddressOperandInfo(val operand: Operand with FixedSizeOperand) {
+  override def toString: String = operand.toString
+
+  def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
+
+  def rexRequirements: Seq[RexRequirement] = operand match {
+    case f: FixedSizeOperand if f.operandByteSize == ValueSize.QuadWord => Seq(RexRequirement.quadOperand)
+    case _ => Seq.empty
+  }
+}
+
+trait AddressSizePrefix {
+  self: AddressOperandInfo =>
+  override def requiresAddressSize(processorMode: ProcessorMode): Boolean =
+      operand.operandByteSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
+      operand.operandByteSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
+}
+
+object AddressOperandInfo {
+  def rmIndex(register: GeneralPurposeRegister with IndexRegister): AddressOperandInfo =
+    new AddressOperandInfo(register) with AddressSizePrefix
+
+  def rmBase(register: GeneralPurposeRegister with BaseRegisterReference): AddressOperandInfo =
+    new AddressOperandInfo(register) with AddressSizePrefix
+
+  def rmDisplacement(displacement: ImmediateValue): AddressOperandInfo =
+    new AddressOperandInfo(displacement) with AddressSizePrefix
+
+  def SIBBase(register: GeneralPurposeRegister with SIBBaseRegister): AddressOperandInfo =
+    new AddressOperandInfo(register) with AddressSizePrefix
+
+  def SIBIndex(register: GeneralPurposeRegister with SIBIndexRegister): AddressOperandInfo =
+    new AddressOperandInfo(register) with AddressSizePrefix
+
+  def memoryOffset(offset: memoryaccess.MemoryLocation with FixedSizeOperand): AddressOperandInfo =
+    new AddressOperandInfo(offset) with AddressSizePrefix
+
+}
