@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 sealed class RegisterMemoryLocation[T <: RegisterReference] private(val reference: T, displacement: Option[ImmediateValue], segment: SegmentRegister)
   extends IndirectMemoryLocation(reference.indexCode,
      if (reference.onlyWithDisplacement)
-      Some(displacement.getOrElse(ImmediateValue.byteToImmediate(0.toByte)))
+      Some(displacement.getOrElse(ImmediateValue(0.toByte)))
     else
       displacement
   , reference.operandByteSize, segment)

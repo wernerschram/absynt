@@ -13,11 +13,11 @@ sealed abstract class ImmediateValue(val value: Seq[Byte], override val operandB
 }
 
 object ImmediateValue {
-  implicit def byteToImmediate(value: Byte): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.Byte) {}
+  implicit def apply(value: Byte): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.Byte) {}
 
-  implicit def shortToImmediate(value: Short): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.Word) {}
+  implicit def apply(value: Short): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.Word) {}
 
-  implicit def intToImmediate(value: Int): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.DoubleWord) {}
+  implicit def apply(value: Int): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.DoubleWord) {}
 
-  implicit def longToImmediate(value: Long): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.QuadWord) {}
+  implicit def apply(value: Long): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.QuadWord) {}
 }
