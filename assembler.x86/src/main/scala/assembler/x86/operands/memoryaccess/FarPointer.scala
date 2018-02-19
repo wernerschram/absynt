@@ -1,12 +1,11 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
-import assembler.x86.operands.{FarPointerSize, FixedSizeOperand, Operand}
+import assembler.x86.operands._
 
 sealed abstract case class FarPointer(segment: Short, offset: Seq[Byte])
-  extends Operand with FixedSizeOperand {
+  extends Operand with FarPointerSize2 {
 
-  override val operandByteSize: FarPointerSize
   override def toString =
     s"FAR 0x${segment.encodeLittleEndian.bigEndianHexString}:0x${offset.bigEndianHexString}"
 
@@ -14,13 +13,9 @@ sealed abstract case class FarPointer(segment: Short, offset: Seq[Byte])
 }
 
 object FarPointer {
-  def apply(segment: Short, offset: Short): FarPointer =
-    new FarPointer(segment, offset.encodeLittleEndian) {
-      override val operandByteSize: FarPointerSize = FarPointerSize.DoubleWord
-    }
+  def apply(segment: Short, offset: Short): FarPointer with FarPointerSize2 =
+    new FarPointer(segment, offset.encodeLittleEndian) with FarDoubleWordSize
 
-  def apply(segment: Short, offset: Int): FarPointer =
-    new FarPointer(segment, offset.encodeLittleEndian) {
-      override val operandByteSize: FarPointerSize = FarPointerSize.FarWord
-    }
+  def apply(segment: Short, offset: Int): FarPointer with FarPointerSize2 =
+    new FarPointer(segment, offset.encodeLittleEndian) with FarWordSize
 }

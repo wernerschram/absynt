@@ -4,17 +4,15 @@ import assembler.ListExtensions._
 import assembler.x86.operands._
 
 sealed abstract class NearPointer(val offset: Seq[Byte])
-  extends Operand with FixedSizeOperand {
+  extends Operand with ValueSize2 {
 
   def encodeBytes: Seq[Byte] = offset
 }
 
 object ShortPointer {
   def apply(offset: Byte): NearPointer =
-    new NearPointer(offset.encodeLittleEndian) {
+    new NearPointer(offset.encodeLittleEndian) with ByteSize {
       override def toString: String = s"0x${offset.bigEndianHexString}"
-
-      override def operandByteSize: OperandSize = ValueSize.Byte
     }
 
   def apply(offset: Long): NearPointer = {
@@ -26,10 +24,8 @@ object ShortPointer {
 
 object LongPointer {
   def realMode(offset: Short): NearPointer =
-     new NearPointer(offset.encodeLittleEndian) {
+     new NearPointer(offset.encodeLittleEndian) with WordSize {
        override def toString: String = s"0x${offset.bigEndianHexString}"
-
-       override def operandByteSize: OperandSize = ValueSize.Word
     }
 
   def realMode(offset: Long): NearPointer = {
@@ -38,10 +34,8 @@ object LongPointer {
   }
 
   def protectedMode(offset: Int): NearPointer =
-     new NearPointer(offset.encodeLittleEndian) {
+     new NearPointer(offset.encodeLittleEndian) with DoubleWordSize {
        override def toString: String = s"0x${offset.bigEndianHexString}"
-
-       override def operandByteSize: OperandSize = ValueSize.DoubleWord
     }
 
 }

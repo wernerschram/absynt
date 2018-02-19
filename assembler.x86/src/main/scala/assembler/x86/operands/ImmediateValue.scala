@@ -4,8 +4,8 @@ import assembler.ListExtensions._
 
 import scala.language.implicitConversions
 
-sealed abstract class ImmediateValue(val value: Seq[Byte], override val operandByteSize: OperandSize)
-  extends Operand with FixedSizeOperand {
+sealed abstract class ImmediateValue(val value: Seq[Byte])
+  extends Operand with ValueSize2 {
 
   val isPositive: Boolean = (value.last & 0x80.toByte) == 0
 
@@ -13,11 +13,11 @@ sealed abstract class ImmediateValue(val value: Seq[Byte], override val operandB
 }
 
 object ImmediateValue {
-  implicit def apply(value: Byte): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.Byte) {}
+  implicit def apply(value: Byte): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
 
-  implicit def apply(value: Short): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.Word) {}
+  implicit def apply(value: Short): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with WordSize {}
 
-  implicit def apply(value: Int): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.DoubleWord) {}
+  implicit def apply(value: Int): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
 
-  implicit def apply(value: Long): ImmediateValue = new ImmediateValue(value.encodeLittleEndian, ValueSize.QuadWord) {}
+  implicit def apply(value: Long): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
 }

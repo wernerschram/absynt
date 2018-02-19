@@ -5,7 +5,7 @@ import assembler.x86.ProcessorMode
 sealed abstract class Register extends Operand
 
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String)
-  extends Register with ModRMEncodableOperand with FixedSizeOperand {
+  extends Register with ModRMEncodableOperand with ValueSize2 {
   val modValue: Byte = 0x03.toByte
   val registerOrMemoryModeCode: Byte = registerCode
 }
@@ -102,8 +102,7 @@ sealed trait SIBBaseRegister extends ModRMEncodableOperand with FixedSizeOperand
   val SIBBaseCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait ByteRegister extends GeneralPurposeRegister {
-  override val operandByteSize: OperandSize = ValueSize.Byte
+sealed trait ByteRegister extends GeneralPurposeRegister with ByteSize {
 }
 
 sealed trait LowByteRegister extends ByteRegister {
@@ -116,23 +115,17 @@ sealed trait HighByteRegister extends ByteRegister {
   override def toString: String = mnemonic.replace('x', 'h')
 }
 
-sealed trait WideRegister extends GeneralPurposeRegister
+sealed trait WideRegister extends GeneralPurposeRegister with WideSize
 
-sealed trait WordRegister extends WideRegister {
-  override val operandByteSize: OperandSize = ValueSize.Word
-
+sealed trait WordRegister extends WideRegister with WordSize {
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
 }
 
-sealed trait DoubleWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
-  override val operandByteSize: OperandSize = ValueSize.DoubleWord
-
+sealed trait DoubleWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister with DoubleWordSize {
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
 }
 
-sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister {
-  override val operandByteSize: OperandSize = ValueSize.QuadWord
-
+sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister with QuadWordSize {
   override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
 }
 

@@ -1,16 +1,13 @@
 package assembler.x86.operands
 
-sealed abstract class ReturnMode extends Operand with FixedSizeOperand
+sealed abstract class ReturnMode extends Operand with ValueSize2
 
 object ReturnMode {
-  object Protected extends ReturnMode {
+  object Protected extends ReturnMode with DoubleWordSize {
     override def toString: String = ""
-
-    override val operandByteSize: OperandSize = ValueSize.DoubleWord
   }
-  object Long extends ReturnMode {
-    override def toString: String = "q"
 
-    override val operandByteSize: OperandSize = ValueSize.QuadWord
+  object Long extends ReturnMode with QuadWordSize {
+    override def toString: String = "q"
   }
 }
