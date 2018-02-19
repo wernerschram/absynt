@@ -47,9 +47,10 @@ object OperandInfo {
 
   def pointer(pointer: memoryaccess.FarPointer, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(pointer, operandOrder) {
-      override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
-        pointer.farPointerSize == FarPointerSize.DoubleWord && processorMode != ProcessorMode.Real ||
-        pointer.farPointerSize == FarPointerSize.FarWord && processorMode == ProcessorMode.Real
+      override def requiresOperandSize(processorMode: ProcessorMode): Boolean = pointer match {
+        case _: FarDoubleWordSize => processorMode != ProcessorMode.Real
+        case _: FarWordSize => processorMode == ProcessorMode.Real
+      }
     } //ptrXX
 
   def relative(pointer: memoryaccess.NearPointer, operandOrder: OperandOrder): OperandInfo =
