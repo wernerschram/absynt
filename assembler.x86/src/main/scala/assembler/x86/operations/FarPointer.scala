@@ -3,10 +3,10 @@ package assembler.x86.operations
 import assembler.x86.operands.memoryaccess.{X86Offset, FarPointer => FarPointerType}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-trait FarPointer[OffsetType <: X86Offset] extends X86Operation {
+trait FarPointer extends X86Operation {
 
   self: X86Operation =>
-  def pointer: FarPointerType[OffsetType]
+  def pointer: FarPointerType
 
   abstract override def operands: Seq[OperandInfo] = super.operands :+ OperandInfo.pointer(pointer, first)
 

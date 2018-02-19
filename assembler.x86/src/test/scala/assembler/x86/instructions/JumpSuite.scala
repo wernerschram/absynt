@@ -135,17 +135,17 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(FarPointer(0x1000.toShort, offset(0x2000))).encodeByte should be(Hex.lsb("EA 00 20 00 10"))
+        Jump.Far(FarPointer(0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("EA 00 20 00 10"))
       }
       "correctly represent jmp FAR 0x1000:0x2000 as a string" in {
-        Jump.Far(FarPointer(0x1000.toShort, offset(0x2000))).toString should be("jmp FAR 0x1000:0x2000")
+        Jump.Far(FarPointer(0x1000.toShort, 0x2000.toShort)).toString should be("jmp FAR 0x1000:0x2000")
       }
 
       "correctly encode jmp FAR 0x0030:0x200010" in {
-        Jump.Far(FarPointer(0x30.toShort, X86RelativeOffset.ProtectedOffset(0x200010))).encodeByte should be(Hex.lsb("66 EA 10 00 20 00 30 00"))
+        Jump.Far(FarPointer(0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("66 EA 10 00 20 00 30 00"))
       }
       "correctly represent jmp FAR 0x0030:0x200010 as a string" in {
-        Jump.Far(FarPointer(0x30.toShort, X86RelativeOffset.ProtectedOffset(0x200010))).toString should be("jmp FAR 0x0030:0x00200010")
+        Jump.Far(FarPointer(0x30.toShort, 0x200010)).toString should be("jmp FAR 0x0030:0x00200010")
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
@@ -575,11 +575,11 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(FarPointer(0x1000.toShort, X86RelativeOffset.RealOffset(0x2000))).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
+        Jump.Far(FarPointer(0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
       }
 
       "correctly encode jmp FAR 0x30:0x200010" in {
-        Jump.Far(FarPointer(0x30.toShort, offset(0x200010))).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
+        Jump.Far(FarPointer(0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
@@ -721,11 +721,11 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(FarPointer(0x1000.toShort, X86RelativeOffset.RealOffset(0x2000))).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
+        Jump.Far(FarPointer(0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
       }
 
       "correctly encode jmp FAR 0x30:0x200010" in {
-        Jump.Far(FarPointer(0x30.toShort, offset(0x200010))).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
+        Jump.Far(FarPointer(0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {

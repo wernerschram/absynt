@@ -84,9 +84,9 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
       override def operandRMOrder: OperandOrder = first
     }
 
-  private def Ptr1616[OffsetType <: X86Offset](farPointer: FarPointer[OffsetType])(implicit processorMode: ProcessorMode) =
-    new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation[OffsetType] {
-      override def pointer: FarPointer[OffsetType] = farPointer
+  private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
+    new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
+      override def pointer: FarPointer = farPointer
     }
 
   private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode) =
@@ -101,7 +101,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   object Far {
-    def apply[OffsetType <: X86Offset](farPointer: FarPointer[OffsetType])(implicit processorMode: ProcessorMode): Static with FarPointerOperation[OffsetType] =
+    def apply[OffsetType <: X86Offset](farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =
       Ptr1616(farPointer)
 
     def apply(pointer: MemoryLocation)(implicit processorMode: ProcessorMode): ModRMStatic =

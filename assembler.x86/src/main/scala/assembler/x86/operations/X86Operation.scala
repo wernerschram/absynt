@@ -28,7 +28,7 @@ object OperandInfo {
 
   import OperandOrder._
 
-  def pointer(pointer: memoryaccess.FarPointer[_], operandOrder: OperandOrder): OperandInfo =
+  def pointer(pointer: memoryaccess.FarPointer, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(pointer, operandOrder) {
       override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
         pointer.operandByteSize == FarPointerSize.DoubleWord && processorMode != ProcessorMode.Real ||
