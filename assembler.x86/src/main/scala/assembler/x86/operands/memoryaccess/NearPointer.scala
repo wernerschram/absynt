@@ -1,34 +1,47 @@
 package assembler.x86.operands.memoryaccess
 
 import assembler.ListExtensions._
-import assembler.RelativeOffset
-import assembler.x86.operands.{FixedSizeOperand, Operand, OperandSize, ValueSize}
+import assembler.x86.operands._
 
-sealed abstract class NearPointer[OffsetType <: X86Offset](val offset: OffsetType with RelativeOffset)
+sealed abstract class NearPointer(val offset: Seq[Byte])
   extends Operand with FixedSizeOperand {
-  val operandByteSize: OperandSize
 
-  def encodeBytes: Seq[Byte]
+  def encodeBytes: Seq[Byte] = offset
 }
 
 object ShortPointer {
-  def apply[OffsetType <: X86Offset](offset: OffsetType with RelativeOffset): NearPointer[OffsetType] =
-    new NearPointer[OffsetType](offset) {
-      val operandByteSize: ValueSize = ValueSize.Byte
+  def apply(offset: Byte): NearPointer =
+    new NearPointer(offset.encodeLittleEndian) {
+      override def toString: String = s"0x${offset.bigEndianHexString}"
 
-      override def encodeBytes: Seq[Byte] = offset.encodeShort(1)
-
-      override def toString: String = s"0x${offset.encodeShort(1).bigEndianHexString}"
+      override def operandByteSize: OperandSize = ValueSize.Byte
     }
+
+  def apply(offset: Long): NearPointer = {
+    assume(offset.toByte == offset)
+    apply(offset.toByte)
+  }
+
 }
 
 object LongPointer {
-  def apply[OffsetType <: X86Offset](offset: OffsetType with RelativeOffset): NearPointer[OffsetType] =
-    new NearPointer[OffsetType](offset) {
-      val operandByteSize: OperandSize = offset.operandByteSize
+  def realMode(offset: Short): NearPointer =
+     new NearPointer(offset.encodeLittleEndian) {
+       override def toString: String = s"0x${offset.bigEndianHexString}"
 
-      override def encodeBytes: Seq[Byte] = offset.encode(1)
-
-      override def toString: String = s"0x${offset.encode(1).bigEndianHexString}"
+       override def operandByteSize: OperandSize = ValueSize.Word
     }
+
+  def realMode(offset: Long): NearPointer = {
+    assume(offset.toShort == offset)
+    realMode(offset.toShort)
+  }
+
+  def protectedMode(offset: Int): NearPointer =
+     new NearPointer(offset.encodeLittleEndian) {
+       override def toString: String = s"0x${offset.bigEndianHexString}"
+
+       override def operandByteSize: OperandSize = ValueSize.DoubleWord
+    }
+
 }

@@ -1,13 +1,13 @@
 package assembler.x86.operations
 
 import assembler._
-import assembler.resource.{UnlabeledEncodable, Resource}
-import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, X86Offset, NearPointer => NearPointerOperand}
-import assembler.x86.{ProcessorMode, X86OffsetFactory}
+import assembler.resource.{Resource, UnlabeledEncodable}
+import assembler.x86.ProcessorMode
+import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, NearPointer => NearPointerOperand}
 
-abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label)
+abstract class NearJumpOperation(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
-  extends ShortJumpOperation[OffsetType](shortOpcode, mnemonic, target) {
+  extends ShortJumpOperation(shortOpcode, mnemonic, target) {
 
   val forwardShortLongBoundary: Byte = Byte.MaxValue
   val backwardShortLongBoundary: Int = (-Byte.MinValue) - shortJumpSize
@@ -16,13 +16,29 @@ abstract class NearJumpOperation[OffsetType <: X86Offset: X86OffsetFactory](shor
 
   override def possibleSizes: Set[Int] = Set(shortJumpSize, longJumpSize)
 
-  def encodableForLongPointer(pointer: NearPointerOperand[OffsetType]): Resource with UnlabeledEncodable
+  def encodableForLongPointer(pointer: NearPointerOperand): Resource with UnlabeledEncodable
 
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with UnlabeledEncodable = {
-    val offset = offsetFactory.positionalOffset(distance)(offsetDirection)(shortJumpSize)
-    if (offset.isShort(shortJumpSize))
-      encodableForShortPointer(ShortPointer(offset))
-    else
-      encodableForLongPointer(LongPointer(offsetFactory.positionalOffset(distance)(offsetDirection)(longJumpSize)))
+    val shortOffset = offsetDirection match {
+      case OffsetDirection.Self => -shortJumpSize
+      case OffsetDirection.Forward => distance
+      case OffsetDirection.Backward => -distance - shortJumpSize
+    }
+    if (shortOffset.toByte == shortOffset)
+      encodableForShortPointer(ShortPointer(shortOffset.toByte))
+    else {
+      val longOffset = offsetDirection match {
+        case OffsetDirection.Self => -longJumpSize
+        case OffsetDirection.Forward => distance
+        case OffsetDirection.Backward => -distance - longJumpSize
+      }
+
+      processorMode match {
+        case ProcessorMode.Real =>
+          encodableForLongPointer(LongPointer.realMode(longOffset))
+        case _ =>
+          encodableForLongPointer(LongPointer.protectedMode(longOffset))
+      }
+    }
   }
 }

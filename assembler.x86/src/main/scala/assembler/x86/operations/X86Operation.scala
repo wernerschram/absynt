@@ -35,7 +35,7 @@ object OperandInfo {
         pointer.operandByteSize == FarPointerSize.FarWord && processorMode == ProcessorMode.Real
     } //ptrXX
 
-  def relative(pointer: memoryaccess.NearPointer[_], operandOrder: OperandOrder): OperandInfo =
+  def relative(pointer: memoryaccess.NearPointer, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(pointer, operandOrder) {
    } //relXX
 
