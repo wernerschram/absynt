@@ -1,12 +1,16 @@
 package assembler.arm.operands
 
 import assembler.ListExtensions._
-import assembler.{Offset, OffsetDirection, RelativeOffset, RelativeOffsetDirection}
+import assembler.{OffsetDirection, RelativeOffsetDirection}
 
 import scala.language.implicitConversions
 
-abstract class ArmOffset protected(val offset: Int) extends Offset {
+abstract class ArmOffset protected(val offset: Int) {
   override def toString: String = s"0x${(offset + 8).encodeBigEndian.hexString}"
+}
+
+trait RelativeOffset {
+  self: ArmOffset =>
 }
 
 sealed case class ArmRelativeOffset private(override val offset: Int) extends ArmOffset(offset) with RelativeOffset

@@ -11,12 +11,4 @@ object OffsetDirection {
   case object Self extends RelativeOffsetDirection
 }
 
-class Offset
 
-trait RelativeOffset {
-  self: Offset =>
-}
-
-trait AbsoluteOffset {
-  self: Offset =>
-}
