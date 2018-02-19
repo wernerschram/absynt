@@ -106,20 +106,20 @@ object OperandInfo {
         val operandRequirements = rm match {
           case _: GeneralPurposeRexRegister =>
             Seq(RexRequirement.instanceOperandRM)
-          case r: RegisterMemoryLocation[_] if r.reference.isInstanceOf[GeneralPurposeRexRegister with ProtectedModeIndexRegister] =>
-            Seq(RexRequirement.instanceOperandRM)
-          case r: memoryaccess.SIBMemoryLocation =>
-            val addressRequirements: Seq[RexRequirement] = Seq(
-              r.index match {
-                case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceIndex)
-                case _ => Seq.empty[RexRequirement]
-              },
-              r.base match {
-                case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceBase)
-                case _ => Seq.empty[RexRequirement]
-              }).flatten
-
-            addressRequirements
+//          case r: RegisterMemoryLocation[_] if r.reference.isInstanceOf[GeneralPurposeRexRegister with ProtectedModeIndexRegister] =>
+//            Seq(RexRequirement.instanceOperandRM)
+//          case r: memoryaccess.SIBMemoryLocation =>
+//            val addressRequirements: Seq[RexRequirement] = Seq(
+//              r.index match {
+//                case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceIndex)
+//                case _ => Seq.empty[RexRequirement]
+//              },
+//              r.base match {
+//                case _: GeneralPurposeRexRegister => Seq(RexRequirement.instanceBase)
+//                case _ => Seq.empty[RexRequirement]
+//              }).flatten
+//
+//            addressRequirements
           case _ => Seq.empty
         }
         if (includeRexW)
@@ -149,10 +149,7 @@ sealed abstract class AddressOperandInfo(val operand: Operand with FixedSizeOper
 
   def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
 
-  def rexRequirements: Seq[RexRequirement] = operand match {
-    case f: FixedSizeOperand if f.operandByteSize == ValueSize.QuadWord => Seq(RexRequirement.quadOperand)
-    case _ => Seq.empty
-  }
+  def rexRequirements: Seq[RexRequirement] = Seq.empty
 }
 
 trait AddressSizePrefix {
@@ -164,7 +161,14 @@ trait AddressSizePrefix {
 
 object AddressOperandInfo {
   def rmIndex(register: GeneralPurposeRegister with IndexRegister): AddressOperandInfo =
-    new AddressOperandInfo(register) with AddressSizePrefix
+    new AddressOperandInfo(register) with AddressSizePrefix {
+      override def rexRequirements: Seq[RexRequirement] = register match {
+        case _: GeneralPurposeRexRegister =>
+          Seq(RexRequirement.instanceOperandRM) ++ super.rexRequirements
+        case _ =>
+          super.rexRequirements
+      }
+    }
 
   def rmBase(register: GeneralPurposeRegister with BaseRegisterReference): AddressOperandInfo =
     new AddressOperandInfo(register) with AddressSizePrefix
@@ -173,10 +177,24 @@ object AddressOperandInfo {
     new AddressOperandInfo(displacement) with AddressSizePrefix
 
   def SIBBase(register: GeneralPurposeRegister with SIBBaseRegister): AddressOperandInfo =
-    new AddressOperandInfo(register) with AddressSizePrefix
+    new AddressOperandInfo(register) with AddressSizePrefix {
+      override def rexRequirements: Seq[RexRequirement] = register match {
+        case _: GeneralPurposeRexRegister =>
+          Seq(RexRequirement.instanceBase)
+        case _ =>
+          Seq.empty
+      }
+    }
 
   def SIBIndex(register: GeneralPurposeRegister with SIBIndexRegister): AddressOperandInfo =
-    new AddressOperandInfo(register) with AddressSizePrefix
+    new AddressOperandInfo(register) with AddressSizePrefix {
+      override def rexRequirements: Seq[RexRequirement] = register match {
+        case _: GeneralPurposeRexRegister =>
+          Seq(RexRequirement.instanceIndex)
+        case _ =>
+          Seq.empty
+      }
+    }
 
   def memoryOffset(offset: memoryaccess.MemoryLocation with FixedSizeOperand): AddressOperandInfo =
     new AddressOperandInfo(offset) with AddressSizePrefix

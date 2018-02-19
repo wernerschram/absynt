@@ -3,7 +3,7 @@ package assembler.x86.instructions
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
-import assembler.x86.operations.OperandInfo.OperandOrder._
+import assembler.x86.operations.OperandInfo.OperandOrder
 import assembler.x86.operations.{OperandInfo, Repeated, Static}
 
 object StoreString {
@@ -18,24 +18,24 @@ object StoreString {
 
   private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(Register.AL, source))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, OperandOrder.destination), OperandInfo.implicitOperand(Register.AL, OperandOrder.source))
     }
 
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                       (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(register, source))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, OperandOrder.destination), OperandInfo.implicitOperand(register, OperandOrder.source))
     }
 
   private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with Repeated {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(Register.AL, source))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, OperandOrder.destination), OperandInfo.implicitOperand(Register.AL, OperandOrder.source))
     }
 
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                          (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with Repeated {
-      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, destination), OperandInfo.implicitOperand(register, source))
+      override def operands: Seq[OperandInfo] = Seq(OperandInfo.implicitAddress(destination, OperandOrder.destination), OperandInfo.implicitOperand(register, OperandOrder.source))
     }
 
   object Repeat {

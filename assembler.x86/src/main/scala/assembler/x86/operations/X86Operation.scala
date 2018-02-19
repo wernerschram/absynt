@@ -48,7 +48,7 @@ abstract class X86Operation extends UnlabeledEncodable {
   }
 
   def rexRequirements: Seq[RexRequirement] =
-    operands.flatMap(_.rexRequirements)
+    operands.flatMap(o => o.rexRequirements ++ o.addressOperands.flatMap(_.rexRequirements))
 
   def code: Seq[Byte]
 
