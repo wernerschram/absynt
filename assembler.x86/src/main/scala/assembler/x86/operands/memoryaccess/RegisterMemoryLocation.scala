@@ -6,10 +6,10 @@ import assembler.x86.operands._
 
 import scala.language.implicitConversions
 
-sealed class RegisterMemoryLocation[T <: RegisterReference] private(val reference: T, displacement: Option[Displacement], segment: SegmentRegister)
+sealed class RegisterMemoryLocation[T <: RegisterReference] private(val reference: T, displacement: Option[ImmediateValue], segment: SegmentRegister)
   extends IndirectMemoryLocation(reference.indexCode,
      if (reference.onlyWithDisplacement)
-      Some(displacement.getOrElse(Displacement(0.toByte)))
+      Some(displacement.getOrElse(ImmediateValue.byteToImmediate(0.toByte)))
     else
       displacement
   , reference.operandByteSize, segment)
@@ -21,14 +21,14 @@ sealed class RegisterMemoryLocation[T <: RegisterReference] private(val referenc
 
   private def displacementString = displacement match {
     case None => ""
-    case Some(d) => s"+${d.encode.decimalString}"
+    case Some(d) => s"+${d.value.decimalString}"
   }
 
   val actualDisplacement: Seq[Byte] =
     if (reference.onlyWithDisplacement)
-      displacement.map(_.encode).getOrElse(Seq(0.toByte))
+      displacement.map(_.value).getOrElse(Seq(0.toByte))
     else
-      displacement.toSeq.flatMap(_.encode)
+      displacement.toSeq.flatMap(_.value)
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
 
@@ -44,7 +44,7 @@ object RegisterMemoryLocation {
   def apply[T<:RegisterReference](index: T)=
     new RegisterMemoryLocation(index, None, index.defaultSegment)
 
-  def apply[T<:RegisterReference](index: T, displacement: Displacement)=
+  def apply[T<:RegisterReference](index: T, displacement: ImmediateValue)=
     new RegisterMemoryLocation(index, Some(displacement), index.defaultSegment)
 
   def withSize(index: RegisterReference)(size: ValueSize): RegisterMemoryLocation[RegisterReference] with FixedSizeOperand =
@@ -54,7 +54,7 @@ object RegisterMemoryLocation {
       override def toString = s"$operandByteSize PTR ${super.toString()}"
     }
 
-  def withSize(index: RegisterReference, displacement: Displacement)(size: ValueSize): RegisterMemoryLocation[RegisterReference] with FixedSizeOperand =
+  def withSize(index: RegisterReference, displacement: ImmediateValue)(size: ValueSize): RegisterMemoryLocation[RegisterReference] with FixedSizeOperand =
     new RegisterMemoryLocation[RegisterReference](index, Some(displacement), index.defaultSegment) with FixedSizeOperand {
       override val operandByteSize: OperandSize = size
 
@@ -65,7 +65,7 @@ object RegisterMemoryLocation {
     def apply[T<:RegisterReference](index: T, segment: SegmentRegister) =
       new RegisterMemoryLocation(index, None, segment)
 
-    def apply[T<:RegisterReference](index: T, displacement: Displacement , segment: SegmentRegister) =
+    def apply[T<:RegisterReference](index: T, displacement: ImmediateValue, segment: SegmentRegister) =
       new RegisterMemoryLocation(index, Some(displacement), segment)
 
     def withSize(index: RegisterReference, segment: SegmentRegister)(size: ValueSize): RegisterMemoryLocation[RegisterReference] with FixedSizeOperand =
@@ -75,7 +75,7 @@ object RegisterMemoryLocation {
         override def toString = s"$operandByteSize PTR ${super.toString()}"
       }
 
-    def withSize(index: RegisterReference, displacement: Displacement, segment: SegmentRegister)(size: ValueSize): RegisterMemoryLocation[RegisterReference] with FixedSizeOperand =
+    def withSize(index: RegisterReference, displacement: ImmediateValue, segment: SegmentRegister)(size: ValueSize): RegisterMemoryLocation[RegisterReference] with FixedSizeOperand =
       new RegisterMemoryLocation[RegisterReference](index, Some(displacement), segment) with FixedSizeOperand {
         override val operandByteSize: OperandSize = size
 

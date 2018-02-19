@@ -1,6 +1,6 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.{ImmediateValue, OperandSize}
+import assembler.x86.operands.ImmediateValue
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
 trait Immediate extends X86Operation {

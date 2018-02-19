@@ -7,7 +7,6 @@ import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.memoryaccess.Displacement._
 import assembler.x86.operands.memoryaccess._
 import org.scalatest.{Matchers, WordSpec}
 
