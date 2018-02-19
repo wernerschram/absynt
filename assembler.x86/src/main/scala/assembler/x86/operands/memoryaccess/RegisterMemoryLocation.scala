@@ -12,8 +12,7 @@ sealed class RegisterMemoryLocation[T <: RegisterReference] private(val referenc
      if (reference.onlyWithDisplacement)
       Some(displacement.getOrElse(ImmediateValue(0.toByte)))
     else
-      displacement
-  , reference.operandByteSize, segment)
+      displacement, segment)
     with ModRMEncodableOperand {
 
   override val addressOperands: Seq[AddressOperandInfo] = reference match {

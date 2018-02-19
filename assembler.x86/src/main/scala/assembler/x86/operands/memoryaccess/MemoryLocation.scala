@@ -3,7 +3,7 @@ package assembler.x86.operands.memoryaccess
 import assembler.x86.operands._
 import assembler.x86.operations.AddressOperandInfo
 
-abstract class MemoryLocation(val displacement: Option[ImmediateValue], val segment: SegmentRegister, val addressSize: OperandSize)
+abstract class MemoryLocation(val displacement: Option[ImmediateValue], val segment: SegmentRegister)
   extends ModRMEncodableOperand {
 
   def addressOperands: Seq[AddressOperandInfo] = Seq.empty

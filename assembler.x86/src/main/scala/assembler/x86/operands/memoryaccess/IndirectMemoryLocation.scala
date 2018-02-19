@@ -3,8 +3,8 @@ package assembler.x86.operands.memoryaccess
 import assembler.x86.operands.{ImmediateValue, OperandSize, SegmentRegister}
 
 abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue] = None,
-                                      addressSize: OperandSize, segment: SegmentRegister)
-  extends MemoryLocation(displacement, segment, addressSize) {
+                                      segment: SegmentRegister)
+  extends MemoryLocation(displacement, segment) {
 
   val modValue: Byte = {
     displacement match {

@@ -8,7 +8,7 @@ import assembler.x86.operations.AddressOperandInfo
 //TODO: of Page 2-7 of the intel software development manual (325383-sdm-vol-2abcd.pdf) Notes: 1. and Scaled Index == none are not implemented
 sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRegister, val base: GeneralPurposeRegister with SIBBaseRegister,
   displacement: Option[ImmediateValue] = None, val scale: Int, segment: SegmentRegister)
-  extends IndirectMemoryLocation(0x04, displacement, index.operandByteSize, segment) with ModRMEncodableOperand {
+  extends IndirectMemoryLocation(0x04, displacement, segment) with ModRMEncodableOperand {
 
   assume(index.operandByteSize == base.operandByteSize)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))

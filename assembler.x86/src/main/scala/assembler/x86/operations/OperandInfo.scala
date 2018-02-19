@@ -1,8 +1,8 @@
 package assembler.x86.operations
 
-import assembler.x86.{ProcessorMode, RexRequirement}
 import assembler.x86.operands._
-import assembler.x86.operands.memoryaccess.{IndirectMemoryLocation, RegisterMemoryLocation}
+import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
+import assembler.x86.{ProcessorMode, RexRequirement}
 
 sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.OperandOrder.Value) extends Ordered[OperandInfo] {
   override def toString: String = operand.toString
@@ -10,8 +10,6 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
   override def compare(that: OperandInfo): Int = order compare that.order
 
   def requiresOperandSize(processorMode: ProcessorMode): Boolean = false
-
-  def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
 
   def addressOperands: Seq[AddressOperandInfo] = Seq.empty
 
@@ -68,13 +66,6 @@ object OperandInfo {
         case l: memoryaccess.MemoryLocation => l.addressOperands
         case _ => Seq.empty
       }
-
-      override def requiresAddressSize(processorMode: ProcessorMode): Boolean = operand match {
-        case f: memoryaccess.MemoryLocation =>
-          f.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
-          f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
-        case _ => false
-      }
     } //XX
 
   def encodedRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
@@ -97,10 +88,6 @@ object OperandInfo {
         case l: memoryaccess.MemoryLocation => l.addressOperands
         case _ => Seq.empty
       }
-
-      override def requiresAddressSize(processorMode: ProcessorMode): Boolean =
-          offset.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
-          offset.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
     } //moffsXX
 
   def rmRegisterOrMemory(rm: ModRMEncodableOperand, operandOrder: OperandOrder, includeRexW: Boolean): OperandInfo =
@@ -115,13 +102,6 @@ object OperandInfo {
       override def addressOperands: Seq[AddressOperandInfo] = rm match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
         case _ => Seq.empty
-      }
-
-      override def requiresAddressSize(processorMode: ProcessorMode): Boolean = rm match {
-        case f: memoryaccess.MemoryLocation =>
-          f.addressSize == ValueSize.Word && processorMode == ProcessorMode.Protected ||
-          f.addressSize == ValueSize.DoubleWord && processorMode != ProcessorMode.Protected
-        case _ => false
       }
 
       override def rexRequirements: Seq[RexRequirement] = {

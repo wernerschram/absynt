@@ -5,13 +5,13 @@ import assembler.x86.operands._
 import assembler.x86.operations.AddressOperandInfo
 
 sealed class MemoryAddress private(address: ImmediateValue, segment: SegmentRegister = Register.DS)
-  extends MemoryLocation(Some(address), segment, ValueSize.sizeOfValue(address.value.size)) with ModRMEncodableOperand {
+  extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {
 
   override val addressOperands: Seq[AddressOperandInfo] = Seq(AddressOperandInfo.rmDisplacement(address))
 
   override val modValue: Byte = 0x00.toByte
 
-  override val registerOrMemoryModeCode: Byte = if (addressSize == ValueSize.Word) 0x06.toByte else 0x05.toByte
+  override val registerOrMemoryModeCode: Byte = if (address.operandByteSize == ValueSize.Word) 0x06.toByte else 0x05.toByte
   override val defaultSegment: SegmentRegister = Register.DS
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ address.value
