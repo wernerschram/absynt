@@ -10,7 +10,7 @@ sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRe
   displacement: Option[ImmediateValue] = None, val scale: Int, segment: SegmentRegister)
   extends IndirectMemoryLocation(0x04, displacement, segment) with ModRMEncodableOperand {
 
-  assume(index.operandByteSize == base.operandByteSize)
+  assume(index sizeEquals  base)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
   override val addressOperands: Set[AddressOperandInfo] = Set(AddressOperandInfo.SIBBase(base), AddressOperandInfo.SIBIndex(index))
