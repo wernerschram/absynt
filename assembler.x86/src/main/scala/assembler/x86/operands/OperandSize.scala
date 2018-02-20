@@ -34,21 +34,16 @@ trait QuadWordSize extends LongSize {
   override val operandByteSize: OperandSize = ValueSize.QuadWord
 }
 
-trait FarPointerSize2 {
-  val farPointerSize: FarPointerSize
+sealed trait FarPointerSize {
 }
 
-trait FarDoubleWordSize extends FarPointerSize2 {
-  override val farPointerSize: FarPointerSize = FarPointerSize.DoubleWord
+trait FarDoubleWordSize extends FarPointerSize {
 }
 
-trait FarWordSize extends FarPointerSize2 {
-  override val farPointerSize: FarPointerSize = FarPointerSize.FarWord
+trait FarWordSize extends FarPointerSize {
 }
 
 sealed class ValueSize(override val toString: String) extends OperandSize
-
-sealed class FarPointerSize(override val toString: String) extends OperandSize
 
 object ValueSize {
 
@@ -62,8 +57,3 @@ object ValueSize {
 
 }
 
-object FarPointerSize {
-  case object DoubleWord extends FarPointerSize("DWORD")
-
-  case object FarWord extends FarPointerSize("FWORD")
-}
