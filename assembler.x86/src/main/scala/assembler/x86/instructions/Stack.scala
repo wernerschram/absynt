@@ -9,19 +9,19 @@ object Push {
   implicit val opcode: String = "push"
 
   def apply(register: WideRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[WideRegister] =
-    R16(register)
+    (register, processorMode) match {
+      case (r: WordSize, _) =>
+        R16(r)
+      case (r: QuadWordSize, ProcessorMode.Long) =>
+        R16(r)
+      case (r: DoubleWordSize, ProcessorMode.Protected | ProcessorMode.Real) =>
+        R16(r)
+      case _ =>
+        throw new AssertionError
+    }
 
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](register, Seq(0x50.toByte), opcode, includeRexW = false) {
-      override def validate(): Unit = {
-        super.validate()
-        processorMode match {
-          case ProcessorMode.Protected => assume(register.operandByteSize != ValueSize.QuadWord)
-          case ProcessorMode.Long => assume(register.operandByteSize != ValueSize.DoubleWord)
-          case _ => assume(register.operandByteSize != ValueSize.Byte)
-        }
-      }
-
       override def registerOrder: OperandOrder = destination
     }
 
@@ -42,27 +42,23 @@ object Push {
       override def operandRMOrder: OperandOrder = destination
     }
 
-  def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate = immediate.operandByteSize match {
-    case ValueSize.Byte => Imm8(immediate)
-    case ValueSize.Word | ValueSize.DoubleWord => Imm16(immediate)
+  def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate =
+    immediate match {
+    case i: ByteSize => Imm8(i)
+    case i: ExtendedSize => Imm16(i)
     case _ => throw new AssertionError
   }
 
-  private def Imm8(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new Static(0x6A.toByte :: Nil, opcode) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
       override def immediateOrder: OperandOrder = destination
     }
 
-  private def Imm16(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm16(immediateValue: ImmediateValue with ExtendedSize)(implicit processorMode: ProcessorMode) =
     new Static(0x68.toByte :: Nil, opcode) with Immediate {
       override def immediate: ImmediateValue = immediateValue
-
-      override def validate(): Unit = {
-        super.validate()
-        assume(immediate.operandByteSize != ValueSize.QuadWord)
-      }
 
       override def immediateOrder: OperandOrder = destination
     }
