@@ -6,60 +6,63 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
-import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
 abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
-  def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode):
-    Static with NearPointerOperation = Rel8(nearPointer)
+  def apply(nearPointer: NearPointer with ValueSize2)(implicit processorMode: ProcessorMode): X86Operation = nearPointer match {
+    case p: NearPointer with ByteSize =>
+      short(p)
+    case _ =>
+      throw new AssertionError
+  }
+
+  def short(nearPointer: NearPointer with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
+    Rel8(nearPointer)
 
   def apply(targetLabel: Label)(implicit processorMode: ProcessorMode): ShortJumpOperation = {
     new ShortJumpOperation(shortOpcode, mnemonic, targetLabel) {
-      override def encodableForShortPointer(nearPointer: NearPointer): Resource with UnlabeledEncodable =
+      override def encodableForShortPointer(nearPointer: NearPointer with ByteSize): Resource with UnlabeledEncodable =
         Rel8(nearPointer)
     }
   }
 
-  protected def Rel8(nearPointer: NearPointer)(implicit processorMode: ProcessorMode):
-    Static with NearPointerOperation = {
-    assert(nearPointer.operandByteSize == ValueSize.Byte)
+  protected def Rel8(nearPointer: NearPointer with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
     new Static(shortOpcode, mnemonic) with NearPointerOperation {
       override val pointer: NearPointer = nearPointer
 
       override def pointerOrder: OperandOrder = destination
     }
-  }
 }
 
 abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
   extends ShortRelativeJump(shortOpcode, mnemonic) {
 
-  override def apply(nearPointer: NearPointer)(implicit processorMode: ProcessorMode):
-    Static with NearPointerOperation =
-    if (nearPointer.operandByteSize == ValueSize.Byte)
-      Rel8(nearPointer)
-    else
-      Rel16(nearPointer)
+  override def apply(nearPointer: NearPointer with ValueSize2)(implicit processorMode: ProcessorMode): X86Operation =
+    (processorMode, nearPointer) match {
+      case (_, p: NearPointer with ByteSize) =>
+        short(p)
+      case (ProcessorMode.Real, p: NearPointer with WordSize) =>
+        long(p)
+      case (ProcessorMode.Protected | ProcessorMode.Long, p: NearPointer with DoubleWordSize) =>
+        long(p)
+      case _ => throw new AssertionError
+    }
+
+  def long(nearPointer: NearPointer with WideSize)(implicit processorMode: ProcessorMode): X86Operation =
+    Rel16(nearPointer)
 
   private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
     new Static(longOpcode, mnemonic) with NearPointerOperation {
       override val pointer: NearPointer = nearPointer
-
-      override def validate(): Unit = {
-        super.validate()
-        processorMode match {
-          case ProcessorMode.Long | ProcessorMode.Protected => assume(pointer.operandByteSize != ValueSize.Word)
-          case ProcessorMode.Real => assume(pointer.operandByteSize == ValueSize.Word)
-        }
-      }
-
       override def pointerOrder: OperandOrder = destination
     }
   }
 
   override def apply(targetLabel: Label)(implicit processorMode: ProcessorMode): NearJumpOperation = {
     new NearJumpOperation(shortOpcode, longOpcode, mnemonic, targetLabel) {
-      override def encodableForShortPointer(nearPointer: NearPointer): Resource with UnlabeledEncodable = Rel8(nearPointer)
+      override def encodableForShortPointer(nearPointer: NearPointer with ByteSize): Resource with UnlabeledEncodable =
+        Rel8(nearPointer)
 
       override def encodableForLongPointer(nearPointer: NearPointer): Resource with UnlabeledEncodable = Rel16(nearPointer)
     }

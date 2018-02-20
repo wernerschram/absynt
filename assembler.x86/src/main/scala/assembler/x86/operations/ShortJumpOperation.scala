@@ -2,6 +2,7 @@ package assembler.x86.operations
 
 import assembler._
 import assembler.resource.{RelativeReference, Resource, UnlabeledEncodable}
+import assembler.x86.operands.ByteSize
 import assembler.x86.operands.memoryaccess.{ShortPointer, NearPointer => NearPointerOperand}
 
 abstract class ShortJumpOperation
@@ -10,7 +11,7 @@ abstract class ShortJumpOperation
 
   val shortJumpSize: Int = shortOpcode.length + 1
 
-  def encodableForShortPointer(pointer: NearPointerOperand): Resource with UnlabeledEncodable
+  def encodableForShortPointer(pointer: NearPointerOperand with ByteSize): Resource with UnlabeledEncodable
 
   override def toString = s"$mnemonic $target"
 
@@ -21,7 +22,9 @@ abstract class ShortJumpOperation
       case OffsetDirection.Forward => distance
       case OffsetDirection.Backward => -distance - shortJumpSize
     }
-    encodableForShortPointer(ShortPointer(offset))
+    val offsetShort: Byte = offset.toByte
+    assume(offsetShort == offset)
+    encodableForShortPointer(ShortPointer(offsetShort))
   }
 
   override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
