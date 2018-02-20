@@ -4,7 +4,7 @@ import assembler.Label
 import assembler.resource.{Resource, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
-import assembler.x86.operands.{FixedSizeOperand, ModRMEncodableOperand, ValueSize}
+import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
@@ -69,18 +69,19 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
 object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
   def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
-    RM16(operand)
+    (operand, processorMode) match {
+      case (o: ModRMEncodableOperand with ExtendedSize, ProcessorMode.Real | ProcessorMode.Protected) =>
+        RM16(o)
+      case (o: ModRMEncodableOperand with QuadWordSize, ProcessorMode.Long) =>
+        RM16(o)
+      case (o: ModRMEncodableOperand with ValueSize2, _) =>
+        throw new AssertionError
+      case _ =>
+        RM16(operand)
+    }
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
-      assume((operandRM, processorMode) match {
-        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Long)
-          if fixed.operandByteSize != ValueSize.QuadWord => false
-        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected)
-          if fixed.operandByteSize == ValueSize.QuadWord => false
-        case _ => true
-      })
-
       override def operandRMOrder: OperandOrder = destination
     }
 
@@ -89,14 +90,8 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
       override def pointer: FarPointer = farPointer
     }
 
-  private def M1616(operand: MemoryLocation)(implicit processorMode: ProcessorMode) =
+  private def M1616(operand: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
-      assume((operandRM, processorMode) match {
-        case (fixed: ModRMEncodableOperand with FixedSizeOperand, ProcessorMode.Real | ProcessorMode.Protected)
-          if fixed.operandByteSize == ValueSize.QuadWord => false
-        case _ => true
-      })
-
       override def operandRMOrder: OperandOrder = destination
     }
 
@@ -104,8 +99,13 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =
       Ptr1616(farPointer)
 
-    def apply(pointer: MemoryLocation)(implicit processorMode: ProcessorMode): ModRMStatic =
-      M1616(pointer)
+    def apply(pointer: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode): ModRMStatic =
+      (pointer, processorMode) match {
+        case (_: QuadWordSize, ProcessorMode.Protected | ProcessorMode.Real) =>
+          throw new AssertionError
+        case _ =>
+          M1616(pointer)
+      }
   }
 
 }
