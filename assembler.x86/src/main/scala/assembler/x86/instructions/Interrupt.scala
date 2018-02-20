@@ -1,7 +1,7 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.{ByteSize, ImmediateValue, ValueSize}
+import assembler.x86.operands.{ByteSize, ImmediateValue}
 import assembler.x86.operations.{Immediate, OperandInfo, Static}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 

@@ -8,7 +8,3 @@ trait ModRMEncodableOperand extends Operand {
 
   private def getModRM(rValue: Byte): Byte = (((modValue & 3) << 6) | ((rValue & 7) << 3) | (registerOrMemoryModeCode & 7)).toByte
 }
-
-trait FixedSizeOperand {
-  def operandByteSize: OperandSize
-}
