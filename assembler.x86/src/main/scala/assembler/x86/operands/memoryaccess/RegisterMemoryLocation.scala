@@ -106,7 +106,6 @@ object RegisterMemoryLocation {
 
     def quadWordSize[T<:RegisterReference](index: T, displacement: ImmediateValue, segment: SegmentRegister)=
       new RegisterMemoryLocation(index, Some(displacement), segment) with QuadWordSize
-
   }
 
   implicit def indexWrapper(index: DestinationIndex with IndexRegister): RegisterMemoryLocation[DestinationIndex with IndexRegister] =

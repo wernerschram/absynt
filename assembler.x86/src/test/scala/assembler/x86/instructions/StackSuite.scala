@@ -22,7 +22,7 @@ class StackSuite extends WordSpec with Matchers {
       }
 
       "correctly encode push WORD PTR [0x0001]" in {
-        Push(MemoryAddress.withSize(0x0001.toShort)(ValueSize.Word)).encodeByte should be(Hex.lsb("FF 36 01 00"))
+        Push(MemoryAddress.wordSize(0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {

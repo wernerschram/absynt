@@ -24,10 +24,15 @@ object MemoryAddress {
   def apply(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
     new MemoryAddress(address, segment)
 
-  def withSize(address: ImmediateValue, segment: SegmentRegister = Register.DS)(size: ValueSize): MemoryAddress with FixedSizeOperand =
-    new MemoryAddress(address, segment) with FixedSizeOperand {
-      override val operandByteSize: OperandSize = size
+  def byteSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
+    new MemoryAddress(address, segment) with ByteSize
 
-      override def toString = s"$operandByteSize PTR ${super.toString}"
-    }
+  def wordSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
+    new MemoryAddress(address, segment) with WordSize
+
+  def doubleWordSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
+    new MemoryAddress(address, segment) with DoubleWordSize
+
+  def quadWordSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
+    new MemoryAddress(address, segment) with QuadWordSize
 }
