@@ -29,7 +29,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
         Imm16ToRM16(destination, imm)
       case (_: QuadWordSize, _) =>
         throw new AssertionError
-      case (_, dest: ValueSize2) if !(dest sizeEquals immediate) =>
+      case (_, dest: ValueSize) if !(dest sizeEquals immediate) =>
         throw new AssertionError
       case (imm: WideSize, _) =>
         Imm16ToRM16(destination, imm)
@@ -138,7 +138,7 @@ object Xor extends BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
 object Not {
   implicit val opcode: String = "not"
 
-  def apply(operand: ModRMEncodableOperand with ValueSize2)(implicit processorMode: ProcessorMode): ModRMStatic =
+  def apply(operand: ModRMEncodableOperand with ValueSize)(implicit processorMode: ProcessorMode): ModRMStatic =
     operand match {
       case o:ByteSize => RM8(o)
       case o:WideSize => RM16(o)

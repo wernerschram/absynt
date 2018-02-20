@@ -5,7 +5,7 @@ import assembler.x86.ProcessorMode
 sealed abstract class Register extends Operand
 
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String)
-  extends Register with ModRMEncodableOperand with ValueSize2 {
+  extends Register with ModRMEncodableOperand with ValueSize {
   val modValue: Byte = 0x03.toByte
   val registerOrMemoryModeCode: Byte = registerCode
 }

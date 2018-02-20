@@ -10,7 +10,7 @@ import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperat
 
 abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
-  def apply(nearPointer: NearPointer with ValueSize2)(implicit processorMode: ProcessorMode): X86Operation = nearPointer match {
+  def apply(nearPointer: NearPointer with ValueSize)(implicit processorMode: ProcessorMode): X86Operation = nearPointer match {
     case p: NearPointer with ByteSize =>
       short(p)
     case _ =>
@@ -38,7 +38,7 @@ abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemon
 abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
   extends ShortRelativeJump(shortOpcode, mnemonic) {
 
-  override def apply(nearPointer: NearPointer with ValueSize2)(implicit processorMode: ProcessorMode): X86Operation =
+  override def apply(nearPointer: NearPointer with ValueSize)(implicit processorMode: ProcessorMode): X86Operation =
     (processorMode, nearPointer) match {
       case (_, p: NearPointer with ByteSize) =>
         short(p)
@@ -77,7 +77,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
         RM16(o)
       case (o: ModRMEncodableOperand with QuadWordSize, ProcessorMode.Long) =>
         RM16(o)
-      case (o: ModRMEncodableOperand with ValueSize2, _) =>
+      case (o: ModRMEncodableOperand with ValueSize, _) =>
         throw new AssertionError
       case _ =>
         RM16(operand)

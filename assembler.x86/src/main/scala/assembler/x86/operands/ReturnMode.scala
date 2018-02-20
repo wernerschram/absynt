@@ -1,6 +1,6 @@
 package assembler.x86.operands
 
-sealed abstract class ReturnMode extends Operand with ValueSize2
+sealed abstract class ReturnMode extends Operand with ValueSize
 
 object ReturnMode {
   object Protected extends ReturnMode with DoubleWordSize {

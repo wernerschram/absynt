@@ -115,7 +115,7 @@ object OperandInfo {
 
 }
 
-sealed abstract class AddressOperandInfo(val operand: Operand with ValueSize2) {
+sealed abstract class AddressOperandInfo(val operand: Operand with ValueSize) {
   override def toString: String = operand.toString
 
   def requiresAddressSize(processorMode: ProcessorMode): Boolean = false
@@ -170,7 +170,7 @@ object AddressOperandInfo {
       }
     }
 
-  def memoryOffset(offset: memoryaccess.MemoryLocation with ValueSize2): AddressOperandInfo =
+  def memoryOffset(offset: memoryaccess.MemoryLocation with ValueSize): AddressOperandInfo =
     new AddressOperandInfo(offset) with AddressSizePrefix
 
 }

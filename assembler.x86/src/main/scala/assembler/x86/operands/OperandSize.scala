@@ -2,37 +2,36 @@ package assembler.x86.operands
 
 sealed class OperandSize
 
-//TODO Remove original ValueSize class and FixedSize traits
-trait ValueSize2 {
+trait ValueSize {
   def sizeName: String
   override def toString = s"$sizeName PTR ${super.toString}"
-  def sizeEquals(that: ValueSize2): Boolean
+  def sizeEquals(that: ValueSize): Boolean
 }
 
-trait WideSize extends ValueSize2 //16, 32, 64
+trait WideSize extends ValueSize //16, 32, 64
 
 trait ExtendedSize extends WideSize //16, 32
 
 trait LongSize extends WideSize //32, 64
 
-trait ByteSize extends ValueSize2 {
+trait ByteSize extends ValueSize {
   override val sizeName = "BYTE"
-  def sizeEquals(that: ValueSize2): Boolean = that.isInstanceOf[ByteSize]
+  def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[ByteSize]
 }
 
 trait WordSize extends ExtendedSize {
   override val sizeName = "WORD"
-  def sizeEquals(that: ValueSize2): Boolean = that.isInstanceOf[WordSize]
+  def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[WordSize]
 }
 
 trait DoubleWordSize extends ExtendedSize with LongSize {
   override val sizeName = "DWORD"
-  def sizeEquals(that: ValueSize2): Boolean = that.isInstanceOf[DoubleWordSize]
+  def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[DoubleWordSize]
 }
 
 trait QuadWordSize extends LongSize {
   override val sizeName = "QWORD"
-  def sizeEquals(that: ValueSize2): Boolean = that.isInstanceOf[QuadWordSize]
+  def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[QuadWordSize]
 }
 
 // TODO: Implement and test toString for FarPointerSize
