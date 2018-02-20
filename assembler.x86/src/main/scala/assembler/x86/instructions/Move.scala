@@ -125,12 +125,11 @@ object Move {
       override def offsetOrder: OperandOrder = source
     }
 
-  def apply(source: ImmediateValue, destination: ByteRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate =
+  def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate =
     Imm8ToR8(destination, source)
 
-  private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[ByteRegister](register, Seq(0xB0.toByte), mnemonic) with Immediate {
-      assume(register.operandByteSize == immediateValue.operandByteSize)
       override def immediate: ImmediateValue = immediateValue
 
       override def immediateOrder: OperandOrder = source
@@ -143,7 +142,7 @@ object Move {
 
   private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideRegister](register, Seq(0xB8.toByte), mnemonic) with Immediate {
-      assume(register.operandByteSize == immediateValue.operandByteSize)
+      assume(register sizeEquals immediateValue)
       override def immediate: ImmediateValue = immediateValue
 
       override def immediateOrder: OperandOrder = source
@@ -182,16 +181,15 @@ object Move {
     }
   }
 
-  def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRMStatic
-    with Immediate =
-    source.operandByteSize match {
-      case ValueSize.Byte =>
-        Imm8ToRM8(destination, source)
-      case _ =>
-        Imm16ToRM16(destination, source)
+  def apply(source: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): X86Operation =
+    source match {
+      case b: ByteSize =>
+        Imm8ToRM8(destination, b)
+      case w: WideSize =>
+        Imm16ToRM16(destination, w)
     }
 
-  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
@@ -200,7 +198,7 @@ object Move {
       override def immediateOrder: OperandOrder = source
     }
 
-  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
+  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with WideSize)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
