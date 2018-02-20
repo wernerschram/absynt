@@ -67,8 +67,6 @@ sealed abstract class BaseIndexReference(
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
 
-  val operandByteSize: OperandSize = index.operandByteSize
-
   override def toString = s"$base+$index"
 }
 
