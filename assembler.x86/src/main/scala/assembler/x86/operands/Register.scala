@@ -37,7 +37,7 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
   override def toString: String = mnemonic
 }
 
-sealed trait RegisterReference extends FixedSizeOperand {
+sealed trait RegisterReference {
   val defaultSegment: SegmentRegister = Register.DS
   val indexCode: Byte
 
@@ -79,7 +79,7 @@ object BaseIndexReference {
   object BP_DI extends BaseIndexReference(Register.BP, Register.DI, 0x03)
 }
 
-sealed trait BaseRegisterReference extends ModRMEncodableOperand with FixedSizeOperand {
+sealed trait BaseRegisterReference extends ModRMEncodableOperand {
   self: GeneralPurposeRegister =>
 
   def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference
@@ -93,12 +93,12 @@ sealed trait ProtectedModeIndexRegister extends IndexRegister {
   override val indexCode: Byte = self.registerOrMemoryModeCode
 }
 
-sealed trait SIBIndexRegister extends ModRMEncodableOperand with FixedSizeOperand {
+sealed trait SIBIndexRegister extends ModRMEncodableOperand {
   val defaultSIBSegment: SegmentRegister = Register.DS
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait SIBBaseRegister extends ModRMEncodableOperand with FixedSizeOperand {
+sealed trait SIBBaseRegister extends ModRMEncodableOperand {
   val SIBBaseCode: Byte = registerOrMemoryModeCode
 }
 
