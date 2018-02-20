@@ -25,20 +25,20 @@ object Push {
       override def registerOrder: OperandOrder = destination
     }
 
-  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
-    RM16(operand)
+  def apply(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): ModRMStatic =
+    (processorMode, operand) match {
+      case (_, o: WordSize) =>
+        RM16(o)
+      case (ProcessorMode.Protected | ProcessorMode.Real, o: DoubleWordSize) =>
+        RM16(o)
+      case (ProcessorMode.Long, o: QuadWordSize) =>
+        RM16(o)
+      case _ =>
+        throw new AssertionError
+    }
 
-  private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+  private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
-      override def validate(): Unit = {
-        super.validate()
-        processorMode match {
-          case ProcessorMode.Protected => assume(operand.operandByteSize != ValueSize.QuadWord)
-          case ProcessorMode.Long => assume(operand.operandByteSize != ValueSize.DoubleWord)
-          case _ => assume(operand.operandByteSize != ValueSize.Byte)
-        }
-      }
-
       override def operandRMOrder: OperandOrder = destination
     }
 

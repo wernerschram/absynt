@@ -15,24 +15,12 @@ class StackSuite extends WordSpec with Matchers {
 
       import ProcessorMode.Real._
 
-      "throw an AssertionError for push BYTE PTR [bp]" in {
-        an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.byteSize(BP)).encodeByte
-        }
-      }
-
       "correctly encode push WORD PTR [0x0001]" in {
         Push(MemoryAddress.wordSize(0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
         Push(RegisterMemoryLocation.doubleWordSize(BX.combinedIndex(SI))).encodeByte should be(0x66.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
-      }
-
-      "throw an AssertionError for push cl" in {
-        an[AssertionError] should be thrownBy {
-          Push(CL).encodeByte
-        }
       }
 
       "correctly encode push bx" in {
