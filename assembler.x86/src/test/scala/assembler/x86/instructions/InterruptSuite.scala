@@ -32,12 +32,6 @@ class InterruptSuite extends WordSpec with Matchers {
       "correctly represent int 0x01 as a string" in {
         Interrupt(0x01.toByte).toString should be("int 1")
       }
-
-      "throw an AssertionError for INT 0x0001" in {
-        an [AssertionError] should be thrownBy {
-          Interrupt(0x01.toShort).encodeByte
-        }
-      }
     }
   }
 }
