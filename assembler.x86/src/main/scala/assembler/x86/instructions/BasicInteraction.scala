@@ -7,27 +7,34 @@ import assembler.x86.operations._
 
 class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
 
-  def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): Immediate =
-    (destination, immediate.operandByteSize) match {
-      case (Register.AL, ValueSize.Byte) =>
-        Imm8ToAL(immediate)
-      case (Register.AX, ValueSize.Word) =>
-        Imm16ToAX(immediate)
-      case (Register.EAX, ValueSize.DoubleWord) =>
-        Imm32ToEAX(immediate)
-      case (Register.RAX, ValueSize.DoubleWord) =>
-        Imm32ToRAX(immediate)
-      case (destination: ModRMEncodableOperand with FixedSizeOperand, ValueSize.Byte) if destination.operandByteSize != ValueSize.Byte =>
-        Imm8ToRM16(destination, immediate)
-      case (destination: ModRMEncodableOperand with FixedSizeOperand, valueSize)
-        if valueSize == ValueSize.QuadWord || !(destination.operandByteSize == valueSize ||
-          (destination.operandByteSize == ValueSize.QuadWord && valueSize == ValueSize.DoubleWord)) =>
+  def apply(immediate: ImmediateValue with ByteSize, destination: Register.AL.type)(implicit processorMode: ProcessorMode): X86Operation =
+    Imm8ToAL(immediate)
+
+  def apply(immediate: ImmediateValue with WordSize, destination: Register.AX.type)(implicit processorMode: ProcessorMode): X86Operation =
+    Imm16ToAX(immediate)
+
+  def apply(immediate: ImmediateValue with DoubleWordSize, destination: Register.EAX.type)(implicit processorMode: ProcessorMode): X86Operation =
+    Imm32ToEAX(immediate)
+
+  def apply(immediate: ImmediateValue with DoubleWordSize, destination: Register.RAX.type)(implicit processorMode: ProcessorMode): X86Operation =
+    Imm32ToRAX(immediate)
+
+  def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): X86Operation =
+    (immediate, destination) match {
+      case (imm: ImmediateValue with ByteSize, d: WideSize) =>
+        Imm8ToRM16(d, imm)
+      case (imm: ImmediateValue with ByteSize, _) =>
+        Imm8ToRM8(destination, imm)
+      case (imm: DoubleWordSize, _: QuadWordSize) =>
+        Imm16ToRM16(destination, imm)
+      case (_: QuadWordSize, _) =>
         throw new AssertionError
-      case (destination: ModRMEncodableOperand, ValueSize.Byte) =>
-        Imm8ToRM8(destination, immediate)
-      case (destination: ModRMEncodableOperand, _) =>
-        Imm16ToRM16(destination, immediate)
-      case _ => throw new AssertionError
+      case (_, dest: ValueSize2) if !(dest sizeEquals immediate) =>
+        throw new AssertionError
+      case (imm: WideSize, _) =>
+        Imm16ToRM16(destination, imm)
+      case _ =>
+        throw new AssertionError
     }
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
@@ -131,18 +138,18 @@ object Xor extends BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
 object Not {
   implicit val opcode: String = "not"
 
-  def apply(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
-    operand.operandByteSize match {
-      case ValueSize.Byte => RM8(operand)
-      case _ => RM16(operand)
+  def apply(operand: ModRMEncodableOperand with ValueSize2)(implicit processorMode: ProcessorMode): ModRMStatic =
+    operand match {
+      case o:ByteSize => RM8(o)
+      case o:WideSize => RM16(o)
     }
 
-  private def RM8(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+  private def RM8(operand: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xF6.toByte :: Nil, 2, opcode) {
       override val operandRMOrder: OperandOrder = destination
     }
 
-  private def RM16(operand: ModRMEncodableOperand with FixedSizeOperand)(implicit processorMode: ProcessorMode) =
+  private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
     new ModRMStatic(operand, 0xF7.toByte :: Nil, 2, opcode) {
       override val operandRMOrder: OperandOrder = destination
     }

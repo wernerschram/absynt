@@ -13,11 +13,15 @@ sealed abstract class ImmediateValue(val value: Seq[Byte])
 }
 
 object ImmediateValue {
-  implicit def apply(value: Byte): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
+  implicit def apply(value: Byte): ImmediateValue with ByteSize =
+    new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
 
-  implicit def apply(value: Short): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with WordSize {}
+  implicit def apply(value: Short): ImmediateValue with WordSize =
+    new ImmediateValue(value.encodeLittleEndian) with WordSize {}
 
-  implicit def apply(value: Int): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
+  implicit def apply(value: Int): ImmediateValue with DoubleWordSize =
+    new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
 
-  implicit def apply(value: Long): ImmediateValue = new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
+  implicit def apply(value: Long): ImmediateValue with QuadWordSize =
+    new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
 }
