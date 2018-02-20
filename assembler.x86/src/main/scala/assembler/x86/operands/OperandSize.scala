@@ -4,9 +4,12 @@ sealed class OperandSize
 
 //TODO Remove original ValueSize class and FixedSize traits
 trait ValueSize2 extends FixedSizeOperand {
+  def sizeName: String
+  override def toString = s"$sizeName PTR ${super.toString}"
 }
 
 trait ByteSize extends ValueSize2 {
+  override val sizeName = "BYTE"
   override val operandByteSize: OperandSize = ValueSize.Byte
 }
 
@@ -17,14 +20,17 @@ trait ExtendedSize extends WideSize //16, 32
 trait LongSize extends WideSize //32, 64
 
 trait WordSize extends ExtendedSize {
+  override val sizeName = "WORD"
   override val operandByteSize: OperandSize = ValueSize.Word
 }
 
 trait DoubleWordSize extends ExtendedSize with LongSize {
+  override val sizeName = "DWORD"
   override val operandByteSize: OperandSize = ValueSize.DoubleWord
 }
 
 trait QuadWordSize extends LongSize {
+  override val sizeName = "QWORD"
   override val operandByteSize: OperandSize = ValueSize.QuadWord
 }
 
@@ -45,14 +51,6 @@ sealed class ValueSize(override val toString: String) extends OperandSize
 sealed class FarPointerSize(override val toString: String) extends OperandSize
 
 object ValueSize {
-
-  def sizeOfValue(size: Int): ValueSize = size match {
-    case 1 => Byte
-    case 2 => Word
-    case 4 => DoubleWord
-    case 8 => QuadWord
-    case _ => throw new AssertionError
-  }
 
   case object Byte extends ValueSize("BYTE")
 
