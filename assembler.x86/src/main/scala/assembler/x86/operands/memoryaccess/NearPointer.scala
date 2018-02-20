@@ -15,7 +15,7 @@ object ShortPointer {
       override def toString: String = s"0x${offset.bigEndianHexString}"
     }
 
-  def apply(offset: Long): NearPointer = {
+  def apply(offset: Long): NearPointer with ByteSize = {
     assume(offset.toByte == offset)
     apply(offset.toByte)
   }

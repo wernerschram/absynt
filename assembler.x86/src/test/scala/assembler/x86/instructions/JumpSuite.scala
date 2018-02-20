@@ -6,7 +6,6 @@ import assembler.resource.Resource
 import assembler.sections.{Section, SectionType}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
-import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
@@ -108,7 +107,6 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       "correctly represent jnle 0x2030 as a string" in { JumpIfNotLessOrEqual(LongPointer.realMode(0x2030)).toString should be("jnle 0x2030") }
 
       "correctly encode jcx 0x10" in { JumpIfCountZero(ShortPointer(0x10)).encodeByte should be(Hex.lsb("E3 10")) }
-      "throw an AssertionError for jcx 0x2030" in { an[AssertionError] should be thrownBy { JumpIfCountZero(LongPointer.realMode(0x2030)) } }
       "correctly represent jcx 0x10 as a string" in { JumpIfCountZero(ShortPointer(0x10)).toString should be("jcx 0x10") }
 
       "throw an AssertionError for jmp 0x10203040" in { an[AssertionError] should be thrownBy { Jump(LongPointer.protectedMode(0x10203040)).encodeByte } }

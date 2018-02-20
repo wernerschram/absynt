@@ -10,13 +10,6 @@ import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperat
 
 abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
-  def apply(nearPointer: NearPointer with ValueSize)(implicit processorMode: ProcessorMode): X86Operation = nearPointer match {
-    case p: NearPointer with ByteSize =>
-      short(p)
-    case _ =>
-      throw new AssertionError
-  }
-
   def short(nearPointer: NearPointer with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
     Rel8(nearPointer)
 
@@ -35,10 +28,18 @@ abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemon
     }
 }
 
+trait ShortJumpApply {
+  self: ShortRelativeJump =>
+
+  def apply(nearPointer: NearPointer with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
+    self.short(nearPointer)
+
+}
+
 abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
   extends ShortRelativeJump(shortOpcode, mnemonic) {
 
-  override def apply(nearPointer: NearPointer with ValueSize)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply(nearPointer: NearPointer with ValueSize)(implicit processorMode: ProcessorMode): X86Operation =
     (processorMode, nearPointer) match {
       case (_, p: NearPointer with ByteSize) =>
         short(p)
@@ -162,7 +163,7 @@ private[instructions] class JumpIfNotZeroAndSignedEqualsOverflow(mnemonic: Strin
   extends ShortOrLongRelativeJump(Seq(0x7F.toByte), Seq(0x0F.toByte, 0x8F.toByte), mnemonic)
 
 private[instructions] class JumpIfCountZero
-  extends ShortRelativeJump(Seq(0xE3.toByte), "jcx")
+  extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with ShortJumpApply
 
 object JumpIfAbove extends JumpIfNoCarryAndNoZero("ja")
 object JumpIfAboveOrEqual extends JumpIfNoCarry("jae")
