@@ -45,7 +45,6 @@ sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRe
 }
 
 object SIBMemoryLocation {
-
   def apply(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int) =
     new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment)
 
@@ -108,7 +107,5 @@ object SIBMemoryLocation {
 
     def quadWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue, scale: Int, segment: SegmentRegister) =
       new SIBMemoryLocation(index, base, Some(displacement), scale, segment) with QuadWordSize
-
-
   }
 }

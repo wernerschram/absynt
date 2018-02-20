@@ -128,10 +128,10 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       "throw an AssertionError for jmp rax" in { an[AssertionError] should be thrownBy { Jump(RAX) } }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.withSize(BX+SI, segment = FS)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("64 66 FF 20"))
+        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 66 FF 20"))
       }
       "correctly represent jmp DWORD PTR fs:[bx+si] as a string" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.withSize(BX+SI, segment = FS)(ValueSize.DoubleWord)).toString should be("jmp DWORD PTR fs:[bx+si]")
+        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX+SI, segment = FS)).toString should be("jmp DWORD PTR fs:[bx+si]")
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -149,22 +149,22 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.Word)).encodeByte should be(Hex.lsb("FF 2A"))
+        Jump.Far(RegisterMemoryLocation.wordSize(BP+SI)).encodeByte should be(Hex.lsb("FF 2A"))
       }
       "correctly represent jmp FAR WORD PTR [bp+si] as a string" in {
-        Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.Word)).toString should be("jmp FAR WORD PTR [bp+si]")
+        Jump.Far(RegisterMemoryLocation.wordSize(BP+SI)).toString should be("jmp FAR WORD PTR [bp+si]")
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP+SI)).encodeByte should be(Hex.lsb("66 FF 2A"))
       }
       "correctly represent jmp FAR DWORD PTR [bp+si] as a string" in {
-        Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.DoubleWord)).toString should be("jmp FAR DWORD PTR [bp+si]")
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP+SI)).toString should be("jmp FAR DWORD PTR [bp+si]")
       }
 
       "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.QuadWord))
+          Jump.Far(RegisterMemoryLocation.quadWordSize(BP+SI))
         }
       }
 
@@ -571,7 +571,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.withSize(BX+SI, segment = FS)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("64 67 FF 20"))
+        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 67 FF 20"))
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -583,16 +583,16 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.Word)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.wordSize(BP+SI)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP+SI)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation.withSize(BP+SI)(ValueSize.QuadWord))
+          Jump.Far(RegisterMemoryLocation.quadWordSize(BP+SI))
         }
       }
 
@@ -729,15 +729,15 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(EDX)(ValueSize.Word)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.wordSize(EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(EDX)(ValueSize.DoubleWord)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.doubleWordSize(EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "correctly encode jmp FAR QWORD PTR [rdx]" in {
-        Jump.Far(RegisterMemoryLocation.withSize(RDX)(ValueSize.QuadWord)).encodeByte should be(Hex.lsb("48 FF 2A"))
+        Jump.Far(RegisterMemoryLocation.quadWordSize(RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
       }
     }
   }
