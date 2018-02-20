@@ -225,6 +225,14 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(AL, RegisterMemoryLocation(BX)).toString shouldBe "xor [bx], al"
       }
 
+      "correctly encode xor BYTE PTR [bx], al" in {
+        Xor(AL, RegisterMemoryLocation.byteSize(BX)).encodeByte should be(Hex.lsb("30 07"))
+      }
+
+      "correctly represent xor BYTE PTR [bx], al as a string" in {
+        Xor(AL, RegisterMemoryLocation.byteSize(BX)).toString shouldBe "xor BYTE PTR [bx], al"
+      }
+
       "correctly encode xor ah, [si]" in {
         Xor(RegisterMemoryLocation(SI), AH).encodeByte should be(Hex.lsb("32 24"))
       }
