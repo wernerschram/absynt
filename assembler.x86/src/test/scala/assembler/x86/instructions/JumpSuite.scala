@@ -3,15 +3,15 @@ package assembler.x86.instructions
 import assembler._
 import assembler.output.raw.Raw
 import assembler.resource.Resource
-import assembler.sections.{Section, SectionType}
+import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
 import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operations.X86Operation
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.{Matchers, WordSpec}
 
 class JumpSuite extends WordSpec with Matchers with MockFactory {
 
@@ -125,7 +125,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           jump,
           EncodedBytes(List.fill(1)(0x00.toByte)),
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
@@ -145,7 +145,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = JumpIfCountZero(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           jump,
           EncodedBytes(List.fill(1)(0x00.toByte)),
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
@@ -163,7 +163,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(1)(0x00.toByte)),
           jump
@@ -179,7 +179,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = JumpIfCountZero(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(1)(0x00.toByte)),
           jump
@@ -195,7 +195,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           jump,
           EncodedBytes(List.fill(256)(0x00.toByte)),
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
@@ -211,7 +211,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = JumpIfCountZero(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           jump,
           EncodedBytes(List.fill(256)(0x00.toByte)),
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
@@ -226,7 +226,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(256)(0x00.toByte)),
           jump
@@ -244,7 +244,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(1)(0x00.toByte)),
@@ -265,7 +265,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(122)(0x00.toByte)),
@@ -286,7 +286,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(123)(0x00.toByte)),
@@ -308,7 +308,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(123)(0x00.toByte)),
@@ -330,7 +330,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump1 = Jump(label1)
         val jump2 = Jump(label2)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(2)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(123)(0x00.toByte)),
@@ -354,7 +354,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(60)(0x00.toByte)),
@@ -382,7 +382,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
           jump2,
           EncodedBytes(List.fill(60)(0x00.toByte)),
@@ -410,7 +410,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val jump2 = Jump(label2)
         val jump3 = Jump(label3)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(2)(0x00.toByte)).label(label1),
             jump2,
             EncodedBytes(List.fill(60)(0x00.toByte)),
@@ -527,7 +527,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(1)(0x00.toByte)),
           jump
@@ -543,7 +543,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(256)(0x00.toByte)),
           jump
@@ -559,7 +559,7 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           jump,
           EncodedBytes(List.fill(256)(0x00.toByte)),
           EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)

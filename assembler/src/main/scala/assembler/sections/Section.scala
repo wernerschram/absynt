@@ -80,6 +80,12 @@ object Section {
       override val content: Seq[Resource] =
           resources
     }
+
+  def text(resources: Seq[Resource], sectionName: String = ".text", alignment: Int = 16): Section =
+    apply(SectionType.Text, sectionName, resources, alignment)
+
+  def data(resources: Seq[Resource], sectionName: String = ".data", alignment: Int = 16): Section =
+    apply(SectionType.Data, sectionName, resources, alignment)
 }
 
 sealed abstract class SectionType private(defaultName: String)

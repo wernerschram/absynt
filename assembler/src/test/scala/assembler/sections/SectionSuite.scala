@@ -25,7 +25,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val intermediate = EncodedBytes(Seq.fill(5)(0.toByte))
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           reference,
           intermediate,
           target))
@@ -39,7 +39,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val intermediate = EncodedBytes(List.fill(5)(0.toByte))
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           target,
           intermediate,
           reference))
@@ -54,7 +54,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val prefix = EncodedBytes(List.fill(2)(0.toByte))
         val postfix = EncodedBytes(List.fill(3)(0.toByte))
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           prefix,
           referenceWithLabel,
           postfix))
@@ -70,7 +70,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val reference = new MyReference(targetLabel)
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           reference,
           target))
 
@@ -82,7 +82,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val reference = new MyReference(targetLabel)
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           target,
           reference))
 
@@ -94,7 +94,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val reference = new MyReference(targetLabel)
         val referenceWithLabel = reference.label(targetLabel)
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           referenceWithLabel))
 
         section.offsetDirection(reference) shouldBe OffsetDirection.Self
@@ -105,7 +105,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
     "asked to encode itself" should {
 
       "be able to encode itself" in {
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           EncodedBytes(0x00.toByte :: 0x01.toByte :: Nil),
           EncodedBytes(0xEF.toByte :: 0xFF.toByte :: Nil)))
 
@@ -123,7 +123,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
         val one = EncodedBytes(List.fill(oneSize)(1.toByte))
         val two = EncodedBytes(List.fill(twoSize)(2.toByte))
 
-        val section = Section(SectionType.Text, ".test", List[Resource](
+        val section = Section.text(List[Resource](
           one,
           two))
 

@@ -7,7 +7,7 @@ import assembler.ListExtensions._
 import assembler.output.raw.Raw
 import assembler.resource.EncodableConversion._
 import assembler.resource.Resource
-import assembler.sections.{Section, SectionType}
+import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
@@ -36,7 +36,7 @@ object Boot extends App {
     val middleColor = Color(63, 63, 63)
     val bottomColor = Color(0, 0, 63)
 
-    val section: Section = Section(SectionType.Text, ".text",
+    val section: Section = Section.text(
 
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::

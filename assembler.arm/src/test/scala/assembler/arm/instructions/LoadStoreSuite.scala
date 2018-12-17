@@ -1,13 +1,13 @@
 package assembler.arm.instructions
 
+import assembler._
 import assembler.arm.ProcessorMode
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.arm.operands.{ArmRelativeOffset, Condition, RelativeA32Pointer, Shifter}
+import assembler.arm.operands.{Condition, Shifter}
 import assembler.arm.operations._
-import assembler.sections.{Section, SectionType}
-import assembler._
 import assembler.output.raw.Raw
 import assembler.resource.Resource
+import assembler.sections.Section
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
@@ -85,7 +85,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {
         val targetLabel = Label.unique
         val reference = LoadRegister(targetLabel, R1)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           reference,
           EncodedBytes(List.fill(4)(0x00.toByte)),
           EncodedString("Test").label(targetLabel)
@@ -98,7 +98,7 @@ class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a conditional indirect ldr instruction with an indirect reference to a labeled resource" in {
         val targetLabel = Label.unique
         val reference = LoadRegister(targetLabel, R1, Condition.CarrySet)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedString("Test").label(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
           reference

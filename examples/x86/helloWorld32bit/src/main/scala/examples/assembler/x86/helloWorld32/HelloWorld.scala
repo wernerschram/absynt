@@ -5,13 +5,13 @@ import java.nio.file.{Files, Paths}
 
 import assembler.ListExtensions._
 import assembler.output.Elf.{Architecture, Executable}
-import assembler.resource.{AbsoluteReference, UnlabeledDependentResource, UnlabeledEncodable, RelativeReference}
-import assembler.sections.{Section, SectionType}
+import assembler.resource.EncodableConversion._
+import assembler.resource.{AbsoluteReference, RelativeReference}
+import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.Register._
 import assembler.{EncodedString, Label}
-import assembler.resource.EncodableConversion._
 
 object HelloWorld extends App {
   createFile()
@@ -25,7 +25,7 @@ object HelloWorld extends App {
 
     val output: String = "Hello World!\n"
 
-    val text: Section = Section(SectionType.Text, ".text",
+    val text: Section = Section.text(
       // use the write Syscall
       Move(0x04, EAX).label(entry) ::
       Move(0x01, EBX) ::
@@ -36,12 +36,12 @@ object HelloWorld extends App {
       Move(0x01, EAX) ::
       Move(0x00, EBX) ::
       Interrupt(0x80.toByte) ::
-      Nil, 16
+      Nil
     )
 
-    val data: Section = Section(SectionType.Data, ".data",
+    val data: Section = Section.data(
       EncodedString(output).label(hello) ::
-      Nil, 4
+      Nil, alignment = 4
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))

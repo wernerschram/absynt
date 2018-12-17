@@ -15,7 +15,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       EncodedBytes(Seq.fill(count)(0x00.toByte))
 
     def encodables[T <: UnlabeledEncodable : ClassTag](content: Seq[Resource], references: Seq[DependentResource]): Map[DependentResource, T] = {
-      val application = Raw(Section(SectionType.Text, "Text", content), 0)
+      val application = Raw(Section.text(content), 0)
 
       val result = application.encodablesForDependencies(references)
       result.foreach(_._2 shouldBe a[T])
@@ -162,7 +162,7 @@ class ApplicationSuite extends WordSpec with Matchers {
           filler(2) ::
           Nil
 
-        val application = Raw(Section(SectionType.Text, "Text", content), 0)
+        val application = Raw(Section.text(content), 0)
         val result = application.encodablesForDependencies(Seq(reference))
 
         result(reference).asInstanceOf[LinearRelativeTestEncodable].distance shouldBe 2
@@ -224,12 +224,12 @@ class ApplicationSuite extends WordSpec with Matchers {
 
         "represent a reference that depends on the alignment of a section which depends on the size of the section the reference is in, where there is an obvious solution" in {
           val (reference, target) = TestEncodable.absoluteReferenceWithTarget
-          val section1 = Section(SectionType.Text, ".text",
+          val section1 = Section.text(
             reference ::
             filler(15) ::
             Nil)
 
-          val section2 = Section(SectionType.Data, ".data",
+          val section2 = Section.data(
             target :: Nil)
 
           val application = MyApplication(List(section1, section2), 0)
@@ -246,7 +246,7 @@ class ApplicationSuite extends WordSpec with Matchers {
       "asked for the size of an alignment filler" should {
 
         "align the first section" when {
-          val section = Section(SectionType.Data, "Test", List(EncodedBytes(Seq(0x00.toByte))))
+          val section = Section.data(List(EncodedBytes(Seq(0x00.toByte))))
 
           "there is a zero start offset" in {
             val application = MyApplication(List(section), 0)
@@ -264,10 +264,10 @@ class ApplicationSuite extends WordSpec with Matchers {
         }
 
         "align the second section" when {
-          val second = Section(SectionType.Data, "Second", List(EncodedBytes(Seq(0x02.toByte))))
+          val second = Section.data(List(EncodedBytes(Seq(0x02.toByte))), "Second")
 
           "there is a zero start offset and a 16 byte first section" in {
-            val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(16)(0x01.toByte))))
+            val first = Section.data(List(EncodedBytes(Seq.fill(16)(0x01.toByte))), "First")
             val application = MyApplication(List(first, second), 0)
 
             val alignmentFiller = application.alignmentFillers(second)
@@ -276,7 +276,7 @@ class ApplicationSuite extends WordSpec with Matchers {
           }
 
           "there is a zero start offset and a 20 byte first section" in {
-            val first = Section(SectionType.Data, "First", List(EncodedBytes(Seq.fill(20)(0x01.toByte))))
+            val first = Section.data(List(EncodedBytes(Seq.fill(20)(0x01.toByte))), "First")
             val application = MyApplication(List(first, second), 0)
 
             val alignmentFiller = application.alignmentFillers(second)
@@ -298,8 +298,8 @@ class ApplicationSuite extends WordSpec with Matchers {
         val dummy1in2 = dummyResource
         val dummy2in2 = dummyResource
 
-        val first = Section(SectionType.Text, "First", List(relative1, absolute1, dummy1in1, targetAbsolute2, targetRelative1, dummy2in1))
-        val second = Section(SectionType.Text, "Second", List(absolute2, dummy1in2, targetRelative2, dummy2in2, relative2, targetAbsolute1))
+        val first = Section.text(List(relative1, absolute1, dummy1in1, targetAbsolute2, targetRelative1, dummy2in1), "First")
+        val second = Section.text(List(absolute2, dummy1in2, targetRelative2, dummy2in2, relative2, targetAbsolute1), "Second")
 
         val application: MyApplication = MyApplication(List(first, second), 100)
 

@@ -81,8 +81,9 @@ abstract class Elf(
 
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
-  lazy val stringSection = Section(assembler.sections.SectionType.Data, ".shstrtab",
-    EncodedBytes(stringMap.toSeq.sortBy(_._2).map(_._1).flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil, 1)
+  lazy val stringSection: Section = Section.data(
+    EncodedBytes(stringMap.toSeq.sortBy(_._2).map(_._1).flatMap(s => s.toCharArray.map(_.toByte).toList ::: 0.toByte :: Nil)) :: Nil,
+    ".shstrtab", 1)
 }
 
 class Executable private(

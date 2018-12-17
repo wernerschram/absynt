@@ -12,7 +12,7 @@ import assembler.arm.operands.registers.GeneralRegister._
 import assembler.output.Elf.{Architecture, Executable}
 import assembler.output.raw.Raw
 import assembler.resource.Resource
-import assembler.sections.{Section, SectionType}
+import assembler.sections.Section
 
 object Boot extends App {
 
@@ -67,7 +67,7 @@ object Boot extends App {
     val text: Label = "Text"
     val entry: Label = "Entry"
 
-    val section: Section = Section(SectionType.Text, ".text",
+    val section: Section = Section.text(
 
       // Disable UART0
       Move.forConstant(UART0.Base, R0).label(entry) ::

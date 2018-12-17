@@ -1,9 +1,9 @@
 package assembler.elf
 
-import assembler._
 import assembler.ListExtensions._
+import assembler._
 import assembler.output.Elf._
-import assembler.sections.{Section, SectionType}
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class ElfSuite extends WordSpec with Matchers {
@@ -14,18 +14,10 @@ class ElfSuite extends WordSpec with Matchers {
   "an X86 (32-bit) Elf file with some sections" should {
     val entry: Label = Label.unique
 
-
-    val sectionProperties = Seq(
-      (SectionType.Text, "TextName", Seq[Byte](0), Some(entry)),
-      (SectionType.Data, "DataName", Seq[Byte](0), None)
+    val sections = Seq(
+      Section.text(Seq(EncodedBytes(Seq[Byte](0)).label(entry)), "TextName"),
+      Section.data(Seq(EncodedBytes(Seq[Byte](0))), "DataName")
     )
-
-    val sections = sectionProperties.map { case (sectionType, name, content, label) =>
-      Section(sectionType, name, (label match {
-        case Some(l) =>  EncodedBytes(content).label(l)
-        case None =>  EncodedBytes(content)
-      }) :: Nil)
-    }
 
     val executable = Executable(Architecture.X86, sections.toList, entry, 0)
 
@@ -65,24 +57,24 @@ class ElfSuite extends WordSpec with Matchers {
       val sectionHeaderSize: Short = 40
       val sectionHeaderCount: Short = (sections.length + 2).toShort
 
-      val sectionAlignment = sectionProperties
+      val sectionAlignment = sections
         .foldLeft((applicationHeaderSize + programHeaderSize * programHeaderCount, Seq.empty[Int]))((total, current) => {
-        val alignment = if (total._1 % 16 == 0) 0 else 16 - total._1 % 16
-        (total._1 + alignment + current._3.length, total._2 :+ alignment)
-      })._2
+          val alignment = if (total._1 % 16 == 0) 0 else 16 - total._1 % 16
+          (total._1 + alignment + current.content.length, total._2 :+ alignment)
+        })._2
 
       val entryOffset = applicationHeaderSize + programHeaderSize * programHeaderCount + sectionAlignment.head
       val programHeaderOffset = applicationHeaderSize
 
       val section1FileOffset = 0
       val section1MemoryOffset = 0
-      val section1Size = applicationHeaderSize + programHeaderCount * programHeaderSize + sectionAlignment.head + sectionProperties.head._3.length
+      val section1Size = applicationHeaderSize + programHeaderCount * programHeaderSize + sectionAlignment.head + sections.head.content.length
       val section2FileOffset = section1Size + sectionAlignment(1)
       val section2MemoryOffset = section1Size + sectionAlignment(1) + 0x1000
-      val section2Size = sectionProperties(1)._3.length
+      val section2Size = sections(1).content.length
       val stringSectionFileOffset = section2FileOffset + section2Size
       val stringSectionMemoryOffset = 0
-      val stringSectionSize = 1 + sectionProperties.map(_._2.length + 1).sum + 10
+      val stringSectionSize = 1 + sections.map(_.name.length + 1).sum + 10
 
       val sectionHeaderOffset = stringSectionFileOffset + stringSectionSize
 
@@ -105,10 +97,10 @@ class ElfSuite extends WordSpec with Matchers {
         Seq(1, section2FileOffset, section2MemoryOffset, section2MemoryOffset, section2Size, section2Size, 6, 0x1000)
       ).map(header => header.flatMap(_.encodeLittleEndian))
 
-      val stringSection = ("" +: sectionProperties.map(_._2) :+ ".shstrtab").flatMap(name => s"${name}\u0000".toCharArray.map(_.toByte))
+      val stringSection = ("" +: sections.map(_.name) :+ ".shstrtab").flatMap(name => s"${name}\u0000".toCharArray.map(_.toByte))
 
       val content =
-        sectionAlignment.zip(sectionProperties.map(_._3)).flatMap{case (alignment, section) => Seq.fill(alignment)(0) ++ section} ++
+        sectionAlignment.zip(sections.map(_ => Seq[Byte](0))).flatMap{case (alignment, section) => Seq.fill(alignment)(0) ++ section} ++
           stringSection
 
       val sectionHeaders = Seq(

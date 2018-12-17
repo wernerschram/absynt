@@ -3,7 +3,7 @@ package assembler.arm.instructions
 import assembler.arm.ProcessorMode
 import assembler.arm.operands._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.sections.{Section, SectionType}
+import assembler.sections.Section
 import assembler._
 import assembler.output.raw.Raw
 import assembler.resource.Resource
@@ -14,8 +14,6 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
   "an Branch instruction" when {
     "in a32 mode" should {
-
-      import ProcessorMode.A32._
 
       "correctly encode b +0x3e8" in {
         Branch(RelativeA32Pointer(ArmRelativeOffset(0x3e8))).encodeByte should be(Hex.msb("ea0000fa"))
@@ -36,7 +34,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a forward branch to a labeled instruction" in {
         val targetLabel = Label.unique
         val reference = Branch(targetLabel)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           reference,
             EncodedBytes(List.fill(4)(0x00.toByte)),
             EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
@@ -50,7 +48,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a backward branch to a labeled instruction" in {
         val targetLabel: Label = "Label"
         val reference = Branch(targetLabel, Condition.LowerOrSame)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
           reference))
@@ -63,7 +61,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a branch to self instruction" in {
         val targetLabel = Label.unique
         val reference = Branch(targetLabel).label(targetLabel)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(8)(0x00.toByte)),
           reference,
           EncodedBytes(List.fill(8)(0x00.toByte))))
@@ -76,7 +74,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a forward branch over another branch to a labeled instruction" in {
         val targetLabel = Label.unique
         val reference = Branch(targetLabel)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           Branch(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
           reference,
@@ -93,7 +91,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
         val targetLabel = Label.unique
         val reference1 = Branch(targetLabel)
         val reference2 = Branch(targetLabel)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
           reference1,
@@ -122,8 +120,6 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
   "an BranchLink instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
-
       "correctly encode bleq 0x1111118" in {
         BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
       }
@@ -135,7 +131,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a forward branch-link to a labeled instruction" in {
         val targetLabel = Label.unique
         val reference = BranchLink(targetLabel)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           reference,
           EncodedBytes(List.fill(4)(0x00.toByte)),
           EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
@@ -150,8 +146,6 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
   "an BranchLinkExchange instruction" when {
     "in a32 mode" should {
-
-      import ProcessorMode.A32._
 
       "correctly encode blx 0x123C" in {
         BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1234))).encodeByte should be(Hex.msb("fa00048d"))
@@ -176,7 +170,7 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
       "correctly encode a forward branch-link-exchange to a labeled instruction" in {
         val targetLabel = Label.unique
         val reference = BranchLinkExchange(targetLabel)
-        val p = Section(SectionType.Text, ".test", List[Resource](
+        val p = Section.text(List[Resource](
           reference,
           EncodedBytes(List.fill(4)(0x00.toByte)),
           EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
@@ -192,8 +186,6 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
   "a BranchExchange instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
-
       "correctly encode bx r1" in {
         BranchExchange(R1).encodeByte should be(Hex.msb("e12fff11"))
       }
@@ -207,8 +199,6 @@ class BranchSuite extends WordSpec with Matchers with MockFactory {
 
   "a BranchExchangeJazelle instruction" when {
     "in a32 mode" should {
-
-      import ProcessorMode.A32._
 
       "correctly encode bxj r2" in {
         BranchExchangeJazelle(R2).encodeByte should be(Hex.msb("e12fff22"))
