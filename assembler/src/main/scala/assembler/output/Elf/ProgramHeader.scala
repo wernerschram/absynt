@@ -2,7 +2,7 @@ package assembler.output.Elf
 
 import assembler.EncodedBytes
 import assembler.resource.Resource
-import assembler.sections.Section
+import assembler.sections.{DataSection, Section, TextSection}
 
 class ProgramHeader(val section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
@@ -35,10 +35,10 @@ class ProgramHeader(val section: Section, val flags: Flags[ProgramFlag], elf: El
 
 object ProgramHeader {
   def apply(section: Section, elf: Elf): ProgramHeader =
-    section.sectionType match {
-      case assembler.sections.SectionType.Text =>
+    section match {
+      case _: TextSection =>
         new ProgramHeader(section, ProgramFlag.Execute | ProgramFlag.Read, elf)
-      case assembler.sections.SectionType.Data =>
+      case _: DataSection =>
         new ProgramHeader(section, ProgramFlag.Read | ProgramFlag.Write, elf)
     }
 }

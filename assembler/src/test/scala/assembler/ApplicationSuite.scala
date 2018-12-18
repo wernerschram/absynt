@@ -2,7 +2,7 @@ package assembler
 
 import assembler.output.raw.Raw
 import assembler.resource._
-import assembler.sections.{Section, SectionType}
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.reflect.ClassTag

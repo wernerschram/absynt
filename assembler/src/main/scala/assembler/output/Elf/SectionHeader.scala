@@ -2,7 +2,7 @@ package assembler.output.Elf
 
 import assembler.EncodedBytes
 import assembler.resource.Resource
-import assembler.sections.Section
+import assembler.sections.{DataSection, Section, TextSection}
 
 abstract class SectionHeader(elf: Elf) {
 
@@ -41,10 +41,10 @@ class SectionSectionHeader(val section: Section, elf: Elf) extends SectionHeader
   val nameReference: Int = elf.stringMap(section.name)
   val `type`: SectionType = SectionType.ProgramBits
   val flags: Flags[SectionFlag] =
-    section.sectionType match {
-      case assembler.sections.SectionType.Text =>
+    section match {
+      case _: TextSection =>
         SectionFlag.Alloc | SectionFlag.ExecutableInstruction
-      case assembler.sections.SectionType.Data =>
+      case _: DataSection =>
         SectionFlag.Alloc | SectionFlag.Write
     }
 

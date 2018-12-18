@@ -5,12 +5,7 @@ import assembler.resource.{Labeled, RelativeReference, Resource}
 
 import scala.language.implicitConversions
 
-abstract class Section(val alignment: Int) {
-  def content: Seq[Resource]
-
-  def name: String
-
-  def sectionType: SectionType
+sealed abstract class Section protected(val content: Seq[Resource], val name: String, val alignment: Int) {
 
   def precedingResources(target: Label): Seq[Resource] = content.takeWhile(!matchLabel(_, target))
 
@@ -72,26 +67,13 @@ abstract class Section(val alignment: Int) {
   }
 }
 
-object Section {
-  def apply(`type`: SectionType, sectionName: String, resources: Seq[Resource], alignment: Int = 16): Section =
-    new Section(alignment) {
-      override val name: String = sectionName
-      override val sectionType: SectionType = `type`
-      override val content: Seq[Resource] =
-          resources
-    }
+final case class TextSection private[sections](override val content: Seq[Resource], override val name: String, override val alignment: Int) extends Section(content, name, alignment)
+final case class DataSection private[sections](override val content: Seq[Resource], override val name: String, override val alignment: Int) extends Section(content, name, alignment)
 
+object Section {
   def text(resources: Seq[Resource], sectionName: String = ".text", alignment: Int = 16): Section =
-    apply(SectionType.Text, sectionName, resources, alignment)
+    TextSection(resources, sectionName, alignment)
 
   def data(resources: Seq[Resource], sectionName: String = ".data", alignment: Int = 16): Section =
-    apply(SectionType.Data, sectionName, resources, alignment)
+    DataSection(resources, sectionName, alignment)
 }
-
-sealed abstract class SectionType private(defaultName: String)
-
-object SectionType {
-  object Text extends SectionType(".text")
-  object Data extends SectionType(".data")
-}
-
