@@ -156,9 +156,9 @@ object Move {
     new AbsoluteReference(targetLabel) {
       private val size = processorMode match {
           // prefixes + opcode + immediate
-        case (ProcessorMode.Real) => 0 + 1 + 2
-        case (ProcessorMode.Protected) => 0 + 1 + 4
-        case (ProcessorMode.Long) => 1 + 1 + 8
+        case ProcessorMode.Real => 0 + 1 + 2
+        case ProcessorMode.Protected => 0 + 1 + 4
+        case ProcessorMode.Long => 1 + 1 + 8
       }
 
       override def encodableForDistance(distance: Int): UnlabeledEncodable =

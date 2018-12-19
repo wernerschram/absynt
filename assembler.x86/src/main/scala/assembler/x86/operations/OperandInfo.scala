@@ -13,7 +13,7 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
   def addressOperands: Set[AddressOperandInfo] = Set.empty
 
   def rexRequirements: Set[RexRequirement] = operand match {
-    case f: QuadWordSize => Set(RexRequirement.quadOperand)
+    case _: QuadWordSize => Set(RexRequirement.quadOperand)
     case _ => Set.empty
   }
 }
@@ -67,7 +67,7 @@ object OperandInfo {
   def encodedRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(register, operandOrder) with OperandSizePrefix {
       override def rexRequirements: Set[RexRequirement] = register match {
-        case r: GeneralPurposeRexRegister => Set(RexRequirement.instanceOpcodeReg)
+        case _: GeneralPurposeRexRegister => Set(RexRequirement.instanceOpcodeReg)
         case _ => Set.empty
       }
 

@@ -78,7 +78,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
         RM16(o)
       case (o: ModRMEncodableOperand with QuadWordSize, ProcessorMode.Long) =>
         RM16(o)
-      case (o: ModRMEncodableOperand with ValueSize, _) =>
+      case (_: ModRMEncodableOperand with ValueSize, _) =>
         throw new AssertionError
       case _ =>
         RM16(operand)

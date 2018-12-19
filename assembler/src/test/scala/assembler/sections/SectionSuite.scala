@@ -2,26 +2,19 @@ package assembler.sections
 
 import assembler._
 import assembler.output.raw.Raw
-import assembler.resource.{UnlabeledEncodable, RelativeReference, Resource}
-import org.scalamock.scalatest.MockFactory
+import assembler.resource.{RelativeReference, Resource, UnlabeledEncodable}
 import org.scalatest.{Matchers, WordSpec}
 import assembler.resource.EncodableConversion._
 
-class SectionSuite extends WordSpec with Matchers with MockFactory {
+class SectionSuite extends WordSpec with Matchers {
 
   "a Section" when {
-
-    class MyReference(targetLabel: Label) extends RelativeReference(targetLabel) {
-      override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = ???
-      override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable = ???
-      override def possibleSizes: Set[Int] = ???
-    }
 
     "queried for immediate instructions" should {
 
       "provide the intermediate instructions between a relative instruction and a label" in {
         val targetLabel = Label.unique
-        val reference = new MyReference(targetLabel)
+        val reference = LinearRelativeTestReference(targetLabel)
         val intermediate = EncodedBytes(Seq.fill(5)(0.toByte))
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
@@ -35,7 +28,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "provide the intermediate instructions between a label and a relative instruction" in {
         val targetLabel = Label.unique
-        val reference = new MyReference(targetLabel)
+        val reference = LinearRelativeTestReference(targetLabel)
         val intermediate = EncodedBytes(List.fill(5)(0.toByte))
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
@@ -49,7 +42,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "return an empty list for an instruction that references itself" in {
         val targetLabel = Label.unique
-        val reference = new MyReference(targetLabel)
+        val reference = LinearRelativeTestReference(targetLabel)
         val referenceWithLabel = reference.label(targetLabel)
         val prefix = EncodedBytes(List.fill(2)(0.toByte))
         val postfix = EncodedBytes(List.fill(3)(0.toByte))
@@ -67,7 +60,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a forward reference" in {
         val targetLabel = Label.unique
-        val reference = new MyReference(targetLabel)
+        val reference = LinearRelativeTestReference(targetLabel)
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section.text(List[Resource](
@@ -79,7 +72,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a backward reference" in {
         val targetLabel = Label.unique
-        val reference = new MyReference(targetLabel)
+        val reference = LinearRelativeTestReference(targetLabel)
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section.text(List[Resource](
@@ -91,7 +84,7 @@ class SectionSuite extends WordSpec with Matchers with MockFactory {
 
       "know when a indirect reference is a reference to self" in {
         val targetLabel = Label.unique
-        val reference = new MyReference(targetLabel)
+        val reference = LinearRelativeTestReference(targetLabel)
         val referenceWithLabel = reference.label(targetLabel)
 
         val section = Section.text(List[Resource](

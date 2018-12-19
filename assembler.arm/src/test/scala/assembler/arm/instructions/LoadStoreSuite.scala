@@ -8,10 +8,9 @@ import assembler.arm.operations._
 import assembler.output.raw.Raw
 import assembler.resource.Resource
 import assembler.sections.Section
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
-class LoadStoreSuite extends WordSpec with Matchers with MockFactory {
+class LoadStoreSuite extends WordSpec with Matchers {
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {

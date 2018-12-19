@@ -1,16 +1,14 @@
 package assembler.arm.instructions
 
-import assembler.arm.ProcessorMode
+import assembler._
 import assembler.arm.operands._
 import assembler.arm.operands.registers.GeneralRegister._
-import assembler.sections.Section
-import assembler._
 import assembler.output.raw.Raw
 import assembler.resource.Resource
-import org.scalamock.scalatest.MockFactory
+import assembler.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
-class BranchSuite extends WordSpec with Matchers with MockFactory {
+class BranchSuite extends WordSpec with Matchers {
 
   "an Branch instruction" when {
     "in a32 mode" should {

@@ -97,7 +97,7 @@ class ElfSuite extends WordSpec with Matchers {
         Seq(1, section2FileOffset, section2MemoryOffset, section2MemoryOffset, section2Size, section2Size, 6, 0x1000)
       ).map(header => header.flatMap(_.encodeLittleEndian))
 
-      val stringSection = ("" +: sections.map(_.name) :+ ".shstrtab").flatMap(name => s"${name}\u0000".toCharArray.map(_.toByte))
+      val stringSection = ("" +: sections.map(_.name) :+ ".shstrtab").flatMap(name => (name+"\u0000").toCharArray.map(_.toByte))
 
       val content =
         sectionAlignment.zip(sections.map(_ => Seq[Byte](0))).flatMap{case (alignment, section) => Seq.fill(alignment)(0) ++ section} ++

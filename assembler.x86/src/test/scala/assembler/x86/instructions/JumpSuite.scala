@@ -9,11 +9,10 @@ import assembler.x86.operands.Register._
 import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operations.X86Operation
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{Matchers, WordSpec}
 
-class JumpSuite extends WordSpec with Matchers with MockFactory {
+class JumpSuite extends WordSpec with Matchers {
 
   "an Jump instruction" when {
 
@@ -52,7 +51,6 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
           val shortInstruction = operation(ShortPointer(0x10))
           val longName = s"$mnemonic 0x2030"
           val longInstruction = operation(LongPointer.realMode(0x2030))
-          val instruction: X86Operation = operation(ShortPointer(0x10))
 
           s"correctly encode $shortName" in { shortInstruction.encodeByte shouldBe Hex.lsb(short) }
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }
@@ -466,7 +464,6 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
           val shortInstruction = operation(ShortPointer(0x10))
           val longName = s"$mnemonic 0x20304050"
           val longInstruction = operation(LongPointer.protectedMode(0x20304050))
-          val instruction: X86Operation = operation(ShortPointer(0x10))
 
           s"correctly encode $shortName" in { shortInstruction.encodeByte shouldBe Hex.lsb(short) }
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }
@@ -608,7 +605,6 @@ class JumpSuite extends WordSpec with Matchers with MockFactory {
           val shortInstruction = operation(ShortPointer(0x10))
           val longName = s"$mnemonic 0x20304050"
           val longInstruction = operation(LongPointer.protectedMode(0x20304050))
-          val instruction: X86Operation = operation(ShortPointer(0x10))
 
           s"correctly encode $shortName" in { shortInstruction.encodeByte shouldBe Hex.lsb(short) }
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }
