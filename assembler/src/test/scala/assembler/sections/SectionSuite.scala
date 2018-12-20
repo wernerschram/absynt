@@ -2,9 +2,9 @@ package assembler.sections
 
 import assembler._
 import assembler.output.raw.Raw
-import assembler.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.scalatest.{Matchers, WordSpec}
 import assembler.resource.EncodableConversion._
+import assembler.resource.Resource
+import org.scalatest.{Matchers, WordSpec}
 
 class SectionSuite extends WordSpec with Matchers {
 

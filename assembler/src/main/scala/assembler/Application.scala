@@ -11,6 +11,8 @@ abstract class Application {
 
   def startOffset: Int
 
+  // Virtual filler with a set size for defining where the start of the application is including the size of
+  // the application headers without including the actual application headers
   val startFiller: UnlabeledEncodable = new UnlabeledEncodable {
     override def encodeByte: Seq[Byte] = Seq.empty
 
@@ -63,9 +65,10 @@ abstract class Application {
     else
       for (
         t <- possibleSizeCombinations(references.tail);
-        h <- references.head._2
+        (resource, sizes) = references.head;
+        size <- sizes
       ) yield
-        t + (references.head._1 -> h)
+        t + (resource -> size)
 
   private sealed abstract class DependencySize(val offsetDirection: OffsetDirection) {
     def size(assumptions: Map[DependentResource, Int]): Int
