@@ -128,7 +128,11 @@ class StackSuite extends WordSpec with Matchers {
       "correctly encode pusha" in {
         PushAll().encodeByte should be(Hex.lsb("60"))
       }
-    }
+
+      "correctly represent pusha as a string" in {
+        PushAll().toString shouldBe "pusha"
+      }
+     }
 
     "in long mode" should {
 

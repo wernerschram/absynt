@@ -136,6 +136,8 @@ object OperandInfo {
     override def rexRequirements: Set[RexRequirement] = Set.empty
 
     override def compare(that: OperandInfo): Int = 0
+
+    override def toString: String = ""
   }
 
 }

@@ -51,10 +51,13 @@ abstract class X86Operation extends UnlabeledEncodable {
 
   def mnemonic: String
 
-  override def toString: String = if (operands.isEmpty)
+  override def toString: String = {
+    val operandString = operands.toSeq.sorted.map(_.toString).mkString(", ")
+    if (operandString.isEmpty)
       s"$mnemonic"
     else
-      s"$mnemonic ${operands.toSeq.sorted.map{ _.toString }.mkString(", ")}"
+      s"$mnemonic $operandString"
+  }
 }
 
 object X86Operation {

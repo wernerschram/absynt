@@ -2,7 +2,6 @@ package assembler.x86.instructions
 
 import assembler.Hex
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.ReturnMode
 import org.scalatest.{Matchers, WordSpec}
 
@@ -89,7 +88,7 @@ class SystemSuite extends WordSpec with Matchers {
       }
 
       "correctly represent sysexit as a string" in {
-        SystemExit(ReturnMode.Protected).toString should be("sysexit ")
+        SystemExit(ReturnMode.Protected).toString should be("sysexit")
       }
 
       "correctly encode sysret to protected mode" in {
@@ -101,7 +100,7 @@ class SystemSuite extends WordSpec with Matchers {
       }
 
       "correctly represent sysret as a string" in {
-        SystemReturn(ReturnMode.Protected).toString should be("sysret ")
+        SystemReturn(ReturnMode.Protected).toString should be("sysret")
       }
     }
   }
