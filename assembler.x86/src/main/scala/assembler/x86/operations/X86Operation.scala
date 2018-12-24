@@ -13,8 +13,7 @@ abstract class X86Operation extends UnlabeledEncodable {
   override def size: Int = encodeByte.length
 
   override def encodeByte: Seq[Byte] = {
-    validate()
-
+    assert(operands.forall(o => o.isValidForMode))
     optionalSegmentOverridePrefix ++
       optionalAddressSizePrefix ++
       optionalOperandSizePrefix ++
@@ -23,8 +22,6 @@ abstract class X86Operation extends UnlabeledEncodable {
   }
 
   implicit val processorMode: ProcessorMode
-
-  def validate(): Unit = Unit
 
   private def optionalSegmentOverridePrefix: List[Byte] = segmentOverride match {
     case Some(segment) => X86Operation.SegmentOverrideMap.get(segment).toList

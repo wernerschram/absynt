@@ -2,7 +2,7 @@ package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.operations.{Immediate, ModRMStatic, RegisterEncoded, Static}
+import assembler.x86.operations._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
 object Push {
@@ -86,10 +86,7 @@ object PushAll {
   def apply()(implicit processorMode: ProcessorMode): Static = Static()
 
   private def Static()(implicit processorMode: ProcessorMode) = new Static(0x60.toByte :: Nil, opcode) {
-    override def validate(): Unit = {
-      super.validate()
-      assume(processorMode != ProcessorMode.Long)
-    }
+    override def operands = Set(OperandInfo.allRegisters)
   }
 }
 

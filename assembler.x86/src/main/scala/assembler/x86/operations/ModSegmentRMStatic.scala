@@ -15,9 +15,4 @@ abstract class ModSegmentRMStatic(val register: SegmentRegister,
     if (operandRMOrder == destination) source else destination
 
   override def operands: Set[OperandInfo] = super.operands + OperandInfo.rmSegment(register, operandSegmentOrder)
-
-  override def validate(): Unit = {
-    super.validate()
-    assume(register.isValidForMode(processorMode))
-  }
 }

@@ -16,11 +16,6 @@ abstract class ModRMStatic(val operandRM: ModRMEncodableOperand,
 
   override def operands: Set[OperandInfo] = Set(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW))
 
-  override def validate(): Unit = {
-    super.validate()
-    assume(operandRM.isValidForMode(processorMode))
-  }
-
   override def segmentOverride: Option[SegmentRegister] = operandRM match {
     case location: MemoryLocationType => location.segmentOverride
     case _ => None

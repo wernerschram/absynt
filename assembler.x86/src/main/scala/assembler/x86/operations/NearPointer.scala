@@ -1,5 +1,6 @@
 package assembler.x86.operations
 
+import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
@@ -11,11 +12,6 @@ trait NearPointer extends X86Operation {
   def pointerOrder: OperandOrder
 
   abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.relative(pointer, pointerOrder)
-
-  override def validate(): Unit = {
-    super.validate()
-    assume(pointer.isValidForMode(processorMode))
-  }
 
   abstract override def encodeByte: Seq[Byte] =
     super.encodeByte ++ pointer.encodeBytes

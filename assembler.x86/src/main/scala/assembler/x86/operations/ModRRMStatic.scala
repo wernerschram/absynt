@@ -16,9 +16,4 @@ abstract class ModRRMStatic[RegisterType <: GeneralPurposeRegister](val register
     if (operandRMOrder == destination) source else destination
 
   override def operands: Set[OperandInfo] = super.operands + OperandInfo.rmRegister(register, operandROrder)
-
-  override def validate(): Unit = {
-    super.validate()
-    assume(register.isValidForMode(processorMode))
-  }
 }
