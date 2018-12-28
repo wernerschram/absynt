@@ -6,7 +6,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
-import assembler.x86.operations.{ModRMStatic, NearJumpOperation, ShortJumpOperation, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import assembler.x86.operations.{ModRM, NearJumpOperation, ShortJumpOperation, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
 abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
@@ -72,7 +72,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
 
 object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-  def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRMStatic =
+  def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRM =
     (operand, processorMode) match {
       case (o: ModRMEncodableOperand with ExtendedSize, ProcessorMode.Real | ProcessorMode.Protected) =>
         RM16(o)
@@ -85,7 +85,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
+    new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
       override def operandRMOrder: OperandOrder = destination
     }
 
@@ -95,7 +95,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   private def M1616(operand: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
+    new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
       override def operandRMOrder: OperandOrder = destination
     }
 
@@ -103,7 +103,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =
       Ptr1616(farPointer)
 
-    def apply(pointer: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode): ModRMStatic =
+    def apply(pointer: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode): ModRM =
       (pointer, processorMode) match {
         case (_: QuadWordSize, ProcessorMode.Protected | ProcessorMode.Real) =>
           throw new AssertionError

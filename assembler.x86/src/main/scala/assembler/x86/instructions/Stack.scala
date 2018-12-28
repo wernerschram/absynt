@@ -25,7 +25,7 @@ object Push {
       override def registerOrder: OperandOrder = destination
     }
 
-  def apply(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): ModRMStatic =
+  def apply(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): ModRM =
     (processorMode, operand) match {
       case (_, o: WordSize) =>
         RM16(o)
@@ -38,7 +38,7 @@ object Push {
     }
 
   private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
+    new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
       override def operandRMOrder: OperandOrder = destination
     }
 

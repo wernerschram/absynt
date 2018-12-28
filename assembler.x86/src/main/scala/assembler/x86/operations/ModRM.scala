@@ -5,11 +5,11 @@ import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
-abstract class ModRMStatic(val operandRM: ModRMEncodableOperand,
-                  override val code: Seq[Byte],
-                  val rValue: Byte,
-                  override val mnemonic: String,
-                  override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
+abstract class ModRM(val operandRM: ModRMEncodableOperand,
+                     override val code: Seq[Byte],
+                     val rValue: Byte,
+                     override val mnemonic: String,
+                     override val includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends X86Operation {
 
   def operandRMOrder: OperandOrder

@@ -6,25 +6,25 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.OperandInfo.OperandOrder._
-import assembler.x86.operations.{Immediate, ModRMStatic, ModRRMStatic, ModSegmentRMStatic, OperandInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
+import assembler.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, OperandInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 
 object Move {
 
   implicit val mnemonic: String = "mov"
 
-  def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit processorMode: ProcessorMode): ModSegmentRMStatic =
+  def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit processorMode: ProcessorMode): ModSegmentRM =
     RM16ToSReg(destination, source)
 
   private def RM16ToSReg(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModSegmentRMStatic(operand1, operand2, 0x8E.toByte :: Nil, mnemonic) {
+    new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = source
     }
 
-  def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModSegmentRMStatic =
+  def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModSegmentRM =
     SRegToRM16(source, destination)
 
   private def SRegToRM16(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModSegmentRMStatic(operand1, operand2, 0x8C.toByte :: Nil, mnemonic) {
+    new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = destination
     }
 
@@ -43,7 +43,7 @@ object Move {
     }
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](operand1, operand2, 0x88.toByte :: Nil, mnemonic) {
+    new ModRRM[ByteRegister](operand1, operand2, 0x88.toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = destination
     }
 
@@ -68,7 +68,7 @@ object Move {
     }
 
   private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](operand1, operand2, 0x89.toByte :: Nil, mnemonic) {
+    new ModRRM[WideRegister](operand1, operand2, 0x89.toByte :: Nil, mnemonic) {
       override def operandRMOrder: OperandOrder = destination
     }
 
@@ -90,7 +90,7 @@ object Move {
     }
 
   private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](operand1, operand2, 0x8A.toByte :: Nil, mnemonic) {
+    new ModRRM[ByteRegister](operand1, operand2, 0x8A.toByte :: Nil, mnemonic) {
       override def operandRMOrder: OperandOrder = source
     }
 
@@ -112,7 +112,7 @@ object Move {
     }
 
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](operand1, operand2, 0x8B.toByte :: Nil, mnemonic) {
+    new ModRRM[WideRegister](operand1, operand2, 0x8B.toByte :: Nil, mnemonic) {
       override def operandRMOrder: OperandOrder = source
     }
 
@@ -190,7 +190,7 @@ object Move {
     }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate {
+    new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
       override def operandRMOrder: OperandOrder = destination
@@ -199,7 +199,7 @@ object Move {
     }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate {
+    new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic) with Immediate {
       override def immediate: ImmediateValue = immediateValue
 
       override def operandRMOrder: OperandOrder = destination

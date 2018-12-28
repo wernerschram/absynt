@@ -66,61 +66,61 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
     }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+    new ModRM(operand, 0x80.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediateOrder: OperandOrder = source
       override val operandRMOrder: OperandOrder = destination
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+    new ModRM(operand, 0x81.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediateOrder: OperandOrder = source
       override val operandRMOrder: OperandOrder = destination
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
+    new ModRM(operand, 0x83.toByte :: Nil, extensionCode, mnemonic) with Immediate {
       override val immediateOrder: OperandOrder = source
       override val operandRMOrder: OperandOrder = destination
       override val immediate: ImmediateValue = immediateValue
     }
 
-  def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
+  def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =
     R8ToRM8(source, destination)
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic) {
+    new ModRRM[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = destination
     }
 
-  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
+  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =
     R8ToRM8(source, destination)
 
-  def apply(source: WideRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
+  def apply(source: WideRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRM[WideRegister] =
     R16ToRM16(source, destination)
 
   private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic) {
+    new ModRRM[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = destination
     }
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
+  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRM[WideRegister] =
     R16ToRM16(destination, source)
 
-  def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[ByteRegister] =
+  def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =
     RM8ToR8(destination, source)
 
   private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic) {
+    new ModRRM[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = source
     }
 
-  def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRMStatic[WideRegister] =
+  def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRM[WideRegister] =
     RM16ToR16(destination, source)
 
   private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRMStatic[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic) {
+    new ModRRM[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic) {
       override val operandRMOrder: OperandOrder = source
     }
 
@@ -138,19 +138,19 @@ object Xor extends BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
 object Not {
   implicit val opcode: String = "not"
 
-  def apply(operand: ModRMEncodableOperand with ValueSize)(implicit processorMode: ProcessorMode): ModRMStatic =
+  def apply(operand: ModRMEncodableOperand with ValueSize)(implicit processorMode: ProcessorMode): ModRM =
     operand match {
       case o:ByteSize => RM8(o)
       case o:WideSize => RM16(o)
     }
 
   private def RM8(operand: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xF6.toByte :: Nil, 2, opcode) {
+    new ModRM(operand, 0xF6.toByte :: Nil, 2, opcode) {
       override val operandRMOrder: OperandOrder = destination
     }
 
   private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRMStatic(operand, 0xF7.toByte :: Nil, 2, opcode) {
+    new ModRM(operand, 0xF7.toByte :: Nil, 2, opcode) {
       override val operandRMOrder: OperandOrder = destination
     }
 }
