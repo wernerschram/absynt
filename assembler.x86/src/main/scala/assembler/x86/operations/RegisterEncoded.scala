@@ -6,8 +6,7 @@ import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
 abstract class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register: RegisterType,
                                                               rawCode: Seq[Byte],
-                                                              override val mnemonic: String,
-                                                              override val includeRexW: Boolean = true)
+                                                              override val mnemonic: String)
                                                              (override implicit val processorMode: ProcessorMode)
   extends X86Operation {
 

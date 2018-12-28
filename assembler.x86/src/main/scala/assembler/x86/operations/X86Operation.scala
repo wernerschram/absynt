@@ -6,8 +6,6 @@ import assembler.x86.{ProcessorMode, RexRequirement}
 
 
 abstract class X86Operation extends UnlabeledEncodable {
-  val includeRexW: Boolean = true
-
   def operands: Set[OperandInfo]
 
   override def size: Int = encodeByte.length

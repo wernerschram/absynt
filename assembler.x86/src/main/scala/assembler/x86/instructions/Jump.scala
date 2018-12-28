@@ -85,9 +85,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, false) {
-      override def operandRMOrder: OperandOrder = destination
-    }
+    new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)
 
   private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
     new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
@@ -95,9 +93,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   private def M1616(operand: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR") {
-      override def operandRMOrder: OperandOrder = destination
-    }
+    new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination)
 
   object Far {
     def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =

@@ -21,7 +21,7 @@ object Push {
     }
 
   private def R16(register: WideRegister)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[WideRegister](register, Seq(0x50.toByte), opcode, includeRexW = false) {
+    new RegisterEncoded[WideRegister](register, Seq(0x50.toByte), opcode) {
       override def registerOrder: OperandOrder = destination
     }
 
@@ -38,9 +38,7 @@ object Push {
     }
 
   private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode) {
-      override def operandRMOrder: OperandOrder = destination
-    }
+    new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode, destination)
 
   def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate =
     immediate match {
