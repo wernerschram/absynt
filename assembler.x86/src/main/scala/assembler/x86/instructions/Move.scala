@@ -155,9 +155,9 @@ object Move {
             throw new AssertionError
           case (ProcessorMode.Real, _) =>
             Imm16ToR16(register, distance.toShort)
-          case (ProcessorMode.Protected, _: DoubleWordRegister) =>
+          case (ProcessorMode.Protected, _: DoubleWordSize) =>
             Imm16ToR16(register, distance)
-          case (ProcessorMode.Long, _: QuadWordRegister) =>
+          case (ProcessorMode.Long, _: QuadWordSize) =>
             Imm16ToR16(register, distance.toLong)
           case _ =>
             throw new AssertionError

@@ -1,6 +1,6 @@
 package assembler.x86.operands
 
-import assembler.x86.ProcessorMode
+import assembler.x86.{ProcessorMode, RexRequirement}
 
 sealed abstract class Register extends Operand
 
@@ -13,6 +13,7 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
+  override def rexRequirements(rexRequirement: RexRequirement): Set[RexRequirement] = Set(rexRequirement)
 }
 
 sealed abstract class AccumulatorRegister extends GeneralPurposeRegister(0x00, "ax")

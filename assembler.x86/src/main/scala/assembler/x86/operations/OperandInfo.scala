@@ -64,10 +64,7 @@ object OperandInfo {
 
   def encodedRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(register, operandOrder) with OperandSizePrefix {
-      override def rexRequirements: Set[RexRequirement] = register match {
-        case _: GeneralPurposeRexRegister => Set(RexRequirement.instanceOpcodeReg)
-        case _ => Set.empty
-      }
+      override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOpcodeReg)
 
     } //rX
 
@@ -86,11 +83,7 @@ object OperandInfo {
       }
 
       override def rexRequirements: Set[RexRequirement] = {
-        val operandRequirements = rm match {
-          case _: GeneralPurposeRexRegister =>
-            Set(RexRequirement.instanceOperandRM)
-          case _ => Set.empty[RexRequirement]
-        }
+        val operandRequirements = rm.rexRequirements(RexRequirement.instanceOperandRM)
         if (includeRexW)
           super.rexRequirements ++ operandRequirements
         else
@@ -100,10 +93,7 @@ object OperandInfo {
 
   def rmRegister(register: GeneralPurposeRegister, operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(register, operandOrder) with OperandSizePrefix {
-      override def rexRequirements: Set[RexRequirement] = register match {
-        case _: GeneralPurposeRexRegister => super.rexRequirements + RexRequirement.instanceOperandR
-        case _ => super.rexRequirements
-      }
+      override def rexRequirements: Set[RexRequirement] = super.rexRequirements ++ register.rexRequirements(RexRequirement.instanceOperandR)
     } //rXX
 
   def rmSegment(register: SegmentRegister, operandOrder: OperandOrder): OperandInfo =
@@ -131,12 +121,7 @@ trait AddressSizePrefix {
 object AddressOperandInfo {
   def rmIndex(register: GeneralPurposeRegister with IndexRegister, segmentOverride: Option[SegmentRegister]): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) with AddressSizePrefix {
-      override def rexRequirements: Set[RexRequirement] = register match {
-        case _: GeneralPurposeRexRegister =>
-          super.rexRequirements + RexRequirement.instanceOperandRM
-        case _ =>
-          super.rexRequirements
-      }
+      override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOperandRM)
     }
 
   def rmBase(register: GeneralPurposeRegister with BaseRegisterReference): AddressOperandInfo =
@@ -147,22 +132,12 @@ object AddressOperandInfo {
 
   def SIBBase(register: GeneralPurposeRegister with SIBBaseRegister): AddressOperandInfo =
     new AddressOperandInfo(register) with AddressSizePrefix {
-      override def rexRequirements: Set[RexRequirement] = register match {
-        case _: GeneralPurposeRexRegister =>
-          Set(RexRequirement.instanceBase)
-        case _ =>
-          Set.empty
-      }
+      override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceBase)
     }
 
   def SIBIndex(register: GeneralPurposeRegister with SIBIndexRegister, segmentOverride: Option[SegmentRegister]): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) with AddressSizePrefix {
-      override def rexRequirements: Set[RexRequirement] = register match {
-        case _: GeneralPurposeRexRegister =>
-          Set(RexRequirement.instanceIndex)
-        case _ =>
-          Set.empty
-      }
+      override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceIndex)
     }
 
   def memoryOffset(offset: memoryaccess.MemoryLocation with ValueSize): AddressOperandInfo =
