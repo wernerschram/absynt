@@ -5,7 +5,7 @@ import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 
 
-abstract class X86Operation extends UnlabeledEncodable {
+abstract class X86Operation()(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
   def operands: Set[OperandInfo]
 
   override def size: Int = encodeByte.length
@@ -18,8 +18,6 @@ abstract class X86Operation extends UnlabeledEncodable {
       optionalRexPrefix ++
       code
   }
-
-  implicit val processorMode: ProcessorMode
 
   private def optionalSegmentOverridePrefix: List[Byte] =
       operands.flatMap(_.addressOperands).flatMap(_.segmentOverride).flatMap(X86Operation.SegmentOverrideMap.get).toList
