@@ -15,12 +15,12 @@ sealed class RegisterMemoryLocation[T <: RegisterReference] private(val referenc
       displacement, segment)
     with ModRMEncodableOperand {
 
-  override val addressOperands: Set[AddressOperandInfo] = reference match {
-    case bi: BaseIndexReference => Set(AddressOperandInfo.rmBase(bi.base), AddressOperandInfo.rmIndex(bi.index))
-    case o: GeneralPurposeRegister with IndexRegister => Set(AddressOperandInfo.rmIndex(o))
-  }
-
   override val defaultSegment: SegmentRegister = reference.defaultSegment
+
+  override val addressOperands: Set[AddressOperandInfo] = reference match {
+    case bi: BaseIndexReference => Set(AddressOperandInfo.rmBase(bi.base), AddressOperandInfo.rmIndex(bi.index, segmentOverride))
+    case o: GeneralPurposeRegister with IndexRegister => Set(AddressOperandInfo.rmIndex(o, segmentOverride))
+  }
 
   override def toString: String = s"$segmentPrefix[$reference$displacementString]"
 

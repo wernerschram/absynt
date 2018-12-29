@@ -7,12 +7,12 @@ import assembler.x86.operations.AddressOperandInfo
 sealed class MemoryAddress private(address: ImmediateValue, segment: SegmentRegister = Register.DS)
   extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {
 
-  override val addressOperands: Set[AddressOperandInfo] = Set(AddressOperandInfo.rmDisplacement(address))
-
   override val modValue: Byte = 0x00.toByte
 
   override val registerOrMemoryModeCode: Byte = if (address.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
-  override val defaultSegment: SegmentRegister = Register.DS
+  final override val defaultSegment: SegmentRegister = Register.DS
+
+  override val addressOperands: Set[AddressOperandInfo] = Set(AddressOperandInfo.rmDisplacement(address, segmentOverride))
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ address.value
 

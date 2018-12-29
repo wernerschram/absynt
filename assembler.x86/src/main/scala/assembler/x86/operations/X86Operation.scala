@@ -21,12 +21,8 @@ abstract class X86Operation extends UnlabeledEncodable {
 
   implicit val processorMode: ProcessorMode
 
-  private def optionalSegmentOverridePrefix: List[Byte] = segmentOverride match {
-    case Some(segment) => X86Operation.SegmentOverrideMap.get(segment).toList
-    case _ => Nil
-  }
-
-  def segmentOverride: Option[SegmentRegister] = None
+  private def optionalSegmentOverridePrefix: List[Byte] =
+      operands.flatMap(_.addressOperands).flatMap(_.segmentOverride).flatMap(X86Operation.SegmentOverrideMap.get).toList
 
   private def optionalAddressSizePrefix: List[Byte] =
     if (operands.flatMap(_.addressOperands).exists(_.requiresAddressSize(processorMode))) X86Operation.AddressSizeCode :: Nil else Nil
@@ -42,7 +38,7 @@ abstract class X86Operation extends UnlabeledEncodable {
       rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitMask).toByte) :: Nil
   }
 
-  def rexRequirements: Set[RexRequirement] =
+  lazy val rexRequirements: Set[RexRequirement] =
     operands.flatMap(o => o.rexRequirements ++ o.addressOperands.flatMap(_.rexRequirements))
 
   def code: Seq[Byte]

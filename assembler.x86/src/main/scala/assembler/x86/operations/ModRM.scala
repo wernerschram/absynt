@@ -15,11 +15,6 @@ class ModRM(val operandRM: ModRMEncodableOperand,
 
   override def operands: Set[OperandInfo] = Set(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW))
 
-  override def segmentOverride: Option[SegmentRegister] = operandRM match {
-    case location: MemoryLocationType => location.segmentOverride
-    case _ => None
-  }
-
   override def encodeByte: Seq[Byte] =
     super.encodeByte ++ operandRM.getExtendedBytes(rValue)
 }

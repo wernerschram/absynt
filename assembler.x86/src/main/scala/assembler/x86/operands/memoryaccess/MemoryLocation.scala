@@ -8,8 +8,8 @@ abstract class MemoryLocation(val displacement: Option[ImmediateValue], val segm
 
   def addressOperands: Set[AddressOperandInfo]
 
+  def defaultSegment: SegmentRegister
   lazy val segmentOverride: Option[SegmentRegister] = if (segment == defaultSegment) None else Some(segment)
-  val defaultSegment: SegmentRegister
 
   def segmentPrefix: String = segmentOverride match {
     case Some(segmentRegister) => s"$segmentRegister:"
