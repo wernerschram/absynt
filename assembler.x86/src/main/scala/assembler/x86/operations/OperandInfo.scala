@@ -8,8 +8,6 @@ sealed abstract class OperandInfo(val operand: Operand, val order: OperandInfo.O
 
   override def compare(that: OperandInfo): Int = order compare that.order
 
-  def isValidForMode(implicit processorMode: ProcessorMode): Boolean = operand.isValidForMode(processorMode)
-
   def requiresOperandSize(processorMode: ProcessorMode): Boolean = false
 
   def addressOperands: Set[AddressOperandInfo] = Set.empty

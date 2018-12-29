@@ -11,7 +11,7 @@ abstract class X86Operation extends UnlabeledEncodable {
   override def size: Int = encodeByte.length
 
   override def encodeByte: Seq[Byte] = {
-    assert(operands.forall(o => o.isValidForMode))
+    assert(operands.forall(o => o.operand.isValidForMode(processorMode)))
     optionalSegmentOverridePrefix ++
       optionalAddressSizePrefix ++
       optionalOperandSizePrefix ++
