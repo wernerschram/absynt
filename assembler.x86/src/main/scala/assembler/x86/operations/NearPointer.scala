@@ -1,18 +1,17 @@
 package assembler.x86.operations
 
-import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
-trait NearPointer extends X86Operation {
+trait NearPointer extends X86Operation with DisplacementBytes {
 
-  self: X86Operation =>
+  // TODO: remove extends X86Operation so that self type can be restricted
+  self: X86Operation with ModRMBytes with DisplacementBytes with ImmediateBytes =>
   def pointer: NearPointerType
 
   def pointerOrder: OperandOrder
 
-  abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.relative(pointer, pointerOrder)
+  override def displacementBytes: Seq[Byte] = pointer.encodeBytes
 
-  abstract override def encodeByte: Seq[Byte] =
-    super.encodeByte ++ pointer.encodeBytes
+  abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.relative(pointer, pointerOrder)
 }

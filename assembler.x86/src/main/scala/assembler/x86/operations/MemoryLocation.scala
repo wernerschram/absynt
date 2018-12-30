@@ -1,12 +1,12 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.SegmentRegister
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-trait MemoryLocation extends X86Operation {
+trait MemoryLocation extends X86Operation with DisplacementBytes {
 
-  self: X86Operation =>
+  // TODO: remove extends X86Operation so that self type can be restricted
+  self: X86Operation with ModRMBytes with ImmediateBytes =>
   def location: MemoryLocationType
   def offsetOrder: OperandOrder
 
@@ -14,8 +14,7 @@ trait MemoryLocation extends X86Operation {
     super.operands +
       OperandInfo.memoryOffset(location, offsetOrder)
 
-  def addressOperands: Set[AddressOperandInfo] = location.addressOperands
+  override def displacementBytes: Seq[Byte] = location.displacement.toSeq.flatMap(_.value)
 
-  abstract override def encodeByte: Seq[Byte] =
-    super.encodeByte ++ location.displacement.toSeq.flatMap(_.value)
+  def addressOperands: Set[AddressOperandInfo] = location.addressOperands
 }

@@ -6,7 +6,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
-import assembler.x86.operations.{ModRM, NearJumpOperation, ShortJumpOperation, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import assembler.x86.operations.{ModRM, NearJumpOperation, NoDisplacement, NoImmediate, ShortJumpOperation, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
 abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
@@ -21,7 +21,7 @@ abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemon
   }
 
   protected def Rel8(nearPointer: NearPointer with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
-    new Static(shortOpcode, mnemonic) with NearPointerOperation {
+    new Static(shortOpcode, mnemonic) with NearPointerOperation with NoImmediate {
       override val pointer: NearPointer = nearPointer
 
       override def pointerOrder: OperandOrder = destination
@@ -54,7 +54,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
     Rel16(nearPointer)
 
   private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
-    new Static(longOpcode, mnemonic) with NearPointerOperation {
+    new Static(longOpcode, mnemonic) with NearPointerOperation with NoImmediate {
       override val pointer: NearPointer = nearPointer
       override def pointerOrder: OperandOrder = destination
     }
@@ -85,15 +85,15 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     }
 
   private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)
+    new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
   private def Ptr1616(farPointer: FarPointer)(implicit processorMode: ProcessorMode) =
-    new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation {
+    new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation with NoImmediate {
       override def pointer: FarPointer = farPointer
     }
 
   private def M1616(operand: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination)
+    new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
 
   object Far {
     def apply(farPointer: FarPointer)(implicit processorMode: ProcessorMode): Static with FarPointerOperation =

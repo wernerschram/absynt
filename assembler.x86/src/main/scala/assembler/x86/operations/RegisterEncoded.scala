@@ -8,12 +8,10 @@ abstract class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register:
                                                               rawCode: Seq[Byte],
                                                               override val mnemonic: String)
                                                              (override implicit val processorMode: ProcessorMode)
-  extends X86Operation {
+  extends X86Operation(rawCode.take(rawCode.length - 1) :+ (rawCode.last | register.registerCode).toByte) with NoModRM {
 
+  self: DisplacementBytes with ImmediateBytes =>
   def registerOrder: OperandOrder
 
   override def operands: Set[OperandInfo] = Set(OperandInfo.encodedRegister(register, registerOrder))
-
-  override def code: Seq[Byte] =
-    rawCode.take(rawCode.length - 1) :+ (rawCode.last | register.registerCode).toByte
 }

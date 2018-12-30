@@ -9,9 +9,7 @@ class X86OperationSuite extends WordSpec with Matchers {
   "an X86 instruction" when {
     "in protected mode" should {
 
-      class MyInstruction extends X86Operation()(ProcessorMode.Protected) {
-        override def code: List[Byte] = 0x00.toByte :: Nil
-
+      class MyInstruction extends X86Operation(0x00.toByte :: Nil)(ProcessorMode.Protected) with NoModRM with NoImmediate with NoDisplacement {
         override def mnemonic = "mis"
 
         override def operands: Set[OperandInfo] = Set.empty

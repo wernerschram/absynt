@@ -4,19 +4,64 @@ import assembler.resource.UnlabeledEncodable
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 
+object EncodingPosition extends Enumeration {
+  type EncodingPosition = Value
+  val opcode, modRM, SIB, displacement, immediate = Value
+}
 
-abstract class X86Operation()(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
+trait ModRMBytes {
+  self: X86Operation =>
+  override def modRMBytes: Seq[Byte]
+}
+
+trait DisplacementBytes {
+  self: X86Operation =>
+  override def displacementBytes: Seq[Byte]
+}
+
+trait ImmediateBytes {
+  self: X86Operation =>
+  override def immediateBytes: Seq[Byte]
+}
+
+trait NoModRM extends ModRMBytes {
+  self: X86Operation =>
+  override def modRMBytes: Seq[Byte] = Nil
+}
+
+trait NoDisplacement extends DisplacementBytes {
+  self: X86Operation =>
+  override def displacementBytes: Seq[Byte] = Nil
+}
+
+trait NoImmediate extends ImmediateBytes {
+  self: X86Operation =>
+  override def immediateBytes: Seq[Byte] = Nil
+}
+
+abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
+  self: ModRMBytes with DisplacementBytes with ImmediateBytes =>
+  final def prefixes: Seq[Byte] =
+    optionalSegmentOverridePrefix ++
+      optionalAddressSizePrefix ++
+      optionalOperandSizePrefix ++
+      optionalRexPrefix
+
+  def modRMBytes: Seq[Byte]
+  def displacementBytes: Seq[Byte]
+  def immediateBytes: Seq[Byte]
+
   def operands: Set[OperandInfo]
 
   override def size: Int = encodeByte.length
 
   override def encodeByte: Seq[Byte] = {
     assert(operands.forall(o => o.operand.isValidForMode(processorMode)))
-    optionalSegmentOverridePrefix ++
-      optionalAddressSizePrefix ++
-      optionalOperandSizePrefix ++
-      optionalRexPrefix ++
-      code
+    prefixes ++
+      code ++
+      modRMBytes ++
+      displacementBytes ++
+      immediateBytes
   }
 
   private def optionalSegmentOverridePrefix: List[Byte] =
@@ -39,7 +84,6 @@ abstract class X86Operation()(implicit val processorMode: ProcessorMode) extends
   lazy val rexRequirements: Set[RexRequirement] =
     operands.flatMap(o => o.rexRequirements ++ o.addressOperands.flatMap(_.rexRequirements))
 
-  def code: Seq[Byte]
 
   def mnemonic: String
 

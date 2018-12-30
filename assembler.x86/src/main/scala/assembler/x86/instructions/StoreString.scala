@@ -4,7 +4,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
 import assembler.x86.operations.OperandInfo.OperandOrder
-import assembler.x86.operations.{OperandInfo, Repeated, Static}
+import assembler.x86.operations._
 
 object StoreString {
   implicit val mnemonic: String = "stos"
@@ -17,7 +17,7 @@ object StoreString {
     }
 
   private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
-    new Static(0xAA.toByte :: Nil, mnemonic) {
+    new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
       override def operands: Set[OperandInfo] =
         super.operands +
           OperandInfo.implicitAddress(destination, OperandOrder.destination) +
@@ -26,7 +26,7 @@ object StoreString {
 
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                       (implicit processorMode: ProcessorMode) =
-    new Static(0xAB.toByte :: Nil, mnemonic) {
+    new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
       override def operands: Set[OperandInfo] =
         super.operands +
           OperandInfo.implicitAddress(destination, OperandOrder.destination) +
@@ -34,7 +34,7 @@ object StoreString {
     }
 
   private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
-    new Static(0xAA.toByte :: Nil, mnemonic) with Repeated {
+    new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
       override def operands: Set[OperandInfo] =
         super.operands +
           OperandInfo.implicitAddress(destination, OperandOrder.destination) +
@@ -43,7 +43,7 @@ object StoreString {
 
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                          (implicit processorMode: ProcessorMode) =
-    new Static(0xAB.toByte :: Nil, mnemonic) with Repeated {
+    new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
       override def operands: Set[OperandInfo] =
         super.operands +
           OperandInfo.implicitAddress(destination, OperandOrder.destination) +

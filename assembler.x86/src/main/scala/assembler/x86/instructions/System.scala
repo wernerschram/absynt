@@ -3,7 +3,7 @@ package assembler.x86.instructions
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ReturnMode
 import assembler.x86.operations.OperandInfo.OperandOrder._
-import assembler.x86.operations.{OperandInfo, Static}
+import assembler.x86.operations.{NoDisplacement, NoImmediate, OperandInfo, Static}
 
 object SystemCall {
   val opcode = "syscall"
@@ -14,7 +14,7 @@ object SystemCall {
     Static()
   }
 
-  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0x05.toByte :: Nil, opcode)
+  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0x05.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
 
 }
 
@@ -27,7 +27,7 @@ object SystemEnter {
     Static()
   }
 
-  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0x34.toByte :: Nil, opcode)
+  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0x34.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
 
 }
 
@@ -41,7 +41,7 @@ object SystemReturn {
   }
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
-    new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) {
+    new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
       override val operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(returnMode, destination)
     }
 }
@@ -56,7 +56,7 @@ object SystemExit {
   }
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
-    new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) {
+    new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
       override val operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(returnMode, destination)
     }
 }
