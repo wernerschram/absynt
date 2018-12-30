@@ -12,7 +12,6 @@ abstract class ModRM(val operandRM: ModRMEncodableOperand,
                      includeRexW: Boolean = true)(override implicit val processorMode: ProcessorMode)
   extends X86Operation(code) with ModRMBytes {
 
-  // TODO: remove extends X86Operation so that self type can be restricted
   self: X86Operation with DisplacementBytes with ImmediateBytes =>
 
   override def modRMBytes: Seq[Byte] = operandRM.getExtendedBytes(rValue)

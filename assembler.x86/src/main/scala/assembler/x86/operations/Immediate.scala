@@ -3,10 +3,9 @@ package assembler.x86.operations
 import assembler.x86.operands.ImmediateValue
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-trait Immediate extends X86Operation with ImmediateBytes {
+trait Immediate extends ImmediateBytes {
 
-  // TODO: remove extends X86Operation so that self type can be restricted
-  self: X86Operation with ModRMBytes with DisplacementBytes =>
+  self: X86Operation =>
   def immediate: ImmediateValue
   def immediateOrder: OperandOrder
 

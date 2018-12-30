@@ -3,10 +3,9 @@ package assembler.x86.operations
 import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerType}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
-trait NearPointer extends X86Operation with DisplacementBytes {
+trait NearPointer extends DisplacementBytes {
 
-  // TODO: remove extends X86Operation so that self type can be restricted
-  self: X86Operation with ModRMBytes with DisplacementBytes with ImmediateBytes =>
+  self: X86Operation =>
   def pointer: NearPointerType
 
   def pointerOrder: OperandOrder

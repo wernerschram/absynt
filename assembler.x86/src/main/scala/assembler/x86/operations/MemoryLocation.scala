@@ -3,10 +3,9 @@ package assembler.x86.operations
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-trait MemoryLocation extends X86Operation with DisplacementBytes {
+trait MemoryLocation extends DisplacementBytes {
 
-  // TODO: remove extends X86Operation so that self type can be restricted
-  self: X86Operation with ModRMBytes with ImmediateBytes =>
+  self: X86Operation =>
   def location: MemoryLocationType
   def offsetOrder: OperandOrder
 
