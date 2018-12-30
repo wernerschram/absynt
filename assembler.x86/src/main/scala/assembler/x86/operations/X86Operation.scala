@@ -4,11 +4,6 @@ import assembler.resource.UnlabeledEncodable
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 
-object EncodingPosition extends Enumeration {
-  type EncodingPosition = Value
-  val opcode, modRM, SIB, displacement, immediate = Value
-}
-
 trait ModRMBytes {
   self: X86Operation =>
   def modRMBytes: Seq[Byte]
@@ -48,7 +43,8 @@ trait NoImmediate extends ImmediateBytes {
 abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
   self: ModRMBytes with DisplacementBytes with ImmediateBytes =>
   final def prefixes: Seq[Byte] =
-    optionalSegmentOverridePrefix ++
+    optionalRepeatPrefix ++
+      optionalSegmentOverridePrefix ++
       optionalAddressSizePrefix ++
       optionalOperandSizePrefix ++
       optionalRexPrefix
@@ -78,6 +74,11 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
       immediateBytes
   }
 
+  protected def repeated: Boolean = false
+
+  private def optionalRepeatPrefix: List[Byte] =
+    if (repeated) 0xF3.toByte :: Nil else Nil
+
   private def optionalSegmentOverridePrefix: List[Byte] =
       operands.flatMap(_.addressOperands).flatMap(_.segmentOverride).flatMap(X86Operation.SegmentOverrideMap.get).toList
 
@@ -103,10 +104,7 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
 
   override def toString: String = {
     val operandString = operands.toSeq.sorted.map(_.toString).mkString(", ")
-    if (operandString.isEmpty)
-      s"$mnemonic"
-    else
-      s"$mnemonic $operandString"
+    s"${if (repeated) "rep " else ""}$mnemonic${if (operandString.nonEmpty) s" $operandString" else ""}"
   }
 }
 
