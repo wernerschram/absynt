@@ -19,7 +19,6 @@ object Input {
 
   private def Imm8ToAL(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new Static(0xE4.toByte :: Nil, opcode) with NoDisplacement with Immediate {
-      // FIXME: Technically the immediate value here represents an OperandInfo.implicitPort and not an OperandInfo.immediate although it doesn't make a difference in practice
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AL, destination))
 
