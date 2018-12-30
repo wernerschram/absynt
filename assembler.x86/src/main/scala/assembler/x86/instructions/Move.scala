@@ -43,7 +43,8 @@ object Move {
 
   private def ALToMOffs8(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation with NoImmediate {
-      override def operands: Set[OperandInfo] =  super.operands + OperandInfo.implicitOperand(Register.AL, source)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(Register.AL, source))
 
       override val location: MemoryLocation = memoryLocation
 
@@ -66,7 +67,8 @@ object Move {
 
   private def AXToMOffs16(accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation with NoImmediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(accumulatorRegister, source)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(accumulatorRegister, source))
 
       override val location: MemoryLocation = memoryLocation
 
@@ -86,7 +88,8 @@ object Move {
 
   private def MOffs8ToAL(memoryLocation: MemoryLocation)(implicit processorMode: ProcessorMode) =
     new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation with NoImmediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(Register.AL, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(Register.AL, destination))
 
       override val location: MemoryLocation = memoryLocation
 
@@ -106,7 +109,8 @@ object Move {
 
   private def MOffs16ToAX(memoryLocation: MemoryLocation, accumulatorRegister: AccumulatorRegister)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation with NoImmediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(accumulatorRegister, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(accumulatorRegister, destination))
 
       override val location: MemoryLocation = memoryLocation
 

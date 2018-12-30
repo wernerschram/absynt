@@ -11,32 +11,38 @@ object EncodingPosition extends Enumeration {
 
 trait ModRMBytes {
   self: X86Operation =>
-  override def modRMBytes: Seq[Byte]
+  def modRMBytes: Seq[Byte]
+  protected def modRMInit(): Unit
 }
 
 trait DisplacementBytes {
   self: X86Operation =>
-  override def displacementBytes: Seq[Byte]
+  def displacementBytes: Seq[Byte]
+  protected def displacementInit(): Unit
 }
 
 trait ImmediateBytes {
   self: X86Operation =>
-  override def immediateBytes: Seq[Byte]
+  def immediateBytes: Seq[Byte]
+  protected def immediateInit(): Unit
 }
 
 trait NoModRM extends ModRMBytes {
   self: X86Operation =>
   override def modRMBytes: Seq[Byte] = Nil
+  protected def modRMInit(): Unit = Unit
 }
 
 trait NoDisplacement extends DisplacementBytes {
   self: X86Operation =>
   override def displacementBytes: Seq[Byte] = Nil
+  protected def displacementInit(): Unit = Unit
 }
 
 trait NoImmediate extends ImmediateBytes {
   self: X86Operation =>
   override def immediateBytes: Seq[Byte] = Nil
+  protected def immediateInit(): Unit = Unit
 }
 
 abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
@@ -47,11 +53,19 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
       optionalOperandSizePrefix ++
       optionalRexPrefix
 
-  def modRMBytes: Seq[Byte]
-  def displacementBytes: Seq[Byte]
-  def immediateBytes: Seq[Byte]
+  protected def implicitInit(): Unit = Unit
 
-  def operands: Set[OperandInfo]
+  private final val operandsBuilder = Set.newBuilder[OperandInfo]
+
+  protected final def addOperand(operand: OperandInfo): Unit = operandsBuilder += operand
+
+  final lazy val operands: Set[OperandInfo] = {
+    implicitInit()
+    modRMInit()
+    displacementInit()
+    immediateInit()
+    operandsBuilder.result()
+  }
 
   override def size: Int = encodeByte.length
 

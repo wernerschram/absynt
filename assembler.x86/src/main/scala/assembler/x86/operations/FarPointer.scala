@@ -9,7 +9,8 @@ trait FarPointer extends X86Operation with DisplacementBytes {
   self: X86Operation with ModRMBytes with DisplacementBytes with ImmediateBytes =>
   def pointer: FarPointerType
 
-  abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.pointer(pointer, destination)
+  override protected def displacementInit(): Unit =
+    addOperand(OperandInfo.pointer(pointer, destination))
 
   override def displacementBytes: Seq[Byte] = pointer.encodeByte
 }

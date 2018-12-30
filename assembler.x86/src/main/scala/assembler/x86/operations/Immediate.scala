@@ -10,7 +10,8 @@ trait Immediate extends X86Operation with ImmediateBytes {
   def immediate: ImmediateValue
   def immediateOrder: OperandOrder
 
-  abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.immediate(immediate, immediateOrder)
+  override protected def immediateInit(): Unit =
+    addOperand(OperandInfo.immediate(immediate, immediateOrder))
 
   override def immediateBytes: Seq[Byte] = immediate.value
 }

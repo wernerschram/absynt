@@ -17,9 +17,7 @@ abstract class ModRM(val operandRM: ModRMEncodableOperand,
 
   override def modRMBytes: Seq[Byte] = operandRM.getExtendedBytes(rValue)
 
-  override def operands: Set[OperandInfo] = Set(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW))
-
-//  override def encodeByte: Seq[Byte] =
-//    super.encodeByte ++ operandRM.getExtendedBytes(rValue)
+  override protected def modRMInit(): Unit =
+    addOperand(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW))
 }
 

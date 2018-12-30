@@ -84,7 +84,8 @@ object PushAll {
   def apply()(implicit processorMode: ProcessorMode): Static = Static()
 
   private def Static()(implicit processorMode: ProcessorMode) = new Static(0x60.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
-    override def operands = Set(OperandInfo.implicitOperand(AllRegisters, source))
+    override protected def implicitInit(): Unit =
+      addOperand(OperandInfo.implicitOperand(AllRegisters, source))
   }
 }
 

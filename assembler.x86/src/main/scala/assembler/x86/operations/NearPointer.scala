@@ -13,5 +13,6 @@ trait NearPointer extends X86Operation with DisplacementBytes {
 
   override def displacementBytes: Seq[Byte] = pointer.encodeBytes
 
-  abstract override def operands: Set[OperandInfo] = super.operands + OperandInfo.relative(pointer, pointerOrder)
+  override protected def displacementInit(): Unit =
+    addOperand(OperandInfo.relative(pointer, pointerOrder))
 }

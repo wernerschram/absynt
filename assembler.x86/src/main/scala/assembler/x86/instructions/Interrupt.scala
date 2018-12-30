@@ -14,7 +14,8 @@ object Interrupt {
   }
 
   private def Static()(implicit processorMode: ProcessorMode) = new Static(0xCC.toByte :: Nil, opcode) with NoDisplacement with NoImmediate  {
-    override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(ImmediateValue(3.toByte), destination)
+    override protected def implicitInit(): Unit =
+      addOperand(OperandInfo.implicitOperand(ImmediateValue(3.toByte), destination))
   }
 
   private def Imm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =

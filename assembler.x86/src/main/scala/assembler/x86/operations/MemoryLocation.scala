@@ -10,9 +10,8 @@ trait MemoryLocation extends X86Operation with DisplacementBytes {
   def location: MemoryLocationType
   def offsetOrder: OperandOrder
 
-  abstract override def operands: Set[OperandInfo] =
-    super.operands +
-      OperandInfo.memoryOffset(location, offsetOrder)
+  override protected def displacementInit(): Unit =
+    addOperand(OperandInfo.memoryOffset(location, offsetOrder))
 
   override def displacementBytes: Seq[Byte] = location.displacement.toSeq.flatMap(_.value)
 

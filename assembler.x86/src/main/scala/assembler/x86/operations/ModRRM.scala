@@ -16,5 +16,8 @@ abstract class ModRRM[RegisterType <: GeneralPurposeRegister](val register: Regi
   def operandROrder: OperandOrder =
     if (operandRMOrder == destination) source else destination
 
-  override def operands: Set[OperandInfo] = super.operands + OperandInfo.rmRegister(register, operandROrder)
+  override protected def modRMInit(): Unit = {
+    super.modRMInit()
+    addOperand(OperandInfo.rmRegister(register, operandROrder))
+  }
 }

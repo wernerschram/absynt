@@ -15,5 +15,8 @@ abstract class ModSegmentRM(val register: SegmentRegister,
   def operandSegmentOrder: OperandOrder =
     if (operandRMOrder == destination) source else destination
 
-  override def operands: Set[OperandInfo] = super.operands + OperandInfo.rmSegment(register, operandSegmentOrder)
+  override protected def modRMInit(): Unit = {
+    super.modRMInit()
+    addOperand(OperandInfo.rmSegment(register, operandSegmentOrder))
+  }
 }

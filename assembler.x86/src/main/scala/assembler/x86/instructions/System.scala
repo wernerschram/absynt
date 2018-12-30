@@ -42,7 +42,8 @@ object SystemReturn {
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
-      override val operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(returnMode, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(returnMode, destination))
     }
 }
 
@@ -57,6 +58,7 @@ object SystemExit {
 
   private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
     new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
-      override val operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(returnMode, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(returnMode, destination))
     }
 }

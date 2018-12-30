@@ -11,9 +11,6 @@ class X86OperationSuite extends WordSpec with Matchers {
 
       class MyInstruction extends X86Operation(0x00.toByte :: Nil)(ProcessorMode.Protected) with NoModRM with NoImmediate with NoDisplacement {
         override def mnemonic = "mis"
-
-        override def operands: Set[OperandInfo] = Set.empty
-
       }
 
       "return the size of the instruction" in {

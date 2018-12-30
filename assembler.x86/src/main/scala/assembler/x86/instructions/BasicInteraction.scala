@@ -39,28 +39,32 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
 
   private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(Register.AL, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(Register.AL, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(Register.AX, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(Register.AX, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(Register.EAX, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(Register.EAX, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue = immediateValue
     }
 
   private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
-      override def operands: Set[OperandInfo] = super.operands + OperandInfo.implicitOperand(Register.RAX, destination)
+      override protected def implicitInit(): Unit =
+        addOperand(OperandInfo.implicitOperand(Register.RAX, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue = immediateValue
     }

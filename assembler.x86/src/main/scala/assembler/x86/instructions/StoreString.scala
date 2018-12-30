@@ -18,36 +18,36 @@ object StoreString {
 
   private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override def operands: Set[OperandInfo] =
-        super.operands +
-          OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-          OperandInfo.implicitOperand(Register.AL, OperandOrder.source)
+      override protected def implicitInit(): Unit = {
+        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+        addOperand(OperandInfo.implicitOperand(Register.AL, OperandOrder.source))
+      }
     }
 
   private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                       (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override def operands: Set[OperandInfo] =
-        super.operands +
-          OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-          OperandInfo.implicitOperand(register, OperandOrder.source)
+      override protected def implicitInit(): Unit = {
+        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+        addOperand(OperandInfo.implicitOperand(register, OperandOrder.source))
+      }
     }
 
   private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-      override def operands: Set[OperandInfo] =
-        super.operands +
-          OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-          OperandInfo.implicitOperand(Register.AL, OperandOrder.source)
+      override protected def implicitInit(): Unit = {
+        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+        addOperand(OperandInfo.implicitOperand(Register.AL, OperandOrder.source))
+      }
     }
 
   private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
                          (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-      override def operands: Set[OperandInfo] =
-        super.operands +
-          OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-          OperandInfo.implicitOperand(register, OperandOrder.source)
+      override protected def implicitInit(): Unit = {
+        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+        addOperand(OperandInfo.implicitOperand(register, OperandOrder.source))
+      }
     }
 
   object Repeat {

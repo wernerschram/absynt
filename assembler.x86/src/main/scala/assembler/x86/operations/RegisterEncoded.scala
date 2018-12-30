@@ -13,5 +13,6 @@ abstract class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register:
   self: DisplacementBytes with ImmediateBytes =>
   def registerOrder: OperandOrder
 
-  override def operands: Set[OperandInfo] = Set(OperandInfo.encodedRegister(register, registerOrder))
+  override protected def implicitInit(): Unit =
+    addOperand(OperandInfo.encodedRegister(register, registerOrder))
 }

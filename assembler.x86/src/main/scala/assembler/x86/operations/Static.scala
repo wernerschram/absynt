@@ -7,6 +7,4 @@ abstract class Static(override val code: Seq[Byte], opcode: String)(override imp
 
   self: X86Operation with DisplacementBytes with ImmediateBytes =>
   def mnemonic: String = opcode
-
-  override def operands: Set[OperandInfo] = Set.empty
 }
