@@ -18,33 +18,33 @@ object Input {
     Imm8ToEAX(immediate)
 
   private def Imm8ToAL(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xE4.toByte :: Nil, opcode) with NoDisplacement with Immediate {
+    new Static(0xE4.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AL, destination))
 
       override def immediateOrder: OperandOrder = source
 
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   private def Imm8ToAX(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xE5.toByte :: Nil, opcode) with NoDisplacement with Immediate {
+    new Static(0xE5.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AX, destination))
 
       override def immediateOrder: OperandOrder = source
 
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   private def Imm8ToEAX(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xE5.toByte :: Nil, opcode) with NoDisplacement with Immediate {
+    new Static(0xE5.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.EAX, destination))
 
       override def immediateOrder: OperandOrder = source
 
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   def apply(port: Register.DX.type, destination: Register.AL.type)(implicit processorMode: ProcessorMode): Static =
@@ -81,43 +81,43 @@ object Input {
 object Output {
   implicit val opcode: String = "out"
 
-  def apply(destination: Register.AL.type, immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static with Immediate =
+  def apply(destination: Register.AL.type, immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static with Immediate[ByteSize] =
     ALToImm8(immediate)
 
-  def apply(destination: Register.AX.type, immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static with Immediate =
+  def apply(destination: Register.AX.type, immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static with Immediate[ByteSize] =
     AXToImm8(immediate)
 
-  def apply(destination: Register.EAX.type, immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static with Immediate =
+  def apply(destination: Register.EAX.type, immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static with Immediate[ByteSize] =
     EAXToImm8(immediate)
 
   private def ALToImm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xE6.toByte :: Nil, opcode) with NoDisplacement with Immediate {
+    new Static(0xE6.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AL, source))
 
       override def immediateOrder: OperandOrder = destination
 
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   private def AXToImm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xE7.toByte :: Nil, opcode) with NoDisplacement with Immediate {
+    new Static(0xE7.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AX, source))
 
       override def immediateOrder: OperandOrder = destination
 
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   private def EAXToImm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xE7.toByte :: Nil, opcode) with NoDisplacement with Immediate {
+    new Static(0xE7.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.EAX, source))
 
       override def immediateOrder: OperandOrder = destination
 
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   def apply(destination: Register.AL.type, port: Register.DX.type)(implicit processorMode: ProcessorMode): Static =

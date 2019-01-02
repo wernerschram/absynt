@@ -19,72 +19,72 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   def apply(immediate: ImmediateValue with DoubleWordSize, destination: Register.RAX.type)(implicit processorMode: ProcessorMode): X86Operation =
     Imm32ToRAX(immediate)
 
-  def apply(immediate: ImmediateValue, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply(immediate: ImmediateValue with ValueSize, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): X86Operation =
     (immediate, destination) match {
-      case (imm: ImmediateValue with ByteSize, d: WideSize) =>
+      case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with WideSize) =>
         Imm8ToRM16(d, imm)
       case (imm: ImmediateValue with ByteSize, _) =>
         Imm8ToRM8(destination, imm)
-      case (imm: DoubleWordSize, _: QuadWordSize) =>
+      case (imm: ImmediateValue with DoubleWordSize, _: ModRMEncodableOperand with QuadWordSize) =>
         Imm16ToRM16(destination, imm)
-      case (_: QuadWordSize, _) =>
+      case (_: ImmediateValue with QuadWordSize, _) =>
         throw new AssertionError
       case (_, dest: ValueSize) if !(dest sizeEquals immediate) =>
         throw new AssertionError
-      case (imm: WideSize, _) =>
+      case (imm: ImmediateValue with WideSize, _) =>
         Imm16ToRM16(destination, imm)
       case _ =>
         throw new AssertionError
     }
 
-  private def Imm8ToAL(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
+  private def Imm8ToAL(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AL, destination))
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
-  private def Imm16ToAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
+  private def Imm16ToAX(immediateValue: ImmediateValue with WordSize)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.AX, destination))
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with WordSize = immediateValue
     }
 
-  private def Imm32ToEAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
+  private def Imm32ToEAX(immediateValue: ImmediateValue with DoubleWordSize)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.EAX, destination))
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with DoubleWordSize = immediateValue
     }
 
-  private def Imm32ToRAX(immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate {
+  private def Imm32ToRAX(immediateValue: ImmediateValue with DoubleWordSize)(implicit processorMode: ProcessorMode) =
+    new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(Register.RAX, destination))
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with DoubleWordSize = immediateValue
     }
 
-  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0x80.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate {
+  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
+    new ModRM(operand, 0x80.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
-  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0x81.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate {
+  private def Imm16ToRM16[Size<:WideSize](operand: ModRMEncodableOperand, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
+    new ModRM(operand, 0x81.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[Size] {
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with Size = immediateValue
     }
 
-  private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0x83.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate {
+  private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
+    new ModRM(operand, 0x83.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
       override val immediateOrder: OperandOrder = source
-      override val immediate: ImmediateValue = immediateValue
+      override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
   def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =

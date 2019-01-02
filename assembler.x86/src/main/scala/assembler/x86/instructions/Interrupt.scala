@@ -19,8 +19,8 @@ object Interrupt {
   }
 
   private def Imm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xCD.toByte :: Nil, opcode) with NoDisplacement with Immediate {
-      override def immediate: ImmediateValue = immediateValue
+    new Static(0xCD.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
+      override def immediate: ImmediateValue with ByteSize = immediateValue
 
       override def immediateOrder: OperandOrder = destination
     }

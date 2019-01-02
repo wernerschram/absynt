@@ -12,7 +12,7 @@ trait DisplacementSize extends ValueSize // 8, 16, 32
 
 trait WideSize extends ValueSize //16, 32, 64
 
-trait ExtendedSize extends WideSize //16, 32
+trait ExtendedSize extends WideSize with DisplacementSize //16, 32
 
 trait LongSize extends WideSize //32, 64
 
@@ -21,12 +21,12 @@ trait ByteSize extends ValueSize with DisplacementSize {
   def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[ByteSize]
 }
 
-trait WordSize extends ExtendedSize with DisplacementSize {
+trait WordSize extends ExtendedSize {
   override val sizeName = "WORD"
   def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[WordSize]
 }
 
-trait DoubleWordSize extends ExtendedSize with LongSize with DisplacementSize {
+trait DoubleWordSize extends ExtendedSize with LongSize {
   override val sizeName = "DWORD"
   def sizeEquals(that: ValueSize): Boolean = that.isInstanceOf[DoubleWordSize]
 }

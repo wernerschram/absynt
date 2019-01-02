@@ -117,25 +117,25 @@ object Move {
       override def offsetOrder: OperandOrder = source
     }
 
-  def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate =
+  def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate[ByteSize] =
     Imm8ToR8(destination, source)
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[ByteRegister](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate {
-      override def immediate: ImmediateValue = immediateValue
+    new RegisterEncoded[ByteRegister](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      override def immediate: ImmediateValue with ByteSize = immediateValue
 
       override def immediateOrder: OperandOrder = source
 
       override def registerOrder: OperandOrder = destination
     }
 
-  def apply(source: ImmediateValue, destination: WideRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[WideRegister] with Immediate =
+  def apply(source: ImmediateValue with WideSize, destination: WideRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[WideRegister] with Immediate[WideSize] =
     Imm16ToR16(destination, source)
 
-  private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[WideRegister](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate {
+  private def Imm16ToR16(register: WideRegister, immediateValue: ImmediateValue with WideSize)(implicit processorMode: ProcessorMode) =
+    new RegisterEncoded[WideRegister](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[WideSize] {
       assume(register sizeEquals immediateValue)
-      override def immediate: ImmediateValue = immediateValue
+      override def immediate: ImmediateValue with WideSize = immediateValue
 
       override def immediateOrder: OperandOrder = source
 
@@ -182,15 +182,15 @@ object Move {
     }
 
   private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate {
-      override def immediate: ImmediateValue = immediateValue
+    new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
+      override def immediate: ImmediateValue with ByteSize = immediateValue
 
       override def immediateOrder: OperandOrder = source
     }
 
-  private def Imm16ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with WideSize)(implicit processorMode: ProcessorMode) =
-    new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate {
-      override def immediate: ImmediateValue = immediateValue
+  private def Imm16ToRM16[Size<:WideSize](operand: ModRMEncodableOperand, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
+    new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[Size] {
+      override def immediate: ImmediateValue with Size = immediateValue
 
       override def immediateOrder: OperandOrder = source
     }

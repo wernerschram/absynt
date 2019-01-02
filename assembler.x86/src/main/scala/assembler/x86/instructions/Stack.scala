@@ -2,8 +2,8 @@ package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.operations._
 import assembler.x86.operations.OperandInfo.OperandOrder._
+import assembler.x86.operations._
 
 object Push {
   implicit val opcode: String = "push"
@@ -40,23 +40,28 @@ object Push {
   private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode, destination) with NoDisplacement with NoImmediate
 
-  def apply(immediate: ImmediateValue)(implicit processorMode: ProcessorMode): Static with Immediate =
+//  def apply(immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static =
+//    Imm8(immediate)
+//
+//  def apply[Size<:ExtendedSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
+//    Imm16(immediate)
+
+  def apply(immediate: ImmediateValue with DisplacementSize)(implicit processorMode: ProcessorMode): Static =
     immediate match {
-    case i: ByteSize => Imm8(i)
-    case i: ExtendedSize => Imm16(i)
-    case _ => throw new AssertionError
+      case i: ImmediateValue with ByteSize => Imm8(i)
+      case i: ImmediateValue with ExtendedSize => Imm16(i)
   }
 
   private def Imm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0x6A.toByte :: Nil, opcode) with NoDisplacement with Immediate {
-      override def immediate: ImmediateValue = immediateValue
+    new Static(0x6A.toByte :: Nil, opcode) with NoDisplacement with Immediate[ByteSize] {
+      override def immediate: ImmediateValue with ByteSize = immediateValue
 
       override def immediateOrder: OperandOrder = destination
     }
 
-  private def Imm16(immediateValue: ImmediateValue with ExtendedSize)(implicit processorMode: ProcessorMode) =
-    new Static(0x68.toByte :: Nil, opcode) with NoDisplacement with Immediate {
-      override def immediate: ImmediateValue = immediateValue
+  private def Imm16[Size<:ExtendedSize](immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
+    new Static(0x68.toByte :: Nil, opcode) with NoDisplacement with Immediate[Size] {
+      override def immediate: ImmediateValue with Size = immediateValue
 
       override def immediateOrder: OperandOrder = destination
     }

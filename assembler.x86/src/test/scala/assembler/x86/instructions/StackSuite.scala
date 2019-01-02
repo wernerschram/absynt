@@ -99,12 +99,6 @@ class StackSuite extends WordSpec with Matchers {
         }
       }
 
-      "throw an AssertionError for push 0x1234567812345678" in {
-        an[AssertionError] should be thrownBy {
-          Push(0x1234567812345678l)
-        }
-      }
-
       "correctly encode push r13" in {
         Push(R13).encodeByte should be(0x41.toByte :: 0x55.toByte :: Nil)
       }

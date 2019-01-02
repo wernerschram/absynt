@@ -1,12 +1,12 @@
 package assembler.x86.operations
 
-import assembler.x86.operands.ImmediateValue
+import assembler.x86.operands.{ImmediateValue, ValueSize}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-trait Immediate extends ImmediateBytes {
+trait Immediate[Size<:ValueSize] extends ImmediateBytes {
 
   self: X86Operation =>
-  def immediate: ImmediateValue
+  def immediate: ImmediateValue with Size
   def immediateOrder: OperandOrder
 
   override protected def immediateInit(): Unit =
