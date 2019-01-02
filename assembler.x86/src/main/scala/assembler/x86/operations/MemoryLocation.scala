@@ -1,12 +1,13 @@
 package assembler.x86.operations
 
+import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess.{MemoryLocation => MemoryLocationType}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-trait MemoryLocation extends DisplacementBytes {
+trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
 
   self: X86Operation =>
-  def location: MemoryLocationType
+  def location: MemoryLocationType with Size
   def offsetOrder: OperandOrder
 
   override protected def displacementInit(): Unit =

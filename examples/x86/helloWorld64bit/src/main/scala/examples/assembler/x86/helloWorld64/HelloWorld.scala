@@ -41,7 +41,7 @@ object HelloWorld extends App {
     )
 
     val text2: Section = Section.text(
-      Move(EBP, SIBMemoryLocation(R9, R8, 0, 2)) ::
+      Move(EBP, SIBMemoryLocation.doubleWordSize(R9, R8, 0, 2)) ::
       Nil
     )
 
