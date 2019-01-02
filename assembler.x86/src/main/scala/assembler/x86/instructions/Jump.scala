@@ -21,8 +21,8 @@ abstract class ShortRelativeJump(val shortOpcode: Seq[Byte], implicit val mnemon
   }
 
   protected def Rel8(nearPointer: NearPointer with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
-    new Static(shortOpcode, mnemonic) with NearPointerOperation with NoImmediate {
-      override val pointer: NearPointer = nearPointer
+    new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate {
+      override val pointer: NearPointer with ByteSize = nearPointer
 
       override def pointerOrder: OperandOrder = destination
     }
@@ -53,9 +53,9 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
   def long(nearPointer: NearPointer with WideSize)(implicit processorMode: ProcessorMode): X86Operation =
     Rel16(nearPointer)
 
-  private def Rel16(nearPointer: NearPointer)(implicit processorMode: ProcessorMode) = {
-    new Static(longOpcode, mnemonic) with NearPointerOperation with NoImmediate {
-      override val pointer: NearPointer = nearPointer
+  private def Rel16[Size<:WideSize](nearPointer: NearPointer with Size)(implicit processorMode: ProcessorMode) = {
+    new Static(longOpcode, mnemonic) with NearPointerOperation[Size] with NoImmediate {
+      override val pointer: NearPointer with Size = nearPointer
       override def pointerOrder: OperandOrder = destination
     }
   }
@@ -65,7 +65,7 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
       override def encodableForShortPointer(nearPointer: NearPointer with ByteSize): Resource with UnlabeledEncodable =
         Rel8(nearPointer)
 
-      override def encodableForLongPointer(nearPointer: NearPointer): Resource with UnlabeledEncodable = Rel16(nearPointer)
+      override def encodableForLongPointer[Size<:WideSize](nearPointer: NearPointer with Size): Resource with UnlabeledEncodable = Rel16(nearPointer)
     }
   }
 }

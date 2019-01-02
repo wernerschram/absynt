@@ -28,7 +28,7 @@ object LongPointer {
        override def toString: String = s"0x${offset.bigEndianHexString}"
     }
 
-  def realMode(offset: Long): NearPointer = {
+  def realMode(offset: Long): NearPointer with WordSize = {
     assume(offset.toShort == offset)
     realMode(offset.toShort)
   }

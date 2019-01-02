@@ -3,6 +3,7 @@ package assembler.x86.operations
 import assembler._
 import assembler.resource.{Resource, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.WideSize
 import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, NearPointer => NearPointerOperand}
 
 abstract class NearJumpOperation(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label)
@@ -16,7 +17,7 @@ abstract class NearJumpOperation(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], 
 
   override def possibleSizes: Set[Int] = Set(shortJumpSize, longJumpSize)
 
-  def encodableForLongPointer(pointer: NearPointerOperand): Resource with UnlabeledEncodable
+  def encodableForLongPointer[Size<:WideSize](pointer: NearPointerOperand with Size): Resource with UnlabeledEncodable
 
   override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with UnlabeledEncodable = {
     val shortOffset = offsetDirection match {
