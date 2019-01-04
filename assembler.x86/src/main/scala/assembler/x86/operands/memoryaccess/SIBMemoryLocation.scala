@@ -45,67 +45,37 @@ sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRe
 }
 
 object SIBMemoryLocation {
-  def apply(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int) =
-    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment)
+    abstract class SIBForSize[Size<:ValueSize]() {
+    def instance(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: Option[ImmediateValue with DisplacementSize], scale: Int, segmentOverride: SegmentRegister): SIBMemoryLocation with Size
+  }
 
-  def apply(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int) =
-    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment)
+  implicit def SIBforByteSize: SIBForSize[ByteSize] =
+    (index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: Option[ImmediateValue with DisplacementSize], scale: Int, segmentOverride: SegmentRegister) =>
+      new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with ByteSize
 
-  def byteSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int) =
-    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment) with ByteSize
+  implicit def SIBforWordSize: SIBForSize[WordSize] =
+    (index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: Option[ImmediateValue with DisplacementSize], scale: Int, segmentOverride: SegmentRegister) =>
+      new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with WordSize
 
-  def byteSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int) =
-    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment) with ByteSize
+  implicit def SIBforDoubleWordSize: SIBForSize[DoubleWordSize] =
+    (index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: Option[ImmediateValue with DisplacementSize], scale: Int, segmentOverride: SegmentRegister) =>
+      new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with DoubleWordSize
 
-  def wordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int) =
-    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment) with WordSize
+  implicit def SIBforQuadWordSize: SIBForSize[QuadWordSize] =
+    (index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: Option[ImmediateValue with DisplacementSize], scale: Int, segmentOverride: SegmentRegister) =>
+      new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with QuadWordSize
 
-  def wordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int) =
-    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment) with WordSize
+  def apply[Size<:ValueSize: SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int): SIBMemoryLocation with Size =
+    implicitly[SIBForSize[Size]].instance(index, base, None, scale, index.defaultSIBSegment)
 
-  def doubleWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int) =
-    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment) with DoubleWordSize
-
-  def doubleWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int) =
-    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment) with DoubleWordSize
-
-  def quadWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int) =
-    new SIBMemoryLocation(index, base, None, scale, index.defaultSIBSegment) with QuadWordSize
-
-  def quadWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int) =
-    new SIBMemoryLocation(index, base, Some(displacement), scale, index.defaultSIBSegment) with QuadWordSize
+  def apply[Size<:ValueSize: SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int): SIBMemoryLocation with Size =
+    implicitly[SIBForSize[Size]].instance(index, base, Some(displacement), scale, index.defaultSIBSegment)
 
   object withSegmentOverride {
-    def apply(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int,
-              segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, None, scale, segment)
+    def apply[Size<:ValueSize: SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int, segment: SegmentRegister): SIBMemoryLocation with Size =
+      implicitly[SIBForSize[Size]].instance(index, base, None, scale, segment)
 
-    def apply(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int,
-              segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, Some(displacement), scale, segment)
-
-    def byteSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, None, scale, segment) with ByteSize
-
-    def byteSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, Some(displacement), scale, segment) with ByteSize
-
-    def wordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, None, scale, segment) with WordSize
-
-    def wordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, Some(displacement), scale, segment) with WordSize
-
-    def doubleWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, None, scale, segment) with DoubleWordSize
-
-    def doubleWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, Some(displacement), scale, segment) with DoubleWordSize
-
-    def quadWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, None, scale, segment) with QuadWordSize
-
-    def quadWordSize(index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int, segment: SegmentRegister) =
-      new SIBMemoryLocation(index, base, Some(displacement), scale, segment) with QuadWordSize
+    def apply[Size<:ValueSize: SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister, base: GeneralPurposeRegister with SIBBaseRegister, displacement: ImmediateValue with DisplacementSize, scale: Int, segment: SegmentRegister): SIBMemoryLocation with Size =
+      implicitly[SIBForSize[Size]].instance(index, base, Some(displacement), scale, segment)
   }
 }

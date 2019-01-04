@@ -10,6 +10,7 @@ import assembler.resource.{AbsoluteReference, RelativeReference}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
+import assembler.x86.operands.DoubleWordSize
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.SIBMemoryLocation
 import assembler.{EncodedString, Label}
@@ -41,7 +42,7 @@ object HelloWorld extends App {
     )
 
     val text2: Section = Section.text(
-      Move(EBP, SIBMemoryLocation.doubleWordSize(R9, R8, 0, 2)) ::
+      Move(EBP, SIBMemoryLocation[DoubleWordSize](R9, R8, 0, 2)) ::
       Nil
     )
 
