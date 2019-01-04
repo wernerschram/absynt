@@ -72,19 +72,17 @@ abstract class ShortOrLongRelativeJump(shortOpcode: Seq[Byte], val longOpcode: S
 
 object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-  def apply(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRM =
+  def apply[Size<:WideSize](operand: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
     (operand, processorMode) match {
       case (o: ModRMEncodableOperand with ExtendedSize, ProcessorMode.Real | ProcessorMode.Protected) =>
         RM16(o)
       case (o: ModRMEncodableOperand with QuadWordSize, ProcessorMode.Long) =>
         RM16(o)
-      case (_: ModRMEncodableOperand with ValueSize, _) =>
+      case (_: ModRMEncodableOperand with WideSize, _) =>
         throw new AssertionError
-      case _ =>
-        RM16(operand)
     }
 
-  private def RM16(operand: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+  private def RM16[Size<:WideSize](operand: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
   private def Ptr1616[Size<:FarPointerSize](farPointer: FarPointer with Size)(implicit processorMode: ProcessorMode) =
@@ -99,7 +97,7 @@ object Jump extends ShortOrLongRelativeJump(0xEB.toByte :: Nil, 0xE9.toByte :: N
     def apply[Size<:FarPointerSize](farPointer: FarPointer with Size)(implicit processorMode: ProcessorMode): Static with FarPointerOperation[Size] =
       Ptr1616(farPointer)
 
-    def apply(pointer: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode): ModRM =
+    def apply(pointer: MemoryLocation with WideSize)(implicit processorMode: ProcessorMode): X86Operation =
       (pointer, processorMode) match {
         case (_: QuadWordSize, ProcessorMode.Protected | ProcessorMode.Real) =>
           throw new AssertionError

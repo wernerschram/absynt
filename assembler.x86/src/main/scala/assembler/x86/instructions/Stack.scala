@@ -25,7 +25,7 @@ object Push {
       override def registerOrder: OperandOrder = destination
     }
 
-  def apply(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): ModRM =
+  def apply(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): X86Operation =
     (processorMode, operand) match {
       case (_, o: WordSize) =>
         RM16(o)

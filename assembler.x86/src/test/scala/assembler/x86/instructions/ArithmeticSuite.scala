@@ -4,7 +4,6 @@ import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess._
 import org.scalatest.{Matchers, WordSpec}
 
@@ -312,30 +311,6 @@ class ArithmeticSuite extends WordSpec with Matchers {
         an[AssertionError] should be thrownBy {
           Xor(0x7877665544332211l, RAX)
         }
-      }
-
-      "correctly encode xor [rax+rbx*2], 0x11" in {
-        Xor(0x11.toByte, SIBMemoryLocation(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("80 34 58 11"))
-      }
-
-      "correctly represent xor [rax+rbx*2], 0x11 as a string" in {
-        Xor(0x11.toByte, SIBMemoryLocation(RBX, RAX, scale = 2)).toString shouldBe "xor [rax+rbx*2], 17"
-      }
-
-      "correctly encode xor [rax+rbx*2], 0x2211" in {
-        Xor(0x2211.toShort, SIBMemoryLocation(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("66 81 34 58 11 22"))
-      }
-
-      "correctly represent xor [rax+rbx*2], 0x2211 as a string" in {
-        Xor(0x2211.toShort, SIBMemoryLocation(RBX, RAX, scale = 2)).toString shouldBe "xor [rax+rbx*2], 8721"
-      }
-
-      "correctly encode xor [rax+rbx*2], 0x44332211" in {
-        Xor(0x44332211, SIBMemoryLocation(RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("81 34 58 11 22 33 44"))
-      }
-
-      "correctly represent xor [rax+rbx*2], 0x44332211 as a string" in {
-        Xor(0x44332211, SIBMemoryLocation(RBX, RAX, scale = 2)).toString shouldBe "xor [rax+rbx*2], 1144201745"
       }
 
       "correctly encode xor BYTE PTR [rax+rbx*2], 0x11" in {

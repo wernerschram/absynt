@@ -4,7 +4,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
-abstract class ModRM(val operandRM: ModRMEncodableOperand,
+abstract class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
                      override val code: Seq[Byte],
                      val rValue: Byte,
                      override val mnemonic: String,

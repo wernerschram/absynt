@@ -1,11 +1,11 @@
 package assembler.x86.operations
 
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.{ModRMEncodableOperand, SegmentRegister}
+import assembler.x86.operands.{ModRMEncodableOperand, SegmentRegister, WideSize, WordSize}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
-abstract class ModSegmentRM(val register: SegmentRegister,
-                            operandRM: ModRMEncodableOperand,
+abstract class ModSegmentRM[Size<:WideSize](val register: SegmentRegister,
+                            operandRM: ModRMEncodableOperand with Size,
                             override val code: Seq[Byte],
                             override val mnemonic: String,
                             override val operandRMOrder: OperandOrder)(override implicit val processorMode: ProcessorMode)

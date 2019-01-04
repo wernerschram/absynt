@@ -19,20 +19,20 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   def apply(immediate: ImmediateValue with DoubleWordSize, destination: Register.RAX.type)(implicit processorMode: ProcessorMode): X86Operation =
     Imm32ToRAX(immediate)
 
-  def apply(immediate: ImmediateValue with ValueSize, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply[ImmediateSize<:ValueSize, DestinationSize<:ValueSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize)(implicit processorMode: ProcessorMode): X86Operation =
     (immediate, destination) match {
       case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with WideSize) =>
         Imm8ToRM16(d, imm)
-      case (imm: ImmediateValue with ByteSize, _) =>
-        Imm8ToRM8(destination, imm)
-      case (imm: ImmediateValue with DoubleWordSize, _: ModRMEncodableOperand with QuadWordSize) =>
-        Imm16ToRM16(destination, imm)
+      case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
+        Imm8ToRM8(d, imm)
+      case (imm: ImmediateValue with DoubleWordSize, d: ModRMEncodableOperand with QuadWordSize) =>
+        Imm16ToRM16(d, imm)
       case (_: ImmediateValue with QuadWordSize, _) =>
         throw new AssertionError
       case (_, dest: ValueSize) if !(dest sizeEquals immediate) =>
         throw new AssertionError
-      case (imm: ImmediateValue with WideSize, _) =>
-        Imm16ToRM16(destination, imm)
+      case (imm: ImmediateValue with WideSize, d: ModRMEncodableOperand with WideSize) =>
+        Imm16ToRM16(d, imm)
       case _ =>
         throw new AssertionError
     }
@@ -69,19 +69,19 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       override val immediate: ImmediateValue with DoubleWordSize = immediateValue
     }
 
-  private def Imm8ToRM8(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0x80.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
-  private def Imm16ToRM16[Size<:WideSize](operand: ModRMEncodableOperand, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
+  private def Imm16ToRM16[Size<:WideSize](operand: ModRMEncodableOperand with Size, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0x81.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[Size] {
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with Size = immediateValue
     }
 
-  private def Imm8ToRM16(operand: ModRMEncodableOperand, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
+  private def Imm8ToRM16[Size<:WideSize](operand: ModRMEncodableOperand with Size, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0x83.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with ByteSize = immediateValue
@@ -131,7 +131,7 @@ object Xor extends BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
 object Not {
   implicit val opcode: String = "not"
 
-  def apply(operand: ModRMEncodableOperand with ValueSize)(implicit processorMode: ProcessorMode): ModRM =
+  def apply(operand: ModRMEncodableOperand with ValueSize)(implicit processorMode: ProcessorMode): X86Operation =
     operand match {
       case o:ByteSize => RM8(o)
       case o:WideSize => RM16(o)

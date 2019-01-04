@@ -12,16 +12,16 @@ object Move {
 
   implicit val mnemonic: String = "mov"
 
-  def apply(source: ModRMEncodableOperand, destination: SegmentRegister)(implicit processorMode: ProcessorMode): ModSegmentRM =
+  def apply[Size<:WideSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister)(implicit processorMode: ProcessorMode): X86Operation =
     RM16ToSReg(destination, source)
 
-  private def RM16ToSReg(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+  private def RM16ToSReg[Size<:WideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
 
-  def apply(source: SegmentRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModSegmentRM =
+  def apply[Size<:WideSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
     SRegToRM16(source, destination)
 
-  private def SRegToRM16(operand1: SegmentRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
+  private def SRegToRM16[Size<:WideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
 
   def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation = {
