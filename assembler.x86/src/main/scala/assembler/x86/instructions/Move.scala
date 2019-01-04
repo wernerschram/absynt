@@ -117,11 +117,11 @@ object Move {
       override def offsetOrder: OperandOrder = source
     }
 
-  def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): RegisterEncoded[ByteRegister] with Immediate[ByteSize] =
+  def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
     Imm8ToR8(destination, source)
 
   private def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[ByteRegister](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize] {
+    new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize] {
       override def immediate: ImmediateValue with ByteSize = immediateValue
 
       override def immediateOrder: OperandOrder = source
@@ -133,7 +133,7 @@ object Move {
     Imm16ToR16(destination, source)
 
   private def Imm16ToR16[Size<:WideSize](register: GeneralPurposeRegister with Size, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded(register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size] {
+    new RegisterEncoded[Size](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size] {
       assume(register sizeEquals immediateValue)
       override def immediate: ImmediateValue with Size = immediateValue
 

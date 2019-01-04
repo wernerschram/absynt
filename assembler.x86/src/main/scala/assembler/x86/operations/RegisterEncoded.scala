@@ -1,10 +1,10 @@
 package assembler.x86.operations
 
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.GeneralPurposeRegister
+import assembler.x86.operands.{GeneralPurposeRegister, ValueSize}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
-abstract class RegisterEncoded[RegisterType <: GeneralPurposeRegister](register: RegisterType,
+abstract class RegisterEncoded[Size <: ValueSize](register: GeneralPurposeRegister with Size,
                                                               rawCode: Seq[Byte],
                                                               override val mnemonic: String)
                                                              (override implicit val processorMode: ProcessorMode)
