@@ -217,14 +217,6 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(0x3412.toShort, RegisterMemoryLocation.wordSize(BX)).toString shouldBe "xor WORD PTR [bx], 13330"
       }
 
-      "correctly encode xor [bx], al" in {
-        Xor(AL, RegisterMemoryLocation(BX)).encodeByte should be(Hex.lsb("30 07"))
-      }
-
-      "correctly represent xor [bx], al as a string" in {
-        Xor(AL, RegisterMemoryLocation(BX)).toString shouldBe "xor [bx], al"
-      }
-
       "correctly encode xor BYTE PTR [bx], al" in {
         Xor(AL, RegisterMemoryLocation.byteSize(BX)).encodeByte should be(Hex.lsb("30 07"))
       }
@@ -233,12 +225,12 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(AL, RegisterMemoryLocation.byteSize(BX)).toString shouldBe "xor BYTE PTR [bx], al"
       }
 
-      "correctly encode xor ah, [si]" in {
-        Xor(RegisterMemoryLocation(SI), AH).encodeByte should be(Hex.lsb("32 24"))
+      "correctly encode xor ah, BYTE PTR [si]" in {
+        Xor(RegisterMemoryLocation.byteSize(SI), AH).encodeByte should be(Hex.lsb("32 24"))
       }
 
-      "correctly represent xor ah, [si] as a string" in {
-        Xor(RegisterMemoryLocation(SI), AH).toString shouldBe "xor ah, [si]"
+      "correctly represent xor ah, BYTE PTR [si] as a string" in {
+        Xor(RegisterMemoryLocation.byteSize(SI), AH).toString shouldBe "xor ah, BYTE PTR [si]"
       }
 
     }
@@ -263,20 +255,20 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(0x44.toByte, MemoryAddress.wordSize(0x11111111)).toString shouldBe "xor WORD PTR [286331153], 68"
       }
 
-      "correctly encode xor [0x1234], edx" in {
-        Xor(EDX, MemoryAddress(0X1234.toShort)).encodeByte should be(Hex.lsb("67 31 16 34 12"))
+      "correctly encode xor DWORD PTR [0x1234], edx" in {
+        Xor(EDX, MemoryAddress.doubleWordSize(0X1234.toShort)).encodeByte should be(Hex.lsb("67 31 16 34 12"))
       }
 
-      "correctly represent xor [0x1234], edx as a string" in {
-        Xor(EDX, MemoryAddress(0x1234.toShort)).toString shouldBe "xor [4660], edx"
+      "correctly represent xor DWORD PTR [0x1234], edx as a string" in {
+        Xor(EDX, MemoryAddress.doubleWordSize(0x1234.toShort)).toString shouldBe "xor DWORD PTR [4660], edx"
       }
 
-      "correctly encode xor esi, gs:[eax+0x12]" in {
-        Xor(RegisterMemoryLocation.withSegmentOverride(EAX, 0x12.toByte, GS), ESI).encodeByte should be(Hex.lsb("65 33 70 12"))
+      "correctly encode xor esi, DWORD PTR gs:[eax+0x12]" in {
+        Xor(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(EAX, 0x12.toByte, GS), ESI).encodeByte should be(Hex.lsb("65 33 70 12"))
       }
 
-      "correctly represent xor esi, gs:[eax+0x12] as a string" in {
-        Xor(RegisterMemoryLocation.withSegmentOverride(EAX, 0x12.toByte, GS), ESI).toString shouldBe "xor esi, gs:[eax+18]"
+      "correctly represent xor esi, DWORD PTR gs:[eax+0x12] as a string" in {
+        Xor(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(EAX, 0x12.toByte, GS), ESI).toString shouldBe "xor esi, DWORD PTR gs:[eax+18]"
       }
 
     }
@@ -467,44 +459,44 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(0x44.toByte, SIBMemoryLocation.quadWordSize(RBX, RAX, scale = 2)).toString shouldBe "xor QWORD PTR [rax+rbx*2], 68"
       }
 
-      "correctly encode xor [rbx], al" in {
-        Xor(AL, RegisterMemoryLocation(RBX)).encodeByte should be(Hex.lsb("30 03"))
+      "correctly encode xor BYTE PTR [rbx], al" in {
+        Xor(AL, RegisterMemoryLocation.byteSize(RBX)).encodeByte should be(Hex.lsb("30 03"))
       }
 
-      "correctly represent xor [rbx], al as a string" in {
-        Xor(AL, RegisterMemoryLocation(RBX)).toString shouldBe "xor [rbx], al"
+      "correctly represent xor BYTE PTR [rbx], al as a string" in {
+        Xor(AL, RegisterMemoryLocation.byteSize(RBX)).toString shouldBe "xor BYTE PTR [rbx], al"
       }
 
-      "correctly encode xor [rbx], ah" in {
-        Xor(AH, RegisterMemoryLocation(RBX)).encodeByte should be(Hex.lsb("30 23"))
+      "correctly encode xor BYTE PTR [rbx], ah" in {
+        Xor(AH, RegisterMemoryLocation.byteSize(RBX)).encodeByte should be(Hex.lsb("30 23"))
       }
 
-      "correctly represent xor [rbx], ah as a string" in {
-        Xor(AH, RegisterMemoryLocation(RBX)).toString shouldBe "xor [rbx], ah"
+      "correctly represent xor BYTE PTR [rbx], ah as a string" in {
+        Xor(AH, RegisterMemoryLocation.byteSize(RBX)).toString shouldBe "xor BYTE PTR [rbx], ah"
       }
 
-      "correctly encode xor [rbx], r15l" in {
-        Xor(R15L, RegisterMemoryLocation(RBX)).encodeByte should be(Hex.lsb("44 30 3B"))
+      "correctly encode xor BYTE PTR [rbx], r15l" in {
+        Xor(R15L, RegisterMemoryLocation.byteSize(RBX)).encodeByte should be(Hex.lsb("44 30 3B"))
       }
 
-      "correctly represent xor [rbx], r15l as a string" in {
-        Xor(R15L, RegisterMemoryLocation(RBX)).toString shouldBe "xor [rbx], r15l"
+      "correctly represent xor BYTE PTR [rbx], r15l as a string" in {
+        Xor(R15L, RegisterMemoryLocation.byteSize(RBX)).toString shouldBe "xor BYTE PTR [rbx], r15l"
       }
 
-      "correctly encode xor [rax], rax" in {
-        Xor(RAX, RegisterMemoryLocation(RAX)).encodeByte should be(Hex.lsb("48 31 00"))
+      "correctly encode xor QWORD PTR [rax], rax" in {
+        Xor(RAX, RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(Hex.lsb("48 31 00"))
       }
 
-      "correctly represent xor [rax], rax as a string" in {
-        Xor(RAX, RegisterMemoryLocation(RAX)).toString shouldBe "xor [rax], rax"
+      "correctly represent xor QWORD PTR [rax], rax as a string" in {
+        Xor(RAX, RegisterMemoryLocation.quadWordSize(RAX)).toString shouldBe "xor QWORD PTR [rax], rax"
       }
 
-      "correctly encode xor r15, [r11]" in {
-        Xor(RegisterMemoryLocation(R11), R15).encodeByte should be(Hex.lsb("4D 33 3B"))
+      "correctly encode xor r15, DWORD PTR [r11]" in {
+        Xor(RegisterMemoryLocation.doubleWordSize(R11), R15).encodeByte should be(Hex.lsb("4D 33 3B"))
       }
 
-      "correctly represent xor r15, [r11] as a string" in {
-        Xor(RegisterMemoryLocation(R11), R15).toString shouldBe "xor r15, [r11]"
+      "correctly represent xor r15, DWORD PTR [r11] as a string" in {
+        Xor(RegisterMemoryLocation.doubleWordSize(R11), R15).toString shouldBe "xor r15, DWORD PTR [r11]"
       }
     }
   }

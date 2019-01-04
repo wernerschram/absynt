@@ -324,28 +324,28 @@ class MoveSuite extends WordSpec with Matchers {
         Move(0x78563412, ESI).toString should be("mov esi, 2018915346")
       }
 
-      "correctly encode mov [bp+di], 0x13" in {
-        Move(0x13.toByte, RegisterMemoryLocation(BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
+      "correctly encode mov BYTE PTR [bp+di], 0x13" in {
+        Move(0x13.toByte, RegisterMemoryLocation.byteSize(BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
       }
 
-      "correctly represent mov [bp+di], 19 as a string" in {
-        Move(0x13.toByte, RegisterMemoryLocation(BP+DI)).toString should be("mov [bp+di], 19")
+      "correctly represent mov BYTE PTR [bp+di], 19 as a string" in {
+        Move(0x13.toByte, RegisterMemoryLocation.byteSize(BP+DI)).toString should be("mov BYTE PTR [bp+di], 19")
       }
 
-      "correctly encode mov [bx+0x10], 0x5656" in {
-        Move(0x5656.toShort, RegisterMemoryLocation(BX, 0x10.toByte)).encodeByte should be(Hex.lsb("C7 47 10 56 56"))
+      "correctly encode mov WORD PTR [bx+0x10], 0x5656" in {
+        Move(0x5656.toShort, RegisterMemoryLocation.wordSize(BX, 0x10.toByte)).encodeByte should be(Hex.lsb("C7 47 10 56 56"))
       }
 
-      "correctly represent mov [bx+16], 22102 as a string" in {
-        Move(0x5656.toShort, RegisterMemoryLocation(BX, 0x10.toByte)).toString should be("mov [bx+16], 22102")
+      "correctly represent mov WORD PTR [bx+16], 22102 as a string" in {
+        Move(0x5656.toShort, RegisterMemoryLocation.wordSize(BX, 0x10.toByte)).toString should be("mov WORD PTR [bx+16], 22102")
       }
 
-      "correctly encode mov [eax+ebx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
+      "correctly encode mov DWORD PTR [eax+ebx*2+0x11111111], 0x99999999" in {
+        Move(0x99999999, SIBMemoryLocation.doubleWordSize(EBX, EAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
-      "correctly represent mov [eax+ebx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation(EBX, EAX, 0x11111111, 2)).toString should be("mov [eax+ebx*2+286331153], 2576980377")
+      "correctly represent mov DWORD PTR [eax+ebx*2+286331153], 2576980377 as a string" in {
+        Move(0x99999999, SIBMemoryLocation.doubleWordSize(EBX, EAX, 0x11111111, 2)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], 2576980377")
       }
     }
 
@@ -647,12 +647,12 @@ class MoveSuite extends WordSpec with Matchers {
         Move(0x1122334455667788L, RAX).toString should be("mov rax, 1234605616436508552")
       }
 
-      "correctly encode mov [rax+rbx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, SIBMemoryLocation(RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
+      "correctly encode mov DWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {
+        Move(0x99999999, SIBMemoryLocation.doubleWordSize(RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
-      "correctly represent mov [rax+rbx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation(RBX, RAX, 0x11111111, 2)).toString should be("mov [rax+rbx*2+286331153], 2576980377")
+      "correctly represent mov DWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
+        Move(0x99999999, SIBMemoryLocation.doubleWordSize(RBX, RAX, 0x11111111, 2)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], 2576980377")
       }
 
       "correctly encode mov DWORD PTR [r8+r9*2], ebp" in {

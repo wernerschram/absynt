@@ -87,35 +87,35 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
       override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
-  def apply(source: ByteRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =
+  def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
     R8ToRM8(source, destination)
 
-  private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRM[ByteRegister](operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
+  private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode) =
+    new ModRRM(operand1, operand2, (OpcodeBase + 0x00).toByte :: Nil, mnemonic, destination)
 
-  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =
+  def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
     R8ToRM8(source, destination)
 
-  def apply(source: WideRegister, destination: ModRMEncodableOperand)(implicit processorMode: ProcessorMode): ModRRM[WideRegister] =
+  def apply(source: WideRegister, destination: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): X86Operation =
     R16ToRM16(source, destination)
 
-  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRM[WideRegister](operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
+  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
+    new ModRRM(operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic, destination)
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRM[WideRegister] =
+  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): X86Operation =
     R16ToRM16(destination, source)
 
-  def apply(source: ModRMEncodableOperand, destination: ByteRegister)(implicit processorMode: ProcessorMode): ModRRM[ByteRegister] =
+  def apply(source: ModRMEncodableOperand with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
     RM8ToR8(destination, source)
 
-  private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRM[ByteRegister](operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
+  private def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode) =
+    new ModRRM(operand1, operand2, (OpcodeBase + 0x02).toByte :: Nil, mnemonic, source)
 
-  def apply(source: ModRMEncodableOperand, destination: WideRegister)(implicit processorMode: ProcessorMode): ModRRM[WideRegister] =
+  def apply[Size<:WideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
     RM16ToR16(destination, source)
 
-  private def RM16ToR16(operand1: WideRegister, operand2: ModRMEncodableOperand)(implicit processorMode: ProcessorMode) =
-    new ModRRM[WideRegister](operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
+  private def RM16ToR16[Size<:WideSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
+    new ModRRM(operand1, operand2, (OpcodeBase + 0x03).toByte :: Nil, mnemonic, source)
 
 }
 
@@ -140,6 +140,6 @@ object Not {
   private def RM8(operand: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xF6.toByte :: Nil, 2, opcode, destination) with NoDisplacement with NoImmediate
 
-  private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
+  private def RM16[Size<:WideSize](operand: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xF7.toByte :: Nil, 2, opcode, destination) with NoDisplacement with NoImmediate
 }
