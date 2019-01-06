@@ -6,7 +6,7 @@ import assembler.resource.Resource
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
-import assembler.x86.operands.ValueSize
+import assembler.x86.operands.{DoubleWordSize, QuadWordSize, ValueSize, WordSize}
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operations.X86Operation
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -67,22 +67,22 @@ class JumpSuite extends WordSpec with Matchers {
       "correctly encode jmp ax" in { Jump(AX).encodeByte should be(Hex.lsb("FF E0")) }
       "correctly represent jmp ax as a string" in { Jump(AX).toString should be("jmp ax") }
 
-      "correctly encode jmp WORD PTR [bp+si]" in { Jump(RegisterMemoryLocation.wordSize(BP+SI)).encodeByte should be(Hex.lsb("FF 22")) }
-      "correctly represent jmp WORD PTR [bp+si] as a string" in { Jump(RegisterMemoryLocation.wordSize(BP+SI)).toString should be("jmp WORD PTR [bp+si]") }
+      "correctly encode jmp WORD PTR [bp+si]" in { Jump(RegisterMemoryLocation[WordSize](BP+SI)).encodeByte should be(Hex.lsb("FF 22")) }
+      "correctly represent jmp WORD PTR [bp+si] as a string" in { Jump(RegisterMemoryLocation[WordSize](BP+SI)).toString should be("jmp WORD PTR [bp+si]") }
 
       "correctly encode jmp eax" in { Jump(EAX).encodeByte should be(Hex.lsb("66 FF E0")) }
       "correctly represent jmp eax as a string" in { Jump(EAX).toString should be("jmp eax") }
 
-      "correctly encode jmp WORD PTR [eax]" in { Jump(RegisterMemoryLocation.wordSize(EAX)).encodeByte should be(Hex.lsb("67 FF 20")) }
-      "correctly represent jmp WORD PTR [eax] as a string" in { Jump(RegisterMemoryLocation.wordSize(EAX)).toString should be("jmp WORD PTR [eax]") }
+      "correctly encode jmp WORD PTR [eax]" in { Jump(RegisterMemoryLocation[WordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20")) }
+      "correctly represent jmp WORD PTR [eax] as a string" in { Jump(RegisterMemoryLocation[WordSize](EAX)).toString should be("jmp WORD PTR [eax]") }
 
       "throw an AssertionError for jmp rax" in { an[AssertionError] should be thrownBy { Jump(RAX) } }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 66 FF 20"))
+        Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 66 FF 20"))
       }
       "correctly represent jmp DWORD PTR fs:[bx+si] as a string" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX+SI, segment = FS)).toString should be("jmp DWORD PTR fs:[bx+si]")
+        Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX+SI, segment = FS)).toString should be("jmp DWORD PTR fs:[bx+si]")
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -100,22 +100,22 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.wordSize(BP+SI)).encodeByte should be(Hex.lsb("FF 2A"))
+        Jump.Far(RegisterMemoryLocation[WordSize](BP+SI)).encodeByte should be(Hex.lsb("FF 2A"))
       }
       "correctly represent jmp FAR WORD PTR [bp+si] as a string" in {
-        Jump.Far(RegisterMemoryLocation.wordSize(BP+SI)).toString should be("jmp FAR WORD PTR [bp+si]")
+        Jump.Far(RegisterMemoryLocation[WordSize](BP+SI)).toString should be("jmp FAR WORD PTR [bp+si]")
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP+SI)).encodeByte should be(Hex.lsb("66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP+SI)).encodeByte should be(Hex.lsb("66 FF 2A"))
       }
       "correctly represent jmp FAR DWORD PTR [bp+si] as a string" in {
-        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP+SI)).toString should be("jmp FAR DWORD PTR [bp+si]")
+        Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP+SI)).toString should be("jmp FAR DWORD PTR [bp+si]")
       }
 
       "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation.quadWordSize(BP+SI))
+          Jump.Far(RegisterMemoryLocation[QuadWordSize](BP+SI))
         }
       }
 
@@ -477,7 +477,7 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR [bp+si]" in {
-        Jump(RegisterMemoryLocation.doubleWordSize(BP+SI)).encodeByte should be(Hex.lsb("67 FF 22"))
+        Jump(RegisterMemoryLocation[DoubleWordSize](BP+SI)).encodeByte should be(Hex.lsb("67 FF 22"))
       }
 
       "correctly encode jmp eax" in {
@@ -485,7 +485,7 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR [eax]" in {
-        Jump(RegisterMemoryLocation.doubleWordSize(EAX)).encodeByte should be(Hex.lsb("FF 20"))
+        Jump(RegisterMemoryLocation[DoubleWordSize](EAX)).encodeByte should be(Hex.lsb("FF 20"))
       }
 
       "throw an AssertionError for jmp rax" in {
@@ -495,7 +495,7 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride.doubleWordSize(BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 67 FF 20"))
+        Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 67 FF 20"))
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -507,16 +507,16 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.wordSize(BP+SI)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation[WordSize](BP+SI)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation.doubleWordSize(BP+SI)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP+SI)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation.quadWordSize(BP+SI))
+          Jump.Far(RegisterMemoryLocation[QuadWordSize](BP+SI))
         }
       }
 
@@ -621,7 +621,7 @@ class JumpSuite extends WordSpec with Matchers {
 
       "throw an AssertionError for jmp [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Jump(RegisterMemoryLocation.doubleWordSize(BP+SI)).encodeByte
+          Jump(RegisterMemoryLocation[DoubleWordSize](BP+SI)).encodeByte
         }
       }
 
@@ -632,7 +632,7 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR [eax]" in {
-        Jump(RegisterMemoryLocation.quadWordSize(EAX)).encodeByte should be(Hex.lsb("67 FF 20"))
+        Jump(RegisterMemoryLocation[QuadWordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20"))
       }
 
       "correctly encode jmp rax" in {
@@ -648,15 +648,15 @@ class JumpSuite extends WordSpec with Matchers {
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.wordSize(EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterMemoryLocation[WordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation.doubleWordSize(EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterMemoryLocation[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "correctly encode jmp FAR QWORD PTR [rdx]" in {
-        Jump.Far(RegisterMemoryLocation.quadWordSize(RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
+        Jump.Far(RegisterMemoryLocation[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
       }
     }
   }

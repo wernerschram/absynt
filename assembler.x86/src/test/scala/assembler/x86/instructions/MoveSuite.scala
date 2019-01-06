@@ -7,7 +7,7 @@ import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.{DoubleWordSize, QuadWordSize, WordSize}
+import assembler.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import assembler.x86.operands.memoryaccess._
 import org.scalatest.{Matchers, WordSpec}
 
@@ -27,47 +27,47 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov BYTE PTR [si], ch" in {
-        Move(CH, RegisterMemoryLocation.byteSize(SI)).encodeByte should be(Hex.lsb("88 2C"))
+        Move(CH, RegisterMemoryLocation[ByteSize](SI)).encodeByte should be(Hex.lsb("88 2C"))
       }
 
       "correctly represent mov BYTE PTR [si], ch as a string" in {
-        Move(CH, RegisterMemoryLocation.byteSize(SI)).toString should be("mov BYTE PTR [si], ch")
+        Move(CH, RegisterMemoryLocation[ByteSize](SI)).toString should be("mov BYTE PTR [si], ch")
       }
 
       "correctly encode mov BYTE PTR fs:[si], ch" in {
-        Move(CH, RegisterMemoryLocation.withSegmentOverride.byteSize(SI, segment = FS)).encodeByte should be(Hex.lsb("64 88 2C"))
+        Move(CH, RegisterMemoryLocation.withSegmentOverride[ByteSize](SI, segment = FS)).encodeByte should be(Hex.lsb("64 88 2C"))
       }
 
       "correctly represent mov BYTE PTR fs:[si], ch as a string" in {
-        Move(CH, RegisterMemoryLocation.withSegmentOverride.byteSize(SI, segment = FS)).toString should be("mov BYTE PTR fs:[si], ch")
+        Move(CH, RegisterMemoryLocation.withSegmentOverride[ByteSize](SI, segment = FS)).toString should be("mov BYTE PTR fs:[si], ch")
       }
 
       "correctly encode BYTE PTR mov cs:[di], ch" in {
-        Move(CH, RegisterMemoryLocation.withSegmentOverride.byteSize(DI, segment = CS)).encodeByte should be(Hex.lsb("2E 88 2D"))
+        Move(CH, RegisterMemoryLocation.withSegmentOverride[ByteSize](DI, segment = CS)).encodeByte should be(Hex.lsb("2E 88 2D"))
       }
 
       "correctly encode mov BYTE PTR [bp+si+0x7D], bh" in {
-        Move(BH, RegisterMemoryLocation.byteSize(BP+SI, 0x7D.toByte)).encodeByte should be(Hex.lsb("88 7A 7D"))
+        Move(BH, RegisterMemoryLocation[ByteSize](BP+SI, 0x7D.toByte)).encodeByte should be(Hex.lsb("88 7A 7D"))
       }
 
       "correctly represent mov BYTE PTR [bp+si+0x7D], bh as a string" in {
-        Move(BH, RegisterMemoryLocation.byteSize(SI+BP, 0x7D.toByte)).toString should be("mov BYTE PTR [bp+si+125], bh")
+        Move(BH, RegisterMemoryLocation[ByteSize](SI+BP, 0x7D.toByte)).toString should be("mov BYTE PTR [bp+si+125], bh")
       }
 
      "correctly encode mov WORD PTR [bp], bp" in {
-        Move(BP, RegisterMemoryLocation.wordSize(BP)).encodeByte should be(Hex.lsb("89 6E 00"))
+        Move(BP, RegisterMemoryLocation[WordSize](BP)).encodeByte should be(Hex.lsb("89 6E 00"))
       }
 
       "correctly represent mov WORD PTR [bp], bp as a string" in {
-        Move(BP, RegisterMemoryLocation.wordSize(BP)).toString should be("mov WORD PTR [bp], bp")
+        Move(BP, RegisterMemoryLocation[WordSize](BP)).toString should be("mov WORD PTR [bp], bp")
       }
 
       "correctly encode mov BYTE PTR [bp]+0x1234, cl" in {
-        Move(CL, RegisterMemoryLocation.byteSize(BP, 0x1234.toShort)).encodeByte should be(Hex.lsb("88 8E 34 12"))
+        Move(CL, RegisterMemoryLocation[ByteSize](BP, 0x1234.toShort)).encodeByte should be(Hex.lsb("88 8E 34 12"))
       }
 
       "correctly represent mov BYTE PTR [bp]+0x1234, cl as a string" in {
-        Move(CL, RegisterMemoryLocation.byteSize(BP, 0x1234.toShort)).toString should be("mov BYTE PTR [bp+4660], cl")
+        Move(CL, RegisterMemoryLocation[ByteSize](BP, 0x1234.toShort)).toString should be("mov BYTE PTR [bp+4660], cl")
       }
 
       "correctly encode mov bx, ax" in {
@@ -87,11 +87,11 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov WORD PTR [si], si" in {
-        Move(SI, RegisterMemoryLocation.wordSize(SI)).encodeByte should be(Hex.lsb("89 34"))
+        Move(SI, RegisterMemoryLocation[WordSize](SI)).encodeByte should be(Hex.lsb("89 34"))
       }
 
       "correctly represent mov WORD PTR [si], si as a string" in {
-        Move(SI, RegisterMemoryLocation.wordSize(SI)).toString should be("mov WORD PTR [si], si")
+        Move(SI, RegisterMemoryLocation[WordSize](SI)).toString should be("mov WORD PTR [si], si")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*1], edx" in {
@@ -135,67 +135,67 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov WORD PTR [bx+3D], bp" in {
-        Move(BP, RegisterMemoryLocation.wordSize(BX, 0x3D.toByte)).encodeByte should be(Hex.lsb("89 6F 3D"))
+        Move(BP, RegisterMemoryLocation[WordSize](BX, 0x3D.toByte)).encodeByte should be(Hex.lsb("89 6F 3D"))
       }
 
       "correctly represent mov WORD PTR [bx+61], bp as a string" in {
-        Move(BP, RegisterMemoryLocation.wordSize(BX, 0x3D.toByte)).toString should be("mov WORD PTR [bx+61], bp")
+        Move(BP, RegisterMemoryLocation[WordSize](BX, 0x3D.toByte)).toString should be("mov WORD PTR [bx+61], bp")
       }
 
       "correctly encode mov WORD PTR [bp+di+0xDEAD], cx" in {
-        Move(CX, RegisterMemoryLocation.wordSize(BP+DI, 0xDEAD.toShort)).encodeByte should be(Hex.lsb("89 8B AD DE"))
+        Move(CX, RegisterMemoryLocation[WordSize](BP+DI, 0xDEAD.toShort)).encodeByte should be(Hex.lsb("89 8B AD DE"))
       }
 
       "correctly represent mov WORD PTR [bp+di+57005], cx as a string" in {
-        Move(CX, RegisterMemoryLocation.wordSize(BP+DI, 0xDEAD.toShort)).toString should be("mov WORD PTR [bp+di+57005], cx")
+        Move(CX, RegisterMemoryLocation[WordSize](BP+DI, 0xDEAD.toShort)).toString should be("mov WORD PTR [bp+di+57005], cx")
       }
 
       "correctly encode mov cl, BYTE PTR [bp+si]" in {
-        Move(RegisterMemoryLocation.byteSize(BP+SI), CL).encodeByte should be(Hex.lsb("8A 0A"))
+        Move(RegisterMemoryLocation[ByteSize](BP+SI), CL).encodeByte should be(Hex.lsb("8A 0A"))
       }
 
       "correctly represent mov cl, BYTE PTR [bp+si] as a string" in {
-        Move(RegisterMemoryLocation.byteSize(BP+SI), CL).toString should be("mov cl, BYTE PTR [bp+si]")
+        Move(RegisterMemoryLocation[ByteSize](BP+SI), CL).toString should be("mov cl, BYTE PTR [bp+si]")
       }
 
       "correctly encode mov dl, BYTE PTR [bx+di+0xA0]" in {
-        Move(RegisterMemoryLocation.byteSize(BX+DI, 0xA0.toByte), DL).encodeByte should be(Hex.lsb("8A 51 A0"))
+        Move(RegisterMemoryLocation[ByteSize](BX+DI, 0xA0.toByte), DL).encodeByte should be(Hex.lsb("8A 51 A0"))
       }
 
       "correctly represent mov dl, BYTE PTR [bx+di+160] as a string" in {
-        Move(RegisterMemoryLocation.byteSize(BX+DI, 0xA0.toByte), DL).toString should be("mov dl, BYTE PTR [bx+di+160]")
+        Move(RegisterMemoryLocation[ByteSize](BX+DI, 0xA0.toByte), DL).toString should be("mov dl, BYTE PTR [bx+di+160]")
       }
 
       "correctly encode mov dh, BYTE PTR [bp]+0xABBA" in {
-        Move(RegisterMemoryLocation.byteSize(BP, 0xABBA.toShort), DH).encodeByte should be(Hex.lsb("8A B6 BA AB"))
+        Move(RegisterMemoryLocation[ByteSize](BP, 0xABBA.toShort), DH).encodeByte should be(Hex.lsb("8A B6 BA AB"))
       }
 
       "correctly represent dh, BYTE PTR [bp+43962] as a string" in {
-        Move(RegisterMemoryLocation.byteSize(BP, 0xABBA.toShort), DH).toString should be("mov dh, BYTE PTR [bp+43962]")
+        Move(RegisterMemoryLocation[ByteSize](BP, 0xABBA.toShort), DH).toString should be("mov dh, BYTE PTR [bp+43962]")
       }
 
       "correctly encode mov dx, WORD PTR [si]" in {
-        Move(RegisterMemoryLocation.wordSize(SI), DX).encodeByte should be(Hex.lsb("8B 14"))
+        Move(RegisterMemoryLocation[WordSize](SI), DX).encodeByte should be(Hex.lsb("8B 14"))
       }
 
       "correctly represent mov dx, WORD PTR [si] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(SI), DX).toString should be("mov dx, WORD PTR [si]")
+        Move(RegisterMemoryLocation[WordSize](SI), DX).toString should be("mov dx, WORD PTR [si]")
       }
 
       "correctly encode mov sp, WORD PTR [bp+di+0x12]" in {
-        Move(RegisterMemoryLocation.wordSize(BP+DI, 0x12.toByte), SP).encodeByte should be(Hex.lsb("8B 63 12"))
+        Move(RegisterMemoryLocation[WordSize](BP+DI, 0x12.toByte), SP).encodeByte should be(Hex.lsb("8B 63 12"))
       }
 
       "correctly represent mov sp, WORD PTR [bp+di+18] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(BP+DI, 0x12.toByte), SP).toString should be("mov sp, WORD PTR [bp+di+18]")
+        Move(RegisterMemoryLocation[WordSize](BP+DI, 0x12.toByte), SP).toString should be("mov sp, WORD PTR [bp+di+18]")
       }
 
       "correctly encode mov di, WORD PTR [di+0xBEEF]" in {
-        Move(RegisterMemoryLocation.wordSize(DI, 0xBEEF.toShort), DI).encodeByte should be(Hex.lsb("8B BD EF BE"))
+        Move(RegisterMemoryLocation[WordSize](DI, 0xBEEF.toShort), DI).encodeByte should be(Hex.lsb("8B BD EF BE"))
       }
 
       "correctly represent mov di, WORD PTR [di+48879] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(DI, 0xBEEF.toShort), DI).toString should be("mov di, WORD PTR [di+48879]")
+        Move(RegisterMemoryLocation[WordSize](DI, 0xBEEF.toShort), DI).toString should be("mov di, WORD PTR [di+48879]")
       }
 
       "correctly encode mov dx, cs" in {
@@ -207,19 +207,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov WORD PTR [bx], es" in {
-        Move(ES, RegisterMemoryLocation.wordSize(BX)).encodeByte should be(Hex.lsb("8C 07"))
+        Move(ES, RegisterMemoryLocation[WordSize](BX)).encodeByte should be(Hex.lsb("8C 07"))
       }
 
       "correctly represent mov WORD PTR [bx], es as a string" in {
-        Move(ES, RegisterMemoryLocation.wordSize(BX)).toString should be("mov WORD PTR [bx], es")
+        Move(ES, RegisterMemoryLocation[WordSize](BX)).toString should be("mov WORD PTR [bx], es")
       }
 
       "correctly encode mov WORD PTR [si+0x1234], fs" in {
-        Move(FS, RegisterMemoryLocation.wordSize(SI, 0x1234.toShort)).encodeByte should be(Hex.lsb("8C A4 34 12"))
+        Move(FS, RegisterMemoryLocation[WordSize](SI, 0x1234.toShort)).encodeByte should be(Hex.lsb("8C A4 34 12"))
       }
 
       "correctly represent mov WORD PTR [si+4660], fs as a string" in {
-        Move(FS, RegisterMemoryLocation.wordSize(SI, 0x1234.toShort)).toString should be("mov WORD PTR [si+4660], fs")
+        Move(FS, RegisterMemoryLocation[WordSize](SI, 0x1234.toShort)).toString should be("mov WORD PTR [si+4660], fs")
       }
 
       "correctly encode mov gs, si" in {
@@ -231,19 +231,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov ss, WORD PTR [bp+si]" in {
-        Move(RegisterMemoryLocation.wordSize(BP+SI), SS).encodeByte should be(Hex.lsb("8E 12"))
+        Move(RegisterMemoryLocation[WordSize](BP+SI), SS).encodeByte should be(Hex.lsb("8E 12"))
       }
 
       "correctly represent mov ss, WORD PTR [bp+si] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(BP+SI), SS).toString should be("mov ss, WORD PTR [bp+si]")
+        Move(RegisterMemoryLocation[WordSize](BP+SI), SS).toString should be("mov ss, WORD PTR [bp+si]")
       }
 
       "correctly encode mov ds, WORD PTR [bx+0x99]" in {
-        Move(RegisterMemoryLocation.wordSize(BX, 0x99.toByte), DS).encodeByte should be(Hex.lsb("8E 5F 99"))
+        Move(RegisterMemoryLocation[WordSize](BX, 0x99.toByte), DS).encodeByte should be(Hex.lsb("8E 5F 99"))
       }
 
       "correctly represent mov ds, WORD PTR [bx+153] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(BX, 0x99.toByte), DS).toString should be("mov ds, WORD PTR [bx+153]")
+        Move(RegisterMemoryLocation[WordSize](BX, 0x99.toByte), DS).toString should be("mov ds, WORD PTR [bx+153]")
       }
 
       "correctly encode mov al, BYTE PTR [0x0022]" in {
@@ -326,19 +326,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov BYTE PTR [bp+di], 0x13" in {
-        Move(0x13.toByte, RegisterMemoryLocation.byteSize(BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
+        Move(0x13.toByte, RegisterMemoryLocation[ByteSize](BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
       }
 
       "correctly represent mov BYTE PTR [bp+di], 19 as a string" in {
-        Move(0x13.toByte, RegisterMemoryLocation.byteSize(BP+DI)).toString should be("mov BYTE PTR [bp+di], 19")
+        Move(0x13.toByte, RegisterMemoryLocation[ByteSize](BP+DI)).toString should be("mov BYTE PTR [bp+di], 19")
       }
 
       "correctly encode mov WORD PTR [bx+0x10], 0x5656" in {
-        Move(0x5656.toShort, RegisterMemoryLocation.wordSize(BX, 0x10.toByte)).encodeByte should be(Hex.lsb("C7 47 10 56 56"))
+        Move(0x5656.toShort, RegisterMemoryLocation[WordSize](BX, 0x10.toByte)).encodeByte should be(Hex.lsb("C7 47 10 56 56"))
       }
 
       "correctly represent mov WORD PTR [bx+16], 22102 as a string" in {
-        Move(0x5656.toShort, RegisterMemoryLocation.wordSize(BX, 0x10.toByte)).toString should be("mov WORD PTR [bx+16], 22102")
+        Move(0x5656.toShort, RegisterMemoryLocation[WordSize](BX, 0x10.toByte)).toString should be("mov WORD PTR [bx+16], 22102")
       }
 
       "correctly encode mov DWORD PTR [eax+ebx*2+0x11111111], 0x99999999" in {
@@ -371,19 +371,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov DWORD PTR [edx], ebp" in {
-        Move(EBP, RegisterMemoryLocation.doubleWordSize(EDX)).encodeByte should be(Hex.lsb("89 2A"))
+        Move(EBP, RegisterMemoryLocation[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("89 2A"))
       }
 
       "correctly represent mov DWORD PTR [edx], ebp as a string" in {
-        Move(EBP, RegisterMemoryLocation.doubleWordSize(EDX)).toString should be("mov DWORD PTR [edx], ebp")
+        Move(EBP, RegisterMemoryLocation[DoubleWordSize](EDX)).toString should be("mov DWORD PTR [edx], ebp")
       }
 
      "correctly encode mov DWORD PTR [ebp], ebp" in {
-        Move(EBP, RegisterMemoryLocation.doubleWordSize(EBP)).encodeByte should be(Hex.lsb("89 6D 00"))
+        Move(EBP, RegisterMemoryLocation[DoubleWordSize](EBP)).encodeByte should be(Hex.lsb("89 6D 00"))
       }
 
       "correctly represent mov DWORD PTR [ebp], ebp as a string" in {
-        Move(EBP, RegisterMemoryLocation.doubleWordSize(EBP)).toString should be("mov DWORD PTR [ebp], ebp")
+        Move(EBP, RegisterMemoryLocation[DoubleWordSize](EBP)).toString should be("mov DWORD PTR [ebp], ebp")
       }
 
       "throw an AssertionError for mov r10d, [label]" in {
@@ -497,32 +497,32 @@ class MoveSuite extends WordSpec with Matchers {
 
       "throw an exception for mov BYTE PTR r13l, [bp+si]" in {
         an[AssertionError] should be thrownBy {
-          Move(RegisterMemoryLocation.byteSize(BP+SI), R13L).encodeByte
+          Move(RegisterMemoryLocation[ByteSize](BP+SI), R13L).encodeByte
         }
       }
 
       "correctly encode mov r13l, BYTE PTR [eax]" in {
-        Move(RegisterMemoryLocation.byteSize(EAX), R13L).encodeByte should be(Hex.lsb("67 44 8A 28"))
+        Move(RegisterMemoryLocation[ByteSize](EAX), R13L).encodeByte should be(Hex.lsb("67 44 8A 28"))
       }
 
       "correctly represent mov r13l, BYTE PTR [eax] as a string" in {
-        Move(RegisterMemoryLocation.byteSize(EAX), R13L).toString should be("mov r13l, BYTE PTR [eax]")
+        Move(RegisterMemoryLocation[ByteSize](EAX), R13L).toString should be("mov r13l, BYTE PTR [eax]")
       }
 
       "correctly encode mov r15w, WORD PTR [eax]" in {
-        Move(RegisterMemoryLocation.wordSize(EAX), R15W).encodeByte should be(Hex.lsb("67 66 44 8B 38"))
+        Move(RegisterMemoryLocation[WordSize](EAX), R15W).encodeByte should be(Hex.lsb("67 66 44 8B 38"))
       }
 
       "correctly represent mov r15w, WORD PTR [eax] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(EAX), R15W).toString should be("mov r15w, WORD PTR [eax]")
+        Move(RegisterMemoryLocation[WordSize](EAX), R15W).toString should be("mov r15w, WORD PTR [eax]")
       }
 
       "correctly encode mov ax, WORD PTR [eax]" in {
-        Move(RegisterMemoryLocation.wordSize(EAX), AX).encodeByte should be(Hex.lsb("67 66 8B 00"))
+        Move(RegisterMemoryLocation[WordSize](EAX), AX).encodeByte should be(Hex.lsb("67 66 8B 00"))
       }
 
       "correctly represent mov ax, WORD PTR [eax] as a string" in {
-        Move(RegisterMemoryLocation.wordSize(EAX), AX).toString should be("mov ax, WORD PTR [eax]")
+        Move(RegisterMemoryLocation[WordSize](EAX), AX).toString should be("mov ax, WORD PTR [eax]")
       }
 
 

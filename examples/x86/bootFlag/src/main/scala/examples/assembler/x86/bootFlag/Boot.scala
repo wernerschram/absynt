@@ -10,7 +10,9 @@ import assembler.resource.Resource
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
+import assembler.x86.operands.ByteSize
 import assembler.x86.operands.Register._
+import assembler.x86.operands.memoryaccess.DestinationReference
 import assembler.{Label, UniqueLabel}
 
 object Boot extends App {
@@ -55,15 +57,15 @@ object Boot extends App {
       //
       Move(0x0.toByte, AL) ::
       Move((320*67).toShort, CX) ::
-      StoreString.Repeat(AL, DI) ::
+      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
       //
       Move(0x1.toByte, AL) ::
       Move((320*66).toShort, CX) ::
-      StoreString.Repeat(AL, DI) ::
+      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
       //
       Move(0x2.toByte, AL) ::
       Move((320*67).toShort, CX) ::
-      StoreString.Repeat(AL, DI) ::
+      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
 
       { val label: UniqueLabel = Label.unique; Jump(label).label(label) } ::
       Nil

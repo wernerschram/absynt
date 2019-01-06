@@ -2,21 +2,21 @@ package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
 import assembler.x86.operands._
-import assembler.x86.operands.memoryaccess.RegisterMemoryLocation
+import assembler.x86.operands.memoryaccess.DestinationReference
 import assembler.x86.operations.OperandInfo.OperandOrder
 import assembler.x86.operations._
 
 object StoreString {
   implicit val mnemonic: String = "stos"
 
-  def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
+  def apply[Size<:ValueSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size)
            (implicit processorMode: ProcessorMode): Static =
     (register, destination) match {
-      case (Register.AL, _) => Static8(destination)
-      case _ => Static16(register, destination)
+      case (Register.AL, d: DestinationReference with ByteSize) => Static8(d)
+      case (_, d: DestinationReference with WideSize) => Static16(register, d)
     }
 
-  private def Static8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
+  private def Static8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
       override protected def implicitInit(): Unit = {
         addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
@@ -24,7 +24,7 @@ object StoreString {
       }
     }
 
-  private def Static16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
+  private def Static16[Size<:WideSize](register: AccumulatorRegister, destination: DestinationReference with Size)
                       (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
       override protected def implicitInit(): Unit = {
@@ -33,7 +33,7 @@ object StoreString {
       }
     }
 
-  private def RepStatic8(destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])(implicit processorMode: ProcessorMode) =
+  private def RepStatic8(destination: DestinationReference)(implicit processorMode: ProcessorMode) =
     new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
       override protected def implicitInit(): Unit = {
         addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
@@ -41,7 +41,7 @@ object StoreString {
       }
     }
 
-  private def RepStatic16(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
+  private def RepStatic16(register: AccumulatorRegister, destination: DestinationReference)
                          (implicit processorMode: ProcessorMode) =
     new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
       override protected def implicitInit(): Unit = {
@@ -51,7 +51,7 @@ object StoreString {
     }
 
   object Repeat {
-    def apply(register: AccumulatorRegister, destination: RegisterMemoryLocation[DestinationIndex with IndexRegister])
+    def apply[Size<:ValueSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size)
              (implicit processorMode: ProcessorMode): Static with Repeated =
       (register, destination) match {
         case (Register.AL, _) => RepStatic8(destination)

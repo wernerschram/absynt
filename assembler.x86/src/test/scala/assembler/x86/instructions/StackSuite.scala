@@ -4,8 +4,8 @@ import assembler.Hex
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
-import assembler.x86.operands.ValueSize
 import assembler.x86.operands.memoryaccess._
+import assembler.x86.operands.{DoubleWordSize, QuadWordSize}
 import org.scalatest.{Matchers, WordSpec}
 
 class StackSuite extends WordSpec with Matchers {
@@ -20,7 +20,7 @@ class StackSuite extends WordSpec with Matchers {
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
-        Push(RegisterMemoryLocation.doubleWordSize(BX.combinedIndex(SI))).encodeByte should be(0x66.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
+        Push(RegisterMemoryLocation[DoubleWordSize](BX.combinedIndex(SI))).encodeByte should be(0x66.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
       }
 
       "correctly encode push bx" in {
@@ -74,7 +74,7 @@ class StackSuite extends WordSpec with Matchers {
 
       "throw an AssertionError for push QWORD PTR [bp]" in {
         an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.quadWordSize(BP)).encodeByte
+          Push(RegisterMemoryLocation[QuadWordSize](BP)).encodeByte
         }
       }
     }
@@ -84,12 +84,12 @@ class StackSuite extends WordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode push QWORD PTR [rax]" in {
-        Push(RegisterMemoryLocation.quadWordSize(RAX)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
+        Push(RegisterMemoryLocation[QuadWordSize](RAX)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
       }
 
       "throw an AssertionError for push DWORD PTR [rax]" in {
         an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation.doubleWordSize(RAX)).encodeByte
+          Push(RegisterMemoryLocation[DoubleWordSize](RAX)).encodeByte
         }
       }
 

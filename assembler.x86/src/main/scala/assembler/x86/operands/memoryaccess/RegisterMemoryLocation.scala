@@ -7,7 +7,7 @@ import assembler.x86.operations.AddressOperandInfo
 
 import scala.language.implicitConversions
 
-sealed class RegisterMemoryLocation[T <: RegisterReference] private(val reference: T, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister)
+sealed class RegisterMemoryLocation(val reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister)
   extends IndirectMemoryLocation(reference.indexCode,
      if (reference.onlyWithDisplacement)
       Some(displacement.getOrElse(ImmediateValue(0.toByte)))
@@ -44,70 +44,67 @@ sealed class RegisterMemoryLocation[T <: RegisterReference] private(val referenc
   }
 }
 
+class DestinationReference(override val reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister)
+  extends RegisterMemoryLocation(reference, displacement, segment)
+
 object RegisterMemoryLocation {
-
-  def apply[T<:RegisterReference](index: T)=
-    new RegisterMemoryLocation(index, None, index.defaultSegment)
-
-  def apply[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize)=
-    new RegisterMemoryLocation(index, Some(displacement), index.defaultSegment)
-
-  def byteSize[T<:RegisterReference](index: T)=
-    new RegisterMemoryLocation(index, None, index.defaultSegment) with ByteSize
-
-  def byteSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize)=
-    new RegisterMemoryLocation(index, Some(displacement), index.defaultSegment) with ByteSize
-
-  def wordSize[T<:RegisterReference](index: T)=
-    new RegisterMemoryLocation(index, None, index.defaultSegment) with WordSize
-
-  def wordSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize)=
-    new RegisterMemoryLocation(index, Some(displacement), index.defaultSegment) with WordSize
-
-  def doubleWordSize[T<:RegisterReference](index: T)=
-    new RegisterMemoryLocation(index, None, index.defaultSegment) with DoubleWordSize
-
-  def doubleWordSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize)=
-    new RegisterMemoryLocation(index, Some(displacement), index.defaultSegment) with DoubleWordSize
-
-  def quadWordSize[T<:RegisterReference](index: T)=
-    new RegisterMemoryLocation(index, None, index.defaultSegment) with QuadWordSize
-
-  def quadWordSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize)=
-    new RegisterMemoryLocation(index, Some(displacement), index.defaultSegment) with QuadWordSize
-
-  object withSegmentOverride {
-    def apply[T<:RegisterReference](index: T, segment: SegmentRegister) =
-      new RegisterMemoryLocation(index, None, segment)
-
-    def apply[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize, segment: SegmentRegister) =
-      new RegisterMemoryLocation(index, Some(displacement), segment)
-
-    def byteSize[T<:RegisterReference](index: T, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, None, segment) with ByteSize
-
-    def byteSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, Some(displacement), segment) with ByteSize
-
-    def wordSize[T<:RegisterReference](index: T, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, None, segment) with WordSize
-
-    def wordSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, Some(displacement), segment) with WordSize
-
-    def doubleWordSize[T<:RegisterReference](index: T, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, None, segment) with DoubleWordSize
-
-    def doubleWordSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, Some(displacement), segment) with DoubleWordSize
-
-    def quadWordSize[T<:RegisterReference](index: T, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, None, segment) with QuadWordSize
-
-    def quadWordSize[T<:RegisterReference](index: T, displacement: ImmediateValue with DisplacementSize, segment: SegmentRegister)=
-      new RegisterMemoryLocation(index, Some(displacement), segment) with QuadWordSize
+  abstract class RMForSize[Size<:ValueSize] {
+    def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with Size
+    def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with Size
   }
 
-  implicit def indexWrapper(index: DestinationIndex with IndexRegister): RegisterMemoryLocation[DestinationIndex with IndexRegister] =
-    new RegisterMemoryLocation[DestinationIndex with IndexRegister](index, None, index.defaultSegment)
+  implicit def RMforByteSize: RMForSize[ByteSize] = new RMForSize[ByteSize] {
+    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with ByteSize =
+      new RegisterMemoryLocation(reference, displacement, segment) with ByteSize
+
+    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with ByteSize =
+      new DestinationReference(reference, displacement, segment) with ByteSize
+  }
+
+  implicit def RMforWordSize: RMForSize[WordSize] = new RMForSize[WordSize] {
+    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with WordSize =
+      new RegisterMemoryLocation(reference, displacement, segment) with WordSize
+
+    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with WordSize =
+      new DestinationReference(reference, displacement, segment) with WordSize
+  }
+
+  implicit def RMforDoubleWordSize: RMForSize[DoubleWordSize] = new RMForSize[DoubleWordSize] {
+    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with DoubleWordSize =
+      new RegisterMemoryLocation(reference, displacement, segment) with DoubleWordSize
+
+    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with DoubleWordSize =
+      new DestinationReference(reference, displacement, segment) with DoubleWordSize
+  }
+
+  implicit def RMforQuadWordSize: RMForSize[QuadWordSize] = new RMForSize[QuadWordSize] {
+    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with QuadWordSize =
+      new RegisterMemoryLocation(reference, displacement, segment) with QuadWordSize
+
+    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with QuadWordSize =
+      new DestinationReference(reference, displacement, segment) with QuadWordSize
+  }
+
+
+  def apply[Size<:ValueSize:RMForSize](index: RegisterReference): RegisterMemoryLocation with Size =
+    implicitly[RMForSize[Size]].instance(index, None, index.defaultSegment)
+
+  def apply[Size<:ValueSize:RMForSize](index: RegisterReference, displacement: ImmediateValue with DisplacementSize): RegisterMemoryLocation with Size =
+    implicitly[RMForSize[Size]].instance(index, Some(displacement), index.defaultSegment)
+
+  object withSegmentOverride {
+    def apply[Size<:ValueSize:RMForSize](index: RegisterReference, segment: SegmentRegister): RegisterMemoryLocation with Size =
+      implicitly[RMForSize[Size]].instance(index, None, segment)
+
+    def apply[Size<:ValueSize:RMForSize](index: RegisterReference, displacement: ImmediateValue with DisplacementSize, segment: SegmentRegister): RegisterMemoryLocation with Size =
+      implicitly[RMForSize[Size]].instance(index, Some(displacement), segment)
+  }
+
+}
+
+object DestinationReference {
+  import assembler.x86.operands.memoryaccess.RegisterMemoryLocation._
+
+  implicit def apply[Size<:ValueSize:RMForSize](index: DestinationIndex with IndexRegister): DestinationReference with Size =
+    implicitly[RMForSize[Size]].DestinationReference(index, None, index.defaultSegment)
 }
