@@ -247,43 +247,43 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov al, BYTE PTR [0x0022]" in {
-        Move(MemoryAddress.byteSize(0x0022.toShort), AL).encodeByte should be(Hex.lsb("A0 22 00"))
+        Move(MemoryAddress[ByteSize](0x0022.toShort), AL).encodeByte should be(Hex.lsb("A0 22 00"))
       }
 
       "correctly represent mov al, BYTE PTR [34] as a string" in {
-        Move(MemoryAddress.byteSize(0x0022.toShort), AL).toString should be("mov al, BYTE PTR [34]")
+        Move(MemoryAddress[ByteSize](0x0022.toShort), AL).toString should be("mov al, BYTE PTR [34]")
       }
 
       "correctly encode mov ax, WORD PTR [0x6677]" in {
-        Move(MemoryAddress.wordSize(0x6677.toShort), AX).encodeByte should be(Hex.lsb("A1 77 66"))
+        Move(MemoryAddress[WordSize](0x6677.toShort), AX).encodeByte should be(Hex.lsb("A1 77 66"))
       }
 
       "correctly represent mov ax, WORD PTR [26231] as a string" in {
-        Move(MemoryAddress.wordSize(0x6677.toShort), AX).toString should be("mov ax, WORD PTR [26231]")
+        Move(MemoryAddress[WordSize](0x6677.toShort), AX).toString should be("mov ax, WORD PTR [26231]")
       }
 
       "correctly encode mov ax, WORD PTR ss:[0x6677]" in {
-        Move(MemoryAddress.wordSize(0x6677.toShort, SS), AX).encodeByte should be(Hex.lsb("36 A1 77 66"))
+        Move(MemoryAddress[WordSize](0x6677.toShort, SS), AX).encodeByte should be(Hex.lsb("36 A1 77 66"))
       }
 
       "correctly represent mov ax, WORD PTR ss:[26231] as a string" in {
-        Move(MemoryAddress.wordSize(0x6677.toShort, SS), AX).toString should be("mov ax, WORD PTR ss:[26231]")
+        Move(MemoryAddress[WordSize](0x6677.toShort, SS), AX).toString should be("mov ax, WORD PTR ss:[26231]")
       }
 
       "correctly encode mov BYTE PTR [0xDEAF], al" in {
-        Move(AL, MemoryAddress.byteSize(0xDEAF.toShort)).encodeByte should be(Hex.lsb("A2 AF DE"))
+        Move(AL, MemoryAddress[ByteSize](0xDEAF.toShort)).encodeByte should be(Hex.lsb("A2 AF DE"))
       }
 
       "correctly represent mov BYTE PTR [57007], al as a string" in {
-        Move(AL, MemoryAddress.byteSize(0xDEAF.toShort)).toString should be("mov BYTE PTR [57007], al")
+        Move(AL, MemoryAddress[ByteSize](0xDEAF.toShort)).toString should be("mov BYTE PTR [57007], al")
       }
 
       "correctly encode mov WORD PTR [0x2D], ax" in {
-        Move(AX, MemoryAddress.wordSize(0x2D.toByte)).encodeByte should be(Hex.lsb("A3 2D"))
+        Move(AX, MemoryAddress[WordSize](0x2D.toByte)).encodeByte should be(Hex.lsb("A3 2D"))
       }
 
       "correctly represent mov WORD PTR [45], ax as a string" in {
-        Move(AX, MemoryAddress.wordSize(0x2D.toByte)).toString should be("mov WORD PTR [45], ax")
+        Move(AX, MemoryAddress[WordSize](0x2D.toByte)).toString should be("mov WORD PTR [45], ax")
       }
 
       "correctly encode mov dl, 0x12" in {
@@ -355,19 +355,19 @@ class MoveSuite extends WordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode mov DWORD PTR [0xDEADBEEF], eax" in {
-        Move(EAX, MemoryAddress.doubleWordSize(0xDEADBEEF)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
+        Move(EAX, MemoryAddress[DoubleWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
       }
 
       "correctly represent mov DWORD PTR [3735928559], eax as a string" in {
-        Move(EAX, MemoryAddress.doubleWordSize(0xDEADBEEF)).toString should be("mov DWORD PTR [3735928559], eax")
+        Move(EAX, MemoryAddress[DoubleWordSize](0xDEADBEEF)).toString should be("mov DWORD PTR [3735928559], eax")
       }
 
       "correctly encode mov eax, DWORD PTR [0xFAFAFAFA]" in {
-        Move(MemoryAddress.doubleWordSize(0xFAFAFAFA), EAX).encodeByte should be(Hex.lsb("A1 FA FA FA FA"))
+        Move(MemoryAddress[DoubleWordSize](0xFAFAFAFA), EAX).encodeByte should be(Hex.lsb("A1 FA FA FA FA"))
       }
 
       "correctly represent mov eax, DWORD PTR [4210752250] as a string" in {
-        Move(MemoryAddress.doubleWordSize(0xFAFAFAFA), EAX).toString should be("mov eax, DWORD PTR [4210752250]")
+        Move(MemoryAddress[DoubleWordSize](0xFAFAFAFA), EAX).toString should be("mov eax, DWORD PTR [4210752250]")
       }
 
       "correctly encode mov DWORD PTR [edx], ebp" in {
@@ -559,19 +559,19 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly encode mov rax, QWORD PTR [0xA4A3A2A1F4F3F2F1]" in {
-        Move(MemoryAddress.quadWordSize(0xA4A3A2A1F4F3F2F1L), RAX).encodeByte should be(Hex.lsb("48 A1 F1 F2 F3 F4 A1 A2 A3 A4"))
+        Move(MemoryAddress[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).encodeByte should be(Hex.lsb("48 A1 F1 F2 F3 F4 A1 A2 A3 A4"))
       }
 
       "correctly represent mov rax, QWORD PTR [-6583239413802470671] as a string" in {
-        Move(MemoryAddress.quadWordSize(0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
+        Move(MemoryAddress[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
       }
 
       "correctly encode mov QWORD PTR [0xDEADBEEF], rax" in {
-        Move(RAX, MemoryAddress.quadWordSize(0xDEADBEEF)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
+        Move(RAX, MemoryAddress[QuadWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
       }
 
       "correctly represent mov QWORD PTR [3735928559], rax as a string" in {
-        Move(RAX, MemoryAddress.quadWordSize(0xDEADBEEF)).toString should be("mov QWORD PTR [3735928559], rax")
+        Move(RAX, MemoryAddress[QuadWordSize](0xDEADBEEF)).toString should be("mov QWORD PTR [3735928559], rax")
       }
 
       "correctly encode mov r15l, 0x12" in {

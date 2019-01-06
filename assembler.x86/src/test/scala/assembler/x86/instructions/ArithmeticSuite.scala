@@ -79,11 +79,11 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode not BYTE PTR [0x01]" in {
-        Not(MemoryAddress.byteSize(0x0001.toShort)).encodeByte should be(Hex.lsb("F6 16 01 00"))
+        Not(MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("F6 16 01 00"))
       }
 
       "correctly encode not WORD PTR [0x0001]" in {
-        Not(MemoryAddress.wordSize(0x0001.toShort)).encodeByte should be(Hex.lsb("F7 16 01 00"))
+        Not(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("F7 16 01 00"))
       }
     }
     "in protected mode" should {
@@ -240,27 +240,27 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode xor DWORD PTR [0x11111111], 0x44332211" in {
-        Xor(0x44332211, MemoryAddress.doubleWordSize(0x11111111)).encodeByte should be(Hex.lsb("81 35 11 11 11 11 11 22 33 44"))
+        Xor(0x44332211, MemoryAddress[DoubleWordSize](0x11111111)).encodeByte should be(Hex.lsb("81 35 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent xor DWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Xor(0x44332211, MemoryAddress.doubleWordSize(0x11111111)).toString shouldBe "xor DWORD PTR [286331153], 1144201745"
+        Xor(0x44332211, MemoryAddress[DoubleWordSize](0x11111111)).toString shouldBe "xor DWORD PTR [286331153], 1144201745"
       }
 
       "correctly encode xor WORD PTR [0x11111111], 0x44" in {
-        Xor(0x44.toByte, MemoryAddress.wordSize(0x11111111)).encodeByte should be(Hex.lsb("66 83 35 11 11 11 11 44"))
+        Xor(0x44.toByte, MemoryAddress[WordSize](0x11111111)).encodeByte should be(Hex.lsb("66 83 35 11 11 11 11 44"))
       }
 
       "correctly represent xor WORD PTR [0x11111111], 0x44 as a string" in {
-        Xor(0x44.toByte, MemoryAddress.wordSize(0x11111111)).toString shouldBe "xor WORD PTR [286331153], 68"
+        Xor(0x44.toByte, MemoryAddress[WordSize](0x11111111)).toString shouldBe "xor WORD PTR [286331153], 68"
       }
 
       "correctly encode xor DWORD PTR [0x1234], edx" in {
-        Xor(EDX, MemoryAddress.doubleWordSize(0X1234.toShort)).encodeByte should be(Hex.lsb("67 31 16 34 12"))
+        Xor(EDX, MemoryAddress[DoubleWordSize](0X1234.toShort)).encodeByte should be(Hex.lsb("67 31 16 34 12"))
       }
 
       "correctly represent xor DWORD PTR [0x1234], edx as a string" in {
-        Xor(EDX, MemoryAddress.doubleWordSize(0x1234.toShort)).toString shouldBe "xor DWORD PTR [4660], edx"
+        Xor(EDX, MemoryAddress[DoubleWordSize](0x1234.toShort)).toString shouldBe "xor DWORD PTR [4660], edx"
       }
 
       "correctly encode xor esi, DWORD PTR gs:[eax+0x12]" in {
@@ -278,16 +278,16 @@ class ArithmeticSuite extends WordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode xor QWORD PTR [0x11111111], 0x44332211" in {
-        Xor(0x44332211, MemoryAddress.quadWordSize(0x11111111)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
+        Xor(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent xor QWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Xor(0x44332211, MemoryAddress.quadWordSize(0x11111111)).toString shouldBe "xor QWORD PTR [286331153], 1144201745"
+        Xor(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).toString shouldBe "xor QWORD PTR [286331153], 1144201745"
       }
 
       "throw an AssertionError for xor WORD PTR [0x11111111], 0x44332211" in {
         an[AssertionError] should be thrownBy {
-          Xor(0x44332211, MemoryAddress.wordSize(0x11111111))
+          Xor(0x44332211, MemoryAddress[WordSize](0x11111111))
         }
       }
 

@@ -20,20 +20,22 @@ sealed class MemoryAddress private(address: ImmediateValue, segment: SegmentRegi
 }
 
 object MemoryAddress {
+  abstract class MemoryAddressForSize[Size<:ValueSize] {
+    def instance(address: ImmediateValue, segment: SegmentRegister = Register.DS): MemoryAddress with Size
+  }
 
-  def apply(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
-    new MemoryAddress(address, segment)
+  implicit def memoryAddressForByteSize: MemoryAddressForSize[ByteSize] =
+    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
 
-  def byteSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
-    new MemoryAddress(address, segment) with ByteSize
+  implicit def memoryAddressForWordSize: MemoryAddressForSize[WordSize] =
+    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
 
-  def wordSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
-    new MemoryAddress(address, segment) with WordSize
+  implicit def memoryAddressForDoubleWordSize: MemoryAddressForSize[DoubleWordSize] =
+    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
 
-  def doubleWordSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
-    new MemoryAddress(address, segment) with DoubleWordSize
+  implicit def memoryAddressForQuadWordSize: MemoryAddressForSize[QuadWordSize] =
+    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
 
-  def quadWordSize(address: ImmediateValue, segment: SegmentRegister = Register.DS) =
-    new MemoryAddress(address, segment) with QuadWordSize
-
+  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue, segment: SegmentRegister = Register.DS): MemoryAddress with Size =
+    implicitly[MemoryAddressForSize[Size]].instance(address, segment)
 }

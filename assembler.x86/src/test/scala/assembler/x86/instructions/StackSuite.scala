@@ -5,7 +5,7 @@ import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue._
 import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess._
-import assembler.x86.operands.{DoubleWordSize, QuadWordSize}
+import assembler.x86.operands.{DoubleWordSize, QuadWordSize, WordSize}
 import org.scalatest.{Matchers, WordSpec}
 
 class StackSuite extends WordSpec with Matchers {
@@ -16,7 +16,7 @@ class StackSuite extends WordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode push WORD PTR [0x0001]" in {
-        Push(MemoryAddress.wordSize(0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
+        Push(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
