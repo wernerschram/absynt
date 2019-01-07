@@ -14,6 +14,7 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
     else
       displacement, segment)
     with ModRMEncodableOperand {
+  self: ValueSize =>
 
   override val defaultSegment: SegmentRegister = reference.defaultSegment
 
@@ -22,7 +23,7 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
     case o: GeneralPurposeRegister with IndexRegister => Set(AddressOperandInfo.rmIndex(o, segmentOverride))
   }
 
-  override def toString: String = s"$segmentPrefix[$reference$displacementString]"
+  override def toString: String = s"$sizeName PTR $segmentPrefix[$reference$displacementString]"
 
   private def displacementString = displacement match {
     case None => ""
@@ -45,7 +46,9 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
 }
 
 class DestinationReference(override val reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister)
-  extends RegisterMemoryLocation(reference, displacement, segment)
+  extends RegisterMemoryLocation(reference, displacement, segment) {
+  self: ValueSize =>
+}
 
 object RegisterMemoryLocation {
   abstract class RMForSize[Size<:ValueSize] {

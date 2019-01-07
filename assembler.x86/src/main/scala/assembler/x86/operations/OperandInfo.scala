@@ -130,7 +130,7 @@ object AddressOperandInfo {
   def rmBase(register: GeneralPurposeRegister with BaseRegisterReference): AddressOperandInfo =
     new AddressOperandInfo(register)
 
-  def rmDisplacement(displacement: ImmediateValue, segmentOverride: Option[SegmentRegister]): AddressOperandInfo =
+  def rmDisplacement(displacement: ImmediateValue with ValueSize, segmentOverride: Option[SegmentRegister]): AddressOperandInfo =
     new AddressOperandInfo(displacement, segmentOverride)
 
   def SIBBase(register: GeneralPurposeRegister with SIBBaseRegister): AddressOperandInfo =

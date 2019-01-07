@@ -4,8 +4,9 @@ import assembler.ListExtensions.ListToImmediate
 import assembler.x86.operands._
 import assembler.x86.operations.AddressOperandInfo
 
-sealed class MemoryAddress private(address: ImmediateValue, segment: SegmentRegister = Register.DS)
+sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS)
   extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {
+  self: ValueSize =>
 
   override val modValue: Byte = 0x00.toByte
 
@@ -16,26 +17,26 @@ sealed class MemoryAddress private(address: ImmediateValue, segment: SegmentRegi
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ address.value
 
-  override def toString = s"$segmentPrefix[${address.value.decimalString}]"
+  override def toString = s"$sizeName PTR $segmentPrefix[${address.value.decimalString}]"
 }
 
 object MemoryAddress {
   abstract class MemoryAddressForSize[Size<:ValueSize] {
-    def instance(address: ImmediateValue, segment: SegmentRegister = Register.DS): MemoryAddress with Size
+    def instance(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS): MemoryAddress with Size
   }
 
   implicit def memoryAddressForByteSize: MemoryAddressForSize[ByteSize] =
-    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
 
   implicit def memoryAddressForWordSize: MemoryAddressForSize[WordSize] =
-    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
 
   implicit def memoryAddressForDoubleWordSize: MemoryAddressForSize[DoubleWordSize] =
-    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
 
   implicit def memoryAddressForQuadWordSize: MemoryAddressForSize[QuadWordSize] =
-    (address: ImmediateValue, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
 
-  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue, segment: SegmentRegister = Register.DS): MemoryAddress with Size =
+  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS): MemoryAddress with Size =
     implicitly[MemoryAddressForSize[Size]].instance(address, segment)
 }

@@ -10,6 +10,8 @@ sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRe
   displacement: Option[ImmediateValue with DisplacementSize] = None, val scale: Int, segment: SegmentRegister)
   extends IndirectMemoryLocation(0x04, displacement, segment) with ModRMEncodableOperand {
 
+  self: ValueSize =>
+
   assume(index sizeEquals  base)
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
@@ -34,7 +36,7 @@ sealed class SIBMemoryLocation(val index: GeneralPurposeRegister with SIBIndexRe
   override def isValidForMode(processorMode: ProcessorMode): Boolean =
     base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
 
-  override def toString = s"$segmentPrefix[$base+$index$scaleString$displacementString]"
+  override def toString = s"$sizeName PTR $segmentPrefix[$base+$index$scaleString$displacementString]"
 
   private def scaleString = s"*$scale"
 

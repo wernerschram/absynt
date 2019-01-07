@@ -4,8 +4,9 @@ import assembler.ListExtensions._
 
 import scala.language.implicitConversions
 
-sealed abstract class ImmediateValue(val value: Seq[Byte])
-  extends Operand with ValueSize {
+sealed class ImmediateValue(val value: Seq[Byte])
+  extends Operand {
+  self: ValueSize =>
 
   val isPositive: Boolean = (value.last & 0x80.toByte) == 0
 

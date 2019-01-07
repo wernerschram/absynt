@@ -6,7 +6,6 @@ sealed trait OperandSize {
 
 trait ValueSize extends OperandSize {
   def sizeName: String
-  override def toString = s"$sizeName PTR ${super.toString}"
 }
 
 trait DisplacementSize extends ValueSize // 8, 16, 32
@@ -39,10 +38,7 @@ trait QuadWordSize extends LongSize {
 
 sealed trait FarPointerSize[OffsetSize<:ExtendedSize] extends OperandSize {
   val offset: OffsetSize
-  override def sizeEquals(that: OperandSize): Boolean = that match {
-    case f: FarPointerSize[_] => offset.sizeEquals(f.offset)
-    case _ => false
-  }
+  override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[FarPointerSize[OffsetSize]]
 }
 
 trait FarWordSize extends FarPointerSize[WordSize]
