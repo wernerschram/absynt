@@ -37,8 +37,8 @@ trait PointerOperandSizePrefix {
   self: OperandInfo =>
   override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
     (operand, processorMode) match {
-      case (_: FarDoubleWordSize, ProcessorMode.Protected | ProcessorMode.Long) => true
-      case (_: FarWordSize, ProcessorMode.Real) => true
+      case (_: FarWordSize, ProcessorMode.Protected | ProcessorMode.Long) => true
+      case (_: FarDoubleWordSize, ProcessorMode.Real) => true
       case _ => false
     }
 }
@@ -51,7 +51,7 @@ object OperandInfo {
 
   import OperandOrder._
 
-  def pointer(pointer: memoryaccess.FarPointer, operandOrder: OperandOrder): OperandInfo =
+  def pointer(pointer: memoryaccess.FarPointer[_], operandOrder: OperandOrder): OperandInfo =
     new OperandInfo(pointer, operandOrder) with PointerOperandSizePrefix //ptrXX
 
   def relative(pointer: memoryaccess.NearPointer, operandOrder: OperandOrder): OperandInfo =
