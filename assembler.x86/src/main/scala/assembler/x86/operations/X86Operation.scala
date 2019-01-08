@@ -4,42 +4,6 @@ import assembler.resource.UnlabeledEncodable
 import assembler.x86.operands._
 import assembler.x86.{ProcessorMode, RexRequirement}
 
-trait ModRMBytes {
-  self: X86Operation =>
-  def modRMBytes: Seq[Byte]
-  protected def modRMInit(): Unit
-}
-
-trait DisplacementBytes {
-  self: X86Operation =>
-  def displacementBytes: Seq[Byte]
-  protected def displacementInit(): Unit
-}
-
-trait ImmediateBytes {
-  self: X86Operation =>
-  def immediateBytes: Seq[Byte]
-  protected def immediateInit(): Unit
-}
-
-trait NoModRM extends ModRMBytes {
-  self: X86Operation =>
-  override def modRMBytes: Seq[Byte] = Nil
-  protected def modRMInit(): Unit = Unit
-}
-
-trait NoDisplacement extends DisplacementBytes {
-  self: X86Operation =>
-  override def displacementBytes: Seq[Byte] = Nil
-  protected def displacementInit(): Unit = Unit
-}
-
-trait NoImmediate extends ImmediateBytes {
-  self: X86Operation =>
-  override def immediateBytes: Seq[Byte] = Nil
-  protected def immediateInit(): Unit = Unit
-}
-
 abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
   self: ModRMBytes with DisplacementBytes with ImmediateBytes =>
   final def prefixes: Seq[Byte] =
