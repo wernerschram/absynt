@@ -58,7 +58,7 @@ object Move {
     (source, destination) match {
       case (accumulator: AccumulatorRegister, destination: MemoryAddress) =>
         AXToMOffs16(accumulator, destination)
-      case (source: WideRegister, destination: ModRMEncodableOperand) =>
+      case _ =>
         R16ToRM16(source, destination)
     }
 
@@ -98,9 +98,9 @@ object Move {
 
   def apply[Size<:WideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
     (source, destination) match {
-      case (source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size) =>
+      case (source: MemoryAddress, accumulator: AccumulatorRegister) =>
         MOffs16ToAX(source, accumulator)
-      case (source: ModRMEncodableOperand, destination: WideRegister) =>
+      case _ =>
         RM16ToR16(destination, source)
     }
 
@@ -142,7 +142,7 @@ object Move {
       override def registerOrder: OperandOrder = destination
     }
 
-  def forLabel(targetLabel: Label, register: WideRegister)
+  def forLabel[Size<:WideSize](targetLabel: Label, register: GeneralPurposeRegister with Size)
               (implicit processorMode: ProcessorMode): AbsoluteReference = {
 
     new AbsoluteReference(targetLabel) {

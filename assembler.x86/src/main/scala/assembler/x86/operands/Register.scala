@@ -101,8 +101,7 @@ sealed trait SIBBaseRegister extends ModRMEncodableOperand {
   val SIBBaseCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait ByteRegister extends GeneralPurposeRegister with ByteSize {
-}
+sealed trait ByteRegister extends GeneralPurposeRegister with ByteSize
 
 sealed trait LowByteRegister extends ByteRegister {
   override def toString: String = if ( mnemonic.startsWith("r")) s"${mnemonic}l" else mnemonic.replace('x', 'l')
@@ -114,17 +113,15 @@ sealed trait HighByteRegister extends ByteRegister {
   override def toString: String = mnemonic.replace('x', 'h')
 }
 
-sealed trait WideRegister extends GeneralPurposeRegister with WideSize
-
-sealed trait WordRegister extends WideRegister with WordSize {
+sealed trait WordRegister extends GeneralPurposeRegister with WordSize {
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
 }
 
-sealed trait DoubleWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister with DoubleWordSize {
+sealed trait DoubleWordRegister extends GeneralPurposeRegister with SIBIndexRegister with SIBBaseRegister with DoubleWordSize {
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
 }
 
-sealed trait QuadWordRegister extends WideRegister with SIBIndexRegister with SIBBaseRegister with QuadWordSize {
+sealed trait QuadWordRegister extends GeneralPurposeRegister with SIBIndexRegister with SIBBaseRegister with QuadWordSize {
   override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
 }
 

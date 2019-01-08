@@ -8,19 +8,19 @@ import assembler.x86.operations._
 object Push {
   implicit val opcode: String = "push"
 
-  def apply(register: WideRegister)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply[Size<:WideSize](register: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
     (register, processorMode) match {
-      case (r: WordSize, _) =>
+      case (r: GeneralPurposeRegister with WordSize, _) =>
         R16(r)
-      case (r: QuadWordSize, ProcessorMode.Long) =>
+      case (r: GeneralPurposeRegister with QuadWordSize, ProcessorMode.Long) =>
         R16(r)
-      case (r: DoubleWordSize, ProcessorMode.Protected | ProcessorMode.Real) =>
+      case (r: GeneralPurposeRegister with DoubleWordSize, ProcessorMode.Protected | ProcessorMode.Real) =>
         R16(r)
       case _ =>
         throw new AssertionError
     }
 
-  private def R16(register: GeneralPurposeRegister with WideSize)(implicit processorMode: ProcessorMode) =
+  private def R16[Size<:WideSize](register: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[WideSize](register, Seq(0x50.toByte), opcode) with NoDisplacement with NoImmediate {
       override def registerOrder: OperandOrder = destination
     }

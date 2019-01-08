@@ -96,13 +96,13 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
     R8ToRM8(source, destination)
 
-  def apply(source: WideRegister, destination: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply[Size<:WideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
     R16ToRM16(source, destination)
 
-  private def R16ToRM16(operand1: WideRegister, operand2: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
+  private def R16ToRM16[Size<:WideSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModRRM(operand1, operand2, (OpcodeBase + 0x01).toByte :: Nil, mnemonic, destination)
 
-  def apply(source: WideRegister, destination: WideRegister)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply[Size<:WideSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
     R16ToRM16(destination, source)
 
   def apply(source: ModRMEncodableOperand with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
