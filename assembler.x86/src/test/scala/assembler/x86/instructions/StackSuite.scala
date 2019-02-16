@@ -35,10 +35,6 @@ class StackSuite extends WordSpec with Matchers {
         Push(0x1980.toShort).encodeByte should be(0x68.toByte :: 0x80.toByte :: 0x19.toByte :: Nil)
       }
 
-      "correctly encode push 0x00FF11EE" in {
-        Push(0x00FF11EE).encodeByte should be(0x66.toByte :: 0x68.toByte :: 0xEE.toByte :: 0x11.toByte :: 0xFF.toByte :: 0x00.toByte :: Nil)
-      }
-
       "correctly encode push cs" in {
         Push(CS).encodeByte should be(0x0E.toByte :: Nil)
       }

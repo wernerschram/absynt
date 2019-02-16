@@ -563,7 +563,7 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly represent mov rax, QWORD PTR [-6583239413802470671] as a string" in {
-        Move(MemoryAddress[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
+        Move[QuadWordSize](MemoryAddress[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
       }
 
       "correctly encode mov QWORD PTR [0xDEADBEEF], rax" in {

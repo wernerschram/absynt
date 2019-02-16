@@ -158,11 +158,11 @@ object Move {
           case (ProcessorMode.Real | ProcessorMode.Protected, _: GeneralPurposeRexRegister) =>
             throw new AssertionError
           case (ProcessorMode.Real, _) =>
-            Imm16ToR16(register, distance.toShort)
+            Imm16ToR16(register, processorMode.pointer(distance))
           case (ProcessorMode.Protected, _: DoubleWordSize) =>
-            Imm16ToR16(register, distance)
+            Imm16ToR16(register, processorMode.pointer(distance))
           case (ProcessorMode.Long, _: QuadWordSize) =>
-            Imm16ToR16(register, distance.toLong)
+            Imm16ToR16(register, processorMode.pointer(distance))
           case _ =>
             throw new AssertionError
        }

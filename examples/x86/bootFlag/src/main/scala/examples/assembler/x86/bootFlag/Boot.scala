@@ -20,6 +20,8 @@ object Boot extends App {
 
   case class Color(r: Byte, g: Byte, b: Byte)
 
+  import ProcessorMode.Real._
+
   def setColor(col: Color)(implicit processorMode: ProcessorMode): List[Resource] =
     Move(0x3c9.toShort, DX) ::
     Move(col.r, AL) ::
@@ -32,7 +34,6 @@ object Boot extends App {
 
   def createFile(): Unit = {
 
-    import ProcessorMode.Real._
 
     val topColor = Color(63, 0, 0)
     val middleColor = Color(63, 63, 63)

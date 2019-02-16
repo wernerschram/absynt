@@ -10,7 +10,7 @@ import scala.language.implicitConversions
 sealed class RegisterMemoryLocation(val reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister)
   extends IndirectMemoryLocation(reference.indexCode,
      if (reference.onlyWithDisplacement)
-      Some(displacement.getOrElse(ImmediateValue(0.toByte)))
+      Some(displacement.getOrElse(ImmediateValue.forByte(0.toByte)))
     else
       displacement, segment)
     with ModRMEncodableOperand {
