@@ -29,7 +29,7 @@ object Push {
     (processorMode, operand) match {
       case (_, o: WordSize) =>
         RM16(o)
-      case (ProcessorMode.Protected | ProcessorMode.Real, o: DoubleWordSize) =>
+      case (ProcessorMode.Protected | ProcessorMode.Real | ProcessorMode.Legacy, o: DoubleWordSize) =>
         RM16(o)
       case (ProcessorMode.Long, o: QuadWordSize) =>
         RM16(o)
@@ -39,12 +39,6 @@ object Push {
 
   private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, opcode, destination) with NoDisplacement with NoImmediate
-
-//  def apply(immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): Static =
-//    Imm8(immediate)
-//
-//  def apply[Size<:ExtendedSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
-//    Imm16(immediate)
 
   def apply(immediate: ImmediateValue with DisplacementSize)(implicit processorMode: ProcessorMode): Static =
     immediate match {

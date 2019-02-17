@@ -56,36 +56,42 @@ object RegisterMemoryLocation {
     def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with Size
   }
 
-  implicit def RMforByteSize: RMForSize[ByteSize] = new RMForSize[ByteSize] {
-    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with ByteSize =
-      new RegisterMemoryLocation(reference, displacement, segment) with ByteSize
+  trait I8086Implicits {
+    implicit def RMforByteSize: RMForSize[ByteSize] = new RMForSize[ByteSize] {
+      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with ByteSize =
+        new RegisterMemoryLocation(reference, displacement, segment) with ByteSize
 
-    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with ByteSize =
-      new DestinationReference(reference, displacement, segment) with ByteSize
+      override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with ByteSize =
+        new DestinationReference(reference, displacement, segment) with ByteSize
+    }
+
+    implicit def RMforWordSize: RMForSize[WordSize] = new RMForSize[WordSize] {
+      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with WordSize =
+        new RegisterMemoryLocation(reference, displacement, segment) with WordSize
+
+      override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with WordSize =
+        new DestinationReference(reference, displacement, segment) with WordSize
+    }
   }
 
-  implicit def RMforWordSize: RMForSize[WordSize] = new RMForSize[WordSize] {
-    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with WordSize =
-      new RegisterMemoryLocation(reference, displacement, segment) with WordSize
+  trait I386Implicits {
+    implicit def RMforDoubleWordSize: RMForSize[DoubleWordSize] = new RMForSize[DoubleWordSize] {
+      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with DoubleWordSize =
+        new RegisterMemoryLocation(reference, displacement, segment) with DoubleWordSize
 
-    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with WordSize =
-      new DestinationReference(reference, displacement, segment) with WordSize
+      override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with DoubleWordSize =
+        new DestinationReference(reference, displacement, segment) with DoubleWordSize
+    }
   }
 
-  implicit def RMforDoubleWordSize: RMForSize[DoubleWordSize] = new RMForSize[DoubleWordSize] {
-    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with DoubleWordSize =
-      new RegisterMemoryLocation(reference, displacement, segment) with DoubleWordSize
+  trait X64Implicits {
+    implicit def RMforQuadWordSize: RMForSize[QuadWordSize] = new RMForSize[QuadWordSize] {
+      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with QuadWordSize =
+        new RegisterMemoryLocation(reference, displacement, segment) with QuadWordSize
 
-    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with DoubleWordSize =
-      new DestinationReference(reference, displacement, segment) with DoubleWordSize
-  }
-
-  implicit def RMforQuadWordSize: RMForSize[QuadWordSize] = new RMForSize[QuadWordSize] {
-    override def instance(reference: RegisterReference, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): RegisterMemoryLocation with QuadWordSize =
-      new RegisterMemoryLocation(reference, displacement, segment) with QuadWordSize
-
-    override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with QuadWordSize =
-      new DestinationReference(reference, displacement, segment) with QuadWordSize
+      override def DestinationReference(reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with DisplacementSize], segment: SegmentRegister): DestinationReference with QuadWordSize =
+        new DestinationReference(reference, displacement, segment) with QuadWordSize
+    }
   }
 
 

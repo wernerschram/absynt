@@ -113,12 +113,6 @@ class JumpSuite extends WordSpec with Matchers {
         Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP+SI)).toString should be("jmp FAR DWORD PTR [bp+si]")
       }
 
-      "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
-        an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation[QuadWordSize](BP+SI))
-        }
-      }
-
       "Encode a simple program with an indirect forward short jump instruction" in {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
@@ -512,12 +506,6 @@ class JumpSuite extends WordSpec with Matchers {
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
         Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP+SI)).encodeByte should be(Hex.lsb("67 FF 2A"))
-      }
-
-      "throw an AssertionError for jmp FAR QWORD PTR [bp+si]" in {
-        an[AssertionError] should be thrownBy {
-          Jump.Far(RegisterMemoryLocation[QuadWordSize](BP+SI))
-        }
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {

@@ -48,6 +48,10 @@ class StackSuite extends WordSpec with Matchers {
         Push(EAX).encodeByte should be(0x50.toByte :: Nil)
       }
 
+      "correctly encode push bx" in {
+        Push(BX).encodeByte should be(0x66.toByte :: 0x53.toByte :: Nil)
+      }
+
       "correctly encode push ss" in {
         Push(SS).encodeByte should be(0x16.toByte :: Nil)
       }
@@ -66,12 +70,6 @@ class StackSuite extends WordSpec with Matchers {
 
       "correctly encode push gs" in {
         Push(GS).encodeByte should be(0x0F.toByte :: 0xA8.toByte :: Nil)
-      }
-
-      "throw an AssertionError for push QWORD PTR [bp]" in {
-        an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation[QuadWordSize](BP)).encodeByte
-        }
       }
     }
 
@@ -93,6 +91,10 @@ class StackSuite extends WordSpec with Matchers {
         an[AssertionError] should be thrownBy {
           Push(R13D).encodeByte
         }
+      }
+
+      "correctly encode push bx" in {
+        Push(BX).encodeByte should be(0x66.toByte :: 0x53.toByte :: Nil)
       }
 
       "correctly encode push r13" in {
