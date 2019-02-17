@@ -20,39 +20,16 @@ object ImmediateValue {
   private def forDoubleWord(value: Int): ImmediateValue with DoubleWordSize = new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
   private def forQuadWord(value: Long): ImmediateValue with QuadWordSize = new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
 
-  trait ForMode {
-    def pointer(location: Long): ImmediateValue with WideSize
+  trait I8086Implicits {
+    implicit def byteImmedate(value: Byte): ImmediateValue with ByteSize = forByte(value)
+    implicit def wordImmediate(value: Short): ImmediateValue with WordSize = forWord(value)
   }
 
-  trait ForLegacy extends ForMode {
-    implicit def byteImmedate(value: Byte): ImmediateValue with ByteSize = forByte(value)
-    implicit def WordImmediate(value: Short): ImmediateValue with WordSize = forWord(value)
-
-    override def pointer(location: Long): ImmediateValue with WideSize = forWord(location.toShort)
-  }
-
-  trait ForReal extends ForMode {
-    implicit def byteImmedate(value: Byte): ImmediateValue with ByteSize = forByte(value)
-    implicit def WordImmediate(value: Short): ImmediateValue with WordSize = forWord(value)
+  trait I386Implicits {
     implicit def doubleWordImmediate(value: Int): ImmediateValue with DoubleWordSize = forDoubleWord(value)
-
-    override def pointer(location: Long): ImmediateValue with WideSize = forWord(location.toShort)
   }
 
-  trait ForProtected extends ForMode {
-    implicit def byteImmedate(value: Byte): ImmediateValue with ByteSize = forByte(value)
-    implicit def WordImmediate(value: Short): ImmediateValue with WordSize = forWord(value)
-    implicit def doubleWordImmediate(value: Int): ImmediateValue with DoubleWordSize = forDoubleWord(value)
-
-    override def pointer(location: Long): ImmediateValue with WideSize = forDoubleWord(location.toInt)
-  }
-
-  trait ForLong extends ForMode {
-    implicit def byteImmedate(value: Byte): ImmediateValue with ByteSize = forByte(value)
-    implicit def WordImmediate(value: Short): ImmediateValue with WordSize = forWord(value)
-    implicit def doubleWordImmediate(value: Int): ImmediateValue with DoubleWordSize = forDoubleWord(value)
+  trait X64Implicits {
     implicit def quadWordImmediate(value: Long): ImmediateValue with QuadWordSize = forQuadWord(value)
-
-    override def pointer(location: Long): ImmediateValue with WideSize = forQuadWord(location)
   }
 }

@@ -25,18 +25,31 @@ object MemoryAddress {
     def instance(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS): MemoryAddress with Size
   }
 
-  implicit def memoryAddressForByteSize: MemoryAddressForSize[ByteSize] =
-    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
-
-  implicit def memoryAddressForWordSize: MemoryAddressForSize[WordSize] =
-    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
-
-  implicit def memoryAddressForDoubleWordSize: MemoryAddressForSize[DoubleWordSize] =
-    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
-
-  implicit def memoryAddressForQuadWordSize: MemoryAddressForSize[QuadWordSize] =
-    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
-
   def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS): MemoryAddress with Size =
     implicitly[MemoryAddressForSize[Size]].instance(address, segment)
+
+  def forByteSize: MemoryAddressForSize[ByteSize] =
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
+
+  def forWordSize: MemoryAddressForSize[WordSize] =
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
+
+  def forDoubleWordSize: MemoryAddressForSize[DoubleWordSize] =
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
+
+  def forQuadWordSize: MemoryAddressForSize[QuadWordSize] =
+    (address: ImmediateValue with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
+
+  trait I8086Implicits {
+    implicit def ByteMemoryAddress: MemoryAddressForSize[ByteSize] = forByteSize
+    implicit def WordMemoryAddress: MemoryAddressForSize[WordSize] = forWordSize
+  }
+
+  trait I386Implicits {
+    implicit def DoubleWordMemoryAddress: MemoryAddressForSize[DoubleWordSize] = forDoubleWordSize
+  }
+
+  trait X64Implicits {
+    implicit def QuadWordMemoryAddress: MemoryAddressForSize[QuadWordSize] = forQuadWordSize
+  }
 }
