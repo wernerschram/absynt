@@ -18,13 +18,18 @@ object FarPointer {
     def instance(segment: ImmediateValue with WordSize, offset: ImmediateValue with OffsetSize): FarPointer[OffsetSize] with FarPointerSize[OffsetSize]
   }
 
-  implicit def FarPointerForWord: FarPointerForSize[WordSize] =
-    (segment: ImmediateValue with WordSize, offset: ImmediateValue with WordSize) =>
-      new FarPointer[WordSize](segment, offset) with FarWordSize
+  trait I8086Implicits {
+    implicit def FarPointerForWord: FarPointerForSize[WordSize] =
+      (segment: ImmediateValue with WordSize, offset: ImmediateValue with WordSize) =>
+        new FarPointer[WordSize](segment, offset) with FarWordSize
+  }
 
-  implicit def FarPointerForDoubleWord: FarPointerForSize[DoubleWordSize] =
-    (segment: ImmediateValue with WordSize, offset: ImmediateValue with DoubleWordSize) =>
-      new FarPointer[DoubleWordSize](segment, offset) with FarDoubleWordSize
+
+  trait I386Implicits {
+    implicit def FarPointerForDoubleWord: FarPointerForSize[DoubleWordSize] =
+      (segment: ImmediateValue with WordSize, offset: ImmediateValue with DoubleWordSize) =>
+        new FarPointer[DoubleWordSize](segment, offset) with FarDoubleWordSize
+  }
 
   def apply[Size<:ExtendedSize: FarPointerForSize](segment: ImmediateValue with WordSize, offset: ImmediateValue with Size): FarPointer[Size] with FarPointerSize[Size] =
     implicitly[FarPointerForSize[Size]].instance(segment, offset)
