@@ -1,7 +1,7 @@
 package assembler.x86
 
 import assembler.x86.operands.{ImmediateValue, WideSize}
-import assembler.x86.operands.memoryaccess.{MemoryAddress, RegisterMemoryLocation}
+import assembler.x86.operands.memoryaccess.{MemoryAddress, RegisterMemoryLocation, SIBMemoryLocation}
 
 sealed abstract class ProcessorMode
   extends ImmediateValue.I8086Implicits
@@ -23,6 +23,7 @@ object ProcessorMode {
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
     with RegisterMemoryLocation.I386Implicits
+    with SIBMemoryLocation.I386Implicits
   {
     override def pointer(location: Long): ImmediateValue with WideSize = wordImmediate(location.toShort)
     implicit val processorMode: ProcessorMode = this
@@ -32,6 +33,7 @@ object ProcessorMode {
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
     with RegisterMemoryLocation.I386Implicits
+    with SIBMemoryLocation.I386Implicits
   {
     override def pointer(location: Long): ImmediateValue with WideSize = doubleWordImmediate(location.toInt)
     implicit val processorMode: ProcessorMode = this
@@ -44,6 +46,8 @@ object ProcessorMode {
     with MemoryAddress.X64Implicits
     with RegisterMemoryLocation.I386Implicits
     with RegisterMemoryLocation.X64Implicits
+    with SIBMemoryLocation.I386Implicits
+    with SIBMemoryLocation.X64Implicits
   {
     override def pointer(location: Long): ImmediateValue with WideSize = quadWordImmediate(location)
     implicit val processorMode: ProcessorMode = this
