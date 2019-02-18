@@ -39,7 +39,7 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
 }
 
 sealed trait RegisterReference {
-  val defaultSegment: SegmentRegister = Register.DS
+  val defaultSegment: SegmentRegister = Register.Segment.Data
   val indexCode: Byte
 
   def onlyWithDisplacement: Boolean = false
@@ -87,7 +87,7 @@ sealed trait ProtectedModeIndexRegister extends IndexRegister {
 }
 
 sealed trait SIBIndexRegister extends ModRMEncodableOperand {
-  val defaultSIBSegment: SegmentRegister = Register.DS
+  val defaultSIBSegment: SegmentRegister = Register.Segment.Data
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
@@ -161,6 +161,15 @@ object Register {
     case object QuadWord extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister
   }
 
+  object Segment {
+    case object Extra extends SegmentRegister(0x00, "es")
+    case object Code extends SegmentRegister(0x01, "cs")
+    case object Stack extends SegmentRegister(0x02, "ss")
+    case object Data extends SegmentRegister(0x03, "ds")
+    case object MoreExtra extends SegmentRegister(0x04, "fs")
+    case object StillMoreExtra extends SegmentRegister(0x05, "gs")
+  }
+
   trait I8086Registers {
     val AL: Accumulator.LowByte.type = Accumulator.LowByte
     val CL: Count.LowByte.type = Count.LowByte
@@ -176,6 +185,13 @@ object Register {
     val CX: Count.Word.type = Count.Word
     val DX: Data.Word.type = Data.Word
     val BX: Base.Word.type = Base.Word
+
+    val ES: SegmentRegister = Segment.Extra
+    val CS: SegmentRegister = Segment.Code
+    val SS: SegmentRegister = Segment.Stack
+    val DS: SegmentRegister = Segment.Data
+    val FS: SegmentRegister = Segment.MoreExtra
+    val GS: SegmentRegister = Segment.StillMoreExtra
   }
 
   trait I386Registers {
@@ -193,12 +209,6 @@ object Register {
   }
 
   // Segment registers
-  case object ES extends SegmentRegister(0x00, "es")
-  case object CS extends SegmentRegister(0x01, "cs")
-  case object SS extends SegmentRegister(0x02, "ss")
-  case object DS extends SegmentRegister(0x03, "ds")
-  case object FS extends SegmentRegister(0x04, "fs")
-  case object GS extends SegmentRegister(0x05, "gs")
 
   object BaseIndexReference {
     object BX_SI extends BaseIndexReference(Register.Base.Word, Register.SI, 0x00)
@@ -226,7 +236,7 @@ object Register {
   }
 
   final case object DI extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
-    override val defaultSegment: SegmentRegister = Register.ES
+    override val defaultSegment: SegmentRegister = Register.Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }
 
@@ -236,7 +246,7 @@ object Register {
     override val onlyWithDisplacement: Boolean = true
   }
   case object ESI extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
-    override val defaultSegment: SegmentRegister = Register.ES
+    override val defaultSegment: SegmentRegister = Register.Segment.Extra
   }
   case object EDI extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
 
@@ -244,7 +254,7 @@ object Register {
   case object RSP extends SourcePointer with QuadWordRegister
   case object RBP extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
   case object RSI extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
-    override val defaultSegment: SegmentRegister = Register.ES
+    override val defaultSegment: SegmentRegister = Register.Segment.Extra
   }
   case object RDI extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
 

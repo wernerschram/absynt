@@ -4,14 +4,14 @@ import assembler.ListExtensions.ListToImmediate
 import assembler.x86.operands._
 import assembler.x86.operations.AddressOperandInfo
 
-sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS)
+sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.Segment.Data)
   extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {
   self: ValueSize =>
 
   override val modValue: Byte = 0x00.toByte
 
   override val registerOrMemoryModeCode: Byte = if (address.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
-  final override val defaultSegment: SegmentRegister = Register.DS
+  final override val defaultSegment: SegmentRegister = Register.Segment.Data
 
   override val addressOperands: Set[AddressOperandInfo] = Set(AddressOperandInfo.rmDisplacement(address, segmentOverride))
 
@@ -22,10 +22,10 @@ sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segme
 
 object MemoryAddress {
   abstract class MemoryAddressForSize[Size<:ValueSize] {
-    def instance(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS): MemoryAddress with Size
+    def instance(address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.Segment.Data): MemoryAddress with Size
   }
 
-  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.DS): MemoryAddress with Size =
+  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue with ValueSize, segment: SegmentRegister = Register.Segment.Data): MemoryAddress with Size =
     implicitly[MemoryAddressForSize[Size]].instance(address, segment)
 
   trait I8086Implicits {

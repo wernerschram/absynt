@@ -1,11 +1,12 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.Register.I8086Registers
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations._
 
-object Push {
+object Push extends I8086Registers {
   implicit val opcode: String = "push"
 
   def apply[Size<:WideSize](register: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
@@ -61,12 +62,12 @@ object Push {
     }
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode): Static = segment match {
-    case Register.CS => StaticCS()
-    case Register.SS => StaticSS()
-    case Register.DS => StaticDS()
-    case Register.ES => StaticES()
-    case Register.FS => StaticFS()
-    case Register.GS => StaticGS()
+    case CS => StaticCS()
+    case SS => StaticSS()
+    case DS => StaticDS()
+    case ES => StaticES()
+    case FS => StaticFS()
+    case GS => StaticGS()
   }
 
   private def StaticCS()(implicit processorMode: ProcessorMode) = new Static(0x0E.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
