@@ -137,8 +137,8 @@ object Register {
 
       override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
         index match {
-          case SI => BaseIndexReference.BX_SI
-          case DI => BaseIndexReference.BX_DI
+          case Index.RealSource => BaseIndexReference.BX_SI
+          case Index.RealDestination => BaseIndexReference.BX_DI
         }
     }
     case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
@@ -170,6 +170,56 @@ object Register {
     case object StillMoreExtra extends SegmentRegister(0x05, "gs")
   }
 
+  object Pointer {
+    case object RealSource extends SourcePointer with WordRegister
+    case object RealBase extends BasePointer with WordRegister with BaseRegisterReference with RealModeIndexRegister {
+      override val indexCode: Byte = 0x06.toByte
+
+      override val onlyWithDisplacement: Boolean = true
+
+      override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
+        index match {
+          case Index.RealSource => BaseIndexReference.BP_SI
+          case Index.RealDestination => BaseIndexReference.BP_DI
+        }
+    }
+    case object ProtectedSource extends SourcePointer with DoubleWordRegister
+    case object ProtectedBase extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister {
+      override val onlyWithDisplacement: Boolean = true
+    }
+
+    case object LongSource extends SourcePointer with QuadWordRegister
+    case object LongBase extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
+
+    case object LongSourceLowByte extends SourcePointer with LowByteRegister
+    case object LongBaseLowByte extends BasePointer with LowByteRegister
+  }
+
+  object Index {
+    final case object RealSource extends SourceIndex with WordRegister with CombinableRealModeIndexRegister {
+      override val indexCode: Byte = 0x04.toByte
+    }
+
+    final case object RealDestination extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
+      override val defaultSegment: SegmentRegister = Register.Segment.Extra
+      override val indexCode: Byte = 0x05.toByte
+    }
+
+    case object ProtectedSource extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
+      override val defaultSegment: SegmentRegister = Register.Segment.Extra
+    }
+    case object ProtectedDestination extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
+
+    // x86-64 registers
+    case object LongSource extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
+      override val defaultSegment: SegmentRegister = Register.Segment.Extra
+    }
+    case object LongDestination extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
+
+    case object LongSourceLowByte extends SourceIndex with LowByteRegister
+    case object LongDestinationLowByte extends DestinationIndex with LowByteRegister
+  }
+
   trait I8086Registers {
     val AL: Accumulator.LowByte.type = Accumulator.LowByte
     val CL: Count.LowByte.type = Count.LowByte
@@ -192,6 +242,12 @@ object Register {
     val DS: SegmentRegister = Segment.Data
     val FS: SegmentRegister = Segment.MoreExtra
     val GS: SegmentRegister = Segment.StillMoreExtra
+
+    val SP: Pointer.RealSource.type = Pointer.RealSource
+    val BP: Pointer.RealBase.type = Pointer.RealBase
+
+    val SI: Index.RealSource.type = Index.RealSource
+    val DI: Index.RealDestination.type = Index.RealDestination
   }
 
   trait I386Registers {
@@ -199,6 +255,12 @@ object Register {
     val ECX: Count.DoubleWord.type = Count.DoubleWord
     val EDX: Data.DoubleWord.type = Data.DoubleWord
     val EBX: Base.DoubleWord.type = Base.DoubleWord
+
+    val ESP: Pointer.ProtectedSource.type = Pointer.ProtectedSource
+    val EBP: Pointer.ProtectedBase.type = Pointer.ProtectedBase
+
+    val ESI: Index.ProtectedSource.type = Index.ProtectedSource
+    val EDI: Index.ProtectedDestination.type = Index.ProtectedDestination
   }
 
   trait X64Registers {
@@ -206,62 +268,28 @@ object Register {
     val RCX: Count.QuadWord.type = Count.QuadWord
     val RDX: Data.QuadWord.type = Data.QuadWord
     val RBX: Base.QuadWord.type = Base.QuadWord
-  }
 
-  // Segment registers
+    val RSP: Pointer.LongSource.type = Pointer.LongSource
+    val RBP: Pointer.LongBase.type = Pointer.LongBase
+
+    val SPL: Pointer.LongSourceLowByte.type = Pointer.LongSourceLowByte
+    val BPL: Pointer.LongBaseLowByte.type = Pointer.LongBaseLowByte
+
+    val RSI: Index.LongSource.type = Index.LongSource
+    val RDI: Index.LongDestination.type = Index.LongDestination
+
+    val SIL: Index.LongSourceLowByte.type = Index.LongSourceLowByte
+    val DIL: Index.LongDestinationLowByte.type = Index.LongDestinationLowByte
+  }
 
   object BaseIndexReference {
-    object BX_SI extends BaseIndexReference(Register.Base.Word, Register.SI, 0x00)
-    object BX_DI extends BaseIndexReference(Register.Base.Word, Register.DI, 0x01)
-    object BP_SI extends BaseIndexReference(Register.BP, Register.SI, 0x02)
-    object BP_DI extends BaseIndexReference(Register.BP, Register.DI, 0x03)
+    object BX_SI extends BaseIndexReference(Register.Base.Word, Register.Index.RealSource, 0x00)
+    object BX_DI extends BaseIndexReference(Register.Base.Word, Register.Index.RealDestination, 0x01)
+    object BP_SI extends BaseIndexReference(Register.Pointer.RealBase, Register.Index.RealSource, 0x02)
+    object BP_DI extends BaseIndexReference(Register.Pointer.RealBase, Register.Index.RealDestination, 0x03)
   }
 
-  case object SP extends SourcePointer with WordRegister
-  case object BP extends BasePointer with WordRegister with BaseRegisterReference with RealModeIndexRegister {
-    override val indexCode: Byte = 0x06.toByte
 
-    override val onlyWithDisplacement: Boolean = true
-
-    override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
-      index match {
-        case SI => BaseIndexReference.BP_SI
-        case DI => BaseIndexReference.BP_DI
-      }
-
-  }
-
-  final case object SI extends SourceIndex with WordRegister with CombinableRealModeIndexRegister {
-    override val indexCode: Byte = 0x04.toByte
-  }
-
-  final case object DI extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
-    override val defaultSegment: SegmentRegister = Register.Segment.Extra
-    override val indexCode: Byte = 0x05.toByte
-  }
-
-  // i386 registers
-  case object ESP extends SourcePointer with DoubleWordRegister
-  case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister {
-    override val onlyWithDisplacement: Boolean = true
-  }
-  case object ESI extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
-    override val defaultSegment: SegmentRegister = Register.Segment.Extra
-  }
-  case object EDI extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
-
-  // x86-64 registers
-  case object RSP extends SourcePointer with QuadWordRegister
-  case object RBP extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
-  case object RSI extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
-    override val defaultSegment: SegmentRegister = Register.Segment.Extra
-  }
-  case object RDI extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
-
-  case object SPL extends SourcePointer with LowByteRegister
-  case object BPL extends BasePointer with LowByteRegister
-  case object SIL extends SourceIndex with LowByteRegister
-  case object DIL extends DestinationIndex with LowByteRegister
 
   // I used Intel documentation for creating this, so I used the Intel notation for clarity from that perspective.
   // This might be confusing as the AMD notation seems more accepted. This might change in the future.
