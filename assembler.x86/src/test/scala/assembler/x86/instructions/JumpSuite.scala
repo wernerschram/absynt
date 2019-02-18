@@ -48,9 +48,9 @@ class JumpSuite extends WordSpec with Matchers {
       forAll(combinations) {
         (mnemonic: String, operation: (NearPointer with ValueSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
-          val shortInstruction = operation(ShortPointer(0x10))
+          val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x2030"
-          val longInstruction = operation(LongPointer.realMode(0x2030))
+          val longInstruction = operation(longPointer(0x2030.toShort))
 
           s"correctly encode $shortName" in { shortInstruction.encodeByte shouldBe Hex.lsb(short) }
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }
@@ -59,10 +59,10 @@ class JumpSuite extends WordSpec with Matchers {
         }
       }
 
-      "correctly encode jcx 0x10" in { JumpIfCountZero(ShortPointer(0x10)).encodeByte should be(Hex.lsb("E3 10")) }
-      "correctly represent jcx 0x10 as a string" in { JumpIfCountZero(ShortPointer(0x10)).toString should be("jcx 0x10") }
+      "correctly encode jcx 0x10" in { JumpIfCountZero(shortPointer(0x10.toByte)).encodeByte should be(Hex.lsb("E3 10")) }
+      "correctly represent jcx 0x10 as a string" in { JumpIfCountZero(shortPointer(0x10.toByte)).toString should be("jcx 0x10") }
 
-      "throw an AssertionError for jmp 0x10203040" in { an[AssertionError] should be thrownBy { Jump(LongPointer.protectedMode(0x10203040)).encodeByte } }
+      "throw an AssertionError for jmp 0x10203040" in { an[AssertionError] should be thrownBy { Jump(longPointer(0x10203040)).encodeByte } }
 
       "correctly encode jmp ax" in { Jump(AX).encodeByte should be(Hex.lsb("FF E0")) }
       "correctly represent jmp ax as a string" in { Jump(AX).toString should be("jmp ax") }
@@ -455,9 +455,9 @@ class JumpSuite extends WordSpec with Matchers {
       forAll(combinations) {
         (mnemonic: String, operation: (NearPointer with ValueSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
-          val shortInstruction = operation(ShortPointer(0x10))
+          val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"
-          val longInstruction = operation(LongPointer.protectedMode(0x20304050))
+          val longInstruction = operation(longPointer(0x20304050))
 
           s"correctly encode $shortName" in { shortInstruction.encodeByte shouldBe Hex.lsb(short) }
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }
@@ -590,9 +590,9 @@ class JumpSuite extends WordSpec with Matchers {
       forAll(combinations) {
         (mnemonic: String, operation: (NearPointer with ValueSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
-          val shortInstruction = operation(ShortPointer(0x10))
+          val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"
-          val longInstruction = operation(LongPointer.protectedMode(0x20304050))
+          val longInstruction = operation(longPointer(0x20304050))
 
           s"correctly encode $shortName" in { shortInstruction.encodeByte shouldBe Hex.lsb(short) }
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }

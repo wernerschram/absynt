@@ -4,7 +4,7 @@ import assembler._
 import assembler.resource.{Resource, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.WideSize
-import assembler.x86.operands.memoryaccess.{LongPointer, ShortPointer, NearPointer => NearPointerOperand}
+import assembler.x86.operands.memoryaccess.{NearPointer => NearPointerOperand}
 
 abstract class NearJumpOperation(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label)
                                 (implicit processorMode: ProcessorMode)
@@ -26,7 +26,7 @@ abstract class NearJumpOperation(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], 
       case OffsetDirection.Backward => -distance - shortJumpSize
     }
     if (shortOffset.toByte == shortOffset)
-      encodableForShortPointer(ShortPointer(shortOffset.toByte))
+      encodableForShortPointer(processorMode.shortPointer(shortOffset.toByte))
     else {
       val longOffset = offsetDirection match {
         case OffsetDirection.Self => -longJumpSize
@@ -34,12 +34,7 @@ abstract class NearJumpOperation(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], 
         case OffsetDirection.Backward => -distance - longJumpSize
       }
 
-      processorMode match {
-        case ProcessorMode.Real =>
-          encodableForLongPointer(LongPointer.realMode(longOffset))
-        case _ =>
-          encodableForLongPointer(LongPointer.protectedMode(longOffset))
-      }
+      encodableForLongPointer(processorMode.longPointer(longOffset))
     }
   }
 }

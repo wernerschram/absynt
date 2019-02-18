@@ -14,23 +14,14 @@ object ShortPointer {
     new NearPointer(offset.encodeLittleEndian) with ByteSize {
       override def toString: String = s"0x${offset.bigEndianHexString}"
     }
-
-  def apply(offset: Long): NearPointer with ByteSize = {
-    assume(offset.toByte == offset)
-    apply(offset.toByte)
-  }
-
 }
 
 object LongPointer {
-  def realMode(offset: Short): NearPointer with WordSize =
-     new NearPointer(offset.encodeLittleEndian) with WordSize {
-       override def toString: String = s"0x${offset.bigEndianHexString}"
-    }
-
-  def realMode(offset: Long): NearPointer with WordSize = {
+  def realMode(offset: Int): NearPointer with WordSize = {
     assume(offset.toShort == offset)
-    realMode(offset.toShort)
+    new NearPointer(offset.toShort.encodeLittleEndian) with WordSize {
+      override def toString: String = s"0x${offset.bigEndianHexString}"
+    }
   }
 
   def protectedMode(offset: Int): NearPointer with DoubleWordSize =
