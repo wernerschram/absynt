@@ -48,32 +48,32 @@ object Input extends I8086Registers with I386Registers with X64Registers {
       override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
-  def apply(port: Register.DX.type, destination: AL.type)(implicit processorMode: ProcessorMode): Static =
+  def apply(port: DX.type, destination: AL.type)(implicit processorMode: ProcessorMode): Static =
     DXToAL
 
-  def apply(port: Register.DX.type, destination: AX.type)(implicit processorMode: ProcessorMode): Static =
+  def apply(port: DX.type, destination: AX.type)(implicit processorMode: ProcessorMode): Static =
     DXToAX
 
-  def apply(port: Register.DX.type, destination: EAX.type)(implicit processorMode: ProcessorMode): Static =
+  def apply(port: DX.type, destination: EAX.type)(implicit processorMode: ProcessorMode): Static =
     DXToEAX
 
   private def DXToAL()(implicit processorMode: ProcessorMode) = new Static(0xEC.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
     override protected def implicitInit(): Unit = {
-      addOperand(OperandInfo.implicitPort(Register.DX, source))
+      addOperand(OperandInfo.implicitPort(DX, source))
       addOperand(OperandInfo.implicitOperand(AL, destination))
     }
   }
 
   private def DXToAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
     override protected def implicitInit(): Unit = {
-      addOperand(OperandInfo.implicitPort(Register.DX, source))
+      addOperand(OperandInfo.implicitPort(DX, source))
       addOperand(OperandInfo.implicitOperand(AX, destination))
     }
   }
 
   private def DXToEAX()(implicit processorMode: ProcessorMode) = new Static(0xED.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
     override protected def implicitInit(): Unit = {
-      addOperand(OperandInfo.implicitPort(Register.DX, source))
+      addOperand(OperandInfo.implicitPort(DX, source))
       addOperand(OperandInfo.implicitOperand(EAX, destination))
     }
   }
@@ -121,19 +121,19 @@ object Output extends I8086Registers with I386Registers with X64Registers {
       override val immediate: ImmediateValue with ByteSize = immediateValue
     }
 
-  def apply(destination: AL.type, port: Register.DX.type)(implicit processorMode: ProcessorMode): Static =
+  def apply(destination: AL.type, port: DX.type)(implicit processorMode: ProcessorMode): Static =
     ALToDX
 
-  def apply(destination: AX.type, port: Register.DX.type)(implicit processorMode: ProcessorMode): Static =
+  def apply(destination: AX.type, port: DX.type)(implicit processorMode: ProcessorMode): Static =
     AXToDX
 
-  def apply(destination: EAX.type, port: Register.DX.type)(implicit processorMode: ProcessorMode): Static =
+  def apply(destination: EAX.type, port: DX.type)(implicit processorMode: ProcessorMode): Static =
     EAXToDX
 
   private def ALToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEE.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
       override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitPort(Register.DX, destination))
+        addOperand(OperandInfo.implicitPort(DX, destination))
         addOperand(OperandInfo.implicitOperand(AL, source))
       }
     }
@@ -141,7 +141,7 @@ object Output extends I8086Registers with I386Registers with X64Registers {
   private def AXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with NoDisplacement with NoImmediate  {
       override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitPort(Register.DX, destination))
+        addOperand(OperandInfo.implicitPort(DX, destination))
         addOperand(OperandInfo.implicitOperand(AX, source))
       }
     }
@@ -149,7 +149,7 @@ object Output extends I8086Registers with I386Registers with X64Registers {
   private def EAXToDX()(implicit processorMode: ProcessorMode) =
     new Static(0xEF.toByte :: Nil, opcode) with NoDisplacement with NoImmediate  {
       override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitPort(Register.DX, destination))
+        addOperand(OperandInfo.implicitPort(DX, destination))
         addOperand(OperandInfo.implicitOperand(EAX, source))
       }
     }

@@ -71,12 +71,6 @@ sealed abstract class BaseIndexReference(
   override def toString = s"$base+$index"
 }
 
-object BaseIndexReference {
-  object BX_SI extends BaseIndexReference(Register.BX, Register.SI, 0x00)
-  object BX_DI extends BaseIndexReference(Register.BX, Register.DI, 0x01)
-  object BP_SI extends BaseIndexReference(Register.BP, Register.SI, 0x02)
-  object BP_DI extends BaseIndexReference(Register.BP, Register.DI, 0x03)
-}
 
 sealed trait BaseRegisterReference extends ModRMEncodableOperand {
   self: GeneralPurposeRegister =>
@@ -135,27 +129,68 @@ object Register {
     case object QuadWord extends AccumulatorRegister with QuadWordRegister with ProtectedModeIndexRegister
   }
 
+  object Base {
+    case object LowByte extends BaseRegister with LowByteRegister
+    case object HighByte extends BaseRegister with HighByteRegister
+    case object Word extends BaseRegister with WordRegister with BaseRegisterReference with RealModeIndexRegister {
+      override val indexCode: Byte = 0x07.toByte
+
+      override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
+        index match {
+          case SI => BaseIndexReference.BX_SI
+          case DI => BaseIndexReference.BX_DI
+        }
+    }
+    case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
+    case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedModeIndexRegister
+  }
+
+  object Count {
+    case object LowByte extends CountRegister with LowByteRegister
+    case object HighByte extends CountRegister with HighByteRegister
+    case object Word extends CountRegister with WordRegister
+    case object DoubleWord extends CountRegister with DoubleWordRegister with ProtectedModeIndexRegister
+    case object QuadWord extends CountRegister with QuadWordRegister with ProtectedModeIndexRegister
+  }
+
+  object Data {
+    case object LowByte extends DataRegister with LowByteRegister
+    case object HighByte extends DataRegister with HighByteRegister
+    case object Word extends DataRegister with WordRegister
+    case object DoubleWord extends DataRegister with DoubleWordRegister with ProtectedModeIndexRegister
+    case object QuadWord extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister
+  }
+
   trait I8086Registers {
     val AL: Accumulator.LowByte.type = Accumulator.LowByte
+    val CL: Count.LowByte.type = Count.LowByte
+    val DL: Data.LowByte.type = Data.LowByte
+    val BL: Base.LowByte.type = Base.LowByte
+
     val AH: Accumulator.HighByte.type = Accumulator.HighByte
+    val CH: Count.HighByte.type = Count.HighByte
+    val DH: Data.HighByte.type = Data.HighByte
+    val BH: Base.HighByte.type = Base.HighByte
+
     val AX: Accumulator.Word.type = Accumulator.Word
+    val CX: Count.Word.type = Count.Word
+    val DX: Data.Word.type = Data.Word
+    val BX: Base.Word.type = Base.Word
   }
 
   trait I386Registers {
     val EAX: Accumulator.DoubleWord.type = Accumulator.DoubleWord
+    val ECX: Count.DoubleWord.type = Count.DoubleWord
+    val EDX: Data.DoubleWord.type = Data.DoubleWord
+    val EBX: Base.DoubleWord.type = Base.DoubleWord
   }
 
   trait X64Registers {
     val RAX: Accumulator.QuadWord.type = Accumulator.QuadWord
+    val RCX: Count.QuadWord.type = Count.QuadWord
+    val RDX: Data.QuadWord.type = Data.QuadWord
+    val RBX: Base.QuadWord.type = Base.QuadWord
   }
-
-  // Small registers
-  case object CL extends CountRegister with LowByteRegister
-  case object DL extends DataRegister with LowByteRegister
-  case object BL extends BaseRegister with LowByteRegister
-  case object CH extends CountRegister with HighByteRegister
-  case object DH extends DataRegister with HighByteRegister
-  case object BH extends BaseRegister with HighByteRegister
 
   // Segment registers
   case object ES extends SegmentRegister(0x00, "es")
@@ -165,18 +200,11 @@ object Register {
   case object FS extends SegmentRegister(0x04, "fs")
   case object GS extends SegmentRegister(0x05, "gs")
 
-  // Wide registers
-  case object CX extends CountRegister with WordRegister
-  case object DX extends DataRegister with WordRegister
-  case object BX extends BaseRegister with WordRegister with BaseRegisterReference with RealModeIndexRegister {
-    override val indexCode: Byte = 0x07.toByte
-
-    override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
-      index match {
-        case SI => BaseIndexReference.BX_SI
-        case DI => BaseIndexReference.BX_DI
-      }
-
+  object BaseIndexReference {
+    object BX_SI extends BaseIndexReference(Register.Base.Word, Register.SI, 0x00)
+    object BX_DI extends BaseIndexReference(Register.Base.Word, Register.DI, 0x01)
+    object BP_SI extends BaseIndexReference(Register.BP, Register.SI, 0x02)
+    object BP_DI extends BaseIndexReference(Register.BP, Register.DI, 0x03)
   }
 
   case object SP extends SourcePointer with WordRegister
@@ -203,9 +231,6 @@ object Register {
   }
 
   // i386 registers
-  case object ECX extends CountRegister with DoubleWordRegister with ProtectedModeIndexRegister
-  case object EDX extends DataRegister with DoubleWordRegister with ProtectedModeIndexRegister
-  case object EBX extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object ESP extends SourcePointer with DoubleWordRegister
   case object EBP extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister {
     override val onlyWithDisplacement: Boolean = true
@@ -216,9 +241,6 @@ object Register {
   case object EDI extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
 
   // x86-64 registers
-  case object RCX extends CountRegister with QuadWordRegister with ProtectedModeIndexRegister
-  case object RDX extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister
-  case object RBX extends BaseRegister with QuadWordRegister with ProtectedModeIndexRegister
   case object RSP extends SourcePointer with QuadWordRegister
   case object RBP extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
   case object RSI extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
