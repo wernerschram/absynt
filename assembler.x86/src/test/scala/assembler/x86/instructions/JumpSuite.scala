@@ -76,8 +76,6 @@ class JumpSuite extends WordSpec with Matchers {
       "correctly encode jmp WORD PTR [eax]" in { Jump(RegisterMemoryLocation[WordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20")) }
       "correctly represent jmp WORD PTR [eax] as a string" in { Jump(RegisterMemoryLocation[WordSize](EAX)).toString should be("jmp WORD PTR [eax]") }
 
-      "throw an AssertionError for jmp rax" in { an[AssertionError] should be thrownBy { Jump(RAX) } }
-
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
         Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX+SI, segment = FS)).encodeByte should be(Hex.lsb("64 66 FF 20"))
       }
@@ -480,12 +478,6 @@ class JumpSuite extends WordSpec with Matchers {
 
       "correctly encode jmp DWORD PTR [eax]" in {
         Jump(RegisterMemoryLocation[DoubleWordSize](EAX)).encodeByte should be(Hex.lsb("FF 20"))
-      }
-
-      "throw an AssertionError for jmp rax" in {
-        an[AssertionError] should be thrownBy {
-          Jump(RAX)
-        }
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {

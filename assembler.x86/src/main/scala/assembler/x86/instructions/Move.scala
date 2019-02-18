@@ -3,12 +3,13 @@ package assembler.x86.instructions
 import assembler._
 import assembler.resource.{AbsoluteReference, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.Register.I8086Registers
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands.{ImmediateValue, ModRMEncodableOperand, _}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 
-object Move {
+object Move extends I8086Registers {
 
   implicit val mnemonic: String = "mov"
 
@@ -32,7 +33,7 @@ object Move {
 
   def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
     (source, destination) match {
-      case (Register.AL, destination: MemoryAddress with ByteSize) =>
+      case (AL, destination: MemoryAddress with ByteSize) =>
         ALToMOffs8(destination)
       case _ =>
         R8ToRM8(source, destination)
@@ -44,7 +45,7 @@ object Move {
   private def ALToMOffs8(memoryLocation: MemoryLocation with ByteSize)(implicit processorMode: ProcessorMode) =
     new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate {
       override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(Register.AL, source))
+        addOperand(OperandInfo.implicitOperand(AL, source))
 
       override val location: MemoryLocation with ByteSize = memoryLocation
 
@@ -77,7 +78,7 @@ object Move {
 
   def apply(source: ModRMEncodableOperand with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
     (source, destination) match {
-      case (source: MemoryAddress with ByteSize, Register.AL) =>
+      case (source: MemoryAddress with ByteSize, AL) =>
         MOffs8ToAL(source)
       case (source: ModRMEncodableOperand with ByteSize, destination: ByteRegister) =>
         RM8ToR8(destination, source)
@@ -89,7 +90,7 @@ object Move {
   private def MOffs8ToAL(memoryLocation: MemoryLocation with ByteSize)(implicit processorMode: ProcessorMode) =
     new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate {
       override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(Register.AL, destination))
+        addOperand(OperandInfo.implicitOperand(AL, destination))
 
       override val location: MemoryLocation with ByteSize = memoryLocation
 

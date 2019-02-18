@@ -8,6 +8,7 @@ sealed abstract class ProcessorMode
   with MemoryAddress.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
   with FarPointer.I8086Implicits
+  with Register.I8086Registers
 {
   type LongPointerSize <: ExtendedSize
 
@@ -34,6 +35,7 @@ object ProcessorMode {
     with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Implicits
     with FarPointer.I386Implicits
+    with Register.I386Registers
   {
     override type LongPointerSize = WordSize
 
@@ -48,6 +50,7 @@ object ProcessorMode {
     with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Implicits
     with FarPointer.I386Implicits
+    with Register.I386Registers
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -66,6 +69,8 @@ object ProcessorMode {
     with SIBMemoryLocation.I386Implicits
     with SIBMemoryLocation.X64Implicits
     with FarPointer.I386Implicits
+    with Register.I386Registers
+    with Register.X64Registers
   {
     override type LongPointerSize = DoubleWordSize
 

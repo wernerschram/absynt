@@ -127,12 +127,32 @@ sealed trait QuadWordRegister extends GeneralPurposeRegister with SIBIndexRegist
 
 object Register {
 
+  object Accumulator {
+    case object LowByte extends AccumulatorRegister with LowByteRegister
+    case object HighByte extends AccumulatorRegister with HighByteRegister
+    case object Word extends AccumulatorRegister with WordRegister
+    case object DoubleWord extends AccumulatorRegister with DoubleWordRegister with ProtectedModeIndexRegister
+    case object QuadWord extends AccumulatorRegister with QuadWordRegister with ProtectedModeIndexRegister
+  }
+
+  trait I8086Registers {
+    val AL: Accumulator.LowByte.type = Accumulator.LowByte
+    val AH: Accumulator.HighByte.type = Accumulator.HighByte
+    val AX: Accumulator.Word.type = Accumulator.Word
+  }
+
+  trait I386Registers {
+    val EAX: Accumulator.DoubleWord.type = Accumulator.DoubleWord
+  }
+
+  trait X64Registers {
+    val RAX: Accumulator.QuadWord.type = Accumulator.QuadWord
+  }
+
   // Small registers
-  case object AL extends AccumulatorRegister with LowByteRegister
   case object CL extends CountRegister with LowByteRegister
   case object DL extends DataRegister with LowByteRegister
   case object BL extends BaseRegister with LowByteRegister
-  case object AH extends AccumulatorRegister with HighByteRegister
   case object CH extends CountRegister with HighByteRegister
   case object DH extends DataRegister with HighByteRegister
   case object BH extends BaseRegister with HighByteRegister
@@ -146,7 +166,6 @@ object Register {
   case object GS extends SegmentRegister(0x05, "gs")
 
   // Wide registers
-  case object AX extends AccumulatorRegister with WordRegister
   case object CX extends CountRegister with WordRegister
   case object DX extends DataRegister with WordRegister
   case object BX extends BaseRegister with WordRegister with BaseRegisterReference with RealModeIndexRegister {
@@ -184,7 +203,6 @@ object Register {
   }
 
   // i386 registers
-  case object EAX extends AccumulatorRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object ECX extends CountRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object EDX extends DataRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object EBX extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
@@ -198,7 +216,6 @@ object Register {
   case object EDI extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
 
   // x86-64 registers
-  case object RAX extends AccumulatorRegister with QuadWordRegister with ProtectedModeIndexRegister
   case object RCX extends CountRegister with QuadWordRegister with ProtectedModeIndexRegister
   case object RDX extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister
   case object RBX extends BaseRegister with QuadWordRegister with ProtectedModeIndexRegister

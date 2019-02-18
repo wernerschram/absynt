@@ -1,22 +1,23 @@
 package assembler.x86.instructions
 
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.Register.{I386Registers, I8086Registers, X64Registers}
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations._
 
-class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) {
+class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemonic: String) extends I8086Registers with I386Registers with X64Registers {
 
-  def apply(immediate: ImmediateValue with ByteSize, destination: Register.AL.type)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply(immediate: ImmediateValue with ByteSize, destination: AL.type)(implicit processorMode: ProcessorMode): X86Operation =
     Imm8ToAL(immediate)
 
-  def apply(immediate: ImmediateValue with WordSize, destination: Register.AX.type)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply(immediate: ImmediateValue with WordSize, destination: AX.type)(implicit processorMode: ProcessorMode): X86Operation =
     Imm16ToAX(immediate)
 
-  def apply(immediate: ImmediateValue with DoubleWordSize, destination: Register.EAX.type)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply(immediate: ImmediateValue with DoubleWordSize, destination: EAX.type)(implicit processorMode: ProcessorMode): X86Operation =
     Imm32ToEAX(immediate)
 
-  def apply(immediate: ImmediateValue with DoubleWordSize, destination: Register.RAX.type)(implicit processorMode: ProcessorMode): X86Operation =
+  def apply(immediate: ImmediateValue with DoubleWordSize, destination: RAX.type)(implicit processorMode: ProcessorMode): X86Operation =
     Imm32ToRAX(immediate)
 
   def apply[ImmediateSize<:ValueSize, DestinationSize<:ValueSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize)(implicit processorMode: ProcessorMode): X86Operation =
@@ -40,7 +41,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private def Imm8ToAL(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
       override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(Register.AL, destination))
+        addOperand(OperandInfo.implicitOperand(AL, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with ByteSize = immediateValue
     }
@@ -48,7 +49,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private def Imm16ToAX(immediateValue: ImmediateValue with WordSize)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x05).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize] {
       override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(Register.AX, destination))
+        addOperand(OperandInfo.implicitOperand(AX, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with WordSize = immediateValue
     }
@@ -56,7 +57,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private def Imm32ToEAX(immediateValue: ImmediateValue with DoubleWordSize)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
       override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(Register.EAX, destination))
+        addOperand(OperandInfo.implicitOperand(EAX, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with DoubleWordSize = immediateValue
     }
@@ -64,7 +65,7 @@ class BasicInteraction(OpcodeBase: Byte, extensionCode: Byte, implicit val mnemo
   private def Imm32ToRAX(immediateValue: ImmediateValue with DoubleWordSize)(implicit processorMode: ProcessorMode) =
     new Static((OpcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
       override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(Register.RAX, destination))
+        addOperand(OperandInfo.implicitOperand(RAX, destination))
       override val immediateOrder: OperandOrder = source
       override val immediate: ImmediateValue with DoubleWordSize = immediateValue
     }
