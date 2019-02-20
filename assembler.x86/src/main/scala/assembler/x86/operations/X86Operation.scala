@@ -79,10 +79,10 @@ object X86Operation {
   private val AddressSizeCode = 0x67.toByte
 
   private val SegmentOverrideMap: Map[SegmentRegister, Byte] = Map(
-    (Register.Segment.Code, 0x2E.toByte),
-    (Register.Segment.Stack, 0x36.toByte),
-    (Register.Segment.Data, 0x3E.toByte),
-    (Register.Segment.Extra, 0x26.toByte),
-    (Register.Segment.MoreExtra, 0x64.toByte),
-    (Register.Segment.StillMoreExtra, 0x65.toByte))
+    (Segment.Code, 0x2E.toByte),
+    (Segment.Stack, 0x36.toByte),
+    (Segment.Data, 0x3E.toByte),
+    (Segment.Extra, 0x26.toByte),
+    (Segment.MoreExtra, 0x64.toByte),
+    (Segment.StillMoreExtra, 0x65.toByte))
 }

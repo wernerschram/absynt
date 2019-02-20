@@ -32,7 +32,7 @@ object HelloWorld extends App {
       Move(0x01.toLong, RAX).label(entry) ::
       Move(0x01.toLong, RDI) ::
       Move.forLabel(hello, RSI) ::
-      Move(output.length, EDX) ::
+      Move[DoubleWordSize](output.length, EDX) ::
       SystemCall() ::
       // use the _exit Syscall
       Move(0x3C.toLong, RAX) ::

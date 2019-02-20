@@ -62,12 +62,12 @@ object Push extends I8086Registers {
     }
 
   def apply(segment: SegmentRegister)(implicit processorMode: ProcessorMode): Static = segment match {
-    case CS => StaticCS()
-    case SS => StaticSS()
-    case DS => StaticDS()
-    case ES => StaticES()
-    case FS => StaticFS()
-    case GS => StaticGS()
+    case Segment.Code => StaticCS()
+    case Segment.Stack => StaticSS()
+    case Segment.Data => StaticDS()
+    case Segment.Extra => StaticES()
+    case Segment.MoreExtra => StaticFS()
+    case Segment.StillMoreExtra => StaticGS()
   }
 
   private def StaticCS()(implicit processorMode: ProcessorMode) = new Static(0x0E.toByte :: Nil, opcode) with NoDisplacement with NoImmediate

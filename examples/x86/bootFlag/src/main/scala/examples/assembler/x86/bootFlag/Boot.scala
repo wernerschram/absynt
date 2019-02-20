@@ -11,7 +11,6 @@ import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
 import assembler.x86.operands.ByteSize
-import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.DestinationReference
 import assembler.{Label, UniqueLabel}
 

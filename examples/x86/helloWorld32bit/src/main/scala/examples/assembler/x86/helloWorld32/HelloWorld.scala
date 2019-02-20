@@ -10,7 +10,6 @@ import assembler.resource.{AbsoluteReference, RelativeReference}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.instructions._
-import assembler.x86.operands.Register._
 import assembler.{EncodedString, Label}
 
 object HelloWorld extends App {

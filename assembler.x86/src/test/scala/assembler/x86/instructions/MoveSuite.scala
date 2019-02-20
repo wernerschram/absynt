@@ -563,7 +563,7 @@ class MoveSuite extends WordSpec with Matchers {
       }
 
       "correctly represent mov rax, QWORD PTR [-6583239413802470671] as a string" in {
-        Move[QuadWordSize](MemoryAddress[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
+        Move(MemoryAddress[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
       }
 
       "correctly encode mov QWORD PTR [0xDEADBEEF], rax" in {
@@ -572,6 +572,10 @@ class MoveSuite extends WordSpec with Matchers {
 
       "correctly represent mov QWORD PTR [3735928559], rax as a string" in {
         Move(RAX, MemoryAddress[QuadWordSize](0xDEADBEEF)).toString should be("mov QWORD PTR [3735928559], rax")
+      }
+
+      "correctly encode mov edx, 0x12" in {
+        Move[DoubleWordSize](0x12, EDX).encodeByte should be(Hex.lsb("BA 12 00 00 00"))
       }
 
       "correctly encode mov r15l, 0x12" in {
@@ -584,24 +588,6 @@ class MoveSuite extends WordSpec with Matchers {
 
       "correctly encode mov r14d, 0x78563412" in {
         Move[DoubleWordSize](0x78563412, R14D).encodeByte should be(Hex.lsb("41 BE 12 34 56 78"))
-      }
-
-      "throw an AssertionError for mov ebx, [label]" in {
-        val targetLabel = Label.unique
-        val move = Move.forLabel(targetLabel, EBX)
-
-        val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          move,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
-        ))
-
-
-        an[AssertionError] should be thrownBy {
-          val app = Raw(p, 0x100)
-          app.encodablesForDependencies(Seq(move))
-        }
       }
 
       "correctly encode mov r11, [label]" in {

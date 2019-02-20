@@ -1,5 +1,6 @@
 package assembler.x86
 
+import assembler.x86.instructions.Move
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess._
 
@@ -20,13 +21,13 @@ sealed abstract class ProcessorMode
 object ProcessorMode {
 
   object Legacy extends ProcessorMode
+    with Move.LegacyOperations
   {
     override type LongPointerSize = WordSize
 
     override def pointer(location: Long): ImmediateValue with WideSize = wordImmediate(location.toShort)
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
-
   }
 
   object Real extends ProcessorMode
@@ -36,6 +37,7 @@ object ProcessorMode {
     with SIBMemoryLocation.I386Implicits
     with FarPointer.I386Implicits
     with Register.I386Registers
+    with Move.RealOperations
   {
     override type LongPointerSize = WordSize
 
@@ -51,6 +53,7 @@ object ProcessorMode {
     with SIBMemoryLocation.I386Implicits
     with FarPointer.I386Implicits
     with Register.I386Registers
+    with Move.ProtectedOperations
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -71,6 +74,7 @@ object ProcessorMode {
     with FarPointer.I386Implicits
     with Register.I386Registers
     with Register.X64Registers
+    with Move.LongOperations
   {
     override type LongPointerSize = DoubleWordSize
 
