@@ -1,6 +1,6 @@
 package assembler.x86
 
-import assembler.x86.instructions.Move
+import assembler.x86.instructions.{BasicInteraction, Move}
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess._
 
@@ -22,6 +22,7 @@ object ProcessorMode {
 
   object Legacy extends ProcessorMode
     with Move.LegacyOperations
+    with BasicInteraction.LegacyOperations
   {
     override type LongPointerSize = WordSize
 
@@ -38,6 +39,7 @@ object ProcessorMode {
     with FarPointer.I386Implicits
     with Register.I386Registers
     with Move.RealOperations
+    with BasicInteraction.RealOperations
   {
     override type LongPointerSize = WordSize
 
@@ -54,6 +56,7 @@ object ProcessorMode {
     with FarPointer.I386Implicits
     with Register.I386Registers
     with Move.ProtectedOperations
+    with BasicInteraction.ProtectedOperations
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -75,6 +78,7 @@ object ProcessorMode {
     with Register.I386Registers
     with Register.X64Registers
     with Move.LongOperations
+    with BasicInteraction.LongOperations
   {
     override type LongPointerSize = DoubleWordSize
 
