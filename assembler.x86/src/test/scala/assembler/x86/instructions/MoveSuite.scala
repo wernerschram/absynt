@@ -386,41 +386,6 @@ class MoveSuite extends WordSpec with Matchers {
         Move(EBP, RegisterMemoryLocation[DoubleWordSize](EBP)).toString should be("mov DWORD PTR [ebp], ebp")
       }
 
-      "throw an AssertionError for mov r10d, [label]" in {
-        val targetLabel = Label.unique
-        val move = Move.forLabel(targetLabel, R10D)
-
-        val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          move,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
-        ))
-
-
-        an[AssertionError] should be thrownBy {
-          val app = Raw(p, 0x100)
-          app.encodablesForDependencies(Seq(move))
-        }
-      }
-
-      "throw an AssertionError for mov r11, [label]" in {
-        val targetLabel = Label.unique
-        val move = Move.forLabel(targetLabel, R11)
-
-        val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          move,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
-        ))
-
-        an[AssertionError] should be thrownBy {
-          val app = Raw(p, 0x100)
-          app.encodablesForDependencies(Seq(move))
-        }
-      }
-
       "correctly encode mov ecx, [label]" in {
         val targetLabel = Label.unique
         val move = Move.forLabel(targetLabel, ECX)
