@@ -8,6 +8,9 @@ trait ValueSize extends OperandSize {
   def sizeName: String
 }
 
+// TODO: Find a better way to define these
+trait LegacySize extends ValueSize // 8, 16
+
 trait DisplacementSize extends ValueSize // 8, 16, 32
 
 trait WideSize extends ValueSize //16, 32, 64
@@ -16,12 +19,12 @@ trait ExtendedSize extends WideSize with DisplacementSize //16, 32
 
 trait LongSize extends WideSize //32, 64
 
-trait ByteSize extends ValueSize with DisplacementSize {
+trait ByteSize extends ValueSize with LegacySize with DisplacementSize {
   override val sizeName = "BYTE"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[ByteSize]
 }
 
-trait WordSize extends ExtendedSize {
+trait WordSize extends LegacySize with ExtendedSize {
   override val sizeName = "WORD"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[WordSize]
 }

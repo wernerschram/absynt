@@ -87,12 +87,6 @@ class StackSuite extends WordSpec with Matchers {
         }
       }
 
-      "throw an AssertionError for push DWORD PTR [r13d]" in {
-        an[AssertionError] should be thrownBy {
-          Push(R13D).encodeByte
-        }
-      }
-
       "correctly encode push bx" in {
         Push(BX).encodeByte should be(0x66.toByte :: 0x53.toByte :: Nil)
       }
@@ -125,17 +119,6 @@ class StackSuite extends WordSpec with Matchers {
         PushAll().toString shouldBe "pusha"
       }
      }
-
-    "in long mode" should {
-
-      import ProcessorMode.Long._
-
-      "throw an AssertionError for pusha" in {
-        an[AssertionError] should be thrownBy {
-          PushAll().encodeByte
-        }
-      }
-    }
   }
 
   "an PushFlags instruction" when {
