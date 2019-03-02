@@ -6,7 +6,7 @@ import assembler.resource.Resource
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.Register._
-import assembler.x86.operands.{DoubleWordSize, QuadWordSize, ValueSize, WordSize}
+import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operations.X86Operation
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -20,7 +20,7 @@ class JumpSuite extends WordSpec with Matchers {
 
       import ProcessorMode.Real._
 
-      val combinations = Table[String, (NearPointer with ValueSize) => X86Operation, String, String](
+      val combinations = Table[String, (NearPointer with DisplacementSize) => X86Operation, String, String](
         ("Mnemonic", "Instruction",              "Short (0x10)", "Long (0x2030)"),
         ("jmp",      Jump(_),                    "EB 10",        "E9 30 20"),
         ("ja",       JumpIfAbove(_),             "77 10",        "0F 87 30 20"),
@@ -46,7 +46,7 @@ class JumpSuite extends WordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ValueSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer with DisplacementSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x2030"
@@ -423,9 +423,10 @@ class JumpSuite extends WordSpec with Matchers {
 
     "in protected mode" should {
 
+
       import ProcessorMode.Protected._
 
-      val combinations = Table[String, (NearPointer with ValueSize) => X86Operation, String, String](
+      val combinations = Table[String, (NearPointer with DisplacementSize) => X86Operation, String, String](
         ("Mnemonic", "Instruction",              "Short (0x10)", "Long (0x20304050)"),
         ("jmp",      Jump(_),                    "EB 10",        "E9 50 40 30 20"),
         ("ja",       JumpIfAbove(_),             "77 10",        "0F 87 50 40 30 20"),
@@ -451,7 +452,7 @@ class JumpSuite extends WordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ValueSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer with DisplacementSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"
@@ -554,7 +555,7 @@ class JumpSuite extends WordSpec with Matchers {
 
       import ProcessorMode.Long._
 
-      val combinations = Table[String, (NearPointer with ValueSize) => X86Operation, String, String](
+      val combinations = Table[String, (NearPointer with DisplacementSize) => X86Operation, String, String](
         ("Mnemonic", "Instruction",              "Short (0x10)", "Long (0x20304050)"),
         ("jmp",      Jump(_),                    "EB 10",        "E9 50 40 30 20"),
         ("ja",       JumpIfAbove(_),             "77 10",        "0F 87 50 40 30 20"),
@@ -580,7 +581,7 @@ class JumpSuite extends WordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ValueSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer with DisplacementSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"
@@ -590,24 +591,6 @@ class JumpSuite extends WordSpec with Matchers {
           s"correctly represent $shortName as a string" in { shortInstruction.toString shouldBe shortName }
           s"correctly encode $longName" in { longInstruction.encodeByte shouldBe Hex.lsb(long) }
           s"correctly represent $longName as a string" in { longInstruction.toString shouldBe longName }
-        }
-      }
-
-      "throw an AssertionError for jmp ax" in {
-        an[AssertionError] should be thrownBy {
-          Jump(AX)
-        }
-      }
-
-      "throw an AssertionError for jmp [bp+si]" in {
-        an[AssertionError] should be thrownBy {
-          Jump(RegisterMemoryLocation[DoubleWordSize](BP+SI)).encodeByte
-        }
-      }
-
-      "throw an AssertionError for jmp eax" in {
-        an[AssertionError] should be thrownBy {
-          Jump(EAX)
         }
       }
 
