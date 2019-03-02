@@ -27,6 +27,7 @@ object ProcessorMode {
     with IO.LegacyOperations
     with Jump.LegacyOperations
     with Stack.LegacyOperations
+    with StoreString.LegacyOperations
   {
     override type LongPointerSize = WordSize
 
@@ -48,6 +49,7 @@ object ProcessorMode {
     with IO.RealOperations
     with Jump.RealOperations
     with Stack.RealOperations
+    with StoreString.RealOperations
   {
     override type LongPointerSize = WordSize
 
@@ -69,6 +71,7 @@ object ProcessorMode {
     with IO.ProtectedOperations
     with Jump.ProtectedOperations
     with Stack.ProtectedOperations
+    with StoreString.ProtectedOperations
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -95,6 +98,7 @@ object ProcessorMode {
     with IO.LongOperations
     with Jump.LongOperations
     with Stack.LongOperations
+    with StoreString.LongOperations
   {
     override type LongPointerSize = DoubleWordSize
 
