@@ -5,60 +5,50 @@ import assembler.x86.operands.ReturnMode
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations.{NoDisplacement, NoImmediate, OperandInfo, Static}
 
-object SystemCall {
-  val opcode = "syscall"
+object System {
+  def staticCall(): Static =
+    new Static(0x0F.toByte :: 0x05.toByte :: Nil, "syscall")(ProcessorMode.Long) with NoDisplacement with NoImmediate
 
+  def staticEnter()(implicit processorMode: ProcessorMode): Static =
+    new Static(0x0F.toByte :: 0x34.toByte :: Nil, "sysenter") with NoDisplacement with NoImmediate
 
-  def apply()(implicit processorMode: ProcessorMode): Static = {
-    assume(processorMode == ProcessorMode.Long)
-    Static()
-  }
-
-  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0x05.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
-
-}
-
-object SystemEnter {
-  val opcode = "sysenter"
-
-
-  def apply()(implicit processorMode: ProcessorMode): Static = {
-    assume(processorMode != ProcessorMode.Real)
-    Static()
-  }
-
-  private def Static()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0x34.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
-
-}
-
-object SystemReturn {
-  val opcode = "sysret"
-
-
-  def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = {
-    assume(processorMode == ProcessorMode.Long)
-    Static(returnMode)
-  }
-
-  private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
-    new Static(0x0F.toByte :: 0x07.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
+  def staticReturn(returnMode: ReturnMode): Static =
+    new Static(0x0F.toByte :: 0x07.toByte :: Nil, "sysret")(ProcessorMode.Long) with NoDisplacement with NoImmediate {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(returnMode, destination))
     }
-}
 
-object SystemExit {
-  val opcode = "sysexit"
-
-
-  def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = {
-    assume(processorMode == ProcessorMode.Protected && returnMode == ReturnMode.Protected || processorMode == ProcessorMode.Long)
-    Static(returnMode)
-  }
-
-  private def Static(returnMode: ReturnMode)(implicit processorMode: ProcessorMode) =
-    new Static(0x0F.toByte :: 0x35.toByte :: Nil, opcode) with NoDisplacement with NoImmediate {
+  def staticExit(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static =
+    new Static(0x0F.toByte :: 0x35.toByte :: Nil, "sysexit") with NoDisplacement with NoImmediate {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(returnMode, destination))
     }
+
+  trait LongOperations {
+    object SystemCall {
+      def apply(): Static = staticCall()
+    }
+
+    object SystemEnter {
+      def apply()(implicit processorMode: ProcessorMode): Static = staticEnter()
+    }
+
+    object SystemReturn {
+      def apply(returnMode: ReturnMode): Static = staticReturn(returnMode)
+    }
+
+    object SystemExit {
+      def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
+    }
+  }
+
+  trait ProtectedOperations {
+    object SystemEnter {
+      def apply()(implicit processorMode: ProcessorMode): Static = staticEnter()
+    }
+
+    object SystemExit {
+      def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
+    }
+  }
 }

@@ -72,6 +72,7 @@ object ProcessorMode {
     with Jump.ProtectedOperations
     with Stack.ProtectedOperations
     with StoreString.ProtectedOperations
+    with System.ProtectedOperations
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -99,6 +100,7 @@ object ProcessorMode {
     with Jump.LongOperations
     with Stack.LongOperations
     with StoreString.LongOperations
+    with System.LongOperations
   {
     override type LongPointerSize = DoubleWordSize
 

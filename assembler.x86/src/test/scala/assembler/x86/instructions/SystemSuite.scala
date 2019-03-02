@@ -9,33 +9,9 @@ class SystemSuite extends WordSpec with Matchers {
 
   "a SysCall instruction" when {
 
-    "in real mode" should {
-      import ProcessorMode.Real._
-
-      "throw an AssertionError for syscall" in {
-        an [AssertionError] should be thrownBy { SystemCall().encodeByte }
-      }
-
-      "throw an AssertionError for sysenter" in {
-        an [AssertionError] should be thrownBy { SystemEnter().encodeByte }
-      }
-
-      "throw an AssertionError for sysret" in {
-        an [AssertionError] should be thrownBy { SystemReturn(ReturnMode.Protected).encodeByte }
-      }
-
-      "throw an AssertionError for sysexit" in {
-        an [AssertionError] should be thrownBy { SystemExit(ReturnMode.Protected).encodeByte }
-      }
-    }
-
     "in protected mode" should {
       import ProcessorMode.Protected._
 
-
-      "throw an AssertionError for syscall" in {
-        an [AssertionError] should be thrownBy { SystemCall().encodeByte }
-      }
 
       "correctly encode sysenter" in {
         SystemEnter().encodeByte should be (Hex.lsb("0F 34"))
@@ -43,18 +19,6 @@ class SystemSuite extends WordSpec with Matchers {
 
       "correctly encode sysexit to protected mode" in {
         SystemExit(ReturnMode.Protected).encodeByte should be (Hex.lsb("0F 35"))
-      }
-
-      "throw an AssertionError for sysexit to long mode" in {
-        an [AssertionError] should be thrownBy { SystemExit(ReturnMode.Long).encodeByte }
-      }
-
-      "throw an AssertionError for sysret to protected mode" in {
-        an [AssertionError] should be thrownBy { SystemReturn(ReturnMode.Protected).encodeByte }
-      }
-
-      "throw an AssertionError for sysret to long mode" in {
-        an [AssertionError] should be thrownBy { SystemReturn(ReturnMode.Long).encodeByte }
       }
 
     }

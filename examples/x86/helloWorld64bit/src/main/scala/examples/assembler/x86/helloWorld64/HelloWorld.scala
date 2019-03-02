@@ -9,9 +9,7 @@ import assembler.resource.EncodableConversion._
 import assembler.resource.{AbsoluteReference, RelativeReference}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
-import assembler.x86.instructions._
 import assembler.x86.operands.DoubleWordSize
-import assembler.x86.operands.Register._
 import assembler.x86.operands.memoryaccess.SIBMemoryLocation
 import assembler.{EncodedString, Label}
 
