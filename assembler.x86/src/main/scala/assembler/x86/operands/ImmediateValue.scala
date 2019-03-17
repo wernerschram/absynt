@@ -15,21 +15,21 @@ sealed class ImmediateValue(val value: Seq[Byte])
 
 object ImmediateValue {
 
-  def forByte(value: Byte): ImmediateValue with ByteSize = new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
-  def forWord(value: Short): ImmediateValue with WordSize = new ImmediateValue(value.encodeLittleEndian) with WordSize {}
-  def forDoubleWord(value: Int): ImmediateValue with DoubleWordSize = new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
-  def forQuadWord(value: Long): ImmediateValue with QuadWordSize = new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
+  type ValueToByteImmediate = Byte => ImmediateValue with ByteSize
+  type ValueToWordImmediate = Short => ImmediateValue with WordSize
+  type ValueToDoubleWordImmediate = Int => ImmediateValue with DoubleWordSize
+  type ValueToQuadWordImmediate = Long => ImmediateValue with QuadWordSize
 
   trait I8086Implicits {
-    implicit def byteImmedate(value: Byte): ImmediateValue with ByteSize = forByte(value)
-    implicit def wordImmediate(value: Short): ImmediateValue with WordSize = forWord(value)
+    implicit val byteImm: ValueToByteImmediate = value => new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
+    implicit val wordImm: ValueToWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with WordSize {}
   }
 
   trait I386Implicits {
-    implicit def doubleWordImmediate(value: Int): ImmediateValue with DoubleWordSize = forDoubleWord(value)
+    implicit val doubleWordImm: ValueToDoubleWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
   }
 
   trait X64Implicits {
-    implicit def quadWordImmediate(value: Long): ImmediateValue with QuadWordSize = forQuadWord(value)
+    implicit val quadWordImm: ValueToQuadWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
   }
 }

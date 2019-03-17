@@ -32,7 +32,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = WordSize
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = wordImmediate(location.toShort)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
   }
@@ -54,7 +54,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = WordSize
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = wordImmediate(location.toShort)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
   }
@@ -77,7 +77,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = DoubleWordSize
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = doubleWordImmediate(location.toInt)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
     override def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
     implicit val processorMode: ProcessorMode = this
   }
@@ -104,7 +104,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = DoubleWordSize
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = quadWordImmediate(location)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location
     def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
     implicit val processorMode: ProcessorMode = this
   }

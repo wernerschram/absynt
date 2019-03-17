@@ -3,6 +3,7 @@ package assembler.x86.instructions
 import assembler._
 import assembler.resource.{AbsoluteReference, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.ImmediateValue.{ValueToDoubleWordImmediate, ValueToQuadWordImmediate, ValueToWordImmediate}
 import assembler.x86.operands.Register.I8086Registers
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands._
@@ -213,12 +214,12 @@ object Move extends I8086Registers {
   trait LegacyOperations {
     object Move extends I8086 {
 
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize)(implicit processorMode: ProcessorMode): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize)(implicit processorMode: ProcessorMode, wordImmediate: ValueToWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 3
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, ImmediateValue.forWord(distance.toShort))
+            Imm16ToR16(register, wordImmediate(distance.toShort))
         }
     }
   }
@@ -226,12 +227,12 @@ object Move extends I8086Registers {
   trait RealOperations {
     object Move extends I386 {
 
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize)(implicit processorMode: ProcessorMode): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize)(implicit processorMode: ProcessorMode, wordImmediate: ValueToWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 3
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, ImmediateValue.forWord(distance.toShort))
+            Imm16ToR16(register, wordImmediate(distance.toShort))
         }
     }
   }
@@ -239,12 +240,12 @@ object Move extends I8086Registers {
   trait ProtectedOperations {
     object Move extends I386 {
 
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with DoubleWordSize)(implicit processorMode: ProcessorMode): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with DoubleWordSize)(implicit processorMode: ProcessorMode, doubleWordImmediate: ValueToDoubleWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 5
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, ImmediateValue.forDoubleWord(distance))
+            Imm16ToR16[DoubleWordSize](register, doubleWordImmediate(distance))
         }
     }
   }
@@ -296,12 +297,12 @@ object Move extends I8086Registers {
             Imm16ToRM16(d, s)
         }
 
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with QuadWordSize)(implicit processorMode: ProcessorMode): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with QuadWordSize)(implicit processorMode: ProcessorMode, quadWordImmediate: ValueToQuadWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 10
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, ImmediateValue.forQuadWord(distance))
+            Imm16ToR16(register, quadWordImmediate(distance))
         }
     }
   }
