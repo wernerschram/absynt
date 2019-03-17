@@ -9,6 +9,7 @@ import assembler.resource.EncodableConversion._
 import assembler.resource.{AbsoluteReference, RelativeReference}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
+import assembler.x86.operands.ByteSize
 import assembler.{EncodedString, Label}
 
 object HelloWorld extends App {
@@ -34,6 +35,7 @@ object HelloWorld extends App {
       Move(0x01, EAX) ::
       Move(0x00, EBX) ::
       Interrupt(0x80.toByte) ::
+      Move(RegisterMemoryLocation[ByteSize](BP+SI), AL) ::
       Nil
     )
 

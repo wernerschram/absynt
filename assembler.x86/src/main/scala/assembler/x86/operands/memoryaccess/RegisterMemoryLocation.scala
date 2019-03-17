@@ -39,12 +39,6 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
       displacement.toSeq.flatMap(_.value)
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
-
-  override def isValidForMode(processorMode: ProcessorMode): Boolean = (reference, processorMode) match {
-    case (_: RegisterReference, ProcessorMode.Real | ProcessorMode.Protected) => true
-    case (_: ProtectedModeIndexRegister, _) => true
-    case _ => false
-  }
 }
 
 class DestinationReference(override val reference: RegisterReference with DestinationIndex, displacement: Option[ImmediateValue with ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate)

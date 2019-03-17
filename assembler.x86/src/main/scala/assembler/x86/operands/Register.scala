@@ -14,7 +14,6 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
   self: ValueSize =>
-  override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
   override def rexRequirements(rexRequirement: RexRequirement): Set[RexRequirement] = Set(rexRequirement)
 }
 
@@ -141,6 +140,7 @@ object Base {
   }
   case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister
   case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedModeIndexRegister
+  case object X64Word extends BaseRegister with WordRegister
 }
 
 sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register {
@@ -187,6 +187,8 @@ object BasePointer {
     override val onlyWithDisplacement: Boolean = true
   }
 
+  case object X64Real extends BasePointer with WordSize
+
   case object Long extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister
 
   case object LongLowByte extends BasePointer with LowByteRegister
@@ -202,15 +204,17 @@ object SourceIndex {
     override val indexCode: Byte = 0x04.toByte
   }
 
-  case object Protected extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
+  final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
   }
 
-  case object Long extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
+  final case object Long extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
   }
 
-  case object LongLowByte extends SourceIndex with LowByteRegister
+  final case object X64Real extends SourceIndex with WordRegister
+
+  final case object LongLowByte extends SourceIndex with LowByteRegister
 }
 
 sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di") {
@@ -223,11 +227,13 @@ object DestinationIndex {
     override val indexCode: Byte = 0x05.toByte
   }
 
-  case object Protected extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
+  final case object Protected extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
 
-  case object Long extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
+  final case object Long extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
 
-  case object LongLowByte extends DestinationIndex with LowByteRegister
+  final case object X64Real extends DestinationIndex with WordRegister
+
+  final case object LongLowByte extends DestinationIndex with LowByteRegister
 }
 
 sealed abstract class Rex8 extends GeneralPurposeRexRegister(0x00, "r8") {
@@ -337,7 +343,7 @@ object BaseIndexReference {
 }
 
 object Register {
-  trait I8086Registers {
+  trait I8086GenericRegisters {
     val AL: Accumulator.LowByte.type = Accumulator.LowByte
     val CL: Count.LowByte.type = Count.LowByte
     val DL: Data.LowByte.type = Data.LowByte
@@ -351,7 +357,8 @@ object Register {
     val AX: Accumulator.Word.type = Accumulator.Word
     val CX: Count.Word.type = Count.Word
     val DX: Data.Word.type = Data.Word
-    val BX: Base.Word.type = Base.Word
+
+    val SP: SourcePointer.Real.type = SourcePointer.Real
 
     val ES: SegmentRegister = Segment.Extra
     val CS: SegmentRegister = Segment.Code
@@ -359,15 +366,19 @@ object Register {
     val DS: SegmentRegister = Segment.Data
     val FS: SegmentRegister = Segment.MoreExtra
     val GS: SegmentRegister = Segment.StillMoreExtra
+  }
 
-    val SP: SourcePointer.Real.type = SourcePointer.Real
+  trait I8086SpecificRegisters {
+    val BX: Base.Word.type = Base.Word
     val BP: BasePointer.Real.type = BasePointer.Real
 
     val SI: SourceIndex.Real.type = SourceIndex.Real
     val DI: DestinationIndex.Real.type = DestinationIndex.Real
   }
 
-  trait I386Registers {
+  trait I8086Registers extends I8086GenericRegisters with I8086SpecificRegisters
+
+  trait I386GenericRegisters {
     val EAX: Accumulator.DoubleWord.type = Accumulator.DoubleWord
     val ECX: Count.DoubleWord.type = Count.DoubleWord
     val EDX: Data.DoubleWord.type = Data.DoubleWord
@@ -380,7 +391,9 @@ object Register {
     val EDI: DestinationIndex.Protected.type = DestinationIndex.Protected
   }
 
-  trait X64Registers {
+  trait I386Registers extends I8086GenericRegisters with I8086SpecificRegisters with I386GenericRegisters
+
+  trait X64GenericRegisters {
     val RAX: Accumulator.QuadWord.type = Accumulator.QuadWord
     val RCX: Count.QuadWord.type = Count.QuadWord
     val RDX: Data.QuadWord.type = Data.QuadWord
@@ -435,5 +448,15 @@ object Register {
     val R15: Register15.QuadWord.type = Register15.QuadWord
 
   }
+
+  trait X64SpecificRegisters {
+    val BX: Base.X64Word.type = Base.X64Word
+    val BP: BasePointer.X64Real.type = BasePointer.X64Real
+
+    val SI: SourceIndex.X64Real.type = SourceIndex.X64Real
+    val DI: DestinationIndex.X64Real.type = DestinationIndex.X64Real
+  }
+
+  trait X64Registers extends I8086GenericRegisters with I386GenericRegisters with X64GenericRegisters with X64SpecificRegisters
 
 }

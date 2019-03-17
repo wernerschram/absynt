@@ -401,7 +401,6 @@ class MoveSuite extends WordSpec with Matchers {
         val encodables = app.encodablesForDependencies(Seq(move))
         withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("B9 07 01 00 00")) }
       }
-
     }
 
     "in long mode" should {
@@ -458,12 +457,6 @@ class MoveSuite extends WordSpec with Matchers {
 
       "correctly represent mov rcx, r10 as a string" in {
         Move(R10, RCX).toString should be("mov rcx, r10")
-      }
-
-      "throw an exception for mov BYTE PTR r13l, [bp+si]" in {
-        an[AssertionError] should be thrownBy {
-          Move(RegisterMemoryLocation[ByteSize](BP+SI), R13L).encodeByte
-        }
       }
 
       "correctly encode mov r13l, BYTE PTR [eax]" in {

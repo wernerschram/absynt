@@ -1,6 +1,7 @@
 package assembler.x86
 
 import assembler.x86.instructions._
+import assembler.x86.operands.Register.I8086Registers
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess._
 
@@ -10,7 +11,6 @@ sealed abstract class ProcessorMode
   with RegisterMemoryLocation.I8086Implicits
   with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
-  with Register.I8086Registers
 {
   type LongPointerSize <: WordDoubleSize
 
@@ -22,6 +22,7 @@ sealed abstract class ProcessorMode
 object ProcessorMode {
 
   object Legacy extends ProcessorMode
+    with Register.I8086Registers
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
     with Interrupt.Operations
@@ -38,12 +39,13 @@ object ProcessorMode {
   }
 
   object Real extends ProcessorMode
+    with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
     with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
-    with Register.I386Registers
+    with Register.I386GenericRegisters
     with Move.RealOperations
     with BasicInteraction.RealOperations
     with Interrupt.Operations
@@ -60,12 +62,13 @@ object ProcessorMode {
   }
 
   object Protected extends ProcessorMode
+    with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
     with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
-    with Register.I386Registers
+    with Register.I386GenericRegisters
     with Move.ProtectedOperations
     with BasicInteraction.ProtectedOperations
     with Interrupt.Operations
@@ -83,6 +86,7 @@ object ProcessorMode {
   }
 
   object Long extends ProcessorMode
+    with Register.X64Registers
     with ImmediateValue.I386Implicits
     with ImmediateValue.X64Implicits
     with MemoryAddress.I386Implicits
@@ -91,8 +95,8 @@ object ProcessorMode {
     with RegisterMemoryLocation.X64Implicits
     with SIBMemoryLocation.LongOperations
     with FarPointer.I386Implicits
-    with Register.I386Registers
-    with Register.X64Registers
+    with Register.I386GenericRegisters
+    with Register.X64GenericRegisters
     with Move.LongOperations
     with BasicInteraction.LongOperations
     with Interrupt.Operations

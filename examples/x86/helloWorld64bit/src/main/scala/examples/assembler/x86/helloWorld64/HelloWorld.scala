@@ -9,7 +9,7 @@ import assembler.resource.EncodableConversion._
 import assembler.resource.{AbsoluteReference, RelativeReference}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
-import assembler.x86.operands.DoubleWordSize
+import assembler.x86.operands.{ByteSize, DoubleWordSize}
 import assembler.{EncodedString, Label}
 
 object HelloWorld extends App {

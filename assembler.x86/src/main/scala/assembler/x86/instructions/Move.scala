@@ -4,13 +4,13 @@ import assembler._
 import assembler.resource.{AbsoluteReference, UnlabeledEncodable}
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.ImmediateValue.{ValueToDoubleWordImmediate, ValueToQuadWordImmediate, ValueToWordImmediate}
-import assembler.x86.operands.Register.I8086Registers
+import assembler.x86.operands.Register.I8086GenericRegisters
 import assembler.x86.operands.memoryaccess._
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 
-object Move extends I8086Registers {
+object Move extends I8086GenericRegisters {
 
   implicit val mnemonic: String = "mov"
 

@@ -30,7 +30,6 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
   override def size: Int = encodeByte.length
 
   override def encodeByte: Seq[Byte] = {
-    assert(operands.forall(o => o.operand.isValidForMode(processorMode)))
     prefixes ++
       code ++
       modRMBytes ++

@@ -35,9 +35,6 @@ sealed class SIBMemoryLocation(
     ((scaleCode << 6) | (indexCode << 3) | baseCode).toByte
   }
 
-  override def isValidForMode(processorMode: ProcessorMode): Boolean =
-    base.isValidForMode(processorMode) && index.isValidForMode(processorMode)
-
   override def toString = s"$sizeName PTR $segmentPrefix[$base+$index$scaleString$displacementString]"
 
   private def scaleString = s"*$scale"
