@@ -8,12 +8,13 @@ sealed abstract class ProcessorMode
   extends ImmediateValue.I8086Implicits
   with MemoryAddress.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
+  with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
   with Register.I8086Registers
 {
-  type LongPointerSize <: ExtendedSize
+  type LongPointerSize <: WordDoubleSize
 
-  def pointer(location: Long): ImmediateValue with WideSize
+  def pointer(location: Long): ImmediateValue with WordDoubleQuadSize
   def shortPointer(location: Byte): NearPointer with ByteSize = ShortPointer(location)
   def longPointer(location: Int): NearPointer with LongPointerSize
 }
@@ -31,7 +32,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = WordSize
 
-    override def pointer(location: Long): ImmediateValue with WideSize = wordImmediate(location.toShort)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = wordImmediate(location.toShort)
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
   }
@@ -40,7 +41,7 @@ object ProcessorMode {
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
     with RegisterMemoryLocation.I386Implicits
-    with SIBMemoryLocation.I386Implicits
+    with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
     with Register.I386Registers
     with Move.RealOperations
@@ -53,7 +54,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = WordSize
 
-    override def pointer(location: Long): ImmediateValue with WideSize = wordImmediate(location.toShort)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = wordImmediate(location.toShort)
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
   }
@@ -62,7 +63,7 @@ object ProcessorMode {
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
     with RegisterMemoryLocation.I386Implicits
-    with SIBMemoryLocation.I386Implicits
+    with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
     with Register.I386Registers
     with Move.ProtectedOperations
@@ -76,7 +77,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = DoubleWordSize
 
-    override def pointer(location: Long): ImmediateValue with WideSize = doubleWordImmediate(location.toInt)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = doubleWordImmediate(location.toInt)
     override def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
     implicit val processorMode: ProcessorMode = this
   }
@@ -88,8 +89,7 @@ object ProcessorMode {
     with MemoryAddress.X64Implicits
     with RegisterMemoryLocation.I386Implicits
     with RegisterMemoryLocation.X64Implicits
-    with SIBMemoryLocation.I386Implicits
-    with SIBMemoryLocation.X64Implicits
+    with SIBMemoryLocation.LongOperations
     with FarPointer.I386Implicits
     with Register.I386Registers
     with Register.X64Registers
@@ -104,7 +104,7 @@ object ProcessorMode {
   {
     override type LongPointerSize = DoubleWordSize
 
-    override def pointer(location: Long): ImmediateValue with WideSize = quadWordImmediate(location)
+    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = quadWordImmediate(location)
     def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
     implicit val processorMode: ProcessorMode = this
   }

@@ -9,12 +9,12 @@ object Stack {
   private val pushOpcode: String = "push"
 
 
-  private def R16[Size<:WideSize](register: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode) =
-    new RegisterEncoded[WideSize](register, Seq(0x50.toByte), pushOpcode) with NoDisplacement with NoImmediate {
+  private def R16[Size<:WordDoubleQuadSize](register: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode) =
+    new RegisterEncoded[WordDoubleQuadSize](register, Seq(0x50.toByte), pushOpcode) with NoDisplacement with NoImmediate {
       override def registerOrder: OperandOrder = destination
     }
 
-  private def RM16(operand: ModRMEncodableOperand with WideSize)(implicit processorMode: ProcessorMode) =
+  private def RM16(operand: ModRMEncodableOperand with WordDoubleQuadSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, pushOpcode, destination) with NoDisplacement with NoImmediate
 
 
@@ -25,7 +25,7 @@ object Stack {
       override def immediateOrder: OperandOrder = destination
     }
 
-  private def Imm16[Size<:ExtendedSize](immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
+  private def Imm16[Size<:WordDoubleSize](immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
     new Static(0x68.toByte :: Nil, pushOpcode) with NoDisplacement with Immediate[Size] {
       override def immediate: ImmediateValue with Size = immediateValue
 
@@ -48,7 +48,7 @@ object Stack {
       def apply(operand: ModRMEncodableOperand with WordSize): X86Operation =
         RM16(operand)(ProcessorMode.Legacy)
 
-      def apply[Size <: LegacySize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
+      def apply[Size <: ByteWordSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)(ProcessorMode.Legacy)
           case i: ImmediateValue with WordSize => Imm16(i)(ProcessorMode.Legacy)
@@ -83,16 +83,16 @@ object Stack {
   trait RealOperations {
 
     object Push {
-      def apply[Size <: ExtendedSize](register: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](register: GeneralPurposeRegister with Size): X86Operation =
           R16(register)(ProcessorMode.Real)
 
-      def apply[Size <: ExtendedSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
           RM16(operand)(ProcessorMode.Real)
 
-      def apply[Size <: DisplacementSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
+      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)(ProcessorMode.Real)
-          case i: ImmediateValue with ExtendedSize => Imm16(i)(ProcessorMode.Real)
+          case i: ImmediateValue with WordDoubleSize => Imm16(i)(ProcessorMode.Real)
         }
 
       def apply(segment: SegmentRegister): Static = segment match {
@@ -123,16 +123,16 @@ object Stack {
   trait ProtectedOperations {
 
     object Push {
-      def apply[Size <: ExtendedSize](register: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](register: GeneralPurposeRegister with Size): X86Operation =
           R16(register)(ProcessorMode.Protected)
 
-      def apply[Size <: ExtendedSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
           RM16(operand)(ProcessorMode.Protected)
 
-      def apply[Size <: DisplacementSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
+      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): Static =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)(ProcessorMode.Protected)
-          case i: ImmediateValue with ExtendedSize => Imm16(i)(ProcessorMode.Protected)
+          case i: ImmediateValue with WordDoubleSize => Imm16(i)(ProcessorMode.Protected)
         }
 
       def apply(segment: SegmentRegister): Static = segment match {
@@ -164,7 +164,7 @@ object Stack {
   trait LongOperations {
 
     object Push {
-      def apply[Size <: WideSize](register: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](register: GeneralPurposeRegister with Size): X86Operation =
         register match {
           case r: GeneralPurposeRegister with WordSize =>
             R16(r)(ProcessorMode.Long)
@@ -174,7 +174,7 @@ object Stack {
             throw new AssertionError
         }
 
-      def apply[Size <: WideSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size): X86Operation =
         operand match {
           case o: WordSize =>
             RM16(o)(ProcessorMode.Long)
@@ -184,10 +184,10 @@ object Stack {
             throw new AssertionError
         }
 
-      def apply(immediate: ImmediateValue with DisplacementSize): Static =
+      def apply(immediate: ImmediateValue with ByteWordDoubleSize): Static =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)(ProcessorMode.Long)
-          case i: ImmediateValue with ExtendedSize => Imm16(i)(ProcessorMode.Long)
+          case i: ImmediateValue with WordDoubleSize => Imm16(i)(ProcessorMode.Long)
         }
 
       def apply(segment: SegmentRegister): Static = segment match {

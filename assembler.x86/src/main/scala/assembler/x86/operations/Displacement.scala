@@ -1,7 +1,7 @@
 package assembler.x86.operations
 
 import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType, MemoryLocation => MemoryLocationType, NearPointer => NearPointerType}
-import assembler.x86.operands.{ExtendedSize, FarPointerSize, ModRMEncodableOperand, ValueSize}
+import assembler.x86.operands.{WordDoubleSize, FarPointerSize, ModRMEncodableOperand, ValueSize}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
 sealed trait DisplacementBytes {
@@ -24,7 +24,7 @@ trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
   override final def displacementInit(): Unit = Unit
 }
 
-trait FarPointer[OffsetSize<:ExtendedSize] extends DisplacementBytes {
+trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
 
   self: X86Operation =>
   def pointer: FarPointerType[OffsetSize] with FarPointerSize[OffsetSize]

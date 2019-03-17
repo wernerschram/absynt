@@ -4,42 +4,43 @@ sealed trait OperandSize {
   def sizeEquals(that: OperandSize): Boolean
 }
 
-trait ValueSize extends OperandSize {
+sealed trait ValueSize extends OperandSize {
   def sizeName: String
 }
 
-// TODO: Find a better way to define these
-trait LegacySize extends ValueSize // 8, 16
+sealed trait ByteWordDoubleSize extends ValueSize // 8, 16, 32
 
-trait DisplacementSize extends ValueSize // 8, 16, 32
+sealed trait WordDoubleQuadSize extends ValueSize //16, 32, 64
 
-trait WideSize extends ValueSize //16, 32, 64
+sealed trait ByteWordSize extends ByteWordDoubleSize // 8, 16
 
-trait ExtendedSize extends WideSize with DisplacementSize //16, 32
+sealed trait WordDoubleSize extends ByteWordDoubleSize with WordDoubleQuadSize //16, 32
 
-trait LongSize extends WideSize //32, 64
+sealed trait WordQuadSize extends WordDoubleQuadSize //16, 64
 
-trait ByteSize extends ValueSize with LegacySize with DisplacementSize {
+sealed trait DoubleQuadSize extends WordDoubleQuadSize //32, 64
+
+trait ByteSize extends ValueSize with ByteWordSize with ByteWordDoubleSize {
   override val sizeName = "BYTE"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[ByteSize]
 }
 
-trait WordSize extends LegacySize with ExtendedSize {
+trait WordSize extends ByteWordSize with WordDoubleSize {
   override val sizeName = "WORD"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[WordSize]
 }
 
-trait DoubleWordSize extends ExtendedSize with LongSize {
+trait DoubleWordSize extends WordDoubleSize with DoubleQuadSize {
   override val sizeName = "DWORD"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[DoubleWordSize]
 }
 
-trait QuadWordSize extends LongSize {
+trait QuadWordSize extends DoubleQuadSize {
   override val sizeName = "QWORD"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[QuadWordSize]
 }
 
-sealed trait FarPointerSize[OffsetSize<:ExtendedSize] extends OperandSize {
+sealed trait FarPointerSize[OffsetSize<:WordDoubleSize] extends OperandSize {
   val offset: OffsetSize
   override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[FarPointerSize[OffsetSize]]
 }

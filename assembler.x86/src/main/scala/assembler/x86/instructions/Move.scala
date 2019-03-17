@@ -13,11 +13,11 @@ object Move extends I8086Registers {
 
   implicit val mnemonic: String = "mov"
 
-  private def RM16ToSReg[Size<:WideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
+  private def RM16ToSReg[Size<:WordDoubleQuadSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
 
 
-  private def SRegToRM16[Size<:WideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
+  private def SRegToRM16[Size<:WordDoubleQuadSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
 
   private def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize)(implicit processorMode: ProcessorMode) =
@@ -33,10 +33,10 @@ object Move extends I8086Registers {
       override def offsetOrder: OperandOrder = destination
     }
 
-  private def R16ToRM16[Size<:WideSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
+  private def R16ToRM16[Size<:WordDoubleQuadSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModRRM(operand1, operand2, 0x89.toByte :: Nil, mnemonic, destination)
 
-  private def AXToMOffs16[Size<:WideSize](accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation with Size)(implicit processorMode: ProcessorMode) =
+  private def AXToMOffs16[Size<:WordDoubleQuadSize](accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation with Size)(implicit processorMode: ProcessorMode) =
     new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(accumulatorRegister, source))
@@ -59,10 +59,10 @@ object Move extends I8086Registers {
       override def offsetOrder: OperandOrder = source
     }
 
-  private def RM16ToR16[Size<:WideSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
+  private def RM16ToR16[Size<:WordDoubleQuadSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
     new ModRRM(operand1, operand2, 0x8B.toByte :: Nil, mnemonic, source)
 
-  private def MOffs16ToAX[Size<:WideSize](memoryLocation: MemoryLocation with Size, accumulatorRegister: AccumulatorRegister with Size)(implicit processorMode: ProcessorMode) =
+  private def MOffs16ToAX[Size<:WordDoubleQuadSize](memoryLocation: MemoryLocation with Size, accumulatorRegister: AccumulatorRegister with Size)(implicit processorMode: ProcessorMode) =
     new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate {
       override protected def implicitInit(): Unit =
         addOperand(OperandInfo.implicitOperand(accumulatorRegister, destination))
@@ -81,7 +81,7 @@ object Move extends I8086Registers {
       override def registerOrder: OperandOrder = destination
     }
 
-  private def Imm16ToR16[Size<:WideSize](register: GeneralPurposeRegister with Size, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
+  private def Imm16ToR16[Size<:WordDoubleQuadSize](register: GeneralPurposeRegister with Size, immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode) =
     new RegisterEncoded[Size](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size] {
       assume(register sizeEquals immediateValue)
       override def immediate: ImmediateValue with Size = immediateValue
@@ -98,7 +98,7 @@ object Move extends I8086Registers {
       override def immediateOrder: OperandOrder = source
     }
 
-  private def Imm16ToRM16[OperandSize<:WideSize](operand: ModRMEncodableOperand with OperandSize, immediateValue: ImmediateValue with OperandSize)(implicit processorMode: ProcessorMode) =
+  private def Imm16ToRM16[OperandSize<:WordDoubleQuadSize](operand: ModRMEncodableOperand with OperandSize, immediateValue: ImmediateValue with OperandSize)(implicit processorMode: ProcessorMode) =
     new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[OperandSize] {
       override def immediate: ImmediateValue with OperandSize = immediateValue
 
@@ -171,34 +171,34 @@ object Move extends I8086Registers {
     def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
       apply(source, destination.asInstanceOf[ModRMEncodableOperand with ByteSize])
 
-    def apply[Size <: ExtendedSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister)(implicit processorMode: ProcessorMode): X86Operation =
       RM16ToSReg(destination, source)
 
-    def apply[Size <: ExtendedSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
       SRegToRM16(source, destination)
 
-    def apply[Size <: ExtendedSize](accumulator: AccumulatorRegister with Size, destination: MemoryAddress with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](accumulator: AccumulatorRegister with Size, destination: MemoryAddress with Size)(implicit processorMode: ProcessorMode): X86Operation =
       AXToMOffs16(accumulator, destination)
 
-    def apply[Size <: ExtendedSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
       R16ToRM16(source, destination)
 
-    def apply[Size <: ExtendedSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
       apply(source, destination.asInstanceOf[ModRMEncodableOperand with Size])
 
-    def apply[Size <: ExtendedSize](source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
       MOffs16ToAX(source, accumulator)
 
-    def apply[Size <: ExtendedSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
       RM16ToR16(destination, source)
 
-    def apply[Size <: ExtendedSize](source: ImmediateValue with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: WordDoubleSize](source: ImmediateValue with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
       Imm16ToR16(destination, source)
 
     def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
       Imm8ToR8(destination, source)
 
-    def apply[Size <: DisplacementSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    def apply[Size <: ByteWordDoubleSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
       (source, destination) match {
         case (s: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
           Imm8ToRM8(d, s)
@@ -251,10 +251,10 @@ object Move extends I8086Registers {
 
   trait LongOperations {
     object Move extends Common {
-      def apply[Size <: WideSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister)(implicit processorMode: ProcessorMode): X86Operation =
         RM16ToSReg(destination, source)
 
-      def apply[Size <: WideSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
         SRegToRM16(source, destination)
 
       def apply(source: ByteRegister, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation = {
@@ -263,28 +263,28 @@ object Move extends I8086Registers {
         apply(source, destination.asInstanceOf[ModRMEncodableOperand with ByteSize])
       }
 
-      def apply[Size <: WideSize](accumulator: AccumulatorRegister with Size, destination: MemoryAddress with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](accumulator: AccumulatorRegister with Size, destination: MemoryAddress with Size)(implicit processorMode: ProcessorMode): X86Operation =
         AXToMOffs16(accumulator, destination)
 
-      def apply[Size <: WideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
         R16ToRM16(source, destination)
 
-      def apply[Size <: WideSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
         apply(source, destination.asInstanceOf[ModRMEncodableOperand with Size])
 
-      def apply[Size <: WideSize](source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
         MOffs16ToAX(source, accumulator)
 
-      def apply[Size <: WideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
         RM16ToR16(destination, source)
 
-      def apply[Size <: WideSize](source: ImmediateValue with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: WordDoubleQuadSize](source: ImmediateValue with Size, destination: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
         Imm16ToR16(destination, source)
 
       def apply(source: ImmediateValue with ByteSize, destination: ByteRegister)(implicit processorMode: ProcessorMode): X86Operation =
         Imm8ToR8(destination, source)
 
-      def apply[Size <: DisplacementSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: ByteWordDoubleSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode): X86Operation =
         (source, destination) match {
           case (s: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, s)

@@ -10,7 +10,6 @@ import assembler.resource.{AbsoluteReference, RelativeReference}
 import assembler.sections.Section
 import assembler.x86.ProcessorMode
 import assembler.x86.operands.DoubleWordSize
-import assembler.x86.operands.memoryaccess.SIBMemoryLocation
 import assembler.{EncodedString, Label}
 
 object HelloWorld extends App {

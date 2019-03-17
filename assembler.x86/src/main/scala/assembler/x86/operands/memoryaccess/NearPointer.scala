@@ -4,7 +4,8 @@ import assembler.ListExtensions._
 import assembler.x86.operands._
 
 sealed abstract class NearPointer(val offset: Seq[Byte])
-  extends Operand with ValueSize {
+  extends Operand {
+  self: ValueSize =>
 
   def encodeBytes: Seq[Byte] = offset
 }

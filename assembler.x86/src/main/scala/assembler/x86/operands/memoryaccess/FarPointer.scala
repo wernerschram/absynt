@@ -3,7 +3,7 @@ package assembler.x86.operands.memoryaccess
 import assembler.ListExtensions._
 import assembler.x86.operands._
 
-sealed abstract case class FarPointer[Size<:ExtendedSize](segment: ImmediateValue with WordSize, offset: ImmediateValue with Size)
+sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateValue with WordSize, offset: ImmediateValue with Size)
   extends Operand {
   self: FarPointerSize[Size] =>
 
@@ -14,7 +14,7 @@ sealed abstract case class FarPointer[Size<:ExtendedSize](segment: ImmediateValu
 }
 
 object FarPointer {
-  abstract class FarPointerForSize[OffsetSize<:ExtendedSize] {
+  abstract class FarPointerForSize[OffsetSize<:WordDoubleSize] {
     def instance(segment: ImmediateValue with WordSize, offset: ImmediateValue with OffsetSize): FarPointer[OffsetSize] with FarPointerSize[OffsetSize]
   }
 
@@ -31,6 +31,6 @@ object FarPointer {
         new FarPointer[DoubleWordSize](segment, offset) with FarDoubleWordSize
   }
 
-  def apply[Size<:ExtendedSize: FarPointerForSize](segment: ImmediateValue with WordSize, offset: ImmediateValue with Size): FarPointer[Size] with FarPointerSize[Size] =
+  def apply[Size<:WordDoubleSize: FarPointerForSize](segment: ImmediateValue with WordSize, offset: ImmediateValue with Size): FarPointer[Size] with FarPointerSize[Size] =
     implicitly[FarPointerForSize[Size]].instance(segment, offset)
 }

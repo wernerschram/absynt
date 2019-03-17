@@ -68,7 +68,7 @@ sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val 
 sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String, val processorMode: ProcessorMode)
   extends Jump(shortOpcode, mnemonic) {
 
-  def apply(nearPointer: NearPointer with DisplacementSize): X86Operation =
+  def apply(nearPointer: NearPointer with ByteWordDoubleSize): X86Operation =
     nearPointer match {
       case p: NearPointer with ByteSize =>
         Rel8(p)(processorMode)
@@ -131,7 +131,7 @@ sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], l
 abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
   extends Jump(shortOpcode, mnemonic) {
 
-  def apply(nearPointer: NearPointer with DisplacementSize): X86Operation =
+  def apply(nearPointer: NearPointer with ByteWordDoubleSize): X86Operation =
     nearPointer match {
       case p: NearPointer with ByteSize =>
         Rel8(p)(ProcessorMode.Long)
@@ -167,10 +167,10 @@ object Jump {
       def apply(operand: ModRMEncodableOperand with WordSize): X86Operation =
             RM16(operand)
 
-      private def RM16[Size<:WideSize](operand: ModRMEncodableOperand with Size) =
+      private def RM16[Size<:WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
         new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)(ProcessorMode.Legacy) with NoDisplacement with NoImmediate
 
-      private def Ptr1616[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
+      private def Ptr1616[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
         new Static(0xEA.toByte :: Nil, mnemonic)(ProcessorMode.Legacy) with FarPointerOperation[Size] with NoImmediate {
           override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
         }
@@ -223,25 +223,25 @@ object Jump {
   trait RealOperations {
     object Jump extends ShortOrLongRelativeJumpReal(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply[Size<:ExtendedSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
         RM16(operand)
 
-      private def RM16[Size<:WideSize](operand: ModRMEncodableOperand with Size) =
+      private def RM16[Size<:WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
         new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)(ProcessorMode.Real) with NoDisplacement with NoImmediate
 
-      private def Ptr1616[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
+      private def Ptr1616[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
         new Static(0xEA.toByte :: Nil, mnemonic)(ProcessorMode.Real) with FarPointerOperation[Size] with NoImmediate {
           override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
         }
 
-      private def M1616(operand: MemoryLocation with WideSize) =
+      private def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
         new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination)(ProcessorMode.Real) with NoDisplacement with NoImmediate
 
       object Far {
-        def apply[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WideSize): X86Operation =
+        def apply(pointer: MemoryLocation with WordDoubleQuadSize): X86Operation =
           M1616(pointer)
       }
 
@@ -282,25 +282,25 @@ object Jump {
   trait ProtectedOperations {
     object Jump extends ShortOrLongRelativeJumpProtected(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply[Size<:ExtendedSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
         RM16(operand)
 
-      private def RM16[Size<:WideSize](operand: ModRMEncodableOperand with Size) =
+      private def RM16[Size<:WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
         new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)(ProcessorMode.Protected) with NoDisplacement with NoImmediate
 
-      private def Ptr1616[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
+      private def Ptr1616[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
         new Static(0xEA.toByte :: Nil, mnemonic)(ProcessorMode.Protected) with FarPointerOperation[Size] with NoImmediate {
           override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
         }
 
-      private def M1616(operand: MemoryLocation with WideSize) =
+      private def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
         new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination)(ProcessorMode.Protected) with NoDisplacement with NoImmediate
 
       object Far {
-        def apply[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WideSize): X86Operation =
+        def apply(pointer: MemoryLocation with WordDoubleQuadSize): X86Operation =
           M1616(pointer)
       }
 
@@ -344,22 +344,22 @@ object Jump {
       def apply(operand: ModRMEncodableOperand with QuadWordSize): X86Operation =
         RM16(operand)
 
-      private def RM16[Size<:WideSize](operand: ModRMEncodableOperand with Size) =
+      private def RM16[Size<:WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
         new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)(ProcessorMode.Long) with NoDisplacement with NoImmediate
 
-      private def Ptr1616[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
+      private def Ptr1616[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]) =
         new Static(0xEA.toByte :: Nil, mnemonic)(ProcessorMode.Long) with FarPointerOperation[Size] with NoImmediate {
           override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
         }
 
-      private def M1616(operand: MemoryLocation with WideSize) =
+      private def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
         new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination)(ProcessorMode.Long) with NoDisplacement with NoImmediate
 
       object Far {
-        def apply[Size<:ExtendedSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WideSize): X86Operation =
+        def apply(pointer: MemoryLocation with WordDoubleQuadSize): X86Operation =
           M1616(pointer)
       }
 

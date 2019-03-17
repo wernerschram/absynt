@@ -5,13 +5,15 @@ import assembler.x86.{ProcessorMode, RexRequirement}
 sealed abstract class Register extends Operand
 
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String)
-  extends Register with ModRMEncodableOperand with ValueSize {
+  extends Register with ModRMEncodableOperand {
+  self: ValueSize =>
   val modValue: Byte = 0x03.toByte
   val registerOrMemoryModeCode: Byte = registerCode
 }
 
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
+  self: ValueSize =>
   override def isValidForMode(processorMode: ProcessorMode): Boolean = processorMode == ProcessorMode.Long
   override def rexRequirements(rexRequirement: RexRequirement): Set[RexRequirement] = Set(rexRequirement)
 }
@@ -85,7 +87,9 @@ sealed trait QuadWordRegister extends GeneralPurposeRegister with SIBIndexRegist
   override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
 }
 
-sealed abstract class AccumulatorRegister extends GeneralPurposeRegister(0x00, "ax")
+sealed abstract class AccumulatorRegister extends GeneralPurposeRegister(0x00, "ax") {
+  self: ValueSize =>
+}
 
 object Accumulator {
   case object LowByte extends AccumulatorRegister with LowByteRegister
@@ -95,7 +99,9 @@ object Accumulator {
   case object QuadWord extends AccumulatorRegister with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class CountRegister extends GeneralPurposeRegister(0x01, "cx")
+sealed abstract class CountRegister extends GeneralPurposeRegister(0x01, "cx") {
+  self: ValueSize =>
+}
 
 object Count {
   case object LowByte extends CountRegister with LowByteRegister
@@ -105,7 +111,9 @@ object Count {
   case object QuadWord extends CountRegister with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class DataRegister extends GeneralPurposeRegister(0x02, "dx")
+sealed abstract class DataRegister extends GeneralPurposeRegister(0x02, "dx") {
+  self: ValueSize =>
+}
 
 object Data {
   case object LowByte extends DataRegister with LowByteRegister
@@ -115,7 +123,9 @@ object Data {
   case object QuadWord extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class BaseRegister extends GeneralPurposeRegister(0x03, "bx")
+sealed abstract class BaseRegister extends GeneralPurposeRegister(0x03, "bx") {
+  self: ValueSize =>
+}
 
 object Base {
   case object LowByte extends BaseRegister with LowByteRegister
@@ -146,7 +156,9 @@ object Segment {
   case object StillMoreExtra extends SegmentRegister(0x05, "gs")
 }
 
-sealed abstract class SourcePointer extends GeneralPurposeRegister(0x04, "sp")
+sealed abstract class SourcePointer extends GeneralPurposeRegister(0x04, "sp") {
+  self: ValueSize =>
+}
 
 object SourcePointer {
   case object Real extends SourcePointer with WordRegister
@@ -155,7 +167,9 @@ object SourcePointer {
   case object LongLowByte extends SourcePointer with LowByteRegister
 }
 
-sealed abstract class BasePointer extends GeneralPurposeRegister(0x05, "bp")
+sealed abstract class BasePointer extends GeneralPurposeRegister(0x05, "bp") {
+  self: ValueSize =>
+}
 
 object BasePointer {
   case object Real extends BasePointer with WordRegister with BaseRegisterReference with RealModeIndexRegister {
@@ -178,7 +192,9 @@ object BasePointer {
   case object LongLowByte extends BasePointer with LowByteRegister
 }
 
-sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si")
+sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si") {
+  self: ValueSize =>
+}
 
 object SourceIndex {
 
@@ -197,7 +213,9 @@ object SourceIndex {
   case object LongLowByte extends SourceIndex with LowByteRegister
 }
 
-sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di")
+sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di") {
+  self: ValueSize =>
+}
 
 object DestinationIndex {
   final case object Real extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
@@ -212,7 +230,9 @@ object DestinationIndex {
   case object LongLowByte extends DestinationIndex with LowByteRegister
 }
 
-sealed abstract class Rex8 extends GeneralPurposeRexRegister(0x00, "r8")
+sealed abstract class Rex8 extends GeneralPurposeRexRegister(0x00, "r8") {
+  self: ValueSize =>
+}
 
 object Register8 {
   case object LowByte extends Rex8 with LowByteRegister
@@ -221,7 +241,9 @@ object Register8 {
   case object QuadWord extends Rex8 with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class Rex9 extends GeneralPurposeRexRegister(0x01, "r9")
+sealed abstract class Rex9 extends GeneralPurposeRexRegister(0x01, "r9") {
+  self: ValueSize =>
+}
 
 object Register9 {
   case object LowByte extends Rex9 with LowByteRegister
@@ -230,7 +252,9 @@ object Register9 {
   case object QuadWord extends Rex9 with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class Rex10 extends GeneralPurposeRexRegister(0x02, "r10")
+sealed abstract class Rex10 extends GeneralPurposeRexRegister(0x02, "r10") {
+  self: ValueSize =>
+}
 
 object Register10 {
   case object LowByte extends Rex10 with LowByteRegister
@@ -239,7 +263,9 @@ object Register10 {
   case object QuadWord extends Rex10 with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class Rex11 extends GeneralPurposeRexRegister(0x03, "r11")
+sealed abstract class Rex11 extends GeneralPurposeRexRegister(0x03, "r11") {
+  self: ValueSize =>
+}
 
 object Register11 {
   case object LowByte extends Rex11 with LowByteRegister
@@ -248,7 +274,9 @@ object Register11 {
   case object QuadWord extends Rex11 with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class Rex12 extends GeneralPurposeRexRegister(0x04, "r12")
+sealed abstract class Rex12 extends GeneralPurposeRexRegister(0x04, "r12") {
+  self: ValueSize =>
+}
 
 object Register12 {
   case object LowByte extends Rex12 with LowByteRegister
@@ -257,7 +285,9 @@ object Register12 {
   case object QuadWord extends Rex12 with QuadWordRegister
 }
 
-sealed abstract class Rex13 extends GeneralPurposeRexRegister(0x05, "r13")
+sealed abstract class Rex13 extends GeneralPurposeRexRegister(0x05, "r13") {
+  self: ValueSize =>
+}
 
 object Register13 {
   case object LowByte extends Rex13 with LowByteRegister
@@ -266,7 +296,9 @@ object Register13 {
   case object QuadWord extends Rex13 with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14")
+sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14") {
+  self: ValueSize =>
+}
 
 object Register14 {
   case object LowByte extends Rex14 with LowByteRegister
@@ -275,7 +307,9 @@ object Register14 {
   case object QuadWord extends Rex14 with QuadWordRegister with ProtectedModeIndexRegister
 }
 
-sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15")
+sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15") {
+  self: ValueSize =>
+}
 
 object Register15 {
   case object LowByte extends Rex15 with LowByteRegister
@@ -285,8 +319,8 @@ object Register15 {
 }
 
 sealed abstract class BaseIndexReference(
-  val base: GeneralPurposeRegister with BaseRegisterReference,
-  val index: GeneralPurposeRegister with CombinableRealModeIndexRegister,
+  val base: GeneralPurposeRegister with BaseRegisterReference with WordSize,
+  val index: GeneralPurposeRegister with CombinableRealModeIndexRegister with WordSize,
   override val indexCode: Byte)
   extends RegisterReference {
 

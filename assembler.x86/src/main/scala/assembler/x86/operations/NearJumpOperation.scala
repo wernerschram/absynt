@@ -2,9 +2,9 @@ package assembler.x86.operations
 
 import assembler._
 import assembler.resource.{Resource, UnlabeledEncodable}
-import assembler.x86.operands.WideSize
+import assembler.x86.operands.WordDoubleQuadSize
 
-abstract class NearJumpOperation[Size<:WideSize](shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label, longJumpSize: Int)
+abstract class NearJumpOperation[Size<:WordDoubleQuadSize](shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String, target: Label, longJumpSize: Int)
   extends ShortJumpOperation(shortOpcode, mnemonic, target) {
 
   val forwardShortLongBoundary: Byte = Byte.MaxValue
