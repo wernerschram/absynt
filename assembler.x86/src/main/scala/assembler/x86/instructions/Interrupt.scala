@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
+import assembler.x86.HasOperandSizePrefixRequirements
 import assembler.x86.operands.ImmediateValue.ValueToByteImmediate
 import assembler.x86.operands.{ByteSize, ImmediateValue}
 import assembler.x86.operations._
@@ -12,13 +12,13 @@ object Interrupt {
   trait Operations {
     self: HasOperandSizePrefixRequirements =>
 
-    private def Static(mnemonic: String)(implicit processorMode: ProcessorMode, byteImmediate: ValueToByteImmediate) =
+    private def Static(mnemonic: String)(implicit byteImmediate: ValueToByteImmediate) =
       new Static(0xCC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(byteImmediate(3.toByte), destination))
       }
 
-    private def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String)(implicit processorMode: ProcessorMode) =
+    private def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String) =
       new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Operations.this.operandSizePrefixRequirement
 
@@ -30,7 +30,7 @@ object Interrupt {
     object Interrupt {
       val mnemonic: String = "int"
 
-      def apply(immediate: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode, byteImmediate: ValueToByteImmediate): Static = immediate.value.head match {
+      def apply(immediate: ImmediateValue with ByteSize)(implicit byteImmediate: ValueToByteImmediate): Static = immediate.value.head match {
         case 3 => Static(mnemonic)
         case _ => Imm8(immediate, mnemonic)
       }
@@ -39,14 +39,14 @@ object Interrupt {
     object ClearInterruptFlag {
       val mnemonic: String = "cli"
 
-      def apply()(implicit processorMode: ProcessorMode): Static =
+      def apply(): Static =
         new Static(0xFA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
     }
 
     object SetInterruptFlag {
       val mnemonic: String = "sti"
 
-      def apply()(implicit processorMode: ProcessorMode): Static =
+      def apply(): Static =
         new Static(0xFB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
     }
 

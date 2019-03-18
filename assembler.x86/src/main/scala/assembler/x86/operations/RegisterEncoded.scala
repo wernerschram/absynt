@@ -1,13 +1,12 @@
 package assembler.x86.operations
 
-import assembler.x86.ProcessorMode
 import assembler.x86.operands.{GeneralPurposeRegister, ValueSize}
 import assembler.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
 abstract class RegisterEncoded[Size <: ValueSize](register: GeneralPurposeRegister with Size,
                                                               rawCode: Seq[Byte],
                                                               override val mnemonic: String)
-                                                             (implicit override val processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                                                             (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
   extends X86Operation(rawCode.take(rawCode.length - 1) :+ (rawCode.last | register.registerCode).toByte) with NoModRM {
 
   self: DisplacementBytes with ImmediateBytes =>

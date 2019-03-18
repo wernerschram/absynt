@@ -20,7 +20,7 @@ object Boot extends App {
 
   import ProcessorMode.Real._
 
-  def setColor(col: Color)(implicit processorMode: ProcessorMode): List[Resource] =
+  def setColor(col: Color): List[Resource] =
     Move(0x3c9.toShort, DX) ::
     Move(col.r, AL) ::
     Output(AL, DX) ::

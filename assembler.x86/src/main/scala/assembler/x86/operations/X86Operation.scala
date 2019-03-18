@@ -1,10 +1,10 @@
 package assembler.x86.operations
 
 import assembler.resource.UnlabeledEncodable
+import assembler.x86.RexRequirement
 import assembler.x86.operands._
-import assembler.x86.{ProcessorMode, RexRequirement}
 
-abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: ProcessorMode) extends UnlabeledEncodable {
+abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
   self: ModRMBytes with DisplacementBytes with ImmediateBytes =>
   final def prefixes: Seq[Byte] =
     optionalRepeatPrefix ++
@@ -52,7 +52,6 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
     if (operands.exists(_.requiresOperandSize)) X86Operation.OperandSizeCode :: Nil else Nil
 
   private def optionalRexPrefix: List[Byte] = {
-    assume(processorMode == ProcessorMode.Long || rexRequirements.isEmpty)
     if (rexRequirements.isEmpty)
       Nil
     else

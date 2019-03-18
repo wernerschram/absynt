@@ -25,7 +25,7 @@ case class LinearRelativeTestReference(override val target: Label) extends Relat
     else if (dependencySize < 20) 2
     else 3
 
-  override def possibleSizes = Set(1, 2, 3)
+  override def possibleSizes: Set[Int] = Set(1, 2, 3)
 }
 
 

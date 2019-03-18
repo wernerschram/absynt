@@ -3,7 +3,7 @@ package assembler.x86.instructions
 import assembler.x86.operands.{DoubleQuadSize, ReturnMode}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations._
-import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
+import assembler.x86.HasOperandSizePrefixRequirements
 
 object System {
   trait Common {
@@ -24,11 +24,11 @@ object System {
   trait ProtectedOperations extends Common {
     self: HasOperandSizePrefixRequirements =>
     object SystemEnter {
-      def apply()(implicit processorMode: ProcessorMode): Static = staticEnter()
+      def apply(): Static = staticEnter()
     }
 
     object SystemExit {
-      def apply(returnMode: ReturnMode with DoubleQuadSize)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
+      def apply(returnMode: ReturnMode with DoubleQuadSize): Static = staticExit(returnMode)
     }
   }
 
@@ -49,7 +49,7 @@ object System {
     }
 
     object SystemEnter {
-      def apply()(implicit processorMode: ProcessorMode): Static = staticEnter()
+      def apply(): Static = staticEnter()
     }
 
     object SystemReturn {
@@ -57,7 +57,7 @@ object System {
     }
 
     object SystemExit {
-      def apply(returnMode: ReturnMode with DoubleQuadSize)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
+      def apply(returnMode: ReturnMode with DoubleQuadSize): Static = staticExit(returnMode)
     }
 
   }

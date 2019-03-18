@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
+import assembler.x86.HasOperandSizePrefixRequirements
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations._
@@ -11,16 +11,16 @@ object Stack {
   trait Common {
     self: HasOperandSizePrefixRequirements =>
 
-    protected def R16[Size <: WordDoubleQuadSize](register: GeneralPurposeRegister with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    protected def R16[Size <: WordDoubleQuadSize](register: GeneralPurposeRegister with Size): X86Operation =
       new RegisterEncoded[WordDoubleQuadSize](register, Seq(0x50.toByte), pushOpcode) with NoDisplacement with NoImmediate {
         override def registerOrder: OperandOrder = destination
       }
 
-    protected def RM16(operand: ModRMEncodableOperand with WordDoubleQuadSize)(implicit processorMode: ProcessorMode) =
+    protected def RM16(operand: ModRMEncodableOperand with WordDoubleQuadSize) =
       new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, pushOpcode, destination) with NoDisplacement with NoImmediate
 
 
-    protected def Imm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
+    protected def Imm8(immediateValue: ImmediateValue with ByteSize): X86Operation =
       new Static(0x6A.toByte :: Nil, pushOpcode) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
@@ -29,7 +29,7 @@ object Stack {
         override def immediateOrder: OperandOrder = destination
       }
 
-    protected def Imm16[Size <: WordDoubleSize](immediateValue: ImmediateValue with Size)(implicit processorMode: ProcessorMode): X86Operation =
+    protected def Imm16[Size <: WordDoubleSize](immediateValue: ImmediateValue with Size): X86Operation =
       new Static(0x68.toByte :: Nil, pushOpcode) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
         implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
@@ -38,12 +38,12 @@ object Stack {
         override def immediateOrder: OperandOrder = destination
       }
 
-    protected def StaticCS()(implicit processorMode: ProcessorMode) = new Static(0x0E.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticSS()(implicit processorMode: ProcessorMode) = new Static(0x16.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticDS()(implicit processorMode: ProcessorMode) = new Static(0x1E.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticES()(implicit processorMode: ProcessorMode) = new Static(0x06.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticFS()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticGS()(implicit processorMode: ProcessorMode) = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
+    protected def StaticCS() = new Static(0x0E.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
+    protected def StaticSS() = new Static(0x16.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
+    protected def StaticDS() = new Static(0x1E.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
+    protected def StaticES() = new Static(0x06.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
+    protected def StaticFS() = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
+    protected def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
   }
 
   trait LegacyOperations extends Common {
@@ -56,19 +56,19 @@ object Stack {
       def apply(operand: ModRMEncodableOperand with WordSize): X86Operation =
         RM16(operand)
 
-      def apply[Size <: ByteWordSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: ByteWordSize](immediate: ImmediateValue with Size): X86Operation =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)
           case i: ImmediateValue with WordSize => Imm16(i)
         }
 
       def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()(ProcessorMode.Legacy)
-        case Segment.Stack => StaticSS()(ProcessorMode.Legacy)
-        case Segment.Data => StaticDS()(ProcessorMode.Legacy)
-        case Segment.Extra => StaticES()(ProcessorMode.Legacy)
-        case Segment.MoreExtra => StaticFS()(ProcessorMode.Legacy)
-        case Segment.StillMoreExtra => StaticGS()(ProcessorMode.Legacy)
+        case Segment.Code => StaticCS()
+        case Segment.Stack => StaticSS()
+        case Segment.Data => StaticDS()
+        case Segment.Extra => StaticES()
+        case Segment.MoreExtra => StaticFS()
+        case Segment.StillMoreExtra => StaticGS()
       }
     }
 
@@ -77,13 +77,13 @@ object Stack {
       implicit val opcode: String = "pusha"
 
       def apply(): Static =
-        new Static(0x60.toByte :: Nil, opcode)(ProcessorMode.Legacy) with NoDisplacement with NoImmediate
+        new Static(0x60.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
 
     object PushFlags {
       implicit val opcode: String = "pushf"
 
-      def apply(): Static = new Static(0x9C.toByte :: Nil, opcode)(ProcessorMode.Legacy) with NoDisplacement with NoImmediate
+      def apply(): Static = new Static(0x9C.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
 
   }
@@ -98,19 +98,19 @@ object Stack {
       def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
           RM16(operand)
 
-      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size): X86Operation =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)
           case i: ImmediateValue with WordDoubleSize => Imm16(i)
         }
 
       def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()(ProcessorMode.Real)
-        case Segment.Stack => StaticSS()(ProcessorMode.Real)
-        case Segment.Data => StaticDS()(ProcessorMode.Real)
-        case Segment.Extra => StaticES()(ProcessorMode.Real)
-        case Segment.MoreExtra => StaticFS()(ProcessorMode.Real)
-        case Segment.StillMoreExtra => StaticGS()(ProcessorMode.Real)
+        case Segment.Code => StaticCS()
+        case Segment.Stack => StaticSS()
+        case Segment.Data => StaticDS()
+        case Segment.Extra => StaticES()
+        case Segment.MoreExtra => StaticFS()
+        case Segment.StillMoreExtra => StaticGS()
       }
     }
 
@@ -118,14 +118,14 @@ object Stack {
       implicit val opcode: String = "pusha"
 
       def apply(): Static =
-        new Static(0x60.toByte :: Nil, opcode)(ProcessorMode.Real) with NoDisplacement with NoImmediate
+        new Static(0x60.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
 
     object PushFlags {
       implicit val opcode: String = "pushf"
 
       def apply(): Static =
-        new Static(0x9C.toByte :: Nil, opcode)(ProcessorMode.Real) with NoDisplacement with NoImmediate
+        new Static(0x9C.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
   }
 
@@ -138,19 +138,19 @@ object Stack {
       def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
           RM16(operand)
 
-      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size)(implicit processorMode: ProcessorMode): X86Operation =
+      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size): X86Operation =
         immediate match {
           case i: ImmediateValue with ByteSize => Imm8(i)
           case i: ImmediateValue with WordDoubleSize => Imm16(i)
         }
 
       def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()(ProcessorMode.Protected)
-        case Segment.Stack => StaticSS()(ProcessorMode.Protected)
-        case Segment.Data => StaticDS()(ProcessorMode.Protected)
-        case Segment.Extra => StaticES()(ProcessorMode.Protected)
-        case Segment.MoreExtra => StaticFS()(ProcessorMode.Protected)
-        case Segment.StillMoreExtra => StaticGS()(ProcessorMode.Protected)
+        case Segment.Code => StaticCS()
+        case Segment.Stack => StaticSS()
+        case Segment.Data => StaticDS()
+        case Segment.Extra => StaticES()
+        case Segment.MoreExtra => StaticFS()
+        case Segment.StillMoreExtra => StaticGS()
       }
     }
 
@@ -159,14 +159,14 @@ object Stack {
       implicit val opcode: String = "pusha"
 
       def apply(): Static =
-        new Static(0x60.toByte :: Nil, opcode)(ProcessorMode.Protected) with NoDisplacement with NoImmediate
+        new Static(0x60.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
 
     object PushFlags {
       implicit val opcode: String = "pushf"
 
       def apply(): Static =
-        new Static(0x9C.toByte :: Nil, opcode)(ProcessorMode.Protected) with NoDisplacement with NoImmediate
+        new Static(0x9C.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
   }
 
@@ -201,12 +201,12 @@ object Stack {
         }
 
       def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()(ProcessorMode.Long)
-        case Segment.Stack => StaticSS()(ProcessorMode.Long)
-        case Segment.Data => StaticDS()(ProcessorMode.Long)
-        case Segment.Extra => StaticES()(ProcessorMode.Long)
-        case Segment.MoreExtra => StaticFS()(ProcessorMode.Long)
-        case Segment.StillMoreExtra => StaticGS()(ProcessorMode.Long)
+        case Segment.Code => StaticCS()
+        case Segment.Stack => StaticSS()
+        case Segment.Data => StaticDS()
+        case Segment.Extra => StaticES()
+        case Segment.MoreExtra => StaticFS()
+        case Segment.StillMoreExtra => StaticGS()
       }
     }
 
@@ -214,7 +214,7 @@ object Stack {
       implicit val opcode: String = "pushf"
 
       def apply(): Static =
-        new Static(0x9C.toByte :: Nil, opcode)(ProcessorMode.Long) with NoDisplacement with NoImmediate
+        new Static(0x9C.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
   }
 }

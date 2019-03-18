@@ -1,6 +1,5 @@
 package assembler.x86.operations
 
-import assembler.x86.ProcessorMode
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder.{OperandOrder, _}
 
@@ -21,7 +20,7 @@ class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
                      val rValue: Byte,
                      override val mnemonic: String,
                      val operandRMOrder: OperandOrder,
-                     includeRexW: Boolean = true)(implicit override val processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                     includeRexW: Boolean = true)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
   extends X86Operation(code) with ModRMBytes {
 
   self: X86Operation with DisplacementBytes with ImmediateBytes =>
@@ -37,7 +36,7 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister with Size,
                                 override val code: Seq[Byte],
                                 override val mnemonic: String,
                                 override val operandRMOrder: OperandOrder)
-                               (implicit override val processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                               (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerOrMemoryModeCode, mnemonic, operandRMOrder) with NoDisplacement with NoImmediate {
 
   def operandROrder: OperandOrder =
@@ -54,7 +53,7 @@ class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
                                              override val code: Seq[Byte],
                                              override val mnemonic: String,
                                              override val operandRMOrder: OperandOrder)
-                                            (implicit override val processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                                            (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerCode, mnemonic, operandRMOrder) {
   self: X86Operation with DisplacementBytes with ImmediateBytes =>
 
