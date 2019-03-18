@@ -26,10 +26,7 @@ trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
 }
 
 trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
-
   self: X86Operation with HasOperandSizePrefixRequirements =>
-
-  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 
   def pointer: FarPointerType[OffsetSize] with FarPointerSize[OffsetSize]
 
@@ -40,10 +37,7 @@ trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
 }
 
 trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
-
   self: X86Operation with HasOperandSizePrefixRequirements =>
-
-  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 
   def pointer: NearPointerType with Size
   def pointerOrder: OperandOrder
@@ -55,10 +49,7 @@ trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
 }
 
 trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
-
   self: X86Operation with HasOperandSizePrefixRequirements =>
-
-  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 
   def location: MemoryLocationType with Size
   def offsetOrder: OperandOrder
@@ -68,5 +59,6 @@ trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
 
   override def displacementBytes: Seq[Byte] = location.displacement.toSeq.flatMap(_.value)
 
-  def addressOperands: Set[AddressOperandInfo] = location.addressOperands
+  def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
+    location.addressOperands
 }

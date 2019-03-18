@@ -11,7 +11,7 @@ object StoreString {
 
   trait Common {
     self: HasOperandSizePrefixRequirements =>
-    protected def Static8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+    protected def Static8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
       new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         override protected def implicitInit(): Unit = {
           addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
@@ -20,7 +20,7 @@ object StoreString {
       }
 
     protected def Static16[Size <: WordDoubleQuadSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size)
-                                                    (implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+                                                    (implicit processorMode: ProcessorMode): X86Operation =
       new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         override protected def implicitInit(): Unit = {
           addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
@@ -28,7 +28,7 @@ object StoreString {
         }
       }
 
-    protected def RepStatic8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+    protected def RepStatic8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode): X86Operation =
       new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
         override protected def implicitInit(): Unit = {
           addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
@@ -37,7 +37,7 @@ object StoreString {
       }
 
     protected def RepStatic16[Size <: WordDoubleQuadSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size)
-                           (implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+                           (implicit processorMode: ProcessorMode): X86Operation =
       new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
         override protected def implicitInit(): Unit = {
           addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))

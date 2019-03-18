@@ -19,7 +19,6 @@ trait NoImmediate extends ImmediateBytes {
 trait Immediate[Size<:ValueSize] extends ImmediateBytes {
 
   self: X86Operation with HasOperandSizePrefixRequirements =>
-  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 
   def immediate: ImmediateValue with Size
   def immediateOrder: OperandOrder

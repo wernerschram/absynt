@@ -3,13 +3,17 @@ package assembler.x86
 import assembler.x86.instructions._
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess._
-import assembler.x86.operations.OperandSizePrefixRequirement
+import assembler.x86.operations.{AddressSizePrefixRequirement, OperandSizePrefixRequirement}
 
 trait HasOperandSizePrefixRequirements {
   implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 
   //TODO: this is temporary until dependencies on ProcessorMode as a whole have been eliminated
   implicit val processorMode: ProcessorMode
+}
+
+trait HasAddressSizePrefixRequirements {
+  implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 }
 
 sealed abstract class ProcessorMode
@@ -47,6 +51,10 @@ object ProcessorMode {
       override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
     }
 
+    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = new AddressSizePrefixRequirement {
+      override def normalAddress(size: Operand with ValueSize): Boolean = false
+    }
+
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
@@ -78,6 +86,13 @@ object ProcessorMode {
       }
       override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
         case _: FarDoubleWordSize => true
+        case _ => false
+      }
+    }
+
+    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = new AddressSizePrefixRequirement {
+      override def normalAddress(size: Operand with ValueSize): Boolean = size match {
+        case _: DoubleWordSize => true
         case _ => false
       }
     }
@@ -118,6 +133,13 @@ object ProcessorMode {
       }
     }
 
+    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = new AddressSizePrefixRequirement {
+      override def normalAddress(size: Operand with ValueSize): Boolean = size match {
+        case _: WordSize => true
+        case _ => false
+      }
+    }
+
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
     override def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
     implicit val processorMode: ProcessorMode = this
@@ -154,6 +176,13 @@ object ProcessorMode {
       }
       override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
         case _: FarWordSize => true
+        case _ => false
+      }
+    }
+
+    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = new AddressSizePrefixRequirement {
+      override def normalAddress(size: Operand with ValueSize): Boolean = size match {
+        case _: DoubleWordSize => true
         case _ => false
       }
     }
