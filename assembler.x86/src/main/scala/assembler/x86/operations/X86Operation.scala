@@ -46,10 +46,10 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
       operands.flatMap(_.addressOperands).flatMap(_.segmentOverride).flatMap(X86Operation.SegmentOverrideMap.get).toList
 
   private def optionalAddressSizePrefix: List[Byte] =
-    if (operands.flatMap(_.addressOperands).exists(_.requiresAddressSize(processorMode))) X86Operation.AddressSizeCode :: Nil else Nil
+    if (operands.flatMap(_.addressOperands).exists(_.requiresAddressSize)) X86Operation.AddressSizeCode :: Nil else Nil
 
   private def optionalOperandSizePrefix: List[Byte] =
-    if (operands.exists(_.requiresOperandSize(processorMode))) X86Operation.OperandSizeCode :: Nil else Nil
+    if (operands.exists(_.requiresOperandSize)) X86Operation.OperandSizeCode :: Nil else Nil
 
   private def optionalRexPrefix: List[Byte] = {
     assume(processorMode == ProcessorMode.Long || rexRequirements.isEmpty)

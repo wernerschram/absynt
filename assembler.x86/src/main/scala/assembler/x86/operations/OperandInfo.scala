@@ -1,14 +1,14 @@
 package assembler.x86.operations
 
+import assembler.x86.RexRequirement
 import assembler.x86.operands._
-import assembler.x86.{ProcessorMode, RexRequirement}
 
 sealed abstract class OperandInfo[Size<:OperandSize](val operand: Operand with Size, val order: OperandInfo.OperandOrder.Value)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement) extends Ordered[OperandInfo[_]] {
   override def toString: String = operand.toString
 
   override def compare(that: OperandInfo[_]): Int = order compare that.order
 
-  def requiresOperandSize(processorMode: ProcessorMode): Boolean
+  def requiresOperandSize: Boolean
 
   def addressOperands: Set[AddressOperandInfo] =
     Set.empty
@@ -30,18 +30,18 @@ trait AddressSizePrefixRequirement {
 
 trait NoOperandSizePrefix {
   self: OperandInfo[_] =>
-  override def requiresOperandSize(processorMode: ProcessorMode): Boolean = false
+  override def requiresOperandSize: Boolean = false
 }
 
 trait NormalOperandSizePrefix {
   self: OperandInfo[ValueSize] =>
-  override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
+  override def requiresOperandSize: Boolean =
     self.operandSizePrefixRequirement.normalOperand(operand)
 }
 
 trait PointerOperandSizePrefix {
   self: OperandInfo[FarPointerSize[_]] =>
-  override def requiresOperandSize(processorMode: ProcessorMode): Boolean =
+  override def requiresOperandSize: Boolean =
     self.operandSizePrefixRequirement.pointerOperand(operand)
 }
 
@@ -114,7 +114,7 @@ object OperandInfo {
 sealed class AddressOperandInfo(val operand: Operand with ValueSize, val segmentOverride: Option[SegmentRegister] = None)(implicit val addressSizePrefixRequirement: AddressSizePrefixRequirement) {
   override def toString: String = operand.toString
 
-  def requiresAddressSize(processorMode: ProcessorMode): Boolean =
+  def requiresAddressSize: Boolean =
     addressSizePrefixRequirement.normalAddress(operand)
 
   def rexRequirements: Set[RexRequirement] = Set.empty
