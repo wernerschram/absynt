@@ -1,7 +1,8 @@
 package assembler.x86.operations
 
+import assembler.x86.HasOperandSizePrefixRequirements
 import assembler.x86.operands.memoryaccess.{FarPointer => FarPointerType, MemoryLocation => MemoryLocationType, NearPointer => NearPointerType}
-import assembler.x86.operands.{WordDoubleSize, FarPointerSize, ModRMEncodableOperand, ValueSize}
+import assembler.x86.operands.{FarPointerSize, ModRMEncodableOperand, ValueSize, WordDoubleSize}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
 sealed trait DisplacementBytes {
@@ -26,7 +27,10 @@ trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
 
 trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
 
-  self: X86Operation =>
+  self: X86Operation with HasOperandSizePrefixRequirements =>
+
+  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
+
   def pointer: FarPointerType[OffsetSize] with FarPointerSize[OffsetSize]
 
   override final def displacementInit(): Unit =
@@ -37,7 +41,10 @@ trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
 
 trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
 
-  self: X86Operation =>
+  self: X86Operation with HasOperandSizePrefixRequirements =>
+
+  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
+
   def pointer: NearPointerType with Size
   def pointerOrder: OperandOrder
 
@@ -49,7 +56,10 @@ trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
 
 trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
 
-  self: X86Operation =>
+  self: X86Operation with HasOperandSizePrefixRequirements =>
+
+  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
+
   def location: MemoryLocationType with Size
   def offsetOrder: OperandOrder
 

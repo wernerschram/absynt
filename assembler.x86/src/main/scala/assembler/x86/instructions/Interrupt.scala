@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.x86.ProcessorMode
+import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
 import assembler.x86.operands.ImmediateValue.ValueToByteImmediate
 import assembler.x86.operands.{ByteSize, ImmediateValue}
 import assembler.x86.operations._
@@ -8,20 +8,25 @@ import assembler.x86.operations.OperandInfo.OperandOrder._
 
 object Interrupt {
 
-  private def Static(mnemonic: String)(implicit processorMode: ProcessorMode, byteImmediate: ValueToByteImmediate) =
-    new Static(0xCC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate  {
-     override protected def implicitInit(): Unit =
-        addOperand(OperandInfo.implicitOperand(byteImmediate(3.toByte), destination))
-    }
-
-  private def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String)(implicit processorMode: ProcessorMode) =
-    new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-      override def immediate: ImmediateValue with ByteSize = immediateValue
-
-      override def immediateOrder: OperandOrder = destination
-    }
 
   trait Operations {
+    self: HasOperandSizePrefixRequirements =>
+
+    private def Static(mnemonic: String)(implicit processorMode: ProcessorMode, byteImmediate: ValueToByteImmediate) =
+      new Static(0xCC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
+        override protected def implicitInit(): Unit =
+          addOperand(OperandInfo.implicitOperand(byteImmediate(3.toByte), destination))
+      }
+
+    private def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String)(implicit processorMode: ProcessorMode) =
+      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Operations.this.operandSizePrefixRequirement
+
+        override def immediate: ImmediateValue with ByteSize = immediateValue
+
+        override def immediateOrder: OperandOrder = destination
+      }
+
     object Interrupt {
       val mnemonic: String = "int"
 
@@ -44,5 +49,6 @@ object Interrupt {
       def apply()(implicit processorMode: ProcessorMode): Static =
         new Static(0xFB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
     }
+
   }
 }

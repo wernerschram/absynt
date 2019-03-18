@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.x86.ProcessorMode
+import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
 import assembler.x86.operands._
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations._
@@ -8,10 +8,13 @@ import assembler.x86.operations._
 object IO extends {
 
   sealed trait I8086Input {
+    self: HasOperandSizePrefixRequirements =>
     val mnemonic: String = "in"
 
     private def Imm8ToAL(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-      new Static(0xE4.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xE4.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Input.this.operandSizePrefixRequirement
+
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, destination))
 
@@ -21,7 +24,9 @@ object IO extends {
       }
 
     private def Imm8ToAX(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-      new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Input.this.operandSizePrefixRequirement
+
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(Accumulator.Word, destination))
 
@@ -58,9 +63,12 @@ object IO extends {
   }
 
   sealed trait I386Input extends I8086Input {
+    self: HasOperandSizePrefixRequirements =>
 
     private def Imm8ToEAX(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-      new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Input.this.operandSizePrefixRequirement
+
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, destination))
 
@@ -84,11 +92,14 @@ object IO extends {
   }
 
   sealed trait I8086Output {
+    self: HasOperandSizePrefixRequirements =>
 
     val mnemonic: String = "out"
 
     private def ALToImm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-      new Static(0xE6.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xE6.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Output.this.operandSizePrefixRequirement
+
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, source))
 
@@ -98,7 +109,9 @@ object IO extends {
       }
 
     private def AXToImm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-      new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Output.this.operandSizePrefixRequirement
+
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(Accumulator.Word, source))
 
@@ -138,8 +151,11 @@ object IO extends {
   }
 
   sealed trait I386Output extends I8086Output {
+    self: HasOperandSizePrefixRequirements =>
     private def EAXToImm8(immediateValue: ImmediateValue with ByteSize)(implicit processorMode: ProcessorMode) =
-      new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Output.this.operandSizePrefixRequirement
+
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, source))
 
@@ -165,23 +181,50 @@ object IO extends {
   }
 
   trait LegacyOperations {
-    object Input extends I8086Input
-    object Output extends I8086Output
+    self: HasOperandSizePrefixRequirements =>
+
+    object Input extends I8086Input with HasOperandSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
+      override implicit val processorMode: ProcessorMode = LegacyOperations.this.processorMode
+    }
+    object Output extends I8086Output with HasOperandSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
+      override implicit val processorMode: ProcessorMode = LegacyOperations.this.processorMode
+    }
   }
 
-  trait RealOperations {
-    object Input extends I386Input
-    object Output extends I386Output
+  trait I386Operations {
+    self: HasOperandSizePrefixRequirements =>
+
+    object Input extends I386Input with HasOperandSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Operations.this.operandSizePrefixRequirement
+      override implicit val processorMode: ProcessorMode = I386Operations.this.processorMode
+    }
+    object Output extends I386Output with HasOperandSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Operations.this.operandSizePrefixRequirement
+      override implicit val processorMode: ProcessorMode = I386Operations.this.processorMode
+    }
   }
 
-  trait ProtectedOperations {
-    object Input extends I386Input
-    object Output extends I386Output
+  trait ProtectedOperations extends I386Operations {
+    self: HasOperandSizePrefixRequirements =>
+  }
+
+  trait RealOperations extends I386Operations {
+    self: HasOperandSizePrefixRequirements =>
   }
 
   trait LongOperations {
-    object Input extends I386Input
-    object Output extends I386Output
+    self: HasOperandSizePrefixRequirements =>
+
+    object Input extends I386Input with HasOperandSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
+      override implicit val processorMode: ProcessorMode = LongOperations.this.processorMode
+    }
+    object Output extends I386Output with HasOperandSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
+      override implicit val processorMode: ProcessorMode = LongOperations.this.processorMode
+    }
   }
 
 }

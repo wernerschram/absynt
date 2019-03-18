@@ -1,6 +1,6 @@
 package assembler.x86.instructions
 
-import assembler.x86.ProcessorMode
+import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess.DestinationReference
 import assembler.x86.operations.OperandInfo.OperandOrder
@@ -9,108 +9,114 @@ import assembler.x86.operations._
 object StoreString {
   implicit val mnemonic: String = "stos"
 
-  private def Static8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode) =
-    new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
-        addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source))
+  trait Common {
+    self: HasOperandSizePrefixRequirements =>
+    protected def Static8(destination: DestinationReference with ByteSize)(implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+      new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
+        override protected def implicitInit(): Unit = {
+          addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+          addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source))
+        }
       }
-    }
 
-  private def Static16[Size<:WordDoubleQuadSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size)
-                                                (implicit processorMode: ProcessorMode) =
-    new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
-        addOperand(OperandInfo.implicitOperand(register, OperandOrder.source))
+    protected def Static16[Size <: WordDoubleQuadSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size)
+                                                    (implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+      new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
+        override protected def implicitInit(): Unit = {
+          addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+          addOperand(OperandInfo.implicitOperand(register, OperandOrder.source))
+        }
       }
-    }
 
-  private def RepStatic8(destination: DestinationReference)(implicit processorMode: ProcessorMode) =
-    new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
-        addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source))
+    protected def RepStatic8(destination: DestinationReference)(implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+      new Static(0xAA.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
+        override protected def implicitInit(): Unit = {
+          addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+          addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source))
+        }
       }
-    }
 
-  private def RepStatic16(register: AccumulatorRegister, destination: DestinationReference)
-                         (implicit processorMode: ProcessorMode) =
-    new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
-        addOperand(OperandInfo.implicitOperand(register, OperandOrder.source))
+    protected def RepStatic16(register: AccumulatorRegister, destination: DestinationReference)
+                           (implicit processorMode: ProcessorMode, operandSizePrefixRequirement: OperandSizePrefixRequirement): X86Operation =
+      new Static(0xAB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
+        override protected def implicitInit(): Unit = {
+          addOperand(OperandInfo.implicitAddress(destination, OperandOrder.destination))
+          addOperand(OperandInfo.implicitOperand(register, OperandOrder.source))
+        }
       }
-    }
+  }
 
-
-  trait LegacyOperations {
+  trait LegacyOperations extends Common {
+    self: HasOperandSizePrefixRequirements =>
     object StoreString {
-      def apply[Size <: ByteWordSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static =
+      def apply[Size <: ByteWordSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
         (register, destination) match {
-          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)(ProcessorMode.Legacy)
-          case (a: AccumulatorRegister with WordSize, d: DestinationReference with WordSize) => Static16(a, d)(ProcessorMode.Legacy)
+          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)
+          case (a: AccumulatorRegister with WordSize, d: DestinationReference with WordSize) => Static16(a, d)
         }
 
       object Repeat {
-        def apply[Size <: ByteWordSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static with Repeated =
+        def apply[Size <: ByteWordSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
           (register, destination) match {
-            case (Accumulator.LowByte, _) => RepStatic8(destination)(ProcessorMode.Legacy)
-            case (_, d: DestinationReference with WordSize) => RepStatic16(register, d)(ProcessorMode.Legacy)
+            case (Accumulator.LowByte, _) => RepStatic8(destination)
+            case (_, d: DestinationReference with WordSize) => RepStatic16(register, d)
           }
       }
     }
   }
 
-  trait RealOperations {
+  trait RealOperations extends Common {
+    self: HasOperandSizePrefixRequirements =>
     object StoreString {
-      def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static =
+      def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
         (register, destination) match {
-          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)(ProcessorMode.Real)
-          case (a: AccumulatorRegister with WordDoubleSize, d: DestinationReference with WordDoubleSize) => Static16(a, d)(ProcessorMode.Real)
+          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)
+          case (a: AccumulatorRegister with WordDoubleSize, d: DestinationReference with WordDoubleSize) => Static16(a, d)
         }
 
       object Repeat {
-        def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static with Repeated =
+        def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
           (register, destination) match {
-            case (Accumulator.LowByte, _) => RepStatic8(destination)(ProcessorMode.Real)
-            case (_, d: DestinationReference with WordDoubleSize) => RepStatic16(register, d)(ProcessorMode.Real)
+            case (Accumulator.LowByte, _) => RepStatic8(destination)
+            case (_, d: DestinationReference with WordDoubleSize) => RepStatic16(register, d)
           }
       }
     }
   }
 
-  trait ProtectedOperations {
+  trait ProtectedOperations extends Common {
+    self: HasOperandSizePrefixRequirements =>
     object StoreString {
-      def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static =
+      def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
         (register, destination) match {
-          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)(ProcessorMode.Protected)
-          case (a: AccumulatorRegister with WordDoubleSize, d: DestinationReference with WordDoubleSize) => Static16(a, d)(ProcessorMode.Protected)
+          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)
+          case (a: AccumulatorRegister with WordDoubleSize, d: DestinationReference with WordDoubleSize) => Static16(a, d)
         }
 
       object Repeat {
-        def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static with Repeated =
+        def apply[Size <: ByteWordDoubleSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
           (register, destination) match {
-            case (Accumulator.LowByte, _) => RepStatic8(destination)(ProcessorMode.Protected)
-            case (_, d: DestinationReference with WordDoubleSize) => RepStatic16(register, d)(ProcessorMode.Protected)
+            case (Accumulator.LowByte, _) => RepStatic8(destination)
+            case (_, d: DestinationReference with WordDoubleSize) => RepStatic16(register, d)
           }
       }
     }
   }
 
-  trait LongOperations {
+  trait LongOperations extends Common {
+    self: HasOperandSizePrefixRequirements =>
     object StoreString {
-      def apply[Size <: ValueSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static =
+      def apply[Size <: ValueSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
         (register, destination) match {
-          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)(ProcessorMode.Long)
-          case (a: AccumulatorRegister with WordDoubleQuadSize, d: DestinationReference with WordDoubleQuadSize) => Static16(a, d)(ProcessorMode.Long)
+          case (Accumulator.LowByte, d: DestinationReference with ByteSize) => Static8(d)
+          case (a: AccumulatorRegister with WordDoubleQuadSize, d: DestinationReference with WordDoubleQuadSize) => Static16(a, d)
         }
 
       object Repeat {
-        def apply[Size <: ValueSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): Static with Repeated =
+        def apply[Size <: ValueSize](register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
           (register, destination) match {
-            case (Accumulator.LowByte, _) => RepStatic8(destination)(ProcessorMode.Long)
-            case (_, d: DestinationReference with WordDoubleQuadSize) => RepStatic16(register, d)(ProcessorMode.Long)
+            case (Accumulator.LowByte, _) => RepStatic8(destination)
+            case (_, d: DestinationReference with WordDoubleQuadSize) => RepStatic16(register, d)
           }
       }
     }

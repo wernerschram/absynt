@@ -1,9 +1,16 @@
 package assembler.x86
 
 import assembler.x86.instructions._
-import assembler.x86.operands.Register.I8086Registers
 import assembler.x86.operands._
 import assembler.x86.operands.memoryaccess._
+import assembler.x86.operations.OperandSizePrefixRequirement
+
+trait HasOperandSizePrefixRequirements {
+  implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
+
+  //TODO: this is temporary until dependencies on ProcessorMode as a whole have been eliminated
+  implicit val processorMode: ProcessorMode
+}
 
 sealed abstract class ProcessorMode
   extends ImmediateValue.I8086Implicits
@@ -12,6 +19,7 @@ sealed abstract class ProcessorMode
   with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
 {
+  self: HasOperandSizePrefixRequirements =>
   type LongPointerSize <: WordDoubleSize
 
   def pointer(location: Long): ImmediateValue with WordDoubleQuadSize
@@ -22,6 +30,7 @@ sealed abstract class ProcessorMode
 object ProcessorMode {
 
   object Legacy extends ProcessorMode
+    with HasOperandSizePrefixRequirements
     with Register.I8086Registers
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
@@ -33,12 +42,18 @@ object ProcessorMode {
   {
     override type LongPointerSize = WordSize
 
+    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+      override def normalOperand(size: Operand with ValueSize): Boolean = false
+      override def pointerOperand(size: Operand with ValueSize): Boolean = false
+    }
+
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
   }
 
   object Real extends ProcessorMode
+    with HasOperandSizePrefixRequirements
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -56,12 +71,22 @@ object ProcessorMode {
   {
     override type LongPointerSize = WordSize
 
+    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+      override def normalOperand(size: Operand with ValueSize): Boolean = size match {
+        case _: DoubleWordSize => true
+      }
+      override def pointerOperand(size: Operand with ValueSize): Boolean = size match {
+        case _: FarDoubleWordSize => true
+      }
+    }
+
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
     override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
     implicit val processorMode: ProcessorMode = this
   }
 
   object Protected extends ProcessorMode
+    with HasOperandSizePrefixRequirements
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -80,12 +105,22 @@ object ProcessorMode {
   {
     override type LongPointerSize = DoubleWordSize
 
+    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+      override def normalOperand(size: Operand with ValueSize): Boolean = size match {
+        case _: WordSize => true
+      }
+      override def pointerOperand(size: Operand with ValueSize): Boolean = size match {
+        case _: FarWordSize => true
+      }
+    }
+
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
     override def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
     implicit val processorMode: ProcessorMode = this
   }
 
   object Long extends ProcessorMode
+    with HasOperandSizePrefixRequirements
     with Register.X64Registers
     with ImmediateValue.I386Implicits
     with ImmediateValue.X64Implicits
@@ -107,6 +142,15 @@ object ProcessorMode {
     with System.LongOperations
   {
     override type LongPointerSize = DoubleWordSize
+
+    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+      override def normalOperand(size: Operand with ValueSize): Boolean = size match {
+        case _: WordSize => true
+      }
+      override def pointerOperand(size: Operand with ValueSize): Boolean = size match {
+        case _: FarWordSize => true
+      }
+    }
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location
     def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)

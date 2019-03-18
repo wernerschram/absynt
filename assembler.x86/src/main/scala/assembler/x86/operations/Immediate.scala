@@ -1,5 +1,6 @@
 package assembler.x86.operations
 
+import assembler.x86.HasOperandSizePrefixRequirements
 import assembler.x86.operands.{ImmediateValue, ValueSize}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 
@@ -17,7 +18,9 @@ trait NoImmediate extends ImmediateBytes {
 
 trait Immediate[Size<:ValueSize] extends ImmediateBytes {
 
-  self: X86Operation =>
+  self: X86Operation with HasOperandSizePrefixRequirements =>
+  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
+
   def immediate: ImmediateValue with Size
   def immediateOrder: OperandOrder
 
