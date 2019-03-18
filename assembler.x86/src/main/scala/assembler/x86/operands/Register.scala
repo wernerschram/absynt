@@ -1,8 +1,10 @@
 package assembler.x86.operands
 
-import assembler.x86.{ProcessorMode, RexRequirement}
+import assembler.x86.RexRequirement
 
-sealed abstract class Register extends Operand
+sealed abstract class Register extends Operand {
+  self: ValueSize =>
+}
 
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String)
   extends Register with ModRMEncodableOperand {
@@ -143,7 +145,7 @@ object Base {
   case object X64Word extends BaseRegister with WordRegister
 }
 
-sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register {
+sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register with WordSize {
   override def toString: String = mnemonic
 }
 

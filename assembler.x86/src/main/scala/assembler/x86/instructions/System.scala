@@ -1,9 +1,9 @@
 package assembler.x86.instructions
 
-import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
-import assembler.x86.operands.ReturnMode
+import assembler.x86.operands.{DoubleQuadSize, ReturnMode}
 import assembler.x86.operations.OperandInfo.OperandOrder._
 import assembler.x86.operations._
+import assembler.x86.{HasOperandSizePrefixRequirements, ProcessorMode}
 
 object System {
   trait Common {
@@ -14,7 +14,7 @@ object System {
       new Static(0x0F.toByte :: 0x34.toByte :: Nil, "sysenter") with NoDisplacement with NoImmediate
 
 
-    def staticExit(returnMode: ReturnMode): Static =
+    def staticExit(returnMode: ReturnMode with DoubleQuadSize): Static =
       new Static(0x0F.toByte :: 0x35.toByte :: Nil, "sysexit") with NoDisplacement with NoImmediate {
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(returnMode, destination))
@@ -28,7 +28,7 @@ object System {
     }
 
     object SystemExit {
-      def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
+      def apply(returnMode: ReturnMode with DoubleQuadSize)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
     }
   }
 
@@ -38,7 +38,7 @@ object System {
     def staticCall(): Static =
       new Static(0x0F.toByte :: 0x05.toByte :: Nil, "syscall") with NoDisplacement with NoImmediate
 
-    def staticReturn(returnMode: ReturnMode): Static =
+    def staticReturn(returnMode: ReturnMode with DoubleQuadSize): Static =
       new Static(0x0F.toByte :: 0x07.toByte :: Nil, "sysret") with NoDisplacement with NoImmediate {
         override protected def implicitInit(): Unit =
           addOperand(OperandInfo.implicitOperand(returnMode, destination))
@@ -53,11 +53,11 @@ object System {
     }
 
     object SystemReturn {
-      def apply(returnMode: ReturnMode): Static = staticReturn(returnMode)
+      def apply(returnMode: ReturnMode with DoubleQuadSize): Static = staticReturn(returnMode)
     }
 
     object SystemExit {
-      def apply(returnMode: ReturnMode)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
+      def apply(returnMode: ReturnMode with DoubleQuadSize)(implicit processorMode: ProcessorMode): Static = staticExit(returnMode)
     }
 
   }

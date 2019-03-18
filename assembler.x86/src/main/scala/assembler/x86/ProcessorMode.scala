@@ -44,7 +44,7 @@ object ProcessorMode {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = false
-      override def pointerOperand(size: Operand with ValueSize): Boolean = false
+      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
     }
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
@@ -74,9 +74,11 @@ object ProcessorMode {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
         case _: DoubleWordSize => true
+        case _ => false
       }
-      override def pointerOperand(size: Operand with ValueSize): Boolean = size match {
+      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
         case _: FarDoubleWordSize => true
+        case _ => false
       }
     }
 
@@ -108,9 +110,11 @@ object ProcessorMode {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
         case _: WordSize => true
+        case _ => false
       }
-      override def pointerOperand(size: Operand with ValueSize): Boolean = size match {
+      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
         case _: FarWordSize => true
+        case _ => false
       }
     }
 
@@ -146,9 +150,11 @@ object ProcessorMode {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
         case _: WordSize => true
+        case _ => false
       }
-      override def pointerOperand(size: Operand with ValueSize): Boolean = size match {
+      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
         case _: FarWordSize => true
+        case _ => false
       }
     }
 

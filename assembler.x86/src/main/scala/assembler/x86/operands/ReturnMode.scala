@@ -1,7 +1,7 @@
 package assembler.x86.operands
 
 sealed abstract class ReturnMode extends Operand {
-  self: ValueSize =>
+  self: DoubleQuadSize =>
 }
 
 object ReturnMode {

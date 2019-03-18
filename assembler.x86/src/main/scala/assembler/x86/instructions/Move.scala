@@ -42,7 +42,7 @@ object Move extends I8086GenericRegisters {
     protected def R16ToRM16[Size <: WordDoubleQuadSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size)(implicit processorMode: ProcessorMode) =
       new ModRRM(operand1, operand2, 0x89.toByte :: Nil, mnemonic, destination)
 
-    protected def AXToMOffs16[Size <: WordDoubleQuadSize](accumulatorRegister: AccumulatorRegister, memoryLocation: MemoryLocation with Size)(implicit processorMode: ProcessorMode): Static with MemoryLocationOperation[Size] with NoImmediate =
+    protected def AXToMOffs16[Size <: WordDoubleQuadSize](accumulatorRegister: AccumulatorRegister with Size, memoryLocation: MemoryLocation with Size)(implicit processorMode: ProcessorMode): Static with MemoryLocationOperation[Size] with NoImmediate =
       new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 

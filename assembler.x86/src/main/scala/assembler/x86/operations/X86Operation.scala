@@ -15,11 +15,11 @@ abstract class X86Operation(val code: Seq[Byte])(implicit val processorMode: Pro
 
   protected def implicitInit(): Unit = Unit
 
-  private final val operandsBuilder = Set.newBuilder[OperandInfo]
+  private final val operandsBuilder = Set.newBuilder[OperandInfo[_]]
 
-  protected final def addOperand(operand: OperandInfo): Unit = operandsBuilder += operand
+  protected final def addOperand(operand: OperandInfo[_]): Unit = operandsBuilder += operand
 
-  final lazy val operands: Set[OperandInfo] = {
+  final lazy val operands: Set[OperandInfo[_]] = {
     implicitInit()
     modRMInit()
     displacementInit()
