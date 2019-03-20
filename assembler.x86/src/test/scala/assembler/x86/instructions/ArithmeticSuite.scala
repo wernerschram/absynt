@@ -308,12 +308,6 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(0x88776655, RAX).toString shouldBe "xor rax, 2289526357"
       }
 
-      "throw an AssertionError for xor rax, 0x7877665544332211" in {
-        an[AssertionError] should be thrownBy {
-          Xor(0x7877665544332211l, RAX)
-        }
-      }
-
       "correctly encode xor BYTE PTR [rax+rbx*2], 0x11" in {
         Xor(0x11.toByte, SIBMemoryLocation[ByteSize](RBX, RAX, scale = 2)).encodeByte should be(Hex.lsb("80 34 58 11"))
       }

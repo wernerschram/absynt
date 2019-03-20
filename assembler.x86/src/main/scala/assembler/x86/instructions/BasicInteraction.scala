@@ -194,9 +194,8 @@ object BasicInteraction {
             Imm8ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
           case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, imm, extensionCode, opcodeBase, mnemonic)
-          case (_, dest: ValueSize) if !(dest sizeEquals immediate) =>
-            throw new AssertionError
-          case (imm: ImmediateValue with WordDoubleQuadSize, d: ModRMEncodableOperand with WordDoubleQuadSize) =>
+          case (imm: ImmediateValue with WordDoubleQuadSize, d: ModRMEncodableOperand with WordDoubleQuadSize)
+            if d sizeEquals imm =>
             Imm16ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
           case _ =>
             throw new AssertionError
@@ -271,7 +270,7 @@ object BasicInteraction {
       def apply(immediate: ImmediateValue with DoubleWordSize, destination: Accumulator.QuadWord.type): X86Operation =
         Imm32ToRAX(immediate, opcodeBase, mnemonic)
 
-      def apply[ImmediateSize <: ValueSize, DestinationSize <: ValueSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize): X86Operation =
+      def apply[ImmediateSize <: ByteWordDoubleSize, DestinationSize <: ValueSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize): X86Operation =
         (immediate, destination) match {
           case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with WordDoubleQuadSize) =>
             Imm8ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
@@ -279,11 +278,8 @@ object BasicInteraction {
             Imm8ToRM8(d, imm, extensionCode, opcodeBase, mnemonic)
           case (imm: ImmediateValue with DoubleWordSize, d: ModRMEncodableOperand with QuadWordSize) =>
             Imm16ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
-          case (_: ImmediateValue with QuadWordSize, _) =>
-            throw new AssertionError
-          case (_, dest: ValueSize) if !(dest sizeEquals immediate) =>
-            throw new AssertionError
-          case (imm: ImmediateValue with WordDoubleQuadSize, d: ModRMEncodableOperand with WordDoubleQuadSize) =>
+          case (imm: ImmediateValue with WordDoubleSize, d: ModRMEncodableOperand with WordDoubleSize)
+            if d sizeEquals imm =>
             Imm16ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
           case _ =>
             throw new AssertionError
