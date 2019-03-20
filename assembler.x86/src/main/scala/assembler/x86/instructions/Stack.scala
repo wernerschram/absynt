@@ -11,12 +11,16 @@ object Stack {
   trait Common {
     self: HasOperandSizePrefixRequirements =>
 
-    protected def R16[Size <: WordDoubleQuadSize](register: GeneralPurposeRegister with Size): X86Operation =
-      new RegisterEncoded[WordDoubleQuadSize](register, Seq(0x50.toByte), pushOpcode) with NoDisplacement with NoImmediate {
+    type RMMaxSize <: WordDoubleQuadSize
+    type ImmMaxSize <: ValueSize
+    type ImmExtendedMaxSize <: WordDoubleQuadSize
+
+    protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+      new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), pushOpcode) with NoDisplacement with NoImmediate {
         override def registerOrder: OperandOrder = destination
       }
 
-    protected def RM16(operand: ModRMEncodableOperand with WordDoubleQuadSize) =
+    protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
       new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, pushOpcode, destination) with NoDisplacement with NoImmediate
 
 
@@ -29,7 +33,7 @@ object Stack {
         override def immediateOrder: OperandOrder = destination
       }
 
-    protected def Imm16[Size <: WordDoubleSize](immediateValue: ImmediateValue with Size): X86Operation =
+    protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue with Size): X86Operation =
       new Static(0x68.toByte :: Nil, pushOpcode) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
         implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
@@ -44,24 +48,8 @@ object Stack {
     protected def StaticES() = new Static(0x06.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
     protected def StaticFS() = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
     protected def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-  }
 
-  trait LegacyOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
-
-    object Push {
-      def apply(register: GeneralPurposeRegister with WordSize): X86Operation =
-        R16(register)
-
-      def apply(operand: ModRMEncodableOperand with WordSize): X86Operation =
-        RM16(operand)
-
-      def apply[Size <: ByteWordSize](immediate: ImmediateValue with Size): X86Operation =
-        immediate match {
-          case i: ImmediateValue with ByteSize => Imm8(i)
-          case i: ImmediateValue with WordSize => Imm16(i)
-        }
-
+    trait PushOperations {
       def apply(segment: SegmentRegister): Static = segment match {
         case Segment.Code => StaticCS()
         case Segment.Stack => StaticSS()
@@ -70,8 +58,29 @@ object Stack {
         case Segment.MoreExtra => StaticFS()
         case Segment.StillMoreExtra => StaticGS()
       }
-    }
 
+      def apply[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+        R16(register)
+
+      def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand with Size): X86Operation =
+        RM16(operand)
+
+      def apply(immediate: ImmediateValue with ImmMaxSize): X86Operation =
+        immediate match {
+          case i: ByteSize => Imm8(i)
+          case i: ImmExtendedMaxSize => Imm16(i)
+        }
+    }
+  }
+
+  trait LegacyOperations extends Common {
+    self: HasOperandSizePrefixRequirements =>
+
+    override type RMMaxSize = WordSize
+    override type ImmMaxSize = ByteWordSize
+    override type ImmExtendedMaxSize = WordSize
+
+    object Push extends PushOperations
 
     object PushAll {
       implicit val opcode: String = "pusha"
@@ -91,28 +100,11 @@ object Stack {
   trait RealOperations extends Common {
     self: HasOperandSizePrefixRequirements =>
 
-    object Push {
-      def apply[Size <: WordDoubleSize](register: GeneralPurposeRegister with Size): X86Operation =
-          R16(register)
+    override type RMMaxSize = WordDoubleSize
+    override type ImmMaxSize = ByteWordDoubleSize
+    override type ImmExtendedMaxSize = WordDoubleSize
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
-          RM16(operand)
-
-      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size): X86Operation =
-        immediate match {
-          case i: ImmediateValue with ByteSize => Imm8(i)
-          case i: ImmediateValue with WordDoubleSize => Imm16(i)
-        }
-
-      def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()
-        case Segment.Stack => StaticSS()
-        case Segment.Data => StaticDS()
-        case Segment.Extra => StaticES()
-        case Segment.MoreExtra => StaticFS()
-        case Segment.StillMoreExtra => StaticGS()
-      }
-    }
+    object Push extends PushOperations
 
     object PushAll {
       implicit val opcode: String = "pusha"
@@ -132,28 +124,11 @@ object Stack {
   trait ProtectedOperations extends Common {
     self: HasOperandSizePrefixRequirements =>
 
-    object Push {
-      def apply[Size <: WordDoubleSize](register: GeneralPurposeRegister with Size): X86Operation = R16(register)
+    override type RMMaxSize = WordDoubleSize
+    override type ImmMaxSize = ByteWordDoubleSize
+    override type ImmExtendedMaxSize = WordDoubleSize
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
-          RM16(operand)
-
-      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue with Size): X86Operation =
-        immediate match {
-          case i: ImmediateValue with ByteSize => Imm8(i)
-          case i: ImmediateValue with WordDoubleSize => Imm16(i)
-        }
-
-      def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()
-        case Segment.Stack => StaticSS()
-        case Segment.Data => StaticDS()
-        case Segment.Extra => StaticES()
-        case Segment.MoreExtra => StaticFS()
-        case Segment.StillMoreExtra => StaticGS()
-      }
-    }
-
+    object Push extends PushOperations
 
     object PushAll {
       implicit val opcode: String = "pusha"
@@ -173,42 +148,11 @@ object Stack {
   trait LongOperations extends Common {
     self: HasOperandSizePrefixRequirements =>
 
-    object Push {
-      def apply[Size <: WordDoubleQuadSize](register: GeneralPurposeRegister with Size): X86Operation =
-        register match {
-          case r: GeneralPurposeRegister with WordSize =>
-            R16(r)
-          case r: GeneralPurposeRegister with QuadWordSize =>
-            R16(r)
-          case _ =>
-            throw new AssertionError
-        }
+    override type RMMaxSize = WordQuadSize
+    override type ImmMaxSize = ByteWordDoubleSize
+    override type ImmExtendedMaxSize = WordDoubleSize
 
-      def apply[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size): X86Operation =
-        operand match {
-          case o: WordSize =>
-            RM16(o)
-          case o: QuadWordSize =>
-            RM16(o)
-          case _ =>
-            throw new AssertionError
-        }
-
-      def apply(immediate: ImmediateValue with ByteWordDoubleSize): X86Operation =
-        immediate match {
-          case i: ImmediateValue with ByteSize => Imm8(i)
-          case i: ImmediateValue with WordDoubleSize => Imm16(i)
-        }
-
-      def apply(segment: SegmentRegister): Static = segment match {
-        case Segment.Code => StaticCS()
-        case Segment.Stack => StaticSS()
-        case Segment.Data => StaticDS()
-        case Segment.Extra => StaticES()
-        case Segment.MoreExtra => StaticFS()
-        case Segment.StillMoreExtra => StaticGS()
-      }
-    }
+    object Push extends PushOperations
 
     object PushFlags {
       implicit val opcode: String = "pushf"

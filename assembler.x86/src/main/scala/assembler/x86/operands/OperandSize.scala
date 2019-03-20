@@ -25,7 +25,7 @@ trait ByteSize extends ValueSize with ByteWordSize with ByteWordDoubleSize {
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[ByteSize]
 }
 
-trait WordSize extends ByteWordSize with WordDoubleSize {
+trait WordSize extends ByteWordSize with WordDoubleSize with WordQuadSize {
   override val sizeName = "WORD"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[WordSize]
 }
@@ -35,7 +35,7 @@ trait DoubleWordSize extends WordDoubleSize with DoubleQuadSize {
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[DoubleWordSize]
 }
 
-trait QuadWordSize extends DoubleQuadSize {
+trait QuadWordSize extends DoubleQuadSize with WordQuadSize {
   override val sizeName = "QWORD"
   def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[QuadWordSize]
 }

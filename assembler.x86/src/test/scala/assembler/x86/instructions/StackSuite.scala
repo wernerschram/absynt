@@ -81,12 +81,6 @@ class StackSuite extends WordSpec with Matchers {
         Push(RegisterMemoryLocation[QuadWordSize](RAX)).encodeByte should be(0x48.toByte :: 0xFF.toByte :: 0x30.toByte :: Nil)
       }
 
-      "throw an AssertionError for push DWORD PTR [rax]" in {
-        an[AssertionError] should be thrownBy {
-          Push(RegisterMemoryLocation[DoubleWordSize](RAX)).encodeByte
-        }
-      }
-
       "correctly encode push bx" in {
         Push(BX).encodeByte should be(0x66.toByte :: 0x53.toByte :: Nil)
       }
