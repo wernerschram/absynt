@@ -14,8 +14,8 @@ object Interrupt {
 
     private def Static(mnemonic: String)(implicit byteImmediate: ValueToByteImmediate) =
       new Static(0xCC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(byteImmediate(3.toByte), destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(byteImmediate(3.toByte), destination)
       }
 
     private def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String) =

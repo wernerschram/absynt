@@ -15,8 +15,8 @@ object IO extends {
       new Static(0xE4.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Input.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, destination)
 
         override def immediateOrder: OperandOrder = source
 
@@ -27,8 +27,8 @@ object IO extends {
       new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Input.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.Word, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, destination)
 
         override def immediateOrder: OperandOrder = source
 
@@ -36,17 +36,17 @@ object IO extends {
       }
 
     private def DXToAL() = new Static(0xEC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitPort(Data.Word, source))
-        addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, destination))
-      }
+      protected override def allOperands: Set[OperandInfo[_]] =
+        super.allOperands +
+          OperandInfo.implicitPort(Data.Word, source) +
+          OperandInfo.implicitOperand(Accumulator.LowByte, destination)
     }
 
     private def DXToAX() = new Static(0xED.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitPort(Data.Word, source))
-        addOperand(OperandInfo.implicitOperand(Accumulator.Word, destination))
-      }
+      protected override def allOperands: Set[OperandInfo[_]] =
+        super.allOperands +
+          OperandInfo.implicitPort(Data.Word, source) +
+          OperandInfo.implicitOperand(Accumulator.Word, destination)
     }
 
     def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): Static =
@@ -69,8 +69,8 @@ object IO extends {
       new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Input.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
 
         override def immediateOrder: OperandOrder = source
 
@@ -78,10 +78,10 @@ object IO extends {
       }
 
     private def DXToEAX() = new Static(0xED.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-      override protected def implicitInit(): Unit = {
-        addOperand(OperandInfo.implicitPort(Data.Word, source))
-        addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, destination))
-      }
+      protected override def allOperands: Set[OperandInfo[_]] =
+        super.allOperands +
+          OperandInfo.implicitPort(Data.Word, source) +
+          OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
     }
 
     def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.DoubleWord.type): Static =
@@ -100,8 +100,8 @@ object IO extends {
       new Static(0xE6.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Output.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, source))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, source)
 
         override def immediateOrder: OperandOrder = destination
 
@@ -112,8 +112,8 @@ object IO extends {
       new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I8086Output.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.Word, source))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, source)
 
         override def immediateOrder: OperandOrder = destination
 
@@ -122,18 +122,18 @@ object IO extends {
 
     private def ALToDX() =
       new Static(0xEE.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        override protected def implicitInit(): Unit = {
-          addOperand(OperandInfo.implicitPort(Data.Word, destination))
-          addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, source))
-        }
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands +
+            OperandInfo.implicitPort(Data.Word, destination) +
+            OperandInfo.implicitOperand(Accumulator.LowByte, source)
       }
 
     private def AXToDX() =
       new Static(0xEF.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate  {
-        override protected def implicitInit(): Unit = {
-          addOperand(OperandInfo.implicitPort(Data.Word, destination))
-          addOperand(OperandInfo.implicitOperand(Accumulator.Word, source))
-        }
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands +
+            OperandInfo.implicitPort(Data.Word, destination) +
+            OperandInfo.implicitOperand(Accumulator.Word, source)
       }
 
     def apply(destination: Accumulator.LowByte.type, immediate: ImmediateValue with ByteSize): Static with Immediate[ByteSize] =
@@ -156,8 +156,8 @@ object IO extends {
       new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Output.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, source))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, source)
 
         override def immediateOrder: OperandOrder = destination
 
@@ -167,10 +167,10 @@ object IO extends {
 
     private def EAXToDX() =
       new Static(0xEF.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate  {
-        override protected def implicitInit(): Unit = {
-          addOperand(OperandInfo.implicitPort(Data.Word, destination))
-          addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, source))
-        }
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands +
+            OperandInfo.implicitPort(Data.Word, destination) +
+            OperandInfo.implicitOperand(Accumulator.DoubleWord, source)
       }
 
     def apply(destination: Accumulator.DoubleWord.type, port: Data.Word.type): Static =

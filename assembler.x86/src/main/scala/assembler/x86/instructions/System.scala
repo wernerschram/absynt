@@ -16,8 +16,8 @@ object System {
 
     def staticExit(returnMode: ReturnMode with DoubleQuadSize): Static =
       new Static(0x0F.toByte :: 0x35.toByte :: Nil, "sysexit") with NoDisplacement with NoImmediate {
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(returnMode, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(returnMode, destination)
       }
   }
 
@@ -40,8 +40,8 @@ object System {
 
     def staticReturn(returnMode: ReturnMode with DoubleQuadSize): Static =
       new Static(0x0F.toByte :: 0x07.toByte :: Nil, "sysret") with NoDisplacement with NoImmediate {
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(returnMode, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(returnMode, destination)
       }
 
     object SystemCall {

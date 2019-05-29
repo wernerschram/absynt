@@ -6,13 +6,11 @@ import assembler.x86.operations.OperandInfo.OperandOrder.{OperandOrder, _}
 sealed trait ModRMBytes {
   self: X86Operation =>
   def modRMBytes: Seq[Byte]
-  private[operations] def modRMInit(): Unit
 }
 
 trait NoModRM extends ModRMBytes {
   self: X86Operation =>
   override def modRMBytes: Seq[Byte] = Nil
-  override final def modRMInit(): Unit = Unit
 }
 
 class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
@@ -27,8 +25,8 @@ class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
 
   override def modRMBytes: Seq[Byte] = operandRM.getExtendedBytes(rValue)
 
-  override def modRMInit(): Unit =
-    addOperand(OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW))
+  protected override def allOperands: Set[OperandInfo[_]] =
+    super.allOperands + OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW)
 }
 
 class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister with Size,
@@ -42,10 +40,8 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister with Size,
   def operandROrder: OperandOrder =
     if (operandRMOrder == destination) source else destination
 
-  override final def modRMInit(): Unit = {
-    super.modRMInit()
-    addOperand(OperandInfo.rmRegister(register, operandROrder))
-  }
+  protected override def allOperands: Set[OperandInfo[_]] =
+    super.allOperands + OperandInfo.rmRegister(register, operandROrder)
 }
 
 class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
@@ -60,8 +56,6 @@ class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
   def operandSegmentOrder: OperandOrder =
     if (operandRMOrder == destination) source else destination
 
-  override final def modRMInit(): Unit = {
-    super.modRMInit()
-    addOperand(OperandInfo.rmSegment(register, operandSegmentOrder))
-  }
+  protected override def allOperands: Set[OperandInfo[_]] =
+    super.allOperands + OperandInfo.rmSegment(register, operandSegmentOrder)
 }

@@ -30,8 +30,8 @@ object Move extends I8086GenericRegisters {
       new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(AL, source))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(AL, source)
 
         override val location: MemoryLocation with ByteSize = memoryLocation
 
@@ -46,8 +46,8 @@ object Move extends I8086GenericRegisters {
       new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(accumulatorRegister, source))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, source)
 
         override val location: MemoryLocation with Size = memoryLocation
 
@@ -61,8 +61,8 @@ object Move extends I8086GenericRegisters {
       new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(AL, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(AL, destination)
 
         override val location: MemoryLocation with ByteSize = memoryLocation
 
@@ -76,8 +76,8 @@ object Move extends I8086GenericRegisters {
       new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(accumulatorRegister, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, destination)
 
         override val location: MemoryLocation with Size = memoryLocation
 

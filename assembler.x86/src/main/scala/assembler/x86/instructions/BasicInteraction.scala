@@ -15,8 +15,8 @@ object BasicInteraction {
 
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.LowByte, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, destination)
 
         override val immediateOrder: OperandOrder = source
         override val immediate: ImmediateValue with ByteSize = immediateValue
@@ -27,8 +27,8 @@ object BasicInteraction {
 
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.Word, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, destination)
 
         override val immediateOrder: OperandOrder = source
         override val immediate: ImmediateValue with WordSize = immediateValue
@@ -39,8 +39,8 @@ object BasicInteraction {
 
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.DoubleWord, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
 
         override val immediateOrder: OperandOrder = source
         override val immediate: ImmediateValue with DoubleWordSize = immediateValue
@@ -51,8 +51,8 @@ object BasicInteraction {
 
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override protected def implicitInit(): Unit =
-          addOperand(OperandInfo.implicitOperand(Accumulator.QuadWord, destination))
+        protected override def allOperands: Set[OperandInfo[_]] =
+          super.allOperands + OperandInfo.implicitOperand(Accumulator.QuadWord, destination)
 
         override val immediateOrder: OperandOrder = source
         override val immediate: ImmediateValue with DoubleWordSize = immediateValue

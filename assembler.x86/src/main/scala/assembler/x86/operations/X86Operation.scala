@@ -13,19 +13,10 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
       optionalOperandSizePrefix ++
       optionalRexPrefix
 
-  protected def implicitInit(): Unit = Unit
+  protected def allOperands: Set[OperandInfo[_]] =
+    Set.empty
 
-  private final val operandsBuilder = Set.newBuilder[OperandInfo[_]]
-
-  protected final def addOperand(operand: OperandInfo[_]): Unit = operandsBuilder += operand
-
-  final lazy val operands: Set[OperandInfo[_]] = {
-    implicitInit()
-    modRMInit()
-    displacementInit()
-    immediateInit()
-    operandsBuilder.result()
-  }
+  final lazy val operands: Set[OperandInfo[_]] = allOperands
 
   override def size: Int = encodeByte.length
 

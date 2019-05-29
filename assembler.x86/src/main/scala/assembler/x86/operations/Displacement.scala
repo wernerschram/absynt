@@ -7,14 +7,15 @@ import assembler.x86.operations.OperandInfo.OperandOrder._
 
 sealed trait DisplacementBytes {
   self: X86Operation =>
+
   def displacementBytes: Seq[Byte]
-  private[operations] def displacementInit(): Unit
+
+  protected override def allOperands: Set[OperandInfo[_]]
 }
 
 trait NoDisplacement extends DisplacementBytes {
   self: X86Operation =>
   override def displacementBytes: Seq[Byte] = Nil
-  override final def displacementInit(): Unit = Unit
 }
 
 trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
@@ -22,7 +23,6 @@ trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
   val operandRM: ModRMEncodableOperand with Size
 
   override def displacementBytes: Seq[Byte] = Nil
-  override final def displacementInit(): Unit = Unit
 }
 
 trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
@@ -30,8 +30,8 @@ trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
 
   def pointer: FarPointerType[OffsetSize] with FarPointerSize[OffsetSize]
 
-  override final def displacementInit(): Unit =
-    addOperand(OperandInfo.pointer(pointer, destination))
+  protected override abstract def allOperands: Set[OperandInfo[_]] =
+    super.allOperands + OperandInfo.pointer(pointer, destination)
 
   override def displacementBytes: Seq[Byte] = pointer.encodeByte
 }
@@ -44,8 +44,8 @@ trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
 
   override def displacementBytes: Seq[Byte] = pointer.encodeBytes
 
-  final def displacementInit(): Unit =
-    addOperand(OperandInfo.relative(pointer, pointerOrder))
+  protected override abstract def allOperands: Set[OperandInfo[_]] =
+    super.allOperands + OperandInfo.relative(pointer, pointerOrder)
 }
 
 trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
@@ -54,8 +54,8 @@ trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
   def location: MemoryLocationType with Size
   def offsetOrder: OperandOrder
 
-  override final def displacementInit(): Unit =
-    addOperand(OperandInfo.memoryOffset(location, offsetOrder))
+  protected override abstract def allOperands: Set[OperandInfo[_]] =
+    super.allOperands + OperandInfo.memoryOffset(location, offsetOrder)
 
   override def displacementBytes: Seq[Byte] = location.displacement.toSeq.flatMap(_.value)
 
