@@ -22,27 +22,27 @@ sealed trait DoubleQuadSize extends WordDoubleQuadSize //32, 64
 
 trait ByteSize extends ValueSize with ByteWordSize with ByteWordDoubleSize {
   override val sizeName = "BYTE"
-  def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[ByteSize]
+  final override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[ByteSize]
 }
 
 trait WordSize extends ByteWordSize with WordDoubleSize with WordQuadSize {
   override val sizeName = "WORD"
-  def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[WordSize]
+  final override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[WordSize]
 }
 
 trait DoubleWordSize extends WordDoubleSize with DoubleQuadSize {
   override val sizeName = "DWORD"
-  def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[DoubleWordSize]
+  final override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[DoubleWordSize]
 }
 
 trait QuadWordSize extends DoubleQuadSize with WordQuadSize {
   override val sizeName = "QWORD"
-  def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[QuadWordSize]
+  final override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[QuadWordSize]
 }
 
 sealed trait FarPointerSize[OffsetSize<:WordDoubleSize] extends OperandSize {
   val offset: OffsetSize
-  override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[FarPointerSize[OffsetSize]]
+  final override def sizeEquals(that: OperandSize): Boolean = that.isInstanceOf[FarPointerSize[OffsetSize]]
 }
 
 trait FarWordSize extends FarPointerSize[WordSize]
