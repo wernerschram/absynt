@@ -68,7 +68,8 @@ object Stack {
       def apply(immediate: ImmediateValue with ImmMaxSize): X86Operation =
         immediate match {
           case i: ByteSize => Imm8(i)
-          case i: ImmExtendedMaxSize => Imm16(i)
+          // unchecked: type erasure does apply but every ImmMaxSize that is not ByteSize is ImmExtendedMaxSize
+          case i: ImmExtendedMaxSize @unchecked => Imm16(i)
         }
     }
   }
