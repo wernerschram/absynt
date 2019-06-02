@@ -10,6 +10,20 @@ import org.scalatest.{Matchers, WordSpec}
 class StoreStringSuite extends WordSpec with Matchers {
 
   "an StoreString instruction" when {
+    "in legacy mode" should {
+
+      import ProcessorMode.Legacy._
+
+      "correctly encode stos BYTE PTR [edi], al" in {
+        StoreString(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Hex.lsb("AA"))
+      }
+
+      "correctly encode REP stos BYTE PTR [edi], al" in {
+        StoreString.Repeat(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Hex.lsb("F3 AA"))
+      }
+    }
+
+
     "in real mode" should {
 
       import ProcessorMode.Real._
@@ -79,6 +93,10 @@ class StoreStringSuite extends WordSpec with Matchers {
         StoreString(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Hex.lsb("AA"))
       }
 
+      "correctly encode REP stos BYTE PTR [edi], al" in {
+        StoreString.Repeat(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Hex.lsb("F3 AA"))
+      }
+
       "correctly encode stos BYTE PTR [di], al" in {
         StoreString(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Hex.lsb("67 AA"))
       }
@@ -98,6 +116,10 @@ class StoreStringSuite extends WordSpec with Matchers {
 
       "correctly encode stos BYTE PTR [edi], al" in {
         StoreString(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Hex.lsb("67 AA"))
+      }
+
+      "correctly encode REP stos BYTE PTR [edi], al" in {
+        StoreString.Repeat(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Hex.lsb("F3 67 AA"))
       }
 
       "correctly encode stos BYTE PTR [rdi], al" in {

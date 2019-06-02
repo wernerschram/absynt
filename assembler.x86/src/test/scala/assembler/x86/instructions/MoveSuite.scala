@@ -592,12 +592,36 @@ class MoveSuite extends WordSpec with Matchers {
         Move[QuadWordSize](0x1122334455667788L, RAX).toString should be("mov rax, 1234605616436508552")
       }
 
+      "correctly encode mov BYTE PTR [rbx], 0x13" in {
+        Move(0x13.toByte, RegisterMemoryLocation[ByteSize](RBX)).encodeByte should be(Hex.lsb("C6 03 13"))
+      }
+
+      "correctly represent mov BYTE PTR [rbx], 19 as a string" in {
+        Move(0x13.toByte, RegisterMemoryLocation[ByteSize](RBX)).toString should be("mov BYTE PTR [rbx], 19")
+      }
+
+      "correctly encode mov WORD PTR [rbx+0x10], 0x5656" in {
+        Move(0x5656.toShort, RegisterMemoryLocation[WordSize](RBX, 0x10.toByte)).encodeByte should be(Hex.lsb("66 C7 43 10 56 56"))
+      }
+
+      "correctly represent mov WORD PTR [rbx+16], 22102 as a string" in {
+        Move(0x5656.toShort, RegisterMemoryLocation[WordSize](RBX, 0x10.toByte)).toString should be("mov WORD PTR [rbx+16], 22102")
+      }
+
       "correctly encode mov DWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {
         Move(0x99999999, SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov DWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
         Move(0x99999999, SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], 2576980377")
+      }
+
+      "correctly encode mov QWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {
+        Move(0x99999999L, SIBMemoryLocation[QuadWordSize](RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("48 C7 84 58 11 11 11 11 99 99 99 99 00 00 00 00"))
+      }
+
+      "correctly represent mov QWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
+        Move(0x99999999L, SIBMemoryLocation[QuadWordSize](RBX, RAX, 0x11111111, 2)).toString should be("mov QWORD PTR [rax+rbx*2+286331153], 2576980377")
       }
 
       "correctly encode mov DWORD PTR [r8+r9*2], ebp" in {

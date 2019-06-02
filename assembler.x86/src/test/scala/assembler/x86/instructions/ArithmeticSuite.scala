@@ -74,6 +74,20 @@ class ArithmeticSuite extends WordSpec with Matchers {
   }
 
   "an Not instruction" when {
+
+    "in legacy mode" should {
+
+      import ProcessorMode.Legacy._
+
+      "correctly encode not BYTE PTR [0x01]" in {
+        Not(MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("F6 16 01 00"))
+      }
+
+      "correctly encode not WORD PTR [0x0001]" in {
+        Not(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("F7 16 01 00"))
+      }
+    }
+
     "in real mode" should {
 
       import ProcessorMode.Real._
@@ -151,6 +165,17 @@ class ArithmeticSuite extends WordSpec with Matchers {
   }
 
   "an Xor instruction" when {
+
+    "in legacy mode" should {
+      import ProcessorMode.Legacy._
+
+      "correctly encode xor bl, 0x40" in {
+        Xor(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 F3 40"))
+      }
+
+
+    }
+
     "in real mode" should {
 
       import ProcessorMode.Real._

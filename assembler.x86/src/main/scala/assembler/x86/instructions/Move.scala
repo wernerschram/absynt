@@ -317,7 +317,7 @@ object Move extends I8086GenericRegisters {
       def apply(source: ImmediateValue with ByteSize, destination: ByteRegister): X86Operation =
         Imm8ToR8(destination, source)
 
-      def apply[Size <: ByteWordDoubleSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: ValueSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size): X86Operation =
         (source, destination) match {
           case (s: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, s)
