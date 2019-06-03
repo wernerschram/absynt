@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/wernerschram/scasm.svg?branch=master)](https://travis-ci.org/wernerschram/scasm)
-[![codecov](https://codecov.io/gh/wernerschram/scasm/branch/master/graph/badge.svg)](https://codecov.io/gh/wernerschram/scasm)
+[![Build Status](https://travis-ci.org/wernerschram/absynt.svg?branch=master)](https://travis-ci.org/wernerschram/absynt)
+[![codecov](https://codecov.io/gh/wernerschram/absynt/branch/master/graph/badge.svg)](https://codecov.io/gh/wernerschram/absynt)
 
 # Absynt
 Absynt is an assembler written in scala. The name stands for something like assembler b syntax, the reader is free to fill
