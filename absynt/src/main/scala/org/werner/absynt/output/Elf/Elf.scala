@@ -78,7 +78,7 @@ abstract class Elf(
       sections.flatMap(s => alignmentFillers(s) +: s.content) ++
       sectionHeaders.flatMap(p => p.resources)
 
-  override lazy val encodeByte: Seq[Byte] =
+  lazy val encodeByte: Seq[Byte] =
     resources.encodables(encodablesForDependencies(resources.dependentResources)).encodeByte
 
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
