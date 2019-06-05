@@ -1,16 +1,15 @@
 package org.werner.absynt.x86.instructions
 
+import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.Register._
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.X86Operation
-import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{Matchers, WordSpec}
 
 class JumpSuite extends WordSpec with Matchers {
 
@@ -419,10 +418,41 @@ class JumpSuite extends WordSpec with Matchers {
         withClue("Jump2") { encodable(jump2).encodeByte should be(Hex.lsb("E9 81 00")) }
         withClue("Jump3") { encodable(jump3).encodeByte should be(Hex.lsb("E9 80 00")) }
       }
+
+      "correctly encode ret" in {
+        Return().encodeByte should be(Hex.lsb("C3"))
+      }
+      "correctly represent ret as a string" in {
+        Return().toString should be("ret")
+      }
+
+      "correctly encode ret 0x1" in {
+        Return(0x1.toShort).encodeByte should be(Hex.lsb("C2 01 00"))
+      }
+
+      "correctly represent ret 0x1 as a string" in {
+        Return(0x1.toShort).toString should be("ret 1")
+      }
+
+      "correctly encode retf" in {
+        Return.Far().encodeByte should be(Hex.lsb("CB"))
+      }
+
+      "correctly represent retf as a string" in {
+        Return.Far().toString should be("retf")
+      }
+
+      "correctly encode retf 0x1234" in {
+        Return.Far(0x1234.toShort).encodeByte should be(Hex.lsb("CA 34 12"))
+      }
+
+      "correctly represent retf 0x1234 as a string" in {
+        Return.Far(0x1234.toShort).toString should be("retf 4660")
+      }
+
     }
 
     "in protected mode" should {
-
 
       import ProcessorMode.Protected._
 
@@ -549,6 +579,36 @@ class JumpSuite extends WordSpec with Matchers {
         withClue("Jump") { encodable(jump).encodeByte should be(Hex.lsb("E9 00 01 00 00")) }
       }
 
+      "correctly encode ret" in {
+        Return().encodeByte should be(Hex.lsb("C3"))
+      }
+      "correctly represent ret as a string" in {
+        Return().toString should be("ret")
+      }
+
+      "correctly encode ret 0x1" in {
+        Return(0x1.toShort).encodeByte should be(Hex.lsb("C2 01 00"))
+      }
+
+      "correctly represent ret 0x1 as a string" in {
+        Return(0x1.toShort).toString should be("ret 1")
+      }
+
+      "correctly encode retf" in {
+        Return.Far().encodeByte should be(Hex.lsb("CB"))
+      }
+
+      "correctly represent retf as a string" in {
+        Return.Far().toString should be("retf")
+      }
+
+      "correctly encode retf 0x1234" in {
+        Return.Far(0x1234.toShort).encodeByte should be(Hex.lsb("CA 34 12"))
+      }
+
+      "correctly represent retf 0x1234 as a string" in {
+        Return.Far(0x1234.toShort).toString should be("retf 4660")
+      }
     }
 
     "in long mode" should {
@@ -620,6 +680,37 @@ class JumpSuite extends WordSpec with Matchers {
 
       "correctly encode jmp FAR QWORD PTR [rdx]" in {
         Jump.Far(RegisterMemoryLocation[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
+      }
+
+      "correctly encode ret" in {
+        Return().encodeByte should be(Hex.lsb("C3"))
+      }
+      "correctly represent ret as a string" in {
+        Return().toString should be("ret")
+      }
+
+      "correctly encode ret 0x1" in {
+        Return(0x1.toShort).encodeByte should be(Hex.lsb("C2 01 00"))
+      }
+
+      "correctly represent ret 0x1 as a string" in {
+        Return(0x1.toShort).toString should be("ret 1")
+      }
+
+      "correctly encode retf" in {
+        Return.Far().encodeByte should be(Hex.lsb("CB"))
+      }
+
+      "correctly represent retf as a string" in {
+        Return.Far().toString should be("retf")
+      }
+
+      "correctly encode retf 0x1234" in {
+        Return.Far(0x1234.toShort).encodeByte should be(Hex.lsb("CA 34 12"))
+      }
+
+      "correctly represent retf 0x1234 as a string" in {
+        Return.Far(0x1234.toShort).toString should be("retf 4660")
       }
     }
   }

@@ -1,6 +1,6 @@
 package org.werner.absynt.examples.x86.inProc64bit
 
-import org.werner.absynt.{EncodedBytes, Label}
+import org.werner.absynt.Label
 import org.werner.absynt.inproc.InProcSections
 import org.werner.absynt.sections.Section
 
@@ -13,7 +13,7 @@ object InProc64 extends App {
   val text: Section = Section.text(
     Move(RDI, RAX).label(entryLabel) ::
     Add(RSI, RAX) ::
-    EncodedBytes(0xC3.toByte :: Nil) :: // TODO: implement Return
+    Return() ::
     Nil
   )
 
