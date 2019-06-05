@@ -295,7 +295,7 @@ object BasicInteraction {
         R16ToRM16(source, destination, opcodeBase, mnemonic)
 
       def apply[Size <: WordDoubleQuadSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
-        R16ToRM16(destination, source, opcodeBase, mnemonic)
+        R16ToRM16(source, destination, opcodeBase, mnemonic)
 
       def apply(source: ModRMEncodableOperand with ByteSize, destination: ByteRegister): X86Operation =
         RM8ToR8(destination, source, opcodeBase, mnemonic)

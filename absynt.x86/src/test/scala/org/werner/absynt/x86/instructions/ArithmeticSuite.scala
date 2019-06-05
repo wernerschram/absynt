@@ -486,6 +486,22 @@ class ArithmeticSuite extends WordSpec with Matchers {
         Xor(RAX, RegisterMemoryLocation[QuadWordSize](RAX)).toString shouldBe "xor QWORD PTR [rax], rax"
       }
 
+      "correctly encode xor RAX, RDI" in {
+        Xor(RDI, RAX).encodeByte should be(Hex.lsb("48 31 f8"))
+      }
+
+      "correctly represent xor RAX, RDI as a string" in {
+        Xor(RDI, RAX).toString shouldBe "xor rax, rdi"
+      }
+
+      "correctly encode xor al, BYTE PTR [rax]" in {
+        Xor(RegisterMemoryLocation[ByteSize](RAX), AL).encodeByte should be(Hex.lsb("32 00"))
+      }
+
+      "correctly represent xor al, BYTE PTR [rax] as a string" in {
+        Xor(RegisterMemoryLocation[ByteSize](RAX), AL).toString shouldBe "xor al, BYTE PTR [rax]"
+      }
+
       "correctly encode xor r15, DWORD PTR [r11]" in {
         Xor(RegisterMemoryLocation[DoubleWordSize](R11), R15).encodeByte should be(Hex.lsb("4D 33 3B"))
       }
