@@ -1,14 +1,14 @@
 package org.werner.absynt.inproc
 
 import com.sun.jna._
-import org.werner.absynt.inproc.InProcSections.ReturnType
+import org.werner.absynt.inproc.InProcApplication.ReturnType
 import org.werner.absynt.resource.EncodableConversion._
 import org.werner.absynt.resource.{AlignmentFiller, Encodable, Labeled, Resource}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.{Application, Label}
 import sun.misc.Unsafe
 
-class InProcSections(val sections: Seq[Section]) extends Application {
+class InProcApplication(val sections: Seq[Section]) extends Application with AutoCloseable {
 
   lazy val unsafe: Unsafe = {
     val theUnsafe = classOf[sun.misc.Unsafe].getDeclaredField("theUnsafe")
@@ -65,9 +65,19 @@ class InProcSections(val sections: Seq[Section]) extends Application {
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
 
   override def startOffset: Int = startAddress.toInt
+
+  override def finalize(): Unit = {
+    close()
+    super.finalize()
+  }
+
+  override def close(): Unit = {
+    Libc.mprotect(new Pointer(startAddress), contentLength + pageSize - contentLength % pageSize, Libc.Protection.None)
+    unsafe.freeMemory(allocationAddress)
+  }
 }
 
-object InProcSections {
+object InProcApplication {
    sealed abstract class ReturnType[Out] {
     def invoke(function: Function, params: Array[AnyRef]): Out
   }

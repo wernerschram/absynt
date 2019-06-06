@@ -1,7 +1,5 @@
 package org.werner.absynt
 
-import org.werner.absynt.resource._
-import org.werner.absynt.sections.Section
 import org.werner.absynt.resource.{AlignmentFiller, DependentResource, Encodable, Resource, UnlabeledEncodable}
 import org.werner.absynt.sections.Section
 

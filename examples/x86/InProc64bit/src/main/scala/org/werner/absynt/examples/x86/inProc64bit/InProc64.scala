@@ -1,7 +1,7 @@
 package org.werner.absynt.examples.x86.inProc64bit
 
 import org.werner.absynt.Label
-import org.werner.absynt.inproc.InProcSections
+import org.werner.absynt.inproc.InProcApplication
 import org.werner.absynt.sections.Section
 
 object InProc64 extends App {
@@ -17,10 +17,11 @@ object InProc64 extends App {
     Nil
   )
 
-  val inProc = new InProcSections(text :: Nil)
+  val inProc = new InProcApplication(text :: Nil)
 
   val addFunc = inProc.functionForLabel[Int, Int, Int](entryLabel)
   val result = addFunc(2,3)
   println(s"2 + 3 = $result")
 
+  inProc.close()
 }
