@@ -22,8 +22,9 @@ import org.werner.absynt.arm.operations._
 import org.werner.absynt.resource.{UnlabeledEncodable, RelativeReference}
 import org.werner.absynt.{Label, OffsetDirection, RelativeOffsetDirection}
 
-abstract class LoadStoreReference(val opcode: String, target: Label, val condition: Condition)
-  extends RelativeReference(target) with NamedConditional {
+abstract class LoadStoreReference(val opcode: String, targetLabel: Label, val condition: Condition)
+  extends RelativeReference() with NamedConditional {
+  override val target: Label = targetLabel
 
   override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int = 4
 

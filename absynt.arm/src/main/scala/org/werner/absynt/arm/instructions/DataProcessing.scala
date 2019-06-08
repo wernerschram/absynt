@@ -18,7 +18,7 @@ import org.werner.absynt.arm.operands.Condition._
 import org.werner.absynt.arm.operands._
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations._
-import org.werner.absynt.resource.{AbsoluteReference, Encodable, RelativeReference, UnlabeledEncodable}
+import org.werner.absynt.resource.{AbsoluteReference, RelativeReference, UnlabeledEncodable}
 
 class DataProcessing(val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Always): DataProcessingOperation =
@@ -83,7 +83,9 @@ object Add extends DataProcessing(0x04.toByte, "add") {
     }
 
   def forRelativeLabel(source1: GeneralRegister, targetLabel: Label, destination: GeneralRegister, encodableCondition: Condition = Always): RelativeReference =
-    new RelativeReference(targetLabel) with NamedConditional {
+    new RelativeReference() with NamedConditional {
+      override val target: Label = targetLabel
+
       override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
         encodableForDependencySize(distance, offsetDirection).size
 

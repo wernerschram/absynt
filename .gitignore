@@ -80,4 +80,7 @@ project/plugins/project/
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
+# bintray credentials
+.bintray-credentials
+
 /assembler-output/

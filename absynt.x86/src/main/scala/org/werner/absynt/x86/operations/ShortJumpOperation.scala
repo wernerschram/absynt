@@ -17,8 +17,10 @@ import org.werner.absynt._
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
 
 abstract class ShortJumpOperation
-  (val shortOpcode: Seq[Byte], mnemonic: String, target: Label)
-    extends RelativeReference(target) {
+  (val shortOpcode: Seq[Byte], mnemonic: String, targetLabel: Label)
+    extends RelativeReference() {
+
+  override def target: Label = targetLabel
 
   val shortJumpSize: Int = shortOpcode.length + 1
 

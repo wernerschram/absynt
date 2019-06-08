@@ -18,7 +18,9 @@ import org.werner.absynt.resource.{Labeled, RelativeReference, Resource}
 
 import scala.language.implicitConversions
 
-sealed abstract class Section protected(val content: Seq[Resource], val name: String, val alignment: Int) {
+abstract class Section protected(val name: String, val alignment: Int) {
+
+  val content: Seq[Resource]
 
   def precedingResources(target: Label): Seq[Resource] = content.takeWhile(!matchLabel(_, target))
 
@@ -80,8 +82,8 @@ sealed abstract class Section protected(val content: Seq[Resource], val name: St
   }
 }
 
-final case class TextSection private[sections](override val content: Seq[Resource], override val name: String, override val alignment: Int) extends Section(content, name, alignment)
-final case class DataSection private[sections](override val content: Seq[Resource], override val name: String, override val alignment: Int) extends Section(content, name, alignment)
+final case class TextSection private[sections](override val content: Seq[Resource], override val name: String, override val alignment: Int) extends Section(name, alignment)
+final case class DataSection private[sections](override val content: Seq[Resource], override val name: String, override val alignment: Int) extends Section(name, alignment)
 
 object Section {
   def text(resources: Seq[Resource], sectionName: String = ".text", alignment: Int = 16): Section =

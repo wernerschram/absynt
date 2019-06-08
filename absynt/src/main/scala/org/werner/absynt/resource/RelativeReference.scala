@@ -15,7 +15,9 @@ package org.werner.absynt.resource
 
 import org.werner.absynt.{Application, Label, OffsetDirection, RelativeOffsetDirection}
 
-abstract class RelativeReference(val target: Label) extends UnlabeledDependentResource {
+abstract class RelativeReference() extends UnlabeledDependentResource {
+
+  def target: Label
 
   final def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable = {
     assume(offsetDirection.isInstanceOf[RelativeOffsetDirection])
