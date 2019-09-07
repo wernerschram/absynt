@@ -32,7 +32,7 @@ class ApplicationSuite extends WordSpec with Matchers {
 
       val result = application.encodablesForDependencies(references)
       result.foreach(_._2 shouldBe a[T])
-      result.mapValues(_.asInstanceOf[T])
+      result.view.mapValues(_.asInstanceOf[T]).toMap
     }
 
     "asked to return encodables for relative references with a linear sizeForDistance function" should {

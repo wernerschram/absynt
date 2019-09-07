@@ -1,4 +1,7 @@
-scalaVersion in ThisBuild := "2.12.8"
+scalaVersion in ThisBuild := "2.13.0"
+
+val testVersion = "3.0.8"
+val spec2Version = "4.7.0"
 
 lazy val root = project in file(".") aggregate(
   absynt,
@@ -12,14 +15,12 @@ lazy val root = project in file(".") aggregate(
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
-addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.17")
-
 lazy val absynt = (project in file("absynt"))
 .settings(
   name := "absynt",
   version := "1.0",
-  libraryDependencies += "org.specs2" %% "specs2-core" % "3.8.6" % Test,
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
+  libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 )
 
 lazy val absyntInProc = (project in file("absynt.inproc"))
@@ -27,24 +28,24 @@ lazy val absyntInProc = (project in file("absynt.inproc"))
   name := "absynt.inproc",
   version := "1.0",
   libraryDependencies += "net.java.dev.jna" % "jna" % "5.3.1",
-  libraryDependencies += "org.specs2" %% "specs2-core" % "3.8.6" % Test,
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
+  libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 
 lazy val absyntX86 = (project in file("absynt.x86"))
 .settings(
   name := "absynt.x86",
   version := "1.0",
-  libraryDependencies += "org.specs2" %% "specs2-core" % "3.8.6" % Test,
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
+  libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 
 lazy val absyntARM = (project in file("absynt.arm"))
 .settings(
   name := "absynt.arm",
   version := "1.0",
-  libraryDependencies += "org.specs2" %% "specs2-core" % "3.8.6" % Test,
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
+  libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 
 lazy val ARMBootRpiExample = (project in file("examples/arm/bootRpi")) 
