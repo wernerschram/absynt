@@ -60,6 +60,15 @@ class MiscellaneousSuite extends WordSpec with Matchers {
         ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.fastInterrupt).toString should be("cpsie f")
       }
 
+      "correctly encode cpsie if" in {
+        ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.fastInterrupt + InterruptDisableFlags.normalInterrupt).encodeByte should be(Hex.msb("f10a00c0"))
+      }
+
+      "correctly represent cpsie if as a string" in {
+        ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.fastInterrupt + InterruptDisableFlags.normalInterrupt).toString should be("cpsie if")
+      }
+
+
       "correctly encode cps #19" in {
         ChangeProcessorState(ExecutionMode.Supervisor).encodeByte should be(Hex.msb("f1020013"))
       }

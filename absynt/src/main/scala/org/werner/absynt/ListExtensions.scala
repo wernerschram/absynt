@@ -56,7 +56,7 @@ object ListExtensions {
   implicit class ListToImmediate(value: Seq[Byte]) {
     def decimalString: String = decimal.toString
 
-    def bigEndianHexString : String = value.reverseMap("%02X" format _).mkString
+    def bigEndianHexString : String = value.reverseIterator.map("%02X" format _).mkString
     def hexString : String = value.map("%02X" format _).mkString
 
     def decimal: Long =

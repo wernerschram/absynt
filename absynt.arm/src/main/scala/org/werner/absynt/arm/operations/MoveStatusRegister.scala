@@ -36,9 +36,8 @@ object Fields extends Enumeration {
   val status: Value = Value(18, "s")
   val flags: Value = Value(19, "f")
 
-  implicit def fieldsToString(set: ValueSet): String = {
-    set.foldRight("")((a, b) => a + b).reverse
-  }
+  implicit def fieldsToString(set: ValueSet): String =
+    set.foldRight(new StringBuilder)((value, builder) => builder.addAll(value.toString)).result
 }
 
 class MoveToStatusRegister private(override val opcode: String, destination: StatusRegister, fields: Fields.ValueSet,

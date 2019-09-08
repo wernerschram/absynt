@@ -28,7 +28,7 @@ abstract class Elf(
 
   lazy val sections: Seq[Section] = applicationSections :+ stringSection
 
-  val magic: Seq[Byte] = 0x7F.toByte +: "ELF".toCharArray.map(_.toByte)
+  val magic: Seq[Byte] = 0x7F.toByte +: "ELF".toIndexedSeq.map(_.toByte)
 
   val version: ElfVersion = ElfVersion.Original
 

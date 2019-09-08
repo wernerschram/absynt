@@ -66,9 +66,8 @@ object InterruptDisableFlags extends Enumeration {
 
   implicit def valueToSet(value: Value): ValueSet = ValueSet(value)
 
-  implicit def flagsToString(set: ValueSet): String = {
-    set.foldRight("")((a, b) => a + b).reverse
-  }
+  implicit def flagsToString(set: ValueSet): String =
+    set.foldRight(new StringBuilder)((value, builder) => builder.addAll(value.toString)).result
 }
 
 class ProcessorState(val code: Byte, val opcode: String, val condition: Condition,
