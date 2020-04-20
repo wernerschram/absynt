@@ -43,10 +43,6 @@ object GeneralRegister {
   case object R13 extends GeneralRegister(0x0d)
   case object R14 extends GeneralRegister(0x0e)
   case object R15 extends GeneralRegister(0x0f)
-
-  val SP: GeneralRegister = R13
-  val LR: GeneralRegister = R14
-  val PC: GeneralRegister = R15
 }
 
 sealed abstract class StatusRegister(val registerCode: Byte, mnemonic: String) extends Register(mnemonic) {
@@ -58,4 +54,32 @@ object StatusRegister {
   case object CPSR extends StatusRegister(0x00, "CPSR")
   case object SPSR extends StatusRegister(0x01, "SPSR")
 
+}
+
+object Register {
+  trait ARMRegisters {
+    val R0: GeneralRegister = GeneralRegister.R0
+    val R1: GeneralRegister = GeneralRegister.R1
+    val R2: GeneralRegister = GeneralRegister.R2
+    val R3: GeneralRegister = GeneralRegister.R3
+    val R4: GeneralRegister = GeneralRegister.R4
+    val R5: GeneralRegister = GeneralRegister.R5
+    val R6: GeneralRegister = GeneralRegister.R6
+    val R7: GeneralRegister = GeneralRegister.R7
+    val R8: GeneralRegister = GeneralRegister.R8
+    val R9: GeneralRegister = GeneralRegister.R9
+    val R10: GeneralRegister = GeneralRegister.R10
+    val R11: GeneralRegister = GeneralRegister.R11
+    val R12: GeneralRegister = GeneralRegister.R12
+    val R13: GeneralRegister = GeneralRegister.R13
+    val R14: GeneralRegister = GeneralRegister.R14
+    val R15: GeneralRegister = GeneralRegister.R15
+
+    val SP: GeneralRegister = R13
+    val LR: GeneralRegister = R14
+    val PC: GeneralRegister = R15
+
+    val CPSR: StatusRegister = StatusRegister.CPSR
+    val SPSR: StatusRegister = StatusRegister.SPSR
+  }
 }

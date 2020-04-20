@@ -57,7 +57,7 @@ class LoadStoreRegister(
   def apply(targetLabel: Label, destination: GeneralRegister): RelativeReference =
     new LoadStoreReference(mnemonic, targetLabel, Always) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
-        ImmedWord(Always, destination, GeneralRegister.PC,
+        ImmedWord(Always, destination, GeneralRegister.R15,
           LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }
@@ -65,7 +65,7 @@ class LoadStoreRegister(
   def apply(targetLabel: Label, destination: GeneralRegister, condition: Condition): RelativeReference =
     new LoadStoreReference(mnemonic, targetLabel, condition) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
-        ImmedWord(condition, destination, GeneralRegister.PC,
+        ImmedWord(condition, destination, GeneralRegister.R15,
           LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }

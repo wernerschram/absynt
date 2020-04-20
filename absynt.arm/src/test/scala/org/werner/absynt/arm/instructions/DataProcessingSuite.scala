@@ -16,7 +16,6 @@ package org.werner.absynt.arm.instructions
 import org.werner.absynt._
 import org.werner.absynt.arm.operands.Shifter._
 import org.werner.absynt.arm.operands._
-import org.werner.absynt.arm.operands.registers.GeneralRegister._
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.{Labeled, Resource, UnlabeledEncodable}

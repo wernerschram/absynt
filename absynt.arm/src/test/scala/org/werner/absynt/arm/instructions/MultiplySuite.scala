@@ -16,7 +16,6 @@ package org.werner.absynt.arm.instructions
 import org.werner.absynt.Hex
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operands.Condition
-import org.werner.absynt.arm.operands.registers.GeneralRegister._
 import org.scalatest.{Matchers, WordSpec}
 
 class MultiplySuite extends WordSpec with Matchers {
