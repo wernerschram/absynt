@@ -28,13 +28,13 @@ trait HasAddressSizePrefixRequirements {
 }
 
 sealed abstract class ProcessorMode
-  extends ImmediateValue.I8086Implicits
+extends ImmediateValue.I8086Implicits
+  with HasOperandSizePrefixRequirements
   with MemoryAddress.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
   with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
 {
-  self: HasOperandSizePrefixRequirements =>
   type LongPointerSize <: WordDoubleSize
 
   def pointer(location: Long): ImmediateValue with WordDoubleQuadSize
@@ -45,7 +45,6 @@ sealed abstract class ProcessorMode
 object ProcessorMode {
 
   object Legacy extends ProcessorMode
-    with HasOperandSizePrefixRequirements
     with I8086Registers
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
@@ -70,7 +69,6 @@ object ProcessorMode {
   }
 
   object Real extends ProcessorMode
-    with HasOperandSizePrefixRequirements
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -109,7 +107,6 @@ object ProcessorMode {
   }
 
   object Protected extends ProcessorMode
-    with HasOperandSizePrefixRequirements
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -149,7 +146,6 @@ object ProcessorMode {
   }
 
   object Long extends ProcessorMode
-    with HasOperandSizePrefixRequirements
     with Register.X64Registers
     with ImmediateValue.I386Implicits
     with ImmediateValue.X64Implicits
