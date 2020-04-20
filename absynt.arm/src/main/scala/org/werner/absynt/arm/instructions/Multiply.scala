@@ -54,6 +54,11 @@ class Multiply(val code: Byte, val opcode: String) {
     new MultiplyOperation(code, opcode, destination, source, multiplyValue, condition) with SetFlags
 }
 
-object MultiplyAccumulate extends MultiplyWithRegister(0x01.toByte, "mla")
 
-object Multiply extends Multiply(0x00.toByte, "mul")
+object Multiply {
+  trait A32Operations {
+    object MultiplyAccumulate extends MultiplyWithRegister(0x01.toByte, "mla")
+
+    object Multiply extends Multiply(0x00.toByte, "mul")
+  }
+}

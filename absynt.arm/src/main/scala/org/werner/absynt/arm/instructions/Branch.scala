@@ -73,12 +73,17 @@ class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String
     }
 }
 
-object Branch extends Branch(0xA0.toByte, "b")
+object Branch {
+  trait A32Operations {
+    object Branch extends Branch(0xA0.toByte, "b")
 
-object BranchLink extends Branch(0xB0.toByte, "bl")
+    object BranchLink extends Branch(0xB0.toByte, "bl")
 
-object BranchExchange extends BranchExchange(0x1.toByte, "bx")
+    object BranchExchange extends BranchExchange(0x1.toByte, "bx")
 
-object BranchLinkExchange extends BranchLinkExchange(0xA0.toByte, 0x3.toByte, "blx")
+    object BranchLinkExchange extends BranchLinkExchange(0xA0.toByte, 0x3.toByte, "blx")
 
-object BranchExchangeJazelle extends BranchExchange(0x2.toByte, "bxj")
+    object BranchExchangeJazelle extends BranchExchange(0x2.toByte, "bxj")
+  }
+}
+

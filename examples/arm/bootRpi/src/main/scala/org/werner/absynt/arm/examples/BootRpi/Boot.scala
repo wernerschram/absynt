@@ -18,7 +18,6 @@ import java.nio.file.{Files, Paths}
 
 import org.werner.absynt._
 import org.werner.absynt.arm.ProcessorMode
-import org.werner.absynt.arm.instructions._
 import org.werner.absynt.arm.operands.Condition._
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operands.registers.GeneralRegister._
@@ -28,6 +27,8 @@ import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 
 object Boot extends App {
+
+  import ProcessorMode.A32._
 
   object GPIO {
     val Base = 0x3F200000

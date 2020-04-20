@@ -80,67 +80,72 @@ class LoadStoreRegister(
       ImmedByte(condition, register, baseRegister, offset, LoadStoreAddressingTypeUser.PostIndexedUser)
   }
 }
+object LoadStore {
 
-object LoadRegister extends LoadStoreRegister(LoadStoreOperation.LoadWord, LoadStoreOperation.LoadByte)("ldr") {
-  private def ImmedDoubleWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                              offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
-    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
-      LoadStoreMiscellaneousOperation.LoadDoubleWord)
+  trait A32Operations {
 
-  private def ImmedUnsignedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                                    offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
-    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
-      LoadStoreMiscellaneousOperation.LoadUnsignedHalfWord)
-
-  private def ImmedSignedByte(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                              offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
-    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
-      LoadStoreMiscellaneousOperation.LoadSignedByte)
-
-  private def ImmedSignedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+    object LoadRegister extends LoadStoreRegister(LoadStoreOperation.LoadWord, LoadStoreOperation.LoadByte)("ldr") {
+      private def ImmedDoubleWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
                                   offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
-    new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
-      LoadStoreMiscellaneousOperation.LoadSignedHalfWord)
+        new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
+          LoadStoreMiscellaneousOperation.LoadDoubleWord)
 
-  def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                 addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
-    ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
+      private def ImmedUnsignedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+                                        offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
+        new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
+          LoadStoreMiscellaneousOperation.LoadUnsignedHalfWord)
 
-  def signedByte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                 addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
-    ImmedSignedByte(condition, register, baseRegister, offset, addressingType)
+      private def ImmedSignedByte(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+                                  offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
+        new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
+          LoadStoreMiscellaneousOperation.LoadSignedByte)
 
-  def unsignedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                       addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                      (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
-    ImmedUnsignedHalfWord(condition, register, baseRegister, offset, addressingType)
+      private def ImmedSignedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+                                      offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
+        new LoadStoreMiscelaneous("ldr", condition, register, baseRegister, offset, addressingType,
+          LoadStoreMiscellaneousOperation.LoadSignedHalfWord)
 
-  def signedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
+      def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
                      addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
                     (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
-    ImmedSignedHalfWord(condition, register, baseRegister, offset, addressingType)
-}
+        ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
 
-object StoreRegister extends LoadStoreRegister(LoadStoreOperation.StoreWord, LoadStoreOperation.StoreByte)("str") {
-  private def ImmedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                            offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
-    new LoadStoreMiscelaneous("str", condition, register, baseRegister, offset, addressingType,
-      LoadStoreMiscellaneousOperation.StoreHalfWord)
+      def signedByte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
+                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
+                    (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+        ImmedSignedByte(condition, register, baseRegister, offset, addressingType)
 
-  private def ImmedDoubleWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
-                              offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
-    new LoadStoreMiscelaneous("str", condition, register, baseRegister, offset, addressingType,
-      LoadStoreMiscellaneousOperation.StoreDoubleWord)
+      def unsignedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
+                           addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
+                          (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+        ImmedUnsignedHalfWord(condition, register, baseRegister, offset, addressingType)
 
-  def halfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-               addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-              (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
-    ImmedHalfWord(condition, register, baseRegister, offset, addressingType)
+      def signedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
+                         addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
+                        (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+        ImmedSignedHalfWord(condition, register, baseRegister, offset, addressingType)
+    }
 
-  def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                 addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
-                (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
-    ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
+    object StoreRegister extends LoadStoreRegister(LoadStoreOperation.StoreWord, LoadStoreOperation.StoreByte)("str") {
+      private def ImmedHalfWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+                                offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
+        new LoadStoreMiscelaneous("str", condition, register, baseRegister, offset, addressingType,
+          LoadStoreMiscellaneousOperation.StoreHalfWord)
+
+      private def ImmedDoubleWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
+                                  offset: LoadStoreMiscellaneousOffset, addressingType: LoadStoreAddressingType) =
+        new LoadStoreMiscelaneous("str", condition, register, baseRegister, offset, addressingType,
+          LoadStoreMiscellaneousOperation.StoreDoubleWord)
+
+      def halfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
+                   addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
+                  (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+        ImmedHalfWord(condition, register, baseRegister, offset, addressingType)
+
+      def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
+                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Always)
+                    (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+        ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
+    }
+  }
 }

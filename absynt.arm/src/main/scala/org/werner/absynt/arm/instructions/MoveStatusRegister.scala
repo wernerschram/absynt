@@ -19,36 +19,41 @@ import org.werner.absynt.arm.operands.RightRotateImmediate
 import org.werner.absynt.arm.operands.registers._
 import org.werner.absynt.arm.operations.{Fields, MoveFromStatusRegister => MoveFromStatusRegisterOperation, MoveToStatusRegister => MoveToStatusRegisterOpcode}
 
-object MoveFromStatusRegister {
-  implicit val opcode: String = "mrs"
+object MoveStatusRegister {
 
-  def apply(source: StatusRegister, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): MoveFromStatusRegisterOperation =
-    RegToStatus(source, destination, condition)
+  trait A32Operations {
+    object MoveFromStatusRegister {
+      implicit val opcode: String = "mrs"
 
-  private def RegToStatus(source: StatusRegister, destination: GeneralRegister, condition: Condition) =
-    new MoveFromStatusRegisterOperation(opcode, source, destination, condition)
-}
+      def apply(source: StatusRegister, destination: GeneralRegister, condition: Condition = Always)(implicit processorMode: ProcessorMode): MoveFromStatusRegisterOperation =
+        RegToStatus(source, destination, condition)
 
-object MoveToStatusRegister {
-  implicit val opcode: String = "msr"
+      private def RegToStatus(source: StatusRegister, destination: GeneralRegister, condition: Condition) =
+        new MoveFromStatusRegisterOperation(opcode, source, destination, condition)
+    }
 
-  def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
-    RegToReg(source, destination, fields, Always)
+    object MoveToStatusRegister {
+      implicit val opcode: String = "msr"
 
-  def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)
-           (implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
-    RegToReg(source, destination, fields, condition)
+      def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
+        RegToReg(source, destination, fields, Always)
 
-  private def RegToReg(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
-    new MoveToStatusRegisterOpcode(opcode, source, destination, fields, condition)
+      def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)
+               (implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
+        RegToReg(source, destination, fields, condition)
 
-  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
-    ImmediateToReg(source, destination, fields, Always)
+      private def RegToReg(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
+        new MoveToStatusRegisterOpcode(opcode, source, destination, fields, condition)
 
-  def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)
-           (implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
-    ImmediateToReg(source, destination, fields, condition)
+      def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet)(implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
+        ImmediateToReg(source, destination, fields, Always)
 
-  private def ImmediateToReg(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
-    new MoveToStatusRegisterOpcode(opcode, source, destination, fields, condition)
+      def apply(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition)
+               (implicit processorMode: ProcessorMode): MoveToStatusRegisterOpcode =
+        ImmediateToReg(source, destination, fields, condition)
+
+      private def ImmediateToReg(source: RightRotateImmediate, destination: StatusRegister, fields: Fields.ValueSet, condition: Condition) =
+        new MoveToStatusRegisterOpcode(opcode, source, destination, fields, condition)
+    }
+  }
 }

@@ -13,17 +13,25 @@
 
 package org.werner.absynt.arm
 
-import org.werner.absynt._
-import org.werner.absynt.arm.operands.{ArmOffset, ArmRelativeOffset}
+import org.werner.absynt.arm.instructions.{Branch, Breakpoint, ChangeProcessorState, DataProcessing, LoadStore, LoadStoreMultiple, MoveStatusRegister, Multiply, SoftwareInterrupt}
 
 sealed abstract class ProcessorMode {
   implicit val processorMode: ProcessorMode = this
 }
 
 object ProcessorMode {
-  case object A32 extends ProcessorMode {
-  }
 
-  case object Thumb extends ProcessorMode {
-  }
+  case object A32
+    extends ProcessorMode
+      with Branch.A32Operations
+      with Breakpoint.A32Operations
+      with ChangeProcessorState.A32Operations
+      with DataProcessing.A32Operations
+      with LoadStoreMultiple.A32Operations
+      with LoadStore.A32Operations
+      with MoveStatusRegister.A32Operations
+      with Multiply.A32Operations
+      with SoftwareInterrupt.A32Operations
+
+  case object Thumb extends ProcessorMode
 }

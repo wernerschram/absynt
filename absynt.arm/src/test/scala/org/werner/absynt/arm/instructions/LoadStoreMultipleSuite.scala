@@ -25,6 +25,7 @@ class LoadStoreMultipleSuite extends WordSpec with Matchers {
     "in a32 mode" should {
 
       import ProcessorMode.A32._
+
       "correctly encode ldm r4, {r1, r2}" in {
         LoadMultiple(R1 :: R2 :: Nil, R4, UpdateMode.IncrementAfter).encodeByte should be(Hex.msb("e8940006"))
       }
@@ -65,6 +66,7 @@ class LoadStoreMultipleSuite extends WordSpec with Matchers {
     "in a32 mode" should {
 
       import ProcessorMode.A32._
+
       "correctly encode stm r4, {r1, r2}" in {
         StoreMultiple(R1 :: R2 :: Nil, R4, UpdateMode.IncrementAfter).encodeByte should be(Hex.msb("e8840006"))
       }
@@ -91,6 +93,7 @@ class LoadStoreMultipleSuite extends WordSpec with Matchers {
     "in a32 mode" should {
 
       import ProcessorMode.A32._
+
       "correctly encode rfeia r5" in {
         ReturnFromException(R5, UpdateMode.IncrementAfter).encodeByte should be(Hex.msb("f8950a00"))
       }

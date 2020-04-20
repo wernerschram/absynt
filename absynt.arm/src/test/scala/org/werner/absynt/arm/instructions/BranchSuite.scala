@@ -16,6 +16,7 @@ package org.werner.absynt.arm.instructions
 import org.werner.absynt._
 import org.werner.absynt.arm.operands._
 import org.werner.absynt.arm.operands.registers.GeneralRegister._
+import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
@@ -25,6 +26,9 @@ class BranchSuite extends WordSpec with Matchers {
 
   "an Branch instruction" when {
     "in a32 mode" should {
+
+      import ProcessorMode.A32._
+
 
       "correctly encode b +0x3e8" in {
         Branch(RelativeA32Pointer(ArmRelativeOffset(0x3e8))).encodeByte should be(Hex.msb("ea0000fa"))
@@ -131,6 +135,8 @@ class BranchSuite extends WordSpec with Matchers {
   "an BranchLink instruction" when {
     "in a32 mode" should {
 
+      import ProcessorMode.A32._
+
       "correctly encode bleq 0x1111118" in {
         BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
       }
@@ -157,6 +163,8 @@ class BranchSuite extends WordSpec with Matchers {
 
   "an BranchLinkExchange instruction" when {
     "in a32 mode" should {
+
+      import ProcessorMode.A32._
 
       "correctly encode blx 0x123C" in {
         BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1234))).encodeByte should be(Hex.msb("fa00048d"))
@@ -197,6 +205,8 @@ class BranchSuite extends WordSpec with Matchers {
   "a BranchExchange instruction" when {
     "in a32 mode" should {
 
+      import ProcessorMode.A32._
+
       "correctly encode bx r1" in {
         BranchExchange(R1).encodeByte should be(Hex.msb("e12fff11"))
       }
@@ -210,6 +220,8 @@ class BranchSuite extends WordSpec with Matchers {
 
   "a BranchExchangeJazelle instruction" when {
     "in a32 mode" should {
+
+      import ProcessorMode.A32._
 
       "correctly encode bxj r2" in {
         BranchExchangeJazelle(R2).encodeByte should be(Hex.msb("e12fff22"))
