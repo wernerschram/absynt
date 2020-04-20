@@ -13,14 +13,14 @@
 
 package org.werner.absynt.arm.instructions
 
+import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt._
 import org.werner.absynt.arm.ProcessorMode
-import org.werner.absynt.arm.operands.{Condition, Shifter}
+import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operations._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
-import org.scalatest.{Matchers, WordSpec}
 
 class LoadStoreSuite extends WordSpec with Matchers {
 
@@ -78,19 +78,19 @@ class LoadStoreSuite extends WordSpec with Matchers {
       }
 
       "correctly encode ldr r1, [r2, r3, lsl #10]" in {
-        LoadRegister(R1, R2, Shifter.LogicalLeftShift(R3, 10.toByte), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e7921503"))
+        LoadRegister(R1, R2, Shift.logicalLeftShift(R3, 10.toByte), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e7921503"))
       }
 
       "correctly encode ldr r1, [r2, -r9, lsr #20]" in {
-        LoadRegister(R1, R2, LoadStoreOffset(Shifter.LogicalRightShift(R9, 20.toByte), UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e7121a29"))
+        LoadRegister(R1, R2, LoadStoreOffset(Shift.logicalRightShift(R9, 20.toByte), UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e7121a29"))
       }
 
       "correctly encode ldr r1, [r2], r10, asr #30" in {
-        LoadRegister(R1, R2, Shifter.ArithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e6921f4a"))
+        LoadRegister(R1, R2, Shift.arithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e6921f4a"))
       }
 
       "correctly represent ldr r1, [r2], r10, asr #30 as a string" in {
-        LoadRegister(R1, R2, Shifter.ArithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], r10, asr #30")
+        LoadRegister(R1, R2, Shift.arithmeticRightShift(R10, 30.toByte), LoadStoreAddressingTypeNormal.PostIndexedNormal).toString should be("ldr r1, [r2], r10, asr #30")
       }
 
       "correctly encode a indirect ldr instruction with an indirect reference to a labeled resource" in {

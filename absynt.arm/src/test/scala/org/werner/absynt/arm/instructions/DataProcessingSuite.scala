@@ -14,7 +14,6 @@
 package org.werner.absynt.arm.instructions
 
 import org.werner.absynt._
-import org.werner.absynt.arm.operands.Shifter._
 import org.werner.absynt.arm.operands._
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.output.raw.Raw
@@ -42,76 +41,76 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly encode adc r2, r0, r1, lsl #2" in {
-        AddCarry(R0, Shifter.LogicalLeftShift(R1, 2.toByte), R2).encodeByte should be(Hex.msb("e0a02101"))
+        AddCarry(R0, Shift.logicalLeftShift(R1, 2.toByte), R2).encodeByte should be(Hex.msb("e0a02101"))
       }
 
       "correctly represent adc r2, r0, r1, lsl #2 as a string" in {
-        AddCarry(R0, Shifter.LogicalLeftShift(R1, 2.toByte), R2).toString should be("adc r2, r0, r1, lsl #2")
+        AddCarry(R0, Shift.logicalLeftShift(R1, 2.toByte), R2).toString should be("adc r2, r0, r1, lsl #2")
       }
 
       "correctly encode adc r2, r0, r1, rrx" in {
-        AddCarry(R0, Shifter.RightRotateExtend(R1), R2).encodeByte should be(Hex.msb("e0a02061"))
+        AddCarry(R0, Shift.rightRotateExtend(R1), R2).encodeByte should be(Hex.msb("e0a02061"))
       }
 
       "correctly represent adc r2, r0, r1, rrx as a string" in {
-        AddCarry(R0, Shifter.RightRotateExtend(R1), R2).toString should be("adc r2, r0, r1, rrx")
+        AddCarry(R0, Shift.rightRotateExtend(R1), R2).toString should be("adc r2, r0, r1, rrx")
       }
 
       "throw an AssertionError for adc r2, r0, r1, lsl #33" in {
         an[AssertionError] should be thrownBy {
-          AddCarry(R0, Shifter.LogicalLeftShift(R1, 33.toByte), R2)
+          AddCarry(R0, Shift.logicalLeftShift(R1, 33.toByte), R2)
         }
       }
 
       "correctly encode adcs r3, r1, r14, lsl r5" in {
-        AddCarry.setFlags(R1, Shifter.LogicalLeftShift(R14, R5), R3).encodeByte should be(Hex.msb("e0b1351e"))
+        AddCarry.setFlags(R1, Shift.logicalLeftShift(R14, R5), R3).encodeByte should be(Hex.msb("e0b1351e"))
       }
 
       "correctly encode adc r9, r8, r6, lsl #4" in {
-        AddCarry(R8, Shifter.LogicalRightShift(R6, 4.toByte), R9).encodeByte should be(Hex.msb("e0a89226"))
+        AddCarry(R8, Shift.logicalRightShift(R6, 4.toByte), R9).encodeByte should be(Hex.msb("e0a89226"))
       }
 
       "correctly encode adc r5, r7, r10, lsr r11" in {
-        AddCarry(R7, Shifter.LogicalRightShift(R10, R11), R5).encodeByte should be(Hex.msb("e0a75b3a"))
+        AddCarry(R7, Shift.LogicalRightShift(R10, R11), R5).encodeByte should be(Hex.msb("e0a75b3a"))
       }
 
       "correctly encode adc r15, r11, sp, asr #13" in {
-        AddCarry(R11, Shifter.ArithmeticRightShift(SP, 13.toByte), R15).encodeByte should be(Hex.msb("e0abf6cd"))
+        AddCarry(R11, Shift.arithmeticRightShift(SP, 13.toByte), R15).encodeByte should be(Hex.msb("e0abf6cd"))
       }
 
       "correctly encode adc r15, r11, r13, asr r13" in {
-        AddCarry(R11, Shifter.ArithmeticRightShift(R13, R13), R15).encodeByte should be(Hex.msb("e0abfd5d"))
+        AddCarry(R11, Shift.arithmeticRightShift(R13, R13), R15).encodeByte should be(Hex.msb("e0abfd5d"))
       }
 
       "correctly encode adc r0, r0, r0, ror #31" in {
-        AddCarry(R0, Shifter.RightRotate(R0, 31.toByte), R0).encodeByte should be(Hex.msb("e0a00fe0"))
+        AddCarry(R0, Shift.rightRotate(R0, 31.toByte), R0).encodeByte should be(Hex.msb("e0a00fe0"))
       }
 
       "correctly encode adc r9, r8, r7, asr r6" in {
-        AddCarry(R8, Shifter.RightRotate(R7, R6), R9).encodeByte should be(Hex.msb("e0a89677"))
+        AddCarry(R8, Shift.rightRotate(R7, R6), R9).encodeByte should be(Hex.msb("e0a89677"))
       }
 
       "correctly encode adc r1, r2, r3, rrx" in {
-        AddCarry(R2, Shifter.RightRotateExtend(R3), R1).encodeByte should be(Hex.msb("e0a21063"))
+        AddCarry(R2, Shift.rightRotateExtend(R3), R1).encodeByte should be(Hex.msb("e0a21063"))
       }
 
       "correctly encode adc r1, r2, 1, 2" in {
-        AddCarry(R2, Shifter.RightRotateImmediate(1.toByte, 2.toByte), R1).encodeByte should be(Hex.msb("e2a21101"))
+        AddCarry(R2, Shift.rightRotateImmediate(1.toByte, 2.toByte), R1).encodeByte should be(Hex.msb("e2a21101"))
       }
 
       "correctly encode adc r1, r2, #1073741824" in {
-        AddCarry(R2, Shifter.ForImmediate(1073741824), R1).encodeByte should be(Hex.msb("e2a21101"))
+        AddCarry(R2, 1073741824, R1).encodeByte should be(Hex.msb("e2a21101"))
       }
 
       "throw an AssertionError for adc r1, r2, 1, 1" in {
         an[AssertionError] should be thrownBy {
-          AddCarry(R2, Shifter.RightRotateImmediate(1.toByte, 1.toByte), R1)
+          AddCarry(R2, Shift.rightRotateImmediate(1.toByte, 1.toByte), R1)
         }
       }
 
       "throw an AssertionError for adc r1, r2, 1, 32" in {
         an[AssertionError] should be thrownBy {
-          AddCarry(R2, Shifter.RightRotateImmediate(1.toByte, 32.toByte), R1)
+          AddCarry(R2, Shift.rightRotateImmediate(1.toByte, 32.toByte), R1)
         }
       }
 
@@ -169,7 +168,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent add r9, r10, r10, lsr #2 as a string" in {
-        Add(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("add r9, r10, r10, lsr #2")
+        Add(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("add r9, r10, r10, lsr #2")
       }
 
       "correctly encode an add of a register and a labeled relative address to a register" in {
@@ -263,7 +262,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent and r9, r10, r10, lsr #2 as a string" in {
-        And(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("and r9, r10, r10, lsr #2")
+        And(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("and r9, r10, r10, lsr #2")
       }
     }
   }
@@ -288,7 +287,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent bic r9, r10, r10, lsr #2 as a string" in {
-        BitClear(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("bic r9, r10, r10, lsr #2")
+        BitClear(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("bic r9, r10, r10, lsr #2")
       }
     }
   }
@@ -410,7 +409,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       import ProcessorMode.A32._
 
       "correctly encode eor r4, r5, r9 lsl #2" in {
-        ExclusiveOr(R5, Shifter.LogicalLeftShift(R9, 2.toByte), R4).encodeByte should be(Hex.msb("e0254109"))
+        ExclusiveOr(R5, Shift.logicalLeftShift(R9, 2.toByte), R4).encodeByte should be(Hex.msb("e0254109"))
       }
 
       "correctly encode eor r4, r5, 0x10000001" in {
@@ -424,7 +423,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent eor r9, r10, r10, lsr #2 as a string" in {
-        ExclusiveOr(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("eor r9, r10, r10, lsr #2")
+        ExclusiveOr(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("eor r9, r10, r10, lsr #2")
       }
 
     }
@@ -467,7 +466,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent orr r9, r10, r10, lsr #2 as a string" in {
-        Or(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("orr r9, r10, r10, lsr #2")
+        Or(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("orr r9, r10, r10, lsr #2")
       }
     }
   }
@@ -494,7 +493,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent rsb r9, r10, r10, lsr #2 as a string" in {
-        ReverseSubtract(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("rsb r9, r10, r10, lsr #2")
+        ReverseSubtract(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("rsb r9, r10, r10, lsr #2")
       }
     }
   }
@@ -522,7 +521,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
 
 
       "correctly represent rsc r9, r10, r10, lsr #2 as a string" in {
-        ReverseSubtractCarry(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("rsc r9, r10, r10, lsr #2")
+        ReverseSubtractCarry(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("rsc r9, r10, r10, lsr #2")
       }
 
     }
@@ -550,7 +549,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent sbc r9, r10, r10, lsr #2 as a string" in {
-        SubtractCarry(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("sbc r9, r10, r10, lsr #2")
+        SubtractCarry(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("sbc r9, r10, r10, lsr #2")
       }
 
     }
@@ -578,7 +577,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent sub r9, r10, r10, lsr #2 as a string" in {
-        Subtract(R10, Shifter.LogicalRightShift(R10, 2.toByte), R9).toString should be("sub r9, r10, r10, lsr #2")
+        Subtract(R10, Shift.logicalRightShift(R10, 2.toByte), R9).toString should be("sub r9, r10, r10, lsr #2")
       }
     }
   }
@@ -593,7 +592,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent teq r10, r10, lsr #2 as a string" in {
-        TestEquivalence(R10, Shifter.LogicalRightShift(R10, 2.toByte)).toString should be("teq r10, r10, lsr #2")
+        TestEquivalence(R10, Shift.logicalRightShift(R10, 2.toByte)).toString should be("teq r10, r10, lsr #2")
       }
 
     }
@@ -609,7 +608,7 @@ class DataProcessingSuite extends WordSpec with Matchers {
       }
 
       "correctly represent tst r10, r10, lsr #2 as a string" in {
-        Test(R10, Shifter.LogicalRightShift(R10, 2.toByte)).toString should be("tst r10, r10, lsr #2")
+        Test(R10, Shift.logicalRightShift(R10, 2.toByte)).toString should be("tst r10, r10, lsr #2")
       }
     }
   }

@@ -14,6 +14,7 @@
 package org.werner.absynt.arm
 
 import org.werner.absynt.arm.instructions.{Branch, Breakpoint, ChangeProcessorState, DataProcessing, LoadStore, LoadStoreMultiple, MoveStatusRegister, Multiply, SoftwareInterrupt}
+import org.werner.absynt.arm.operands.Shifter
 import org.werner.absynt.arm.operands.registers.Register
 
 sealed abstract class ProcessorMode {
@@ -25,6 +26,7 @@ object ProcessorMode {
   case object A32
     extends ProcessorMode
       with Register.ARMRegisters
+      with Shifter.A32Shifter
       with Branch.A32Operations
       with Breakpoint.A32Operations
       with ChangeProcessorState.A32Operations

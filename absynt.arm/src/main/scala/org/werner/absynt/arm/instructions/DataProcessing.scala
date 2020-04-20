@@ -63,14 +63,14 @@ class DataProcessingNoRegister(val code: Byte, val opcode: String) {
 object DataProcessing {
 
   trait A32Operations {
-
+    self: Shifter.A32Shifter =>
 
     object AddCarry extends DataProcessing(0x05.toByte, "adc") {
       def forConstant(source1: GeneralRegister, source2: Int, destination: GeneralRegister, condition: Condition = Always): UnlabeledEncodable =
         if (source2 == 0)
           AddCarry(source1, 0, destination, condition)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(apply(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Add(destination, value, destination, condition)))
         }
@@ -82,7 +82,7 @@ object DataProcessing {
         if (source2 == 0)
           EncodableCollection(Nil)
         else {
-          val shifters = Shifter.apply(source2)
+          val shifters = immediateShifter(source2)
           EncodableCollection(apply(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Add(destination, value, destination, condition)))
         }
@@ -112,7 +112,7 @@ object DataProcessing {
         if (source2 == 0)
           And(source1, 0, destination, condition)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(~source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(~source2)
           EncodableCollection(BitClear(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => BitClear(destination, value, destination, condition)))
         }
@@ -123,7 +123,7 @@ object DataProcessing {
         if (source2 == 0)
           EncodableCollection(Nil)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(BitClear(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => BitClear(destination, value, destination, condition)))
         }
@@ -138,7 +138,7 @@ object DataProcessing {
         if (source2 == 0)
           EncodableCollection(Nil)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(ExclusiveOr(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => ExclusiveOr(destination, value, destination, condition)))
         }
@@ -149,7 +149,7 @@ object DataProcessing {
         if (source2 == 0)
           Move(0, destination, condition)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(apply(shifters.head, destination, condition) +:
             shifters.tail.map(value => Or(destination, value, destination, condition)))
         }
@@ -177,7 +177,7 @@ object DataProcessing {
         if (source2 == 0)
           EncodableCollection(Nil)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(apply(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Or(destination, value, destination, condition)))
         }
@@ -188,7 +188,7 @@ object DataProcessing {
         if (source2 == 0)
           ReverseSubtract(source1, 0, destination, condition)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(ReverseSubtract(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Add(destination, value, destination, condition)))
         }
@@ -199,7 +199,7 @@ object DataProcessing {
         if (source2 == 0)
           ReverseSubtractCarry(source1, 0, destination, condition)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(ReverseSubtractCarry(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Add(destination, value, destination, condition)))
         }
@@ -210,7 +210,7 @@ object DataProcessing {
         if (source2 == 0)
           SubtractCarry(source1, 0, destination, condition)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(SubtractCarry(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Subtract(destination, value, destination, condition)))
         }
@@ -221,7 +221,7 @@ object DataProcessing {
         if (source2 == 0)
           EncodableCollection(Nil)
         else {
-          val shifters: Seq[RightRotateImmediate] = Shifter.apply(source2)
+          val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
           EncodableCollection(Subtract(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Subtract(destination, value, destination, condition)))
         }
