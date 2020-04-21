@@ -11,14 +11,14 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.werner.absynt.arm.examples.BootRpi
+package org.werner.absynt.examples.arm.BootRpi
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 
 import org.werner.absynt._
 import org.werner.absynt.arm.ProcessorMode
-import org.werner.absynt.arm.operands.Condition._
+import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.output.Elf.{Architecture, Executable}
 import org.werner.absynt.output.raw.Raw

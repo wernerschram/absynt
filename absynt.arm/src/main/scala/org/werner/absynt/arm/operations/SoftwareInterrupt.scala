@@ -13,7 +13,7 @@
 
 package org.werner.absynt.arm.operations
 
-import org.werner.absynt.arm.operands.Condition.Condition
+import org.werner.absynt.arm.operands.Condition
 
 class SoftwareInterrupt(override val opcode: String, interrupt: Int, condition: Condition)
   extends ARMOperation {

@@ -14,17 +14,18 @@
 package org.werner.absynt.arm.instructions
 
 import org.werner.absynt.arm.ProcessorMode
-import org.werner.absynt.arm.operands.Condition._
+import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations.{LoadStoreMultiple => LoadStoreMultipleOperation, LoadStoreMultipleDirection, UpdateBase, UpdateMode, UserModeRegisters, ReturnFromException => ReturnFromExceptionOperation}
 
 object LoadStoreMultiple {
 
   trait A32Operations {
+    self: Condition.ARMCondition =>
     object LoadMultiple {
       implicit val opcode: String = "ldm"
 
-      def apply(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Always)
+      def apply(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Condition.Always)
                (implicit processorMode: ProcessorMode): LoadStoreMultipleOperation =
         Immed(condition, registers, baseRegister, addressingMode)
 
@@ -33,7 +34,7 @@ object LoadStoreMultiple {
         new LoadStoreMultipleOperation(LoadStoreMultipleDirection.Load, condition, registers, baseRegister, addressingMode, opcode)
 
       def withUpdateBase(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                         condition: Condition = Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UpdateBase =
+                         condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UpdateBase =
         ImmedUpdateBase(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUpdateBase(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -41,7 +42,7 @@ object LoadStoreMultiple {
         new LoadStoreMultipleOperation(LoadStoreMultipleDirection.Load, condition, registers, baseRegister, addressingMode, opcode) with UpdateBase
 
       def withUserModeRegisters(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                                condition: Condition = Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UserModeRegisters =
+                                condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UserModeRegisters =
         ImmedUserModeRegisters(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUserModeRegisters(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -50,7 +51,7 @@ object LoadStoreMultiple {
           with UserModeRegisters
 
       def withUserModeRegistersAndUpdateBase(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                                             condition: Condition = Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UpdateBase with UserModeRegisters =
+                                             condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UpdateBase with UserModeRegisters =
         ImmedUserModeRegistersAndUpdateBase(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUserModeRegistersAndUpdateBase(condition: Condition, registers: Seq[GeneralRegister],
@@ -62,7 +63,7 @@ object LoadStoreMultiple {
     object StoreMultiple {
       implicit val opcode: String = "stm"
 
-      def apply(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Always)
+      def apply(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Condition.Always)
                (implicit processorMode: ProcessorMode): LoadStoreMultipleOperation =
         Immed(condition, registers, baseRegister, addressingMode)
 
@@ -71,7 +72,7 @@ object LoadStoreMultiple {
         new LoadStoreMultipleOperation(LoadStoreMultipleDirection.Store, condition, registers, baseRegister, addressingMode, opcode)
 
       def withUpdateBase(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                         condition: Condition = Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UpdateBase =
+                         condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UpdateBase =
         ImmedUpdateBase(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUpdateBase(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -80,7 +81,7 @@ object LoadStoreMultiple {
           with UpdateBase
 
       def withUserModeRegisters(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                                condition: Condition = Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UserModeRegisters =
+                                condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): LoadStoreMultipleOperation with UserModeRegisters =
         ImmedUserModeRegisters(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUserModeRegisters(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,

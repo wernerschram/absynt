@@ -34,15 +34,15 @@ class BranchSuite extends WordSpec with Matchers {
       }
 
       "correctly encode beq +0x1111110" in {
-        Branch(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0a444444"))
+        Branch(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Equal).encodeByte should be(Hex.msb("0a444444"))
       }
 
       "correctly encode blt -0x08" in {
-        Branch(RelativeA32Pointer(ArmRelativeOffset(-0x08)), Condition.SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
+        Branch(RelativeA32Pointer(ArmRelativeOffset(-0x08)), SignedLessThan).encodeByte should be(Hex.msb("bafffffe"))
       }
 
       "correctly represent blt -0x08 as a string" in {
-        Branch(RelativeA32Pointer(ArmRelativeOffset(-0x08)), Condition.SignedLessThan).toString should be("blt 0x00000000")
+        Branch(RelativeA32Pointer(ArmRelativeOffset(-0x08)), SignedLessThan).toString should be("blt 0x00000000")
       }
 
       "correctly encode a forward branch to a labeled instruction" in {
@@ -61,7 +61,7 @@ class BranchSuite extends WordSpec with Matchers {
 
       "correctly encode a backward branch to a labeled instruction" in {
         val targetLabel: Label = "Label"
-        val reference = Branch(targetLabel, Condition.LowerOrSame)
+        val reference = Branch(targetLabel, LowerOrSame)
         val p = Section.text(List[Resource](
           EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
           EncodedBytes(List.fill(4)(0x00.toByte)),
@@ -137,11 +137,11 @@ class BranchSuite extends WordSpec with Matchers {
       import ProcessorMode.A32._
 
       "correctly encode bleq 0x1111118" in {
-        BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).encodeByte should be(Hex.msb("0b444444"))
+        BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Equal).encodeByte should be(Hex.msb("0b444444"))
       }
 
       "correctly represent bleq 0x01111118 as a string" in {
-        BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Condition.Equal).toString should be("bleq 0x01111118")
+        BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Equal).toString should be("bleq 0x01111118")
       }
 
       "correctly encode a forward branch-link to a labeled instruction" in {

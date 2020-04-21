@@ -13,7 +13,7 @@
 
 package org.werner.absynt.arm.operations
 
-import org.werner.absynt.arm.operands.Condition._
+import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operands.{RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 

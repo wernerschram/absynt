@@ -13,7 +13,7 @@
 
 package org.werner.absynt.arm.operations
 
-import org.werner.absynt.arm.operands.Condition.Condition
+import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 
 class MultiplyOperation(val code: Byte, override val opcode: String, destination: GeneralRegister,

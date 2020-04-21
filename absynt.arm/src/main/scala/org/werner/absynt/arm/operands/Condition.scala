@@ -13,9 +13,9 @@
 
 package org.werner.absynt.arm.operands
 
-object Condition {
+sealed abstract class Condition(val value: Byte, val mnemonicExtension: String)
 
-  sealed abstract class Condition(val value: Byte, val mnemonicExtension: String)
+private[arm] object Condition {
 
   case object Equal extends Condition(0x0, "eq")
   case object ZeroSet extends Condition(0x0, "zs")
@@ -40,4 +40,28 @@ object Condition {
   case object Always extends Condition(0xe, "")
   case object Unpredictable extends Condition(0xf, "")
 
+  trait ARMCondition {
+    val Equal: Condition = Condition.Equal
+    val ZeroSet: Condition = Condition.ZeroSet
+    val NotEqual: Condition = Condition.NotEqual
+    val ZeroClear: Condition = Condition.ZeroClear
+    val CarrySet: Condition = Condition.CarrySet
+    val UnsignedHigherOrSame: Condition = Condition.UnsignedHigherOrSame
+    val CarryClear: Condition = Condition.CarryClear
+    val UnsignedLower: Condition = Condition.UnsignedLower
+    val Minus: Condition = Condition.Minus
+    val NegativeSet: Condition = Condition.NegativeSet
+    val Plus: Condition = Condition.Plus
+    val NegativeClear: Condition = Condition.NegativeClear
+    val Overflow: Condition = Condition.Overflow
+    val NoOverflow: Condition = Condition.NoOverflow
+    val UnsignedHigher: Condition = Condition.UnsignedHigher
+    val LowerOrSame: Condition = Condition.LowerOrSame
+    val SignedGreaterOrEqual: Condition = Condition.SignedGreaterOrEqual
+    val SignedLessThan: Condition = Condition.SignedLessThan
+    val SignedGreaterThan: Condition = Condition.SignedGreaterThan
+    val SignedLessOrEqual: Condition = Condition.SignedLessOrEqual
+    val Always: Condition = Condition.Always
+    val Unpredictable: Condition = Condition.Unpredictable
+  }
 }

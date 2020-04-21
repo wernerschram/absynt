@@ -13,8 +13,7 @@
 
 package org.werner.absynt.arm.operations
 
-import org.werner.absynt.arm.operands.Condition.Condition
-import org.werner.absynt.arm.operands.RightRotateImmediate
+import org.werner.absynt.arm.operands.{Condition, RightRotateImmediate}
 import org.werner.absynt.arm.operands.registers._
 
 import scala.language.implicitConversions

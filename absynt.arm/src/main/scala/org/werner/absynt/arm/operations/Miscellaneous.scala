@@ -13,7 +13,7 @@
 
 package org.werner.absynt.arm.operations
 
-import org.werner.absynt.arm.operands.Condition._
+import org.werner.absynt.arm.operands.Condition
 
 import scala.language.implicitConversions
 
@@ -75,16 +75,16 @@ class ProcessorState(val code: Byte, val opcode: String, val condition: Conditio
   extends Conditional {
 
   def this(code: Byte, opcode: String, mode: ExecutionMode) =
-    this(code, opcode, Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")
+    this(code, opcode, Condition.Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")
 
   def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet) =
-    this(code: Byte, opcode: String, Unpredictable, effect.iMod, 0x01.toByte,
+    this(code: Byte, opcode: String, Condition.Unpredictable, effect.iMod, 0x01.toByte,
       interruptDisableFlags.toBitMask(0).toInt << 6, 0x00,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
 
   def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet,
            mode: ExecutionMode) =
-    this(code, opcode, Unpredictable, effect.iMod, 0x01.toByte,
+    this(code, opcode, Condition.Unpredictable, effect.iMod, 0x01.toByte,
       interruptDisableFlags.toBitMask(0).toInt << 6, mode.mode,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #$mode")
 

@@ -13,11 +13,10 @@
 
 package org.werner.absynt.arm.instructions
 
-import org.werner.absynt.arm.operands.Condition._
-import org.werner.absynt.arm.operands.{ArmRelativeOffset, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
+import org.werner.absynt.arm.operands.{ArmRelativeOffset, Condition, RelativeA32Pointer, RelativePointer, RelativeThumbPointer}
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations.{BranchImmediate, BranchRegister, NamedConditional}
-import org.werner.absynt.resource.{UnlabeledEncodable, RelativeReference}
+import org.werner.absynt.resource.{RelativeReference, UnlabeledEncodable}
 import org.werner.absynt.{Label, OffsetDirection, RelativeOffsetDirection}
 
 abstract class BranchReference(val opcode: String, targetLabel: Label, val condition: Condition)
@@ -32,16 +31,16 @@ abstract class BranchReference(val opcode: String, targetLabel: Label, val condi
 }
 
 class Branch(code: Byte, val opcode: String) {
-  def apply(destination: RelativeA32Pointer, condition: Condition = Always):  BranchImmediate[RelativeA32Pointer] =
+  def apply(destination: RelativeA32Pointer, condition: Condition = Condition.Always):  BranchImmediate[RelativeA32Pointer] =
     Immediate(destination, condition)
 
   def apply(targetLabel: Label): BranchReference =
-    new BranchReference(opcode, targetLabel, Always) {
+    new BranchReference(opcode, targetLabel, Condition.Always) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
-        Immediate(RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Always)
+        Immediate(RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Condition.Always)
     }
 
-  private def Immediate[AddressType<:RelativePointer](destination: AddressType, condition: Condition = Always) =
+  private def Immediate[AddressType<:RelativePointer](destination: AddressType, condition: Condition = Condition.Always) =
     new BranchImmediate[AddressType](destination, condition, code, opcode)
 
   def apply(targetLabel: Label, condition: Condition)(): RelativeReference =
@@ -52,24 +51,24 @@ class Branch(code: Byte, val opcode: String) {
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, condition: Condition = Always)(): BranchRegister =
+  def apply(destination: GeneralRegister, condition: Condition = Condition.Always)(): BranchRegister =
     Register(destination, condition)
 
-  private def Register(destination: GeneralRegister, condition: Condition = Always) =
+  private def Register(destination: GeneralRegister, condition: Condition = Condition.Always) =
     new BranchRegister(destination, condition, registerCode, opcode)
 }
 
 class BranchLinkExchange(immediateCode: Byte, registerCode: Byte, opcode: String) extends BranchExchange(registerCode, opcode) {
   def apply(destination: RelativeThumbPointer): BranchImmediate[RelativeThumbPointer] =
-    Immediate(destination, Unpredictable)
+    Immediate(destination, Condition.Unpredictable)
 
-  private def Immediate(destination: RelativeThumbPointer, condition: Condition = Always) =
+  private def Immediate(destination: RelativeThumbPointer, condition: Condition = Condition.Always) =
     new BranchImmediate(destination, condition, immediateCode, opcode)
 
   def apply(targetLabel: Label): BranchReference =
-    new BranchReference(opcode, targetLabel, Unpredictable) {
+    new BranchReference(opcode, targetLabel, Condition.Unpredictable) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
-        Immediate(RelativeThumbPointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Unpredictable)
+        Immediate(RelativeThumbPointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), Condition.Unpredictable)
     }
 }
 
