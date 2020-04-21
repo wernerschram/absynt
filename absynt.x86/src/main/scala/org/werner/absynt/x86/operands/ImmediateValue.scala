@@ -15,7 +15,6 @@ package org.werner.absynt.x86.operands
 
 import org.werner.absynt.ListExtensions._
 
-import scala.language.implicitConversions
 
 sealed class ImmediateValue(val value: Seq[Byte])
   extends Operand {

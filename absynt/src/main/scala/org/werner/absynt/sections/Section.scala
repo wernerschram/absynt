@@ -16,7 +16,6 @@ package org.werner.absynt.sections
 import org.werner.absynt._
 import org.werner.absynt.resource.{Labeled, RelativeReference, Resource}
 
-import scala.language.implicitConversions
 
 abstract class Section protected(val name: String, val alignment: Int) {
 

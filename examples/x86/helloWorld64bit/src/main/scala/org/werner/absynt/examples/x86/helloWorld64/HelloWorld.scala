@@ -22,7 +22,7 @@ import org.werner.absynt.resource.EncodableConversion._
 import org.werner.absynt.resource.{AbsoluteReference, RelativeReference}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize}
+import org.werner.absynt.x86.operands.DoubleWordSize
 import org.werner.absynt.{EncodedString, Label}
 
 object HelloWorld extends App {

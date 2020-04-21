@@ -1,9 +1,18 @@
 scalaVersion in ThisBuild := "2.13.0"
 
+autoCompilerPlugins := true
+libraryDependencies in ThisBuild += compilerPlugin(scalafixSemanticdb) // enable SemanticDB
+
+
 val testVersion = "3.0.8"
 val spec2Version = "4.7.0"
 
-scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
+scalacOptions in ThisBuild ++= Seq(
+	"-unchecked", 
+	"-deprecation", 
+	"-Yrangepos",           // required by SemanticDB compiler plugin
+	"-Ywarn-unused:imports" // required by `RemoveUnused` rule
+)
 
 git.useGitDescribe := true
 

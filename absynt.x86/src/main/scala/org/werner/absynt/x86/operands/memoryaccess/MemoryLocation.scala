@@ -14,7 +14,7 @@
 package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
+import org.werner.absynt.x86.operations.AddressOperandInfo
 
 abstract class MemoryLocation(val displacement: Option[ImmediateValue], val segment: SegmentRegister)
   extends ModRMEncodableOperand {
