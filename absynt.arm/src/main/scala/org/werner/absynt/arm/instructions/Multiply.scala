@@ -13,7 +13,6 @@
 
 package org.werner.absynt.arm.instructions
 
-import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations.{MultiplyOperation, MultiplyWithRegisterOperation, SetFlags}
@@ -21,7 +20,7 @@ import org.werner.absynt.arm.operations.{MultiplyOperation, MultiplyWithRegister
 class MultiplyWithRegister(val code: Byte, val opcode: String) {
 
   def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister,
-            condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): MultiplyWithRegisterOperation =
+            condition: Condition = Condition.Always): MultiplyWithRegisterOperation =
     RegRegAndRegToReg(destination, source, multiplyValue, addValue, condition)
 
   private def RegRegAndRegToReg(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,
@@ -29,7 +28,7 @@ class MultiplyWithRegister(val code: Byte, val opcode: String) {
     new MultiplyWithRegisterOperation(code, opcode, destination, source, multiplyValue, addValue, condition)
 
   def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister,
-               condition: Condition = Condition.Always)(implicit processorMode: ProcessorMode): MultiplyWithRegisterOperation with SetFlags =
+               condition: Condition = Condition.Always): MultiplyWithRegisterOperation with SetFlags =
     RegRegAndRegToRegFlags(destination, source, multiplyValue, addValue, condition)
 
   private def RegRegAndRegToRegFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,
@@ -38,15 +37,13 @@ class MultiplyWithRegister(val code: Byte, val opcode: String) {
 }
 
 class Multiply(val code: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Condition.Always)
-           (implicit processorMode: ProcessorMode): MultiplyOperation =
+  def apply(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Condition.Always): MultiplyOperation =
     RegAndRegToReg(destination, source, multiplyValue, condition)
 
   private def RegAndRegToReg(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition) =
     new MultiplyOperation(code, opcode, destination, source, multiplyValue, condition)
 
-  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Condition.Always)
-              (implicit processorMode: ProcessorMode): MultiplyOperation with SetFlags =
+  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Condition.Always): MultiplyOperation with SetFlags =
     RegAndRegToRegFlags(destination, source, multiplyValue, condition)
 
   private def RegAndRegToRegFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,

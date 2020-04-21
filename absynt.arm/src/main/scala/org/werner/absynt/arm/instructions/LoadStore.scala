@@ -13,7 +13,6 @@
 
 package org.werner.absynt.arm.instructions
 
-import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operands.{ArmRelativeOffset, Condition}
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations.LoadStoreOperation.LoadStoreOperation
@@ -44,13 +43,11 @@ class LoadStoreRegister(
     new LoadStore(mnemonic, condition, register, baseRegister, offset, addressingType, byteOperation)
 
   def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset,
-            addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Condition.Always)
-           (implicit processorMode: ProcessorMode): LoadStore =
+            addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Condition.Always): LoadStore =
     ImmedWord(condition, register, baseRegister, offset, addressingType)
 
   def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset = LoadStoreOffset.noOffset,
-           addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Condition.Always)
-          (implicit processorMode: ProcessorMode): LoadStore =
+           addressingType: LoadStoreAddressingTypeNormal = LoadStoreAddressingTypeNormal.OffsetNormal, condition: Condition = Condition.Always): LoadStore =
     ImmedByte(condition, register, baseRegister, offset, addressingType)
 
   def apply(targetLabel: Label, destination: GeneralRegister): RelativeReference =
@@ -70,12 +67,10 @@ class LoadStoreRegister(
     }
 
   object UserMode {
-    def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Condition.Always)
-             (implicit processorMode: ProcessorMode): LoadStore =
+    def apply(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Condition.Always): LoadStore =
       ImmedWord(condition, register, baseRegister, offset, LoadStoreAddressingTypeUser.PostIndexedUser)
 
-    def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Condition.Always)
-            (implicit processorMode: ProcessorMode): LoadStore =
+    def byte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreOffset, condition: Condition = Condition.Always): LoadStore =
       ImmedByte(condition, register, baseRegister, offset, LoadStoreAddressingTypeUser.PostIndexedUser)
   }
 }
@@ -105,23 +100,19 @@ object LoadStore {
           LoadStoreMiscellaneousOperation.LoadSignedHalfWord)
 
       def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always)
-                    (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always): LoadStoreMiscelaneous =
         ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
 
       def signedByte(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always)
-                    (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always): LoadStoreMiscelaneous =
         ImmedSignedByte(condition, register, baseRegister, offset, addressingType)
 
       def unsignedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                           addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always)
-                          (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+                           addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always): LoadStoreMiscelaneous =
         ImmedUnsignedHalfWord(condition, register, baseRegister, offset, addressingType)
 
       def signedHalfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                         addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always)
-                        (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+                         addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always): LoadStoreMiscelaneous =
         ImmedSignedHalfWord(condition, register, baseRegister, offset, addressingType)
     }
 
@@ -137,13 +128,11 @@ object LoadStore {
           LoadStoreMiscellaneousOperation.StoreDoubleWord)
 
       def halfWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                   addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always)
-                  (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+                   addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always): LoadStoreMiscelaneous =
         ImmedHalfWord(condition, register, baseRegister, offset, addressingType)
 
       def doubleWord(register: GeneralRegister, baseRegister: GeneralRegister, offset: LoadStoreMiscellaneousOffset,
-                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always)
-                    (implicit processorMode: ProcessorMode): LoadStoreMiscelaneous =
+                     addressingType: LoadStoreAddressingTypeNormal, condition: Condition = Condition.Always): LoadStoreMiscelaneous =
         ImmedDoubleWord(condition, register, baseRegister, offset, addressingType)
     }
   }

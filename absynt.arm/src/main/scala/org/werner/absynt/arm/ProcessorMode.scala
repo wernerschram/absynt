@@ -17,15 +17,10 @@ import org.werner.absynt.arm.instructions.{Branch, Breakpoint, ChangeProcessorSt
 import org.werner.absynt.arm.operands.{Condition, Shifter}
 import org.werner.absynt.arm.operands.registers.Register
 
-sealed abstract class ProcessorMode {
-  implicit val processorMode: ProcessorMode = this
-}
-
 object ProcessorMode {
 
   case object A32
-    extends ProcessorMode
-      with Register.ARMRegisters
+    extends Register.ARMRegisters
       with Shifter.A32Shifter
       with Condition.ARMCondition
       with Branch.A32Operations
@@ -37,6 +32,4 @@ object ProcessorMode {
       with MoveStatusRegister.A32Operations
       with Multiply.A32Operations
       with SoftwareInterrupt.A32Operations
-
-  case object Thumb extends ProcessorMode
 }
