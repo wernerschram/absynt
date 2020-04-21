@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.werner.absynt.x86.examples.bootFlag
+package org.werner.absynt.examples.x86.bootFlag
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}

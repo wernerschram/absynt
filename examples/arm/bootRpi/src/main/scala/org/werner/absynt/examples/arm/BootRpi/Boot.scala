@@ -79,6 +79,17 @@ object Boot extends App {
     val text: Label = "Text"
     val entry: Label = "Entry"
 
+    val uartClock = 3000000
+    val baudRate = 115200
+    val divider = uartClock.toDouble / (16 * baudRate)
+
+    val dividerInt = divider.toInt
+    val dividerFraction = divider - dividerInt.toDouble
+    val dividerFractionRegister = ((dividerFraction * 64) + 0.5).toInt
+
+    println(s"divider int: $dividerInt")
+    println(s"divider fraction register: $dividerFractionRegister")
+
     val section: Section = Section.text(
 
       // Disable UART0
@@ -106,14 +117,11 @@ object Boot extends App {
       // Divider = UART_CLOCK/(16 * Baud)
       // Fraction part register = (Fractional part * 64) + 0.5
       // UART_CLOCK = 3000000; Baud = 115200.
-      //
-      // Divider = 3000000 / (16 * 115200) = 1.627 = ~1.
-      // Fractional part register = (.627 * 64) + 0.5 = 40.6 = ~40.
-      Move.forConstant(1, R1) ::
+      Move.forConstant(dividerInt, R1) ::
       StoreRegister(R1, R0, UART0.IBRD) ::
       //
       // Enable FIFO & 8 bit data transmissio (1 stop bit, no parity).
-      Move.forConstant(40, R1) ::
+      Move.forConstant(dividerFractionRegister, R1) ::
       StoreRegister(R1, R0, UART0.FBRD) ::
       //
       // Mask all interrupts.
@@ -130,7 +138,7 @@ object Boot extends App {
       // Put the string from label [text] on the serial line
       Add.forRelativeLabel(PC, text, R7) ::
       Move.forConstant(0.toByte, R6) ::
-        //
+      //
       LoadRegister(R4, R0, UART0.FR).label(putString) ::
       And.setFlags(R4, 0x20.toByte, R4) ::
       Branch(putString, ZeroClear) ::
