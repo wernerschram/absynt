@@ -70,7 +70,7 @@ object OperandInfo {
     new OperandInfo[FarPointerSize[_]](pointer, operandOrder) with PointerOperandSizePrefix //ptrXX
 
   def relative(pointer: memoryaccess.NearPointer with ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[_] =
-    new OperandInfo[ValueSize](pointer, operandOrder) with NoOperandSizePrefix //relXX
+    new OperandInfo[ValueSize](pointer, operandOrder) with NormalOperandSizePrefix //relXX
 
   def immediate(immediate: ImmediateValue with ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[_] =
     new OperandInfo[ValueSize](immediate, operandOrder) with NormalOperandSizePrefix  //immXX

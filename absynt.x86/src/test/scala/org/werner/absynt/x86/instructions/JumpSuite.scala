@@ -32,37 +32,39 @@ class JumpSuite extends WordSpec with Matchers {
 
       import ProcessorMode.Real._
 
-      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String](
-        ("Mnemonic", "Instruction", "Short (0x10)", "Long (0x2030)"),
-        ("jmp", Jump(_), "EB 10", "E9 30 20"),
-        ("ja", JumpIfAbove(_), "77 10", "0F 87 30 20"),
-        ("jae", JumpIfAboveOrEqual(_), "73 10", "0F 83 30 20"),
-        ("jb", JumpIfBelow(_), "72 10", "0F 82 30 20"),
-        ("jbe", JumpIfBelowOrEqual(_), "76 10", "0F 86 30 20"),
-        ("jc", JumpIfCarry(_), "72 10", "0F 82 30 20"),
-        ("je", JumpIfEqual(_), "74 10", "0F 84 30 20"),
-        ("jg", JumpIfGreater(_), "7F 10", "0F 8F 30 20"),
-        ("jge", JumpIfGreaterOrEqual(_), "7D 10", "0F 8D 30 20"),
-        ("jl", JumpIfLess(_), "7C 10", "0F 8C 30 20"),
-        ("jle", JumpIfLessOrEqual(_), "7E 10", "0F 8E 30 20"),
-        ("jna", JumpIfNotAbove(_), "76 10", "0F 86 30 20"),
-        ("jnae", JumpIfNotAboveOrEqual(_), "72 10", "0F 82 30 20"),
-        ("jnb", JumpIfNotBelow(_), "73 10", "0F 83 30 20"),
-        ("jnbe", JumpIfNotBelowOrEqual(_), "77 10", "0F 87 30 20"),
-        ("jnc", JumpIfNoCarry(_), "73 10", "0F 83 30 20"),
-        ("jne", JumpIfNotEqual(_), "75 10", "0F 85 30 20"),
-        ("jng", JumpIfNotGreater(_), "7E 10", "0F 8E 30 20"),
-        ("jnge", JumpIfNotGreaterOrEqual(_), "7C 10", "0F 8C 30 20"),
-        ("jnl", JumpIfNotLess(_), "7D 10", "0F 8D 30 20"),
-        ("jnle", JumpIfNotLessOrEqual(_), "7F 10", "0F 8F 30 20")
+      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String, String](
+        ("Mnemonic", "Instruction", "Short (0x10)", "Word (0x2030)", "Double (0x20304050)"),
+        ("jmp", Jump(_), "EB 10", "E9 30 20", "66 E9 50 40 30 20"),
+        ("ja", JumpIfAbove(_), "77 10", "0F 87 30 20", "66 0F 87 50 40 30 20"),
+        ("jae", JumpIfAboveOrEqual(_), "73 10", "0F 83 30 20", "66 0F 83 50 40 30 20"),
+        ("jb", JumpIfBelow(_), "72 10", "0F 82 30 20", "66 0F 82 50 40 30 20"),
+        ("jbe", JumpIfBelowOrEqual(_), "76 10", "0F 86 30 20", "66 0F 86 50 40 30 20"),
+        ("jc", JumpIfCarry(_), "72 10", "0F 82 30 20", "66 0F 82 50 40 30 20"),
+        ("je", JumpIfEqual(_), "74 10", "0F 84 30 20", "66 0F 84 50 40 30 20"),
+        ("jg", JumpIfGreater(_), "7F 10", "0F 8F 30 20", "66 0F 8F 50 40 30 20"),
+        ("jge", JumpIfGreaterOrEqual(_), "7D 10", "0F 8D 30 20", "66 0F 8D 50 40 30 20"),
+        ("jl", JumpIfLess(_), "7C 10", "0F 8C 30 20", "66 0F 8C 50 40 30 20"),
+        ("jle", JumpIfLessOrEqual(_), "7E 10", "0F 8E 30 20", "66 0F 8E 50 40 30 20"),
+        ("jna", JumpIfNotAbove(_), "76 10", "0F 86 30 20", "66 0F 86 50 40 30 20"),
+        ("jnae", JumpIfNotAboveOrEqual(_), "72 10", "0F 82 30 20", "66 0F 82 50 40 30 20"),
+        ("jnb", JumpIfNotBelow(_), "73 10", "0F 83 30 20", "66 0F 83 50 40 30 20"),
+        ("jnbe", JumpIfNotBelowOrEqual(_), "77 10", "0F 87 30 20", "66 0F 87 50 40 30 20"),
+        ("jnc", JumpIfNoCarry(_), "73 10", "0F 83 30 20", "66 0F 83 50 40 30 20"),
+        ("jne", JumpIfNotEqual(_), "75 10", "0F 85 30 20", "66 0F 85 50 40 30 20"),
+        ("jng", JumpIfNotGreater(_), "7E 10", "0F 8E 30 20", "66 0F 8E 50 40 30 20"),
+        ("jnge", JumpIfNotGreaterOrEqual(_), "7C 10", "0F 8C 30 20", "66 0F 8C 50 40 30 20"),
+        ("jnl", JumpIfNotLess(_), "7D 10", "0F 8D 30 20", "66 0F 8D 50 40 30 20"),
+        ("jnle", JumpIfNotLessOrEqual(_), "7F 10", "0F 8F 30 20", "66 0F 8F 50 40 30 20")
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, word: String, doubleWord: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
-          val longName = s"$mnemonic 0x2030"
-          val longInstruction = operation(longPointer(0x2030.toShort))
+          val wordName = s"$mnemonic 0x2030"
+          val wordInstruction = operation(wordPointer(0x2030.toShort))
+          val doubleWordName = s"$mnemonic 0x20304050"
+          val doubleWordInstruction = operation(doubleWordPointer(0x20304050))
 
           s"correctly encode $shortName" in {
             shortInstruction.encodeByte shouldBe Hex.lsb(short)
@@ -70,11 +72,17 @@ class JumpSuite extends WordSpec with Matchers {
           s"correctly represent $shortName as a string" in {
             shortInstruction.toString shouldBe shortName
           }
-          s"correctly encode $longName" in {
-            longInstruction.encodeByte shouldBe Hex.lsb(long)
+          s"correctly encode $wordName" in {
+            wordInstruction.encodeByte shouldBe Hex.lsb(word)
           }
-          s"correctly represent $longName as a string" in {
-            longInstruction.toString shouldBe longName
+          s"correctly represent $wordName as a string" in {
+            wordInstruction.toString shouldBe wordName
+          }
+          s"correctly encode $doubleWordName" in {
+            doubleWordInstruction.encodeByte shouldBe Hex.lsb(doubleWord)
+          }
+          s"correctly represent $doubleWordName as a string" in {
+            doubleWordInstruction.toString shouldBe doubleWordName
           }
         }
       }
@@ -88,7 +96,7 @@ class JumpSuite extends WordSpec with Matchers {
 
       "throw an AssertionError for jmp 0x10203040" in {
         an[AssertionError] should be thrownBy {
-          Jump(longPointer(0x10203040)).encodeByte
+          Jump(wordPointer(0x10203040)).encodeByte
         }
       }
 
@@ -521,37 +529,39 @@ class JumpSuite extends WordSpec with Matchers {
 
       import ProcessorMode.Protected._
 
-      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String](
-        ("Mnemonic", "Instruction", "Short (0x10)", "Long (0x20304050)"),
-        ("jmp", Jump(_), "EB 10", "E9 50 40 30 20"),
-        ("ja", JumpIfAbove(_), "77 10", "0F 87 50 40 30 20"),
-        ("jae", JumpIfAboveOrEqual(_), "73 10", "0F 83 50 40 30 20"),
-        ("jb", JumpIfBelow(_), "72 10", "0F 82 50 40 30 20"),
-        ("jbe", JumpIfBelowOrEqual(_), "76 10", "0F 86 50 40 30 20"),
-        ("jc", JumpIfCarry(_), "72 10", "0F 82 50 40 30 20"),
-        ("je", JumpIfEqual(_), "74 10", "0F 84 50 40 30 20"),
-        ("jg", JumpIfGreater(_), "7F 10", "0F 8F 50 40 30 20"),
-        ("jge", JumpIfGreaterOrEqual(_), "7D 10", "0F 8D 50 40 30 20"),
-        ("jl", JumpIfLess(_), "7C 10", "0F 8C 50 40 30 20"),
-        ("jle", JumpIfLessOrEqual(_), "7E 10", "0F 8E 50 40 30 20"),
-        ("jna", JumpIfNotAbove(_), "76 10", "0F 86 50 40 30 20"),
-        ("jnae", JumpIfNotAboveOrEqual(_), "72 10", "0F 82 50 40 30 20"),
-        ("jnb", JumpIfNotBelow(_), "73 10", "0F 83 50 40 30 20"),
-        ("jnbe", JumpIfNotBelowOrEqual(_), "77 10", "0F 87 50 40 30 20"),
-        ("jnc", JumpIfNoCarry(_), "73 10", "0F 83 50 40 30 20"),
-        ("jne", JumpIfNotEqual(_), "75 10", "0F 85 50 40 30 20"),
-        ("jng", JumpIfNotGreater(_), "7E 10", "0F 8E 50 40 30 20"),
-        ("jnge", JumpIfNotGreaterOrEqual(_), "7C 10", "0F 8C 50 40 30 20"),
-        ("jnl", JumpIfNotLess(_), "7D 10", "0F 8D 50 40 30 20"),
-        ("jnle", JumpIfNotLessOrEqual(_), "7F 10", "0F 8F 50 40 30 20")
+      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String, String](
+        ("Mnemonic", "Instruction", "Short (0x10)", "Word (0x2030)", "Double (0x20304050)"),
+        ("jmp", Jump(_), "EB 10", "66 E9 30 20", "E9 50 40 30 20"),
+        ("ja", JumpIfAbove(_), "77 10", "66 0F 87 30 20", "0F 87 50 40 30 20"),
+        ("jae", JumpIfAboveOrEqual(_), "73 10", "66 0F 83 30 20", "0F 83 50 40 30 20"),
+        ("jb", JumpIfBelow(_), "72 10", "66 0F 82 30 20", " 0F 82 50 40 30 20"),
+        ("jbe", JumpIfBelowOrEqual(_), "76 10", "66 0F 86 30 20", " 0F 86 50 40 30 20"),
+        ("jc", JumpIfCarry(_), "72 10", "66 0F 82 30 20", " 0F 82 50 40 30 20"),
+        ("je", JumpIfEqual(_), "74 10", "66 0F 84 30 20", " 0F 84 50 40 30 20"),
+        ("jg", JumpIfGreater(_), "7F 10", "66 0F 8F 30 20", " 0F 8F 50 40 30 20"),
+        ("jge", JumpIfGreaterOrEqual(_), "7D 10", "66 0F 8D 30 20", " 0F 8D 50 40 30 20"),
+        ("jl", JumpIfLess(_), "7C 10", "66 0F 8C 30 20", " 0F 8C 50 40 30 20"),
+        ("jle", JumpIfLessOrEqual(_), "7E 10", "66 0F 8E 30 20", " 0F 8E 50 40 30 20"),
+        ("jna", JumpIfNotAbove(_), "76 10", "66 0F 86 30 20", " 0F 86 50 40 30 20"),
+        ("jnae", JumpIfNotAboveOrEqual(_), "72 10", "66 0F 82 30 20", " 0F 82 50 40 30 20"),
+        ("jnb", JumpIfNotBelow(_), "73 10", "66 0F 83 30 20", " 0F 83 50 40 30 20"),
+        ("jnbe", JumpIfNotBelowOrEqual(_), "77 10", "66 0F 87 30 20", " 0F 87 50 40 30 20"),
+        ("jnc", JumpIfNoCarry(_), "73 10", "66 0F 83 30 20", " 0F 83 50 40 30 20"),
+        ("jne", JumpIfNotEqual(_), "75 10", "66 0F 85 30 20", " 0F 85 50 40 30 20"),
+        ("jng", JumpIfNotGreater(_), "7E 10", "66 0F 8E 30 20", " 0F 8E 50 40 30 20"),
+        ("jnge", JumpIfNotGreaterOrEqual(_), "7C 10", "66 0F 8C 30 20", " 0F 8C 50 40 30 20"),
+        ("jnl", JumpIfNotLess(_), "7D 10", "66 0F 8D 30 20", " 0F 8D 50 40 30 20"),
+        ("jnle", JumpIfNotLessOrEqual(_), "7F 10", "66 0F 8F 30 20", " 0F 8F 50 40 30 20")
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, word: String, doubleWord: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
-          val longName = s"$mnemonic 0x20304050"
-          val longInstruction = operation(longPointer(0x20304050))
+          val wordName = s"$mnemonic 0x2030"
+          val wordInstruction = operation(wordPointer(0x2030.toShort))
+          val doubleWordName = s"$mnemonic 0x20304050"
+          val doubleWordInstruction = operation(doubleWordPointer(0x20304050))
 
           s"correctly encode $shortName" in {
             shortInstruction.encodeByte shouldBe Hex.lsb(short)
@@ -559,11 +569,17 @@ class JumpSuite extends WordSpec with Matchers {
           s"correctly represent $shortName as a string" in {
             shortInstruction.toString shouldBe shortName
           }
-          s"correctly encode $longName" in {
-            longInstruction.encodeByte shouldBe Hex.lsb(long)
+          s"correctly encode $wordName" in {
+            wordInstruction.encodeByte shouldBe Hex.lsb(word)
           }
-          s"correctly represent $longName as a string" in {
-            longInstruction.toString shouldBe longName
+          s"correctly represent $wordName as a string" in {
+            wordInstruction.toString shouldBe wordName
+          }
+          s"correctly encode $doubleWordName" in {
+            doubleWordInstruction.encodeByte shouldBe Hex.lsb(doubleWord)
+          }
+          s"correctly represent $doubleWordName as a string" in {
+            doubleWordInstruction.toString shouldBe doubleWordName
           }
         }
       }
@@ -694,7 +710,7 @@ class JumpSuite extends WordSpec with Matchers {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"
-          val longInstruction = operation(longPointer(0x20304050))
+          val longInstruction = operation(doubleWordPointer(0x20304050))
 
           s"correctly encode $shortName" in {
             shortInstruction.encodeByte shouldBe Hex.lsb(short)

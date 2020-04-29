@@ -39,7 +39,8 @@ extends ImmediateValue.I8086Implicits
 
   def pointer(location: Long): ImmediateValue with WordDoubleQuadSize
   def shortPointer(location: Byte): NearPointer with ByteSize = ShortPointer(location)
-  def longPointer(location: Int): NearPointer with LongPointerSize
+  def wordPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
+  def doubleWordPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
 }
 
 object ProcessorMode {
@@ -65,7 +66,6 @@ object ProcessorMode {
       (_: Operand with ValueSize) => false
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
-    override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
   }
 
   object Real extends ProcessorMode
@@ -103,7 +103,6 @@ object ProcessorMode {
       }
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
-    override def longPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
   }
 
   object Protected extends ProcessorMode
@@ -142,7 +141,6 @@ object ProcessorMode {
     }
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
-    override def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
   }
 
   object Long extends ProcessorMode
@@ -185,6 +183,5 @@ object ProcessorMode {
     }
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location
-    def longPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
   }
 }
