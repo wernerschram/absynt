@@ -15,8 +15,6 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.ImmediateValue._
-import org.werner.absynt.x86.operands.Register._
 import org.scalatest.{Matchers, WordSpec}
 
 class IOSuite extends WordSpec with Matchers {

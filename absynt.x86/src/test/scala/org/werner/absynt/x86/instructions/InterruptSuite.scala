@@ -15,7 +15,6 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.ImmediateValue._
 import org.scalatest.{Matchers, WordSpec}
 
 class InterruptSuite extends WordSpec with Matchers {

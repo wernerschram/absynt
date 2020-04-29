@@ -15,9 +15,7 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
-import org.werner.absynt.x86.operands.ImmediateValue._
-import org.werner.absynt.x86.operands.Register._
+import org.werner.absynt.x86.operands.{Accumulator, ByteSize, DoubleWordSize, GeneralPurposeRegister, ImmediateValue, QuadWordSize, WordSize}
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.scalatest.{Matchers, WordSpec}
 
@@ -214,6 +212,7 @@ class ArithmeticSuite extends WordSpec with Matchers {
 
       "correctly encode xor al, al" in {
         Xor(AL, AL).encodeByte should be(Hex.lsb("30 C0"))
+        Add(EAX, EAX)
       }
 
       "correctly represent xor al, al as a string" in {

@@ -13,7 +13,6 @@
 
 package org.werner.absynt
 
-import org.werner.absynt.sections.Section
 import org.scalatest.{Matchers, WordSpec}
 
 class EncodedBytesSuite extends WordSpec with Matchers {

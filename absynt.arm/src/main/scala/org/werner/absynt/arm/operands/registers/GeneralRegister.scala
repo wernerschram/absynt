@@ -26,7 +26,7 @@ sealed abstract class GeneralRegister(val registerCode: Byte) extends Register(s
   override def encodeShiftValue: Int = registerCode << 8
 }
 
-object GeneralRegister {
+private[arm] object GeneralRegister {
   case object R0 extends GeneralRegister(0x00)
   case object R1 extends GeneralRegister(0x01)
   case object R2 extends GeneralRegister(0x02)

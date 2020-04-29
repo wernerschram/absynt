@@ -15,7 +15,6 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.Register._
 import org.werner.absynt.x86.operands.memoryaccess.DestinationReference
 import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, WordSize}
 import org.scalatest.{Matchers, WordSpec}
