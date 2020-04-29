@@ -42,5 +42,8 @@ object LongPointer {
      new NearPointer(offset.encodeLittleEndian) with DoubleWordSize {
        override def toString: String = s"0x${offset.bigEndianHexString}"
     }
-
+  def extMode(offset: Long): NearPointer with QuadWordSize =
+    new NearPointer(offset.encodeLittleEndian) with QuadWordSize {
+      override def toString: String = s"0x${offset.bigEndianHexString}"
+    }
 }

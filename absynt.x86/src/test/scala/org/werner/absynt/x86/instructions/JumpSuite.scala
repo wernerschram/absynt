@@ -628,7 +628,7 @@ class JumpSuite extends WordSpec with Matchers {
 
       import ProcessorMode.Long._
 
-      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String](
+      val combinations = Table[String, (NearPointer with ByteDoubleSize) => X86Operation, String, String](
         ("Mnemonic", "Instruction",              "Short (0x10)", "Long (0x20304050)"),
         ("jmp",      Jump(_),                    "EB 10",        "E9 50 40 30 20"),
         ("ja",       JumpIfAbove(_),             "77 10",        "0F 87 50 40 30 20"),
@@ -654,7 +654,7 @@ class JumpSuite extends WordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer with ByteDoubleSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"
@@ -673,14 +673,6 @@ class JumpSuite extends WordSpec with Matchers {
 
       "correctly encode jmp rax" in {
         Jump(RAX).encodeByte should be(Hex.lsb("FF E0"))
-      }
-
-      "correctly encode jmp FAR 0x1000:0x2000" in {
-        Jump.Far(FarPointer[WordSize](0x1000.toShort, 0x2000.toShort)).encodeByte should be(Hex.lsb("66 EA 00 20 00 10"))
-      }
-
-      "correctly encode jmp FAR 0x30:0x200010" in {
-        Jump.Far(FarPointer[DoubleWordSize](0x30.toShort, 0x200010)).encodeByte should be(Hex.lsb("EA 10 00 20 00 30 00"))
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {

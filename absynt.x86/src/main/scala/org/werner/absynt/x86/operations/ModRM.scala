@@ -26,6 +26,7 @@ trait NoModRM extends ModRMBytes {
   override def modRMBytes: Seq[Byte] = Nil
 }
 
+// TODO: There should also be an option to create a disp32 ModRM: a displacement without operand (the value at an absolute address)
 class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
                      override val code: Seq[Byte],
                      val rValue: Byte,

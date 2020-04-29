@@ -11,37 +11,34 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.werner.absynt.x86.operations
+package org.werner.absynt.x86.operations.branch
 
 import org.werner.absynt._
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
 
-abstract class ShortJumpOperation
-  (val shortOpcode: Seq[Byte], mnemonic: String, targetLabel: Label)
-    extends RelativeReference() {
+abstract class LongJumpOperation
+(val opcode: Seq[Byte], mnemonic: String, targetLabel: Label, longPointerSize: Int)
+  extends RelativeReference() {
 
   override def target: Label = targetLabel
 
-  val shortJumpSize: Int = shortOpcode.length + 1
+  val longJumpSize: Int = opcode.length + longPointerSize
 
-  def encodableForShortPointer(Offset: Byte): Resource with UnlabeledEncodable
+  def encodableForLongPointer(Offset: Int): Resource with UnlabeledEncodable
 
   override def toString = s"$mnemonic $target"
 
-  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with UnlabeledEncodable =
-  {
+  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with UnlabeledEncodable = {
     val offset = offsetDirection match {
-      case OffsetDirection.Self => -shortJumpSize
+      case OffsetDirection.Self => -longJumpSize
       case OffsetDirection.Forward => distance
-      case OffsetDirection.Backward => -distance - shortJumpSize
+      case OffsetDirection.Backward => -distance - longJumpSize
     }
-    val offsetShort: Byte = offset.toByte
-    assume(offsetShort == offset)
-    encodableForShortPointer(offsetShort)
+    encodableForLongPointer(offset)
   }
 
   override def sizeForDependencySize(distance: Int, offsetDirection: OffsetDirection): Int =
     encodableForDependencySize(distance, offsetDirection).size
 
-  override def possibleSizes: Set[Int] = Set(shortJumpSize)
+  override def possibleSizes: Set[Int] = Set(longJumpSize)
 }
