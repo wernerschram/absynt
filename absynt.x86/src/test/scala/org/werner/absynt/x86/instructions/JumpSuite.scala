@@ -638,7 +638,7 @@ class JumpSuite extends WordSpec with Matchers {
         }
       }
 
-      "Encode a simple program with an indirect backward long jump instruction" in {
+      "Encode a simple program with an indirect backward word sized long jump instruction" in {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
@@ -652,11 +652,11 @@ class JumpSuite extends WordSpec with Matchers {
         val encodable = app.encodablesForDependencies(jump :: Nil)
 
         withClue("Jump") {
-          encodable(jump).encodeByte should be(Hex.lsb("E9 FA FE FF FF"))
+          encodable(jump).encodeByte should be(Hex.lsb("66 E9 FB FE"))
         }
       }
 
-      "Encode a simple program with an indirect forward long jump instruction" in {
+      "Encode a simple program with an indirect forward word sized long jump instruction" in {
         val targetLabel = Label.unique
         val jump = Jump(targetLabel)
 
@@ -670,10 +670,45 @@ class JumpSuite extends WordSpec with Matchers {
         val encodable = app.encodablesForDependencies(jump :: Nil)
 
         withClue("Jump") {
-          encodable(jump).encodeByte should be(Hex.lsb("E9 00 01 00 00"))
+          encodable(jump).encodeByte should be(Hex.lsb("66 E9 00 01"))
         }
       }
 
+      "Encode a simple program with an indirect backward doubleword sized long jump instruction" in {
+        val targetLabel = Label.unique
+        val jump = Jump(targetLabel)
+
+        val p = Section.text(List[Resource](
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(65536, 0x00.toByte),
+          jump
+        ))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForDependencies(jump :: Nil)
+
+        withClue("Jump") {
+          encodable(jump).encodeByte should be(Hex.lsb("E9 FA FF FE FF"))
+        }
+      }
+
+      "Encode a simple program with an indirect forward doubleword sized long jump instruction" in {
+        val targetLabel = Label.unique
+        val jump = Jump(targetLabel)
+
+        val p = Section.text(List[Resource](
+          jump,
+          EncodedBytes.fill(65536, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel)
+        ))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForDependencies(jump :: Nil)
+
+        withClue("Jump") {
+          encodable(jump).encodeByte should be(Hex.lsb("E9 00 00 01 00"))
+        }
+      }
     }
 
     "in long mode" should {

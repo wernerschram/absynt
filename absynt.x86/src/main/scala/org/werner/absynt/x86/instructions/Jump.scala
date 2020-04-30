@@ -189,7 +189,6 @@ object Jump {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
 
-      // TODO: ValueSize is too wide
       def apply(nearPointer: NearPointer with ByteWordSize): X86Operation =
         nearPointer match {
           case p: NearPointer with ByteSize =>
@@ -315,7 +314,6 @@ object Jump {
           case p: NearPointer with WordSize =>
             Rel16(p)
           case p: NearPointer with DoubleWordSize =>
-            //TODO: FIX! and add test
             Rel32(p)
         }
 
@@ -329,15 +327,17 @@ object Jump {
             new JumpOption(longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
               override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
                 Rel16(LongPointer.realMode(offset))
-            }
+            },
+            new JumpOption(1 + longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel32(LongPointer.protectedMode(offset))
+            },
           ),
           mnemonic,
           targetLabel
         )
       }
     }
-
-
 
     object Call extends CallOperations with HasOperandSizePrefixRequirements {
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
@@ -436,7 +436,6 @@ object Jump {
           case p: NearPointer with ByteSize =>
             Rel8(p)
           case p: NearPointer with WordSize =>
-            //TODO: FIX! and add test
             Rel16(p)
           case p: NearPointer with DoubleWordSize =>
             Rel32(p)
@@ -449,10 +448,14 @@ object Jump {
               override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
                 Rel8(ShortPointer(offset.toByte))
             },
+            new JumpOption(1 + longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel16(LongPointer.realMode(offset))
+            },
             new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
               override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
-            }
+            },
           ),
           mnemonic,
           targetLabel
