@@ -169,8 +169,8 @@ class JumpSuite extends WordSpec with Matchers {
 
         val p = Section.text(List[Resource](
           jump,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(1, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
         ))
 
         val app = Raw(p, 0)
@@ -191,8 +191,8 @@ class JumpSuite extends WordSpec with Matchers {
 
         val p = Section.text(List[Resource](
           jump,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(1, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
         ))
 
         val app = Raw(p, 0)
@@ -210,8 +210,8 @@ class JumpSuite extends WordSpec with Matchers {
         val jump = Jump(targetLabel)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(1, 0x00.toByte),
           jump
         ))
 
@@ -228,8 +228,8 @@ class JumpSuite extends WordSpec with Matchers {
         val jump = JumpIfCountZero(targetLabel)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(1, 0x00.toByte),
           jump
         ))
 
@@ -247,8 +247,8 @@ class JumpSuite extends WordSpec with Matchers {
 
         val p = Section.text(List[Resource](
           jump,
-          EncodedBytes(List.fill(256)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(256, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
         ))
 
         val app = Raw(p, 0)
@@ -265,8 +265,8 @@ class JumpSuite extends WordSpec with Matchers {
 
         val p = Section.text(List[Resource](
           jump,
-          EncodedBytes(List.fill(256)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(256, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
         ))
 
         val app = Raw(p, 0)
@@ -281,8 +281,8 @@ class JumpSuite extends WordSpec with Matchers {
         val jump = Jump(targetLabel)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(256)(0x00.toByte)),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(256, 0x00.toByte),
           jump
         ))
 
@@ -301,10 +301,10 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(1, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label2),
+          EncodedBytes.fill(1, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(label2),
           jump1
         ))
 
@@ -326,10 +326,10 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(1, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(122)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label2),
+          EncodedBytes.fill(122, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(label2),
           jump1
         ))
 
@@ -351,12 +351,12 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(1, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(123)(0x00.toByte)),
+          EncodedBytes.fill(123, 0x00.toByte),
           jump1,
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label2)
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(label2),
         ))
 
         val app = Raw(p, 0)
@@ -377,12 +377,12 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(1, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(123)(0x00.toByte)),
+          EncodedBytes.fill(123, 0x00.toByte),
           jump1,
-          EncodedBytes(List.fill(3)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label2)
+          EncodedBytes.fill(3, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(label2),
         ))
 
         val app = Raw(p, 0)
@@ -403,12 +403,12 @@ class JumpSuite extends WordSpec with Matchers {
         val jump2 = Jump(label2)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(2)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(2, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(123)(0x00.toByte)),
+          EncodedBytes.fill(123, 0x00.toByte),
           jump1,
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label2)
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(label2),
         ))
 
         val app = Raw(p, 0)
@@ -431,15 +431,15 @@ class JumpSuite extends WordSpec with Matchers {
         val jump3 = Jump(label3)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(1, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(60)(0x00.toByte)),
+          EncodedBytes.fill(60, 0x00.toByte),
           jump3,
-          EncodedBytes(List.fill(61)(0x00.toByte)),
+          EncodedBytes.fill(61, 0x00.toByte),
           jump1,
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(62)(0x00.toByte)).label(label2),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label3)
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(62, 0x00.toByte).label(label2),
+          EncodedBytes.fill(1, 0x00.toByte).label(label3),
         ))
 
         val app = Raw(p, 0)
@@ -465,15 +465,15 @@ class JumpSuite extends WordSpec with Matchers {
         val jump3 = Jump(label3)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(1, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(60)(0x00.toByte)),
+          EncodedBytes.fill(60, 0x00.toByte),
           jump3,
-          EncodedBytes(List.fill(61)(0x00.toByte)),
+          EncodedBytes.fill(61, 0x00.toByte),
           jump1,
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(63)(0x00.toByte)).label(label2),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label3)
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(63, 0x00.toByte).label(label2),
+          EncodedBytes.fill(1, 0x00.toByte).label(label3),
         ))
 
         val app = Raw(p, 0)
@@ -499,15 +499,15 @@ class JumpSuite extends WordSpec with Matchers {
         val jump3 = Jump(label3)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(2)(0x00.toByte)).label(label1),
+          EncodedBytes.fill(2, 0x00.toByte).label(label1),
           jump2,
-          EncodedBytes(List.fill(60)(0x00.toByte)),
+          EncodedBytes.fill(60, 0x00.toByte),
           jump3,
-          EncodedBytes(List.fill(61)(0x00.toByte)),
+          EncodedBytes.fill(61, 0x00.toByte),
           jump1,
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(62)(0x00.toByte)).label(label2),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(label3)
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(62, 0x00.toByte).label(label2),
+          EncodedBytes.fill(1, 0x00.toByte).label(label3),
         ))
 
         val app = Raw(p, 0)
@@ -625,8 +625,8 @@ class JumpSuite extends WordSpec with Matchers {
         val jump = Jump(targetLabel)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(1, 0x00.toByte),
           jump
         ))
 
@@ -643,8 +643,8 @@ class JumpSuite extends WordSpec with Matchers {
         val jump = Jump(targetLabel)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(256)(0x00.toByte)),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(256, 0x00.toByte),
           jump
         ))
 
@@ -662,8 +662,8 @@ class JumpSuite extends WordSpec with Matchers {
 
         val p = Section.text(List[Resource](
           jump,
-          EncodedBytes(List.fill(256)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(256, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0)

@@ -50,8 +50,8 @@ class BranchSuite extends WordSpec with Matchers {
         val reference = Branch(targetLabel)
         val p = Section.text(List[Resource](
           reference,
-            EncodedBytes(List.fill(4)(0x00.toByte)),
-            EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+            EncodedBytes.fill(4, 0x00.toByte),
+            EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val application: Application = Raw(p, 0)
@@ -63,8 +63,8 @@ class BranchSuite extends WordSpec with Matchers {
         val targetLabel: Label = "Label"
         val reference = Branch(targetLabel, LowerOrSame)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(4, 0x00.toByte),
           reference))
 
         val application: Application = Raw(p, 0)
@@ -76,9 +76,9 @@ class BranchSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val reference = Branch(targetLabel).label(targetLabel)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(8)(0x00.toByte)),
+          EncodedBytes.fill(8, 0x00.toByte),
           reference,
-          EncodedBytes(List.fill(8)(0x00.toByte))))
+          EncodedBytes.fill(8, 0x00.toByte)))
 
         val application: Application = Raw(p, 0)
         val encodables = application.encodablesForDependencies(Seq(reference))
@@ -90,10 +90,10 @@ class BranchSuite extends WordSpec with Matchers {
         val reference = Branch(targetLabel)
         val p = Section.text(List[Resource](
           Branch(targetLabel),
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
           reference,
-          EncodedBytes(List.fill(4)(0x00.toByte)),
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(4, 0x00.toByte),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val application: Application = Raw(p, 0)
@@ -106,10 +106,10 @@ class BranchSuite extends WordSpec with Matchers {
         val reference1 = Branch(targetLabel)
         val reference2 = Branch(targetLabel)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(4, 0x00.toByte),
           reference1,
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
           reference2
         ))
 
@@ -149,8 +149,8 @@ class BranchSuite extends WordSpec with Matchers {
         val reference = BranchLink(targetLabel)
         val p = Section.text(List[Resource](
           reference,
-          EncodedBytes(List.fill(4)(0x00.toByte)),
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(4, 0x00.toByte),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val application: Application = Raw(p, 0)
@@ -190,8 +190,8 @@ class BranchSuite extends WordSpec with Matchers {
         val reference = BranchLinkExchange(targetLabel)
         val p = Section.text(List[Resource](
           reference,
-          EncodedBytes(List.fill(4)(0x00.toByte)),
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(4, 0x00.toByte),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val application: Application = Raw(p, 0)

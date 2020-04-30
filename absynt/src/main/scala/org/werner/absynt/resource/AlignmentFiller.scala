@@ -22,7 +22,7 @@ final case class AlignmentFiller(section: Section) extends UnlabeledDependentRes
     (context.startFiller +: context.sectionDependencies(section), OffsetDirection.Absolute)
 
   override def unlabeledForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): UnlabeledEncodable =
-    EncodedBytes(Seq.fill(sizeForDependencySize(dependencySize, offsetDirection))(0.toByte))
+    EncodedBytes.fill(sizeForDependencySize(dependencySize, offsetDirection), 0.toByte)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
     val alignment = dependencySize % section.alignment

@@ -98,7 +98,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
         val reference = LoadRegister(targetLabel, R1)
         val p = Section.text(List[Resource](
           reference,
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
           EncodedString("Test").label(targetLabel)
         ))
 
@@ -111,7 +111,7 @@ class LoadStoreSuite extends WordSpec with Matchers {
         val reference = LoadRegister(targetLabel, R1, Condition.CarrySet)
         val p = Section.text(List[Resource](
           EncodedString("Test").label(targetLabel),
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
           reference
         ))
 

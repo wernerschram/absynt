@@ -42,7 +42,7 @@ class SectionSuite extends WordSpec with Matchers {
       "provide the intermediate instructions between a label and a relative instruction" in {
         val targetLabel = Label.unique
         val reference = LinearRelativeTestReference(targetLabel)
-        val intermediate = EncodedBytes(List.fill(5)(0.toByte))
+        val intermediate = EncodedBytes.fill(5, 0.toByte)
         val target = EncodedBytes(0.toByte :: Nil).label(targetLabel)
 
         val section = Section.text(List[Resource](
@@ -57,8 +57,8 @@ class SectionSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val reference = LinearRelativeTestReference(targetLabel)
         val referenceWithLabel = reference.label(targetLabel)
-        val prefix = EncodedBytes(List.fill(2)(0.toByte))
-        val postfix = EncodedBytes(List.fill(3)(0.toByte))
+        val prefix = EncodedBytes.fill(2, 0.toByte)
+        val postfix = EncodedBytes.fill(3, 0.toByte)
 
         val section = Section.text(List[Resource](
           prefix,
@@ -126,8 +126,8 @@ class SectionSuite extends WordSpec with Matchers {
       "correctly calculate its size" in {
         val oneSize = 4
         val twoSize = 6
-        val one = EncodedBytes(List.fill(oneSize)(1.toByte))
-        val two = EncodedBytes(List.fill(twoSize)(2.toByte))
+        val one = EncodedBytes.fill(oneSize, 1.toByte)
+        val two = EncodedBytes.fill(twoSize, 2.toByte)
 
         val section = Section.text(List[Resource](
           one,

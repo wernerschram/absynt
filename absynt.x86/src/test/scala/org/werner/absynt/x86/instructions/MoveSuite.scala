@@ -319,8 +319,8 @@ class MoveSuite extends WordSpec with Matchers {
 
         val p = Section.text(List[Resource](
           move,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(1, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0)
@@ -402,10 +402,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, ECX)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(1)(0x00.toByte)),
+          EncodedBytes.fill(1, 0x00.toByte),
           move,
-          EncodedBytes(List.fill(1)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(1, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0x100)
@@ -564,10 +564,10 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, R11)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(2)(0x00.toByte)),
+          EncodedBytes.fill(2, 0x00.toByte),
           move,
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0x10000)
@@ -580,9 +580,9 @@ class MoveSuite extends WordSpec with Matchers {
         val move = Move.forLabel(targetLabel, RBX)
 
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(2)(0x00.toByte)),
-          EncodedBytes(List.fill(1)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(2)(0x00.toByte)),
+          EncodedBytes.fill(2, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(2, 0x00.toByte),
           move
         ))
 

@@ -16,15 +16,16 @@ package org.werner.absynt
 import org.werner.absynt.ListExtensions._
 import org.werner.absynt.resource.UnlabeledEncodable
 
-case class EncodedBytes(bytes: Seq[Byte]) extends UnlabeledEncodable {
+class EncodedBytes(encodeBytes: => Seq[Byte], val size: Int) extends UnlabeledEncodable {
+  override def toString: String = s"""SETB "${encodeBytes.bigEndianHexString}""""
 
-  def encodeByte: Seq[Byte] = bytes
-
-  def size: Int = bytes.length
-
-  override def toString: String = s"""SETB "${bytes.bigEndianHexString}""""
+  override def encodeByte: Seq[Byte] = encodeBytes
 }
 
 object EncodedBytes {
-  def apply(byte: Byte): EncodedBytes = new EncodedBytes(Seq(byte))
+  def apply(bytes: => Seq[Byte]) = new EncodedBytes(bytes, bytes.length)
+
+  def fill(size: Int, value: Byte) = new EncodedBytes(List.fill(size)(value), size)
+
+  def apply(byte: Byte): EncodedBytes = new EncodedBytes(Seq(byte), 1)
 }

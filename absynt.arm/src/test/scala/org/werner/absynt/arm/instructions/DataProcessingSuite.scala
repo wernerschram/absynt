@@ -176,8 +176,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section.text(List[Resource](
           instruction,
-            EncodedBytes(List.fill(8)(0x00.toByte)),
-            EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+            EncodedBytes.fill(8, 0x00.toByte),
+            EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0)
@@ -196,9 +196,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
           instruction,
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0)
@@ -211,9 +211,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(4)(0x00.toByte)),
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(4, 0x00.toByte),
           instruction))
 
         val app = Raw(p, 0)
@@ -354,8 +354,8 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section.text(List[Resource](
           instruction,
-          EncodedBytes(List.fill(4)(0x00.toByte)),
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(4, 0x00.toByte),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0)
@@ -375,9 +375,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
           instruction,
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel)
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel)
         ))
 
         val app = Raw(p, 0)
@@ -390,9 +390,9 @@ class DataProcessingSuite extends WordSpec with Matchers {
         val targetLabel = Label.unique
         val instruction = Move.forLabel(targetLabel, R1)
         val p = Section.text(List[Resource](
-          EncodedBytes(List.fill(4)(0x00.toByte)),
-          EncodedBytes(List.fill(4)(0x00.toByte)).label(targetLabel),
-          EncodedBytes(List.fill(4)(0x00.toByte)),
+          EncodedBytes.fill(4, 0x00.toByte),
+          EncodedBytes.fill(4, 0x00.toByte).label(targetLabel),
+          EncodedBytes.fill(4, 0x00.toByte),
           instruction))
 
         val app = Raw(p, 0)
