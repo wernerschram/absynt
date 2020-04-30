@@ -16,10 +16,10 @@ package org.werner.absynt.x86.instructions
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
 import org.werner.absynt.x86.HasOperandSizePrefixRequirements
-import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
-import org.werner.absynt.x86.operations.branch.{LongJumpOperation, NearJumpOperation, ShortJumpOperation}
+import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
 import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizePrefixRequirement, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
 sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
@@ -53,10 +53,14 @@ sealed abstract class ShortRelativeJump(shortOpcode: Seq[Byte], mnemonic: String
   self: HasOperandSizePrefixRequirements =>
 
   def apply(targetLabel: Label): RelativeReference = {
-    new ShortJumpOperation(shortOpcode, mnemonic, targetLabel) {
-      override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
-        Rel8(ShortPointer(offset))
-    }
+    LabelJumpOperation(
+      Seq(new JumpOption(2, Byte.MinValue, Byte.MaxValue) {
+        override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+          Rel8(ShortPointer(offset.toByte))
+      }),
+      mnemonic,
+      targetLabel
+    )
   }
 
   def apply(nearPointer: NearPointer with ByteSize): X86Operation =
@@ -205,15 +209,15 @@ object Jump {
         }
       }
 
-      def apply(targetLabel: Label): NearJumpOperation[WordSize] = {
-        new NearJumpOperation[WordSize](shortOpcode, longOpcode, mnemonic, targetLabel, 2) {
-          override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
-            Rel8(ShortPointer(offset))
-
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel16(LongPointer.realMode(offset))
-        }
-      }
+//      def apply(targetLabel: Label): NearJumpOperation[WordSize] = {
+//        new NearJumpOperation[WordSize](shortOpcode, longOpcode, mnemonic, targetLabel, 2) {
+//          override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
+//            Rel8(ShortPointer(offset))
+//
+//          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
+//            Rel16(LongPointer.realMode(offset))
+//        }
+//      }
     }
 
     object Call extends CallOperations with HasOperandSizePrefixRequirements {
@@ -233,11 +237,15 @@ object Jump {
           M1616(pointer)
       }
 
-      def apply(targetLabel: Label): LongJumpOperation = {
-        new LongJumpOperation(opcode, mnemonic, targetLabel, 4) {
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel16(LongPointer.realMode(offset))
-        }
+      def apply(targetLabel: Label): RelativeReference = {
+        LabelJumpOperation(
+          Seq(new JumpOption(3, Short.MinValue, Short.MaxValue) {
+            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              Rel16(LongPointer.realMode(offset))
+          }),
+          mnemonic,
+          targetLabel
+        )
       }
     }
 
@@ -311,16 +319,25 @@ object Jump {
             Rel32(p)
         }
 
-      // TODO: this ignores the rel16 option
-      def apply(targetLabel: Label): NearJumpOperation[WordSize] =
-        new NearJumpOperation[WordSize](shortOpcode, longOpcode, mnemonic, targetLabel, 2) {
-          override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
-            Rel8(ShortPointer(offset))
-
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel16(LongPointer.realMode(offset))
-        }
+      def apply(targetLabel: Label): LabelJumpOperation = {
+        LabelJumpOperation(
+          Seq(
+            new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel8(ShortPointer(offset.toByte))
+            },
+            new JumpOption(longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel16(LongPointer.realMode(offset))
+            }
+          ),
+          mnemonic,
+          targetLabel
+        )
+      }
     }
+
+
 
     object Call extends CallOperations with HasOperandSizePrefixRequirements {
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
@@ -345,11 +362,15 @@ object Jump {
       }
 
       // TODO: this ignores the rel16 option
-      def apply(targetLabel: Label): LongJumpOperation = {
-        new LongJumpOperation(opcode, mnemonic, targetLabel, 4) {
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel32(LongPointer.protectedMode(offset))
-        }
+      def apply(targetLabel: Label): RelativeReference = {
+        LabelJumpOperation(
+          Seq(new JumpOption(5, Int.MinValue, Int.MaxValue) {
+            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              Rel16(LongPointer.realMode(offset))
+          }),
+          mnemonic,
+          targetLabel
+        )
       }
     }
 
@@ -421,15 +442,22 @@ object Jump {
             Rel32(p)
         }
 
-      // TODO: this ignores the rel16 option
-      def apply(targetLabel: Label): NearJumpOperation[DoubleWordSize] =
-        new NearJumpOperation[DoubleWordSize](shortOpcode, longOpcode, mnemonic, targetLabel, 4) {
-          override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
-            Rel8(ShortPointer(offset))
-
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel32(LongPointer.protectedMode(offset))
-        }
+      def apply(targetLabel: Label): LabelJumpOperation = {
+        LabelJumpOperation(
+          Seq(
+            new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel8(ShortPointer(offset.toByte))
+            },
+            new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel32(LongPointer.protectedMode(offset))
+            }
+          ),
+          mnemonic,
+          targetLabel
+        )
+      }
     }
 
     object Call extends CallOperations with HasOperandSizePrefixRequirements {
@@ -455,11 +483,15 @@ object Jump {
       }
 
       // TODO: this ignores the rel16 option
-      def apply(targetLabel: Label): LongJumpOperation = {
-        new LongJumpOperation(opcode, mnemonic, targetLabel, 4) {
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel32(LongPointer.protectedMode(offset))
-        }
+      def apply(targetLabel: Label): RelativeReference = {
+        LabelJumpOperation(
+          Seq(new JumpOption(5, Int.MinValue, Int.MaxValue) {
+            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              Rel16(LongPointer.realMode(offset))
+          }),
+          mnemonic,
+          targetLabel
+        )
       }
     }
 
@@ -528,14 +560,21 @@ object Jump {
             Rel32(p)
         }
 
-      def apply(targetLabel: Label): NearJumpOperation[DoubleWordSize] = {
-        new NearJumpOperation[DoubleWordSize](shortOpcode, longOpcode, mnemonic, targetLabel, 4) {
-          override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
-            Rel8(ShortPointer(offset))
-
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel32(LongPointer.protectedMode(offset))
-        }
+      def apply(targetLabel: Label): LabelJumpOperation = {
+        LabelJumpOperation(
+          Seq(
+            new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel8(ShortPointer(offset.toByte))
+            },
+            new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel32(LongPointer.protectedMode(offset))
+            }
+          ),
+          mnemonic,
+          targetLabel
+        )
       }
     }
 
@@ -553,11 +592,16 @@ object Jump {
           M1616(pointer)
       }
 
-      def apply(targetLabel: Label): LongJumpOperation = {
-        new LongJumpOperation(opcode, mnemonic, targetLabel, 4) {
-          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel32(LongPointer.protectedMode(offset))
-        }
+      // TODO: this ignores the rel16 option
+      def apply(targetLabel: Label): RelativeReference = {
+        LabelJumpOperation(
+          Seq(new JumpOption(5, Int.MinValue, Int.MaxValue) {
+            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              Rel16(LongPointer.realMode(offset))
+          }),
+          mnemonic,
+          targetLabel
+        )
       }
     }
 
