@@ -361,13 +361,18 @@ object Jump {
           M1616(pointer)
       }
 
-      // TODO: this ignores the rel16 option
       def apply(targetLabel: Label): RelativeReference = {
         LabelJumpOperation(
-          Seq(new JumpOption(5, Int.MinValue, Int.MaxValue) {
-            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
-              Rel16(LongPointer.realMode(offset))
-          }),
+          Seq(
+            new JumpOption(3, Short.MinValue, Short.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel16(LongPointer.realMode(offset))
+            },
+            new JumpOption(6, Int.MinValue, Int.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel32(LongPointer.protectedMode(offset))
+            }
+          ),
           mnemonic,
           targetLabel
         )
@@ -485,13 +490,18 @@ object Jump {
           M1616(pointer)
       }
 
-      // TODO: this ignores the rel16 option
       def apply(targetLabel: Label): RelativeReference = {
         LabelJumpOperation(
-          Seq(new JumpOption(5, Int.MinValue, Int.MaxValue) {
-            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
-              Rel16(LongPointer.realMode(offset))
-          }),
+          Seq(
+            new JumpOption(4, Short.MinValue, Short.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel16(LongPointer.realMode(offset))
+            },
+            new JumpOption(5, Int.MinValue, Int.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel32(LongPointer.protectedMode(offset))
+            }
+          ),
           mnemonic,
           targetLabel
         )
@@ -566,10 +576,6 @@ object Jump {
       def apply(targetLabel: Label): LabelJumpOperation = {
         LabelJumpOperation(
           Seq(
-            new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
-                Rel8(ShortPointer(offset.toByte))
-            },
             new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
               override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
@@ -595,13 +601,14 @@ object Jump {
           M1616(pointer)
       }
 
-      // TODO: this ignores the rel16 option
       def apply(targetLabel: Label): RelativeReference = {
         LabelJumpOperation(
-          Seq(new JumpOption(5, Int.MinValue, Int.MaxValue) {
+          Seq(
+           new JumpOption(5, Int.MinValue, Int.MaxValue) {
             override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
-              Rel16(LongPointer.realMode(offset))
-          }),
+              Rel32(LongPointer.protectedMode(offset))
+            }
+          ),
           mnemonic,
           targetLabel
         )
