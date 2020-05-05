@@ -79,7 +79,7 @@ object ProcessorMode {
     with Register.I386GenericRegisters
     with Move.RealOperations
     with BasicInteraction.RealOperations
-    with Divide.Operations
+    with DivideMultiply.Operations
     with Interrupt.Operations
     with IO.RealOperations
     with Jump.RealOperations
@@ -118,7 +118,7 @@ object ProcessorMode {
     with Register.I386GenericRegisters
     with Move.ProtectedOperations
     with BasicInteraction.ProtectedOperations
-    with Divide.Operations
+    with DivideMultiply.Operations
     with Interrupt.Operations
     with IO.ProtectedOperations
     with Jump.ProtectedOperations
@@ -162,7 +162,7 @@ object ProcessorMode {
     with Register.X64GenericRegisters
     with Move.LongOperations
     with BasicInteraction.LongOperations
-    with Divide.Operations
+    with DivideMultiply.Operations
     with Interrupt.Operations
     with IO.LongOperations
     with Jump.LongOperations

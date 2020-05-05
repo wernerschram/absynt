@@ -17,10 +17,90 @@ import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 
-class DivideSuite extends WordSpec with Matchers {
+class DivideMultiplySuite extends WordSpec with Matchers {
 
-  // IDIV and DIV both inherit from BasicDivide.
-  // BasicDivide is covered by the DIV tests, for the IDIV there are some testcases to test the opcode.
+  // IMUL, MUL, IDIV and DIV all inherit from BasicDivide.
+  // BasicDivide is covered by the DIV tests, for the IMUL, MUL and IDIV there are some testcases to test the opcode.
+  "an IntegerMultiply instruction" when {
+    "in real mode" should {
+
+      import ProcessorMode.Real._
+
+      "correctly encode imul bl" in {
+        IntegerMultiply(BL).encodeByte should be(Hex.lsb("F6 EB"))
+      }
+      "correctly represent imul bl as a string" in {
+        IntegerMultiply(BL).toString should be("imul bl")
+      }
+
+    }
+
+    "in protected mode" should {
+
+      import ProcessorMode.Protected._
+
+      "correctly encode imul bl" in {
+        IntegerMultiply(BL).encodeByte should be(Hex.lsb("F6 EB"))
+      }
+      "correctly represent imul bl as a string" in {
+        IntegerMultiply(BL).toString should be("imul bl")
+      }
+
+    }
+
+    "in long mode" should {
+
+      import ProcessorMode.Long._
+
+      "correctly encode imul bl" in {
+        IntegerMultiply(BL).encodeByte should be(Hex.lsb("F6 EB"))
+      }
+      "correctly represent imul bl as a string" in {
+        IntegerMultiply(BL).toString should be("imul bl")
+      }
+    }
+  }
+
+  "an Multiply instruction" when {
+    "in real mode" should {
+
+      import ProcessorMode.Real._
+
+      "correctly encode mul bl" in {
+        Multiply(BL).encodeByte should be(Hex.lsb("F6 E3"))
+      }
+      "correctly represent mul bl as a string" in {
+        Multiply(BL).toString should be("mul bl")
+      }
+
+    }
+
+    "in protected mode" should {
+
+      import ProcessorMode.Protected._
+
+      "correctly encode mul bl" in {
+        Multiply(BL).encodeByte should be(Hex.lsb("F6 E3"))
+      }
+      "correctly represent mul bl as a string" in {
+        Multiply(BL).toString should be("mul bl")
+      }
+
+    }
+
+    "in long mode" should {
+
+      import ProcessorMode.Long._
+
+      "correctly encode mul bl" in {
+        Multiply(BL).encodeByte should be(Hex.lsb("F6 E3"))
+      }
+      "correctly represent mul bl as a string" in {
+        Multiply(BL).toString should be("mul bl")
+      }
+    }
+  }
+
   "an IntegerDivide instruction" when {
     "in real mode" should {
 

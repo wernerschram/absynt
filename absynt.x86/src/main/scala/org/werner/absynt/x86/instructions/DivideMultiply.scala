@@ -19,7 +19,7 @@ import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue, ModRMEncodableO
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 
-object Divide {
+object DivideMultiply {
 
 
   trait Operations {
@@ -32,7 +32,7 @@ object Divide {
     private def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xF7.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
-    sealed class BasicDivide(extensionCode: Byte, val mnemonic: String){
+    sealed class BasicDivideMultiply(extensionCode: Byte, val mnemonic: String){
 
       def apply(operand: ModRMEncodableOperand with ValueSize): X86Operation =
         operand match {
@@ -41,7 +41,10 @@ object Divide {
         }
     }
 
-    object Divide extends BasicDivide(6.toByte, "div")
-    object IntegerDivide extends BasicDivide(7.toByte, "idiv")
+    object Divide extends BasicDivideMultiply(6.toByte, "div")
+    object IntegerDivide extends BasicDivideMultiply(7.toByte, "idiv")
+
+    object Multiply extends BasicDivideMultiply(4.toByte, "mul")
+    object IntegerMultiply extends BasicDivideMultiply(5.toByte, "imul")
   }
 }
