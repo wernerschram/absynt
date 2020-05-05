@@ -23,7 +23,7 @@ object Test {
 
   trait Common {
     self: HasOperandSizePrefixRequirements =>
-    val mnemonic: "test"
+    val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize): X86Operation =
       new Static(0xA8.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
@@ -74,7 +74,7 @@ object Test {
       }
 
     protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue with ByteSize): X86Operation =
-      new ModRM(operand, 0xF9.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+      new ModRM(operand, 0xF6.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
 
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
@@ -83,7 +83,7 @@ object Test {
       }
 
     protected def Imm16ToRM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, immediateValue: ImmediateValue with Size): X86Operation =
-      new ModRM(operand, 0xF9.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
+      new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
 
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
