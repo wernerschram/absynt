@@ -132,7 +132,7 @@ object BasicInteraction {
       def apply(immediate: ImmediateValue with WordSize, destination: Accumulator.Word.type): X86Operation =
         Imm16ToAX(immediate, opcodeBase, mnemonic)
 
-      def apply[ImmediateSize <: ValueSize, DestinationSize <: ValueSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize): X86Operation =
+      def apply[ImmediateSize <: ByteWordSize, DestinationSize <: ByteWordSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize): X86Operation =
         (immediate, destination) match {
           case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with WordSize) =>
             Imm8ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
