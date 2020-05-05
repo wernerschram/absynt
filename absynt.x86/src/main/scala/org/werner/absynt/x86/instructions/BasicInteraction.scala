@@ -203,11 +203,11 @@ object BasicInteraction {
 
       def apply[ImmediateSize <: ByteWordDoubleSize, DestinationSize <: ByteWordDoubleSize](immediate: ImmediateValue with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize): X86Operation =
         (immediate, destination) match {
-          case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with WordDoubleQuadSize) =>
+          case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with WordDoubleSize) =>
             Imm8ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
           case (imm: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, imm, extensionCode, opcodeBase, mnemonic)
-          case (imm: ImmediateValue with WordDoubleQuadSize, d: ModRMEncodableOperand with WordDoubleQuadSize)
+          case (imm: ImmediateValue with WordDoubleSize, d: ModRMEncodableOperand with WordDoubleSize)
             if d sizeEquals imm =>
             Imm16ToRM16(d, imm, extensionCode, opcodeBase, mnemonic)
           case _ =>
