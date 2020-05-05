@@ -19,7 +19,49 @@ import org.werner.absynt.x86.ProcessorMode
 
 class DivideSuite extends WordSpec with Matchers {
 
-  "an Divide instruction" when {
+  // IDIV and DIV both inherit from BasicDivide.
+  // BasicDivide is covered by the DIV tests, for the IDIV there are some testcases to test the opcode.
+  "an IntegerDivide instruction" when {
+    "in real mode" should {
+
+      import ProcessorMode.Real._
+
+      "correctly encode idiv bl" in {
+        IntegerDivide(BL).encodeByte should be(Hex.lsb("F6 FB"))
+      }
+      "correctly represent idiv bl as a string" in {
+        IntegerDivide(BL).toString should be("idiv bl")
+      }
+
+    }
+
+    "in protected mode" should {
+
+      import ProcessorMode.Protected._
+
+      "correctly encode idiv bl" in {
+        IntegerDivide(BL).encodeByte should be(Hex.lsb("F6 FB"))
+      }
+      "correctly represent idiv bl as a string" in {
+        IntegerDivide(BL).toString should be("idiv bl")
+      }
+
+    }
+
+    "in long mode" should {
+
+      import ProcessorMode.Long._
+
+      "correctly encode idiv bl" in {
+        IntegerDivide(BL).encodeByte should be(Hex.lsb("F6 FB"))
+      }
+      "correctly represent idiv bl as a string" in {
+        IntegerDivide(BL).toString should be("idiv bl")
+      }
+    }
+  }
+
+  "a Divide instruction" when {
 
     "in real mode" should {
 

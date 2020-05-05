@@ -26,20 +26,22 @@ object Divide {
     self: HasOperandSizePrefixRequirements =>
 
 
-    private def RM8(operand: ModRMEncodableOperand with ByteSize, mnemonic: String): X86Operation =
-      new ModRM(operand, 0xF6.toByte :: Nil, 6, mnemonic, destination) with NoDisplacement with NoImmediate
+    private def RM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
+      new ModRM(operand, 0xF6.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
-    private def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, mnemonic: String): X86Operation =
-      new ModRM(operand, 0xF7.toByte :: Nil, 6, mnemonic, destination) with NoDisplacement with NoImmediate
+    private def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, extensionCode: Byte, mnemonic: String): X86Operation =
+      new ModRM(operand, 0xF7.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
-    object Divide{
-      val mnemonic: String = "div"
+    sealed class BasicDivide(extensionCode: Byte, val mnemonic: String){
 
       def apply(operand: ModRMEncodableOperand with ValueSize): X86Operation =
         operand match {
-          case o: ByteSize => RM8(o, mnemonic)
-          case o: WordDoubleQuadSize => RM16(o, mnemonic)
+          case o: ByteSize => RM8(o, extensionCode, mnemonic)
+          case o: WordDoubleQuadSize => RM16(o, extensionCode, mnemonic)
         }
     }
+
+    object Divide extends BasicDivide(6.toByte, "div")
+    object IntegerDivide extends BasicDivide(7.toByte, "idiv")
   }
 }
