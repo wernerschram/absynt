@@ -56,7 +56,7 @@ object ProcessorMode {
     with I8086Registers
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
-    with Interrupt.Operations
+    with Interrupt.LegacyRealProtectedOperations
     with IO.LegacyOperations
     with Jump.LegacyOperations
     with Stack.LegacyOperations
@@ -88,7 +88,7 @@ object ProcessorMode {
     with Move.RealOperations
     with BasicInteraction.RealOperations
     with DivideMultiply.Operations
-    with Interrupt.Operations
+    with Interrupt.LegacyRealProtectedOperations
     with IO.RealOperations
     with Jump.RealOperations
     with Stack.RealOperations
@@ -128,7 +128,7 @@ object ProcessorMode {
     with Move.ProtectedOperations
     with BasicInteraction.ProtectedOperations
     with DivideMultiply.Operations
-    with Interrupt.Operations
+    with Interrupt.LegacyRealProtectedOperations
     with IO.ProtectedOperations
     with Jump.ProtectedOperations
     with Stack.ProtectedOperations
@@ -173,7 +173,7 @@ object ProcessorMode {
     with Move.LongOperations
     with BasicInteraction.LongOperations
     with DivideMultiply.Operations
-    with Interrupt.Operations
+    with Interrupt.LongOperations
     with IO.LongOperations
     with Jump.LongOperations
     with Stack.LongOperations

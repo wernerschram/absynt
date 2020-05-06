@@ -13,41 +13,29 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands.ImmediateValue.ValueToByteImmediate
 import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 
 object Interrupt {
+  trait BaseOperations {
 
-
-  trait Operations {
-    self: HasOperandSizePrefixRequirements =>
-
-    private def Static(mnemonic: String)(implicit byteImmediate: ValueToByteImmediate) =
-      new Static(0xCC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
+    protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String)(implicit byteImmediate: ValueToByteImmediate) =
+      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with HasNoOperandSizePrefixRequirements{
         protected override def allOperands: Set[OperandInfo[_]] =
-          super.allOperands + OperandInfo.implicitOperand(byteImmediate(3.toByte), destination)
+          super.allOperands + OperandInfo.implicitOperand(byteImmediate(interrupt), destination)
       }
 
-    private def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String) =
-      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Operations.this.operandSizePrefixRequirement
+    protected def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String) =
+      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasNoOperandSizePrefixRequirements {
 
         override def immediate: ImmediateValue with ByteSize = immediateValue
 
         override def immediateOrder: OperandOrder = destination
       }
 
-    object Interrupt {
-      val mnemonic: String = "int"
-
-      def apply(immediate: ImmediateValue with ByteSize)(implicit byteImmediate: ValueToByteImmediate): Static = immediate.value.head match {
-        case 3 => Static(mnemonic)
-        case _ => Imm8(immediate, mnemonic)
-      }
-    }
 
     object ClearInterruptFlag {
       val mnemonic: String = "cli"
@@ -62,6 +50,30 @@ object Interrupt {
       def apply(): Static =
         new Static(0xFB.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
     }
+  }
 
+  trait LegacyRealProtectedOperations extends BaseOperations {
+    object Interrupt {
+      val mnemonic: String = "int"
+
+      def apply(immediate: ImmediateValue with ByteSize)(implicit byteImmediate: ValueToByteImmediate): Static = immediate.value.head match {
+        case 0 => Static(0xCE.toByte, 0.toByte, mnemonic)
+        case 1 => Static(0xF1.toByte, 1.toByte, mnemonic)
+        case 3 => Static(0xCC.toByte, 3.toByte, mnemonic)
+        case _ => Imm8(immediate, mnemonic)
+      }
+    }
+  }
+
+  trait LongOperations extends BaseOperations {
+    object Interrupt {
+      val mnemonic: String = "int"
+
+      def apply(immediate: ImmediateValue with ByteSize)(implicit byteImmediate: ValueToByteImmediate): Static = immediate.value.head match {
+        case 1 => Static(0xF1.toByte, 1.toByte, mnemonic)
+        case 3 => Static(0xCC.toByte, 3.toByte, mnemonic)
+        case _ => Imm8(immediate, mnemonic)
+      }
+    }
   }
 }
