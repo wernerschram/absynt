@@ -21,7 +21,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ArithmeticSuite extends WordSpec with Matchers {
 
-  // ADC, ADD, AND, CMP, OR, SBC, SUB and XOR all inherits from BasicInteraction.
+  // ADC, ADD, AND, CMP, OR, SBB, SUB and XOR all inherits from BasicInteraction.
   // BasicInteraction is covered by the XOR tests, for the others there are some testcases to test the opcode.
 
   "an AddCarry instruction" when {
@@ -145,17 +145,17 @@ class ArithmeticSuite extends WordSpec with Matchers {
     }
   }
 
-  "an SubtractCarry instruction" when {
+  "an SubtractBorrow instruction" when {
     "in real mode" should {
 
       import ProcessorMode.Real._
 
       "correctly encode sbb al, 0x40" in {
-        SubtractCarry(0x40.toByte, AL).encodeByte should be(Hex.lsb("1C 40"))
+        SubtractBorrow(0x40.toByte, AL).encodeByte should be(Hex.lsb("1C 40"))
       }
 
       "correctly encode sbb bl, 0x40" in {
-        SubtractCarry(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 DB 40"))
+        SubtractBorrow(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 DB 40"))
       }
     }
   }

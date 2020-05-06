@@ -241,7 +241,7 @@ object BasicInteraction {
     object Compare extends I386BasicInteraction(0x38.toByte, 0x07.toByte, "cmp")
     object Or extends I386BasicInteraction(0x08.toByte, 0x01.toByte, "or")
     object Subtract extends I386BasicInteraction(0x28.toByte, 0x05.toByte, "sub")
-    object SubtractCarry extends I386BasicInteraction(0x18.toByte, 0x03.toByte, "sbc")
+    object SubtractBorrow extends I386BasicInteraction(0x18.toByte, 0x03.toByte, "sbb")
     object Xor extends I386BasicInteraction(0x30.toByte, 0x06.toByte, "xor")
 
     object Not {
