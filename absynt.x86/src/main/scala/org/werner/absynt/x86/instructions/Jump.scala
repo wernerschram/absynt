@@ -15,7 +15,7 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
@@ -142,12 +142,7 @@ object Jump {
         new Static(0xC3.toByte :: Nil, "ret") with NoDisplacement with NoImmediate
 
       protected def Imm16(immediateValue: ImmediateValue with WordSize): X86Operation =
-        new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize] with HasOperandSizePrefixRequirements {
-          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-            override def normalOperand(size: Operand with ValueSize): Boolean = false
-            override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
-          }
-
+        new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize] with HasNoOperandSizePrefixRequirements {
           override def immediate: ImmediateValue with WordSize = immediateValue
 
           override def immediateOrder: OperandOrder = source

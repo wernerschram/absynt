@@ -23,6 +23,13 @@ trait HasOperandSizePrefixRequirements {
   implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 }
 
+trait HasNoOperandSizePrefixRequirements extends HasOperandSizePrefixRequirements {
+  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    override def normalOperand(size: Operand with ValueSize): Boolean = false
+    override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+  }
+}
+
 trait HasAddressSizePrefixRequirements {
   implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 }
@@ -55,6 +62,7 @@ object ProcessorMode {
     with Stack.LegacyOperations
     with StoreString.LegacyOperations
     with Test.LegacyOperations
+    with Adjust.Operations
   {
     override type LongPointerSize = WordSize
 
@@ -86,6 +94,7 @@ object ProcessorMode {
     with Stack.RealOperations
     with StoreString.RealOperations
     with Test.RealOperations
+    with Adjust.Operations
   {
     override type LongPointerSize = WordSize
 
@@ -126,6 +135,7 @@ object ProcessorMode {
     with StoreString.ProtectedOperations
     with System.ProtectedOperations
     with Test.ProtectedOperations
+    with Adjust.Operations
   {
     override type LongPointerSize = DoubleWordSize
 

@@ -32,16 +32,21 @@ object ImmediateValue {
   type ValueToDoubleWordImmediate = Int => ImmediateValue with DoubleWordSize
   type ValueToQuadWordImmediate = Long => ImmediateValue with QuadWordSize
 
+  val byteImmediate: ValueToByteImmediate = value => new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
+  val wordImmediate: ValueToWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with WordSize {}
+  val doubleWordImmediate: ValueToDoubleWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
+  val quadWordImmediate: ValueToQuadWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
+
   trait I8086Implicits {
-    implicit val byteImm: ValueToByteImmediate = value => new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
-    implicit val wordImm: ValueToWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with WordSize {}
+    implicit val byteImm: ValueToByteImmediate = byteImmediate
+    implicit val wordImm: ValueToWordImmediate = wordImmediate
   }
 
   trait I386Implicits {
-    implicit val doubleWordImm: ValueToDoubleWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
+    implicit val doubleWordImm: ValueToDoubleWordImmediate = doubleWordImmediate
   }
 
   trait X64Implicits {
-    implicit val quadWordImm: ValueToQuadWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
+    implicit val quadWordImm: ValueToQuadWordImmediate = quadWordImmediate
   }
 }
