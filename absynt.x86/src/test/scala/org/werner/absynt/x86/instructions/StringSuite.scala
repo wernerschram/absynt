@@ -17,7 +17,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.memoryaccess.DestinationReference
-import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, WordSize}
+import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import org.scalatest.{Matchers, WordSpec}
 
 class StringSuite extends WordSpec with Matchers {
@@ -52,7 +52,8 @@ class StringSuite extends WordSpec with Matchers {
       forAll(combinations) {
         (mnemonic, instruction, byteOpcode, wideOpcode) => {
           val byteName = s"$mnemonic BYTE PTR [di], al"
-          val wideName = s"$mnemonic WORD PTR [di], ax"
+          val wordName = s"$mnemonic WORD PTR [di], ax"
+          val doubleWordName = s"$mnemonic DWORD PTR [di], eax"
 
           s"correctly encode ins $byteName" in {
             instruction(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Seq(byteOpcode))
@@ -61,25 +62,39 @@ class StringSuite extends WordSpec with Matchers {
             instruction(AL, DestinationReference[ByteSize](DI)).toString should be(byteName)
           }
 
-          s"correctly encode ins $wideName" in {
+          s"correctly encode ins $wordName" in {
             instruction(AX, DestinationReference[WordSize](DI)).encodeByte should be(Seq(wideOpcode))
           }
-          s"correctly represent $wideName as a string" in {
-            instruction(AX, DestinationReference[WordSize](DI)).toString should be(wideName)
+          s"correctly represent $wordName as a string" in {
+            instruction(AX, DestinationReference[WordSize](DI)).toString should be(wordName)
           }
 
-          s"correctly encode REP $byteName" in {
+          s"correctly encode ins $doubleWordName" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](DI)).encodeByte should be(Seq(0x66.toByte, wideOpcode))
+          }
+          s"correctly represent $doubleWordName as a string" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](DI)).toString should be(doubleWordName)
+          }
+
+          s"correctly encode rep $byteName" in {
             instruction.Repeat(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Seq(0xF3.toByte, byteOpcode))
           }
           s"correctly represent rep $byteName as a string" in {
             instruction.Repeat(AL, DestinationReference[ByteSize](DI)).toString should be(s"rep $byteName")
           }
 
-          s"correctly encode REP $wideName" in {
+          s"correctly encode rep $wordName" in {
             instruction.Repeat(AX, DestinationReference[WordSize](DI)).encodeByte should be(Seq(0xF3.toByte, wideOpcode))
           }
-          s"correctly represent rep $wideName as a string" in {
-            instruction.Repeat(AX, DestinationReference[WordSize](DI)).toString should be(s"rep $wideName")
+          s"correctly represent rep $wordName as a string" in {
+            instruction.Repeat(AX, DestinationReference[WordSize](DI)).toString should be(s"rep $wordName")
+          }
+
+          s"correctly encode rep $doubleWordName" in {
+            instruction.Repeat(EAX, DestinationReference[DoubleWordSize](DI)).encodeByte should be(Seq(0xF3.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent rep $doubleWordName as a string" in {
+            instruction.Repeat(EAX, DestinationReference[DoubleWordSize](DI)).toString should be(s"rep $doubleWordName")
           }
         }
       }
@@ -92,7 +107,8 @@ class StringSuite extends WordSpec with Matchers {
       forAll(conditionOombinations) {
         (mnemonic, instruction, byteOpcode, wideOpcode) => {
           val byteName = s"$mnemonic BYTE PTR [di], al"
-          val wideName = s"$mnemonic WORD PTR [di], ax"
+          val wordName = s"$mnemonic WORD PTR [di], ax"
+          val doubleWordName = s"$mnemonic DWORD PTR [di], eax"
 
           s"correctly encode ins $byteName" in {
             instruction(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Seq(byteOpcode))
@@ -101,11 +117,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction(AL, DestinationReference[ByteSize](DI)).toString should be(byteName)
           }
 
-          s"correctly encode ins $wideName" in {
+          s"correctly encode ins $wordName" in {
             instruction(AX, DestinationReference[WordSize](DI)).encodeByte should be(Seq(wideOpcode))
           }
-          s"correctly represent $wideName as a string" in {
-            instruction(AX, DestinationReference[WordSize](DI)).toString should be(wideName)
+          s"correctly represent $wordName as a string" in {
+            instruction(AX, DestinationReference[WordSize](DI)).toString should be(wordName)
+          }
+
+          s"correctly encode ins $doubleWordName" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](DI)).encodeByte should be(Seq(0x66.toByte, wideOpcode))
+          }
+          s"correctly represent $doubleWordName as a string" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](DI)).toString should be(doubleWordName)
           }
 
           s"correctly encode repe $byteName" in {
@@ -115,11 +138,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction.RepeatEqual(AL, DestinationReference[ByteSize](DI)).toString should be(s"repe $byteName")
           }
 
-          s"correctly encode repe $wideName" in {
+          s"correctly encode repe $wordName" in {
             instruction.RepeatEqual(AX, DestinationReference[WordSize](DI)).encodeByte should be(Seq(0xF3.toByte, wideOpcode))
           }
-          s"correctly represent repe $wideName as a string" in {
-            instruction.RepeatEqual(AX, DestinationReference[WordSize](DI)).toString should be(s"repe $wideName")
+          s"correctly represent repe $wordName as a string" in {
+            instruction.RepeatEqual(AX, DestinationReference[WordSize](DI)).toString should be(s"repe $wordName")
+          }
+
+          s"correctly encode repe $doubleWordName" in {
+            instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](DI)).encodeByte should be(Seq(0xF3.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent repe $doubleWordName as a string" in {
+            instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](DI)).toString should be(s"repe $doubleWordName")
           }
 
           s"correctly encode repne $byteName" in {
@@ -129,11 +159,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction.RepeatNotEqual(AL, DestinationReference[ByteSize](DI)).toString should be(s"repne $byteName")
           }
 
-          s"correctly encode repne $wideName" in {
+          s"correctly encode repne $wordName" in {
             instruction.RepeatNotEqual(AX, DestinationReference[WordSize](DI)).encodeByte should be(Seq(0xF2.toByte, wideOpcode))
           }
-          s"correctly represent repne $wideName as a string" in {
-            instruction.RepeatNotEqual(AX, DestinationReference[WordSize](DI)).toString should be(s"repne $wideName")
+          s"correctly represent repne $wordName as a string" in {
+            instruction.RepeatNotEqual(AX, DestinationReference[WordSize](DI)).toString should be(s"repne $wordName")
+          }
+
+          s"correctly encode repne $doubleWordName" in {
+            instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](DI)).encodeByte should be(Seq(0xF2.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent repne $doubleWordName as a string" in {
+            instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](DI)).toString should be(s"repne $doubleWordName")
           }
         }
       }
@@ -154,7 +191,8 @@ class StringSuite extends WordSpec with Matchers {
       forAll(combinations) {
         (mnemonic, instruction, byteOpcode, wideOpcode) => {
           val byteName = s"$mnemonic BYTE PTR [edi], al"
-          val wideName = s"$mnemonic DWORD PTR [edi], eax"
+          val wordName = s"$mnemonic WORD PTR [edi], ax"
+          val doubleWordName = s"$mnemonic DWORD PTR [edi], eax"
 
           s"correctly encode ins $byteName" in {
             instruction(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Seq(byteOpcode))
@@ -163,11 +201,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction(AL, DestinationReference[ByteSize](EDI)).toString should be(byteName)
           }
 
-          s"correctly encode ins $wideName" in {
+          s"correctly encode ins $wordName" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0x66.toByte, wideOpcode))
+          }
+          s"correctly represent $wordName as a string" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).toString should be(wordName)
+          }
+
+          s"correctly encode ins $doubleWordName" in {
             instruction(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(wideOpcode))
           }
-          s"correctly represent $wideName as a string" in {
-            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(wideName)
+          s"correctly represent $doubleWordName as a string" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(doubleWordName)
           }
 
           s"correctly encode REP $byteName" in {
@@ -177,11 +222,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction.Repeat(AL, DestinationReference[ByteSize](EDI)).toString should be(s"rep $byteName")
           }
 
-          s"correctly encode REP $wideName" in {
+          s"correctly encode REP $wordName" in {
+            instruction.Repeat(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent rep $wordName as a string" in {
+            instruction.Repeat(AX, DestinationReference[WordSize](EDI)).toString should be(s"rep $wordName")
+          }
+
+          s"correctly encode REP $doubleWordName" in {
             instruction.Repeat(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, wideOpcode))
           }
-          s"correctly represent rep $wideName as a string" in {
-            instruction.Repeat(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"rep $wideName")
+          s"correctly represent rep $doubleWordName as a string" in {
+            instruction.Repeat(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"rep $doubleWordName")
           }
         }
       }
@@ -194,7 +246,8 @@ class StringSuite extends WordSpec with Matchers {
       forAll(conditionOombinations) {
         (mnemonic, instruction, byteOpcode, wideOpcode) => {
           val byteName = s"$mnemonic BYTE PTR [edi], al"
-          val wideName = s"$mnemonic DWORD PTR [edi], eax"
+          val wordName = s"$mnemonic WORD PTR [edi], ax"
+          val doubleWordName = s"$mnemonic DWORD PTR [edi], eax"
 
           s"correctly encode ins $byteName" in {
             instruction(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Seq(byteOpcode))
@@ -203,11 +256,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction(AL, DestinationReference[ByteSize](EDI)).toString should be(byteName)
           }
 
-          s"correctly encode ins $wideName" in {
+          s"correctly encode ins $wordName" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0x66.toByte, wideOpcode))
+          }
+          s"correctly represent $wordName as a string" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).toString should be(wordName)
+          }
+
+          s"correctly encode ins $doubleWordName" in {
             instruction(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(wideOpcode))
           }
-          s"correctly represent $wideName as a string" in {
-            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(wideName)
+          s"correctly represent $doubleWordName as a string" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(doubleWordName)
           }
 
           s"correctly encode repe $byteName" in {
@@ -217,11 +277,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction.RepeatEqual(AL, DestinationReference[ByteSize](EDI)).toString should be(s"repe $byteName")
           }
 
-          s"correctly encode repe $wideName" in {
+          s"correctly encode repe $wordName" in {
+            instruction.RepeatEqual(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent repe $wordName as a string" in {
+            instruction.RepeatEqual(AX, DestinationReference[WordSize](EDI)).toString should be(s"repe $wordName")
+          }
+
+          s"correctly encode repe $doubleWordName" in {
             instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, wideOpcode))
           }
-          s"correctly represent repe $wideName as a string" in {
-            instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repe $wideName")
+          s"correctly represent repe $doubleWordName as a string" in {
+            instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repe $doubleWordName")
           }
 
           s"correctly encode repne $byteName" in {
@@ -231,11 +298,18 @@ class StringSuite extends WordSpec with Matchers {
             instruction.RepeatNotEqual(AL, DestinationReference[ByteSize](EDI)).toString should be(s"repne $byteName")
           }
 
-          s"correctly encode repne $wideName" in {
+          s"correctly encode repne $wordName" in {
+            instruction.RepeatNotEqual(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0xF2.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent repne $wordName as a string" in {
+            instruction.RepeatNotEqual(AX, DestinationReference[WordSize](EDI)).toString should be(s"repne $wordName")
+          }
+
+          s"correctly encode repne $doubleWordName" in {
             instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF2.toByte, wideOpcode))
           }
-          s"correctly represent repne $wideName as a string" in {
-            instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repne $wideName")
+          s"correctly represent repne $doubleWordName as a string" in {
+            instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repne $doubleWordName")
           }
         }
       }
@@ -256,7 +330,9 @@ class StringSuite extends WordSpec with Matchers {
       forAll(combinations) {
         (mnemonic, instruction, byteOpcode, wideOpcode) => {
           val byteName = s"$mnemonic BYTE PTR [edi], al"
-          val wideName = s"$mnemonic DWORD PTR [edi], eax"
+          val wordName = s"$mnemonic WORD PTR [edi], ax"
+          val doubleWordName = s"$mnemonic DWORD PTR [edi], eax"
+          val quadWordName = s"$mnemonic QWORD PTR [edi], rax"
 
           s"correctly encode ins $byteName" in {
             instruction(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Seq(byteOpcode))
@@ -265,11 +341,25 @@ class StringSuite extends WordSpec with Matchers {
             instruction(AL, DestinationReference[ByteSize](EDI)).toString should be(byteName)
           }
 
-          s"correctly encode ins $wideName" in {
+          s"correctly encode ins $wordName" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0x66.toByte, wideOpcode))
+          }
+          s"correctly represent $wordName as a string" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).toString should be(wordName)
+          }
+
+          s"correctly encode ins $doubleWordName" in {
             instruction(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(wideOpcode))
           }
-          s"correctly represent $wideName as a string" in {
-            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(wideName)
+          s"correctly represent $doubleWordName as a string" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(doubleWordName)
+          }
+
+          s"correctly encode ins $quadWordName" in {
+            instruction(RAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0x48.toByte, wideOpcode))
+          }
+          s"correctly represent $quadWordName as a string" in {
+            instruction(RAX, DestinationReference[QuadWordSize](EDI)).toString should be(quadWordName)
           }
 
           s"correctly encode REP $byteName" in {
@@ -279,11 +369,25 @@ class StringSuite extends WordSpec with Matchers {
             instruction.Repeat(AL, DestinationReference[ByteSize](EDI)).toString should be(s"rep $byteName")
           }
 
-          s"correctly encode REP $wideName" in {
+          s"correctly encode REP $wordName" in {
+            instruction.Repeat(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent rep $wordName as a string" in {
+            instruction.Repeat(AX, DestinationReference[WordSize](EDI)).toString should be(s"rep $wordName")
+          }
+
+          s"correctly encode REP $doubleWordName" in {
             instruction.Repeat(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, wideOpcode))
           }
-          s"correctly represent rep $wideName as a string" in {
-            instruction.Repeat(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"rep $wideName")
+          s"correctly represent rep $doubleWordName as a string" in {
+            instruction.Repeat(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"rep $doubleWordName")
+          }
+
+          s"correctly encode REP $quadWordName" in {
+            instruction.Repeat(RAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, 0x48.toByte, wideOpcode))
+          }
+          s"correctly represent rep $quadWordName as a string" in {
+            instruction.Repeat(RAX, DestinationReference[QuadWordSize](EDI)).toString should be(s"rep $quadWordName")
           }
         }
       }
@@ -296,7 +400,9 @@ class StringSuite extends WordSpec with Matchers {
       forAll(conditionOombinations) {
         (mnemonic, instruction, byteOpcode, wideOpcode) => {
           val byteName = s"$mnemonic BYTE PTR [edi], al"
-          val wideName = s"$mnemonic DWORD PTR [edi], eax"
+          val wordName = s"$mnemonic WORD PTR [edi], ax"
+          val doubleWordName = s"$mnemonic DWORD PTR [edi], eax"
+          val quadWordName = s"$mnemonic QWORD PTR [edi], rax"
 
           s"correctly encode ins $byteName" in {
             instruction(AL, DestinationReference[ByteSize](EDI)).encodeByte should be(Seq(byteOpcode))
@@ -305,11 +411,25 @@ class StringSuite extends WordSpec with Matchers {
             instruction(AL, DestinationReference[ByteSize](EDI)).toString should be(byteName)
           }
 
-          s"correctly encode ins $wideName" in {
+          s"correctly encode ins $wordName" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0x66.toByte, wideOpcode))
+          }
+          s"correctly represent $wordName as a string" in {
+            instruction(AX, DestinationReference[WordSize](EDI)).toString should be(wordName)
+          }
+
+          s"correctly encode ins $doubleWordName" in {
             instruction(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(wideOpcode))
           }
-          s"correctly represent $wideName as a string" in {
-            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(wideName)
+          s"correctly represent $doubleWordName as a string" in {
+            instruction(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(doubleWordName)
+          }
+
+          s"correctly encode ins $quadWordName" in {
+            instruction(RAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0x48.toByte, wideOpcode))
+          }
+          s"correctly represent $quadWordName as a string" in {
+            instruction(RAX, DestinationReference[QuadWordSize](EDI)).toString should be(quadWordName)
           }
 
           s"correctly encode repe $byteName" in {
@@ -319,11 +439,25 @@ class StringSuite extends WordSpec with Matchers {
             instruction.RepeatEqual(AL, DestinationReference[ByteSize](EDI)).toString should be(s"repe $byteName")
           }
 
-          s"correctly encode repe $wideName" in {
+          s"correctly encode repe $wordName" in {
+            instruction.RepeatEqual(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent repe $wordName as a string" in {
+            instruction.RepeatEqual(AX, DestinationReference[WordSize](EDI)).toString should be(s"repe $wordName")
+          }
+
+          s"correctly encode repe $doubleWordName" in {
             instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, wideOpcode))
           }
-          s"correctly represent repe $wideName as a string" in {
-            instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repe $wideName")
+          s"correctly represent repe $doubleWordName as a string" in {
+            instruction.RepeatEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repe $doubleWordName")
+          }
+
+          s"correctly encode repe $quadWordName" in {
+            instruction.RepeatEqual(RAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF3.toByte, 0x48.toByte, wideOpcode))
+          }
+          s"correctly represent repe $quadWordName as a string" in {
+            instruction.RepeatEqual(RAX, DestinationReference[QuadWordSize](EDI)).toString should be(s"repe $quadWordName")
           }
 
           s"correctly encode repne $byteName" in {
@@ -333,12 +467,27 @@ class StringSuite extends WordSpec with Matchers {
             instruction.RepeatNotEqual(AL, DestinationReference[ByteSize](EDI)).toString should be(s"repne $byteName")
           }
 
-          s"correctly encode repne $wideName" in {
+          s"correctly encode repne $wordName" in {
+            instruction.RepeatNotEqual(AX, DestinationReference[WordSize](EDI)).encodeByte should be(Seq(0xF2.toByte, 0x66.toByte, wideOpcode))
+          }
+          s"correctly represent repne $wordName as a string" in {
+            instruction.RepeatNotEqual(AX, DestinationReference[WordSize](EDI)).toString should be(s"repne $wordName")
+          }
+
+          s"correctly encode repne $doubleWordName" in {
             instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF2.toByte, wideOpcode))
           }
-          s"correctly represent repne $wideName as a string" in {
-            instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repne $wideName")
+          s"correctly represent repne $doubleWordName as a string" in {
+            instruction.RepeatNotEqual(EAX, DestinationReference[DoubleWordSize](EDI)).toString should be(s"repne $doubleWordName")
           }
+
+          s"correctly encode repne $quadWordName" in {
+            instruction.RepeatNotEqual(RAX, DestinationReference[DoubleWordSize](EDI)).encodeByte should be(Seq(0xF2.toByte, 0x48.toByte, wideOpcode))
+          }
+          s"correctly represent repne $quadWordName as a string" in {
+            instruction.RepeatNotEqual(RAX, DestinationReference[QuadWordSize](EDI)).toString should be(s"repne $quadWordName")
+          }
+
         }
       }
 

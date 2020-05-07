@@ -36,64 +36,64 @@ object String {
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)
       }
 
     protected def Static16[Size <: WS](operand: Byte, mnemonic: String, register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(register, OperandOrder.source)
       }
 
     protected def RepStatic8(operand: Byte, mnemonic: String, destination: DestinationReference with ByteSize): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)
       }
 
     protected def RepStatic16[Size <: WS](operand: Byte, mnemonic: String, register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(register, OperandOrder.source)
       }
 
     protected def RepEStatic8(operand: Byte, mnemonic: String, destination: DestinationReference with ByteSize): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)
       }
 
     protected def RepEStatic16[Size <: WS](operand: Byte, mnemonic: String, register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(register, OperandOrder.source)
       }
 
     protected def RepNEStatic8(operand: Byte, mnemonic: String, destination: DestinationReference with ByteSize): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)
       }
 
     protected def RepNEStatic16[Size <: WS](operand: Byte, mnemonic: String, register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
-            OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
+            OperandInfo.implicitOperand(register, OperandOrder.source)
       }
 
     sealed class StringOperation(byteOperand: Byte, wideOperand: Byte, val mnemonic: String) {
