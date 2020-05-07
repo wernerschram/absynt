@@ -41,10 +41,8 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
       immediateBytes
   }
 
-  protected def repeated: Boolean = false
-
-  private def optionalRepeatPrefix: List[Byte] =
-    if (repeated) 0xF3.toByte :: Nil else Nil
+  protected def optionalRepeatPrefix: List[Byte] =
+    Nil
 
   private def optionalSegmentOverridePrefix: List[Byte] =
       operands.flatMap(_.addressOperands).flatMap(_.segmentOverride).flatMap(X86Operation.SegmentOverrideMap.get).toList
@@ -65,12 +63,13 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
   lazy val rexRequirements: Set[RexRequirement] =
     operands.flatMap(o => o.rexRequirements ++ o.addressOperands.flatMap(_.rexRequirements))
 
-
   def mnemonic: String
+
+  val optionalRepeatPrefixString = ""
 
   override def toString: String = {
     val operandString = operands.toSeq.sorted.map(_.toString).mkString(", ")
-    s"${if (repeated) "rep " else ""}$mnemonic${if (operandString.nonEmpty) s" $operandString" else ""}"
+    s"${optionalRepeatPrefixString}$mnemonic${if (operandString.nonEmpty) s" $operandString" else ""}"
   }
 }
 
