@@ -32,7 +32,7 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
 
   override val defaultSegment: SegmentRegister = reference.defaultSegment
 
-  override def addressOperands: Set[AddressOperandInfo] = reference match {
+  override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] = reference match {
     case bi: BaseIndexReference => Set(AddressOperandInfo.rmBase(bi.base), AddressOperandInfo.rmIndex(bi.index, segmentOverride))
     case o: GeneralPurposeRegister with IndexRegister with ValueSize => Set(AddressOperandInfo.rmIndex(o, segmentOverride))
   }

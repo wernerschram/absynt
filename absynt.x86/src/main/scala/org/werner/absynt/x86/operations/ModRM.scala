@@ -32,7 +32,7 @@ class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
                      val rValue: Byte,
                      override val mnemonic: String,
                      val operandRMOrder: OperandOrder,
-                     includeRexW: Boolean = true)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                     includeRexW: Boolean = true)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends X86Operation(code) with ModRMBytes {
 
   self: X86Operation with DisplacementBytes with ImmediateBytes =>
@@ -48,7 +48,7 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister with Size,
                                 override val code: Seq[Byte],
                                 override val mnemonic: String,
                                 override val operandRMOrder: OperandOrder)
-                               (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                               (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerOrMemoryModeCode, mnemonic, operandRMOrder) with NoDisplacement with NoImmediate {
 
   def operandROrder: OperandOrder =
@@ -63,7 +63,7 @@ class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
                                              override val code: Seq[Byte],
                                              override val mnemonic: String,
                                              override val operandRMOrder: OperandOrder)
-                                            (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                                            (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerCode, mnemonic, operandRMOrder) {
   self: X86Operation with DisplacementBytes with ImmediateBytes =>
 

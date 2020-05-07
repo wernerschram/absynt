@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -22,7 +22,7 @@ import org.werner.absynt.x86.operations._
 object Test {
 
   trait Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize): X86Operation =
@@ -100,12 +100,9 @@ object Test {
 
 
   trait LegacyOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    sealed class I8086BasicInteraction extends HasOperandSizePrefixRequirements {
-
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
-
+    object Test {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
         Imm8ToAL(immediate)
 
@@ -133,17 +130,12 @@ object Test {
         R16ToRM16(destination, source)
 
     }
-
-    object Test extends I8086BasicInteraction
   }
 
   trait I386Operations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    sealed class I386BasicInteraction extends HasOperandSizePrefixRequirements {
-
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = I386Operations.this.operandSizePrefixRequirement
-
+    object Test {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
         Imm8ToAL(immediate)
 
@@ -173,26 +165,20 @@ object Test {
       def apply[Size <: WordDoubleSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
         R16ToRM16(destination, source)
     }
-
-
-    object Test extends I386BasicInteraction
   }
 
   trait RealOperations extends I386Operations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
   }
 
   trait ProtectedOperations extends I386Operations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
   }
 
   trait LongOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    sealed class X64BasicInteraction extends HasOperandSizePrefixRequirements {
-
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
-
+    object Test {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
         Imm8ToAL(immediate)
 
@@ -230,7 +216,5 @@ object Test {
       def apply[Size <: WordDoubleQuadSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
         R16ToRM16(source, destination)
     }
-
-    object Test extends X64BasicInteraction
   }
 }

@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands.ImmediateValue.ValueToByteImmediate
 import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue, ModRMEncodableOperand, ValueSize, WordDoubleQuadSize}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
@@ -23,7 +23,7 @@ object DivideMultiply {
 
 
   trait Operations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
 
     private def RM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =

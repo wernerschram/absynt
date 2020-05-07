@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -22,7 +22,7 @@ import org.werner.absynt.x86.operations._
 object BasicInteraction {
 
   trait Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize, opcodeBase: Byte, mnemonic: String): X86Operation =
       new Static((opcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
 
@@ -120,7 +120,7 @@ object BasicInteraction {
 
 
   trait LegacyOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed class I8086BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends HasOperandSizePrefixRequirements {
 
@@ -186,7 +186,7 @@ object BasicInteraction {
   }
 
   trait I386Operations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed class I386BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends HasOperandSizePrefixRequirements {
 
@@ -257,15 +257,15 @@ object BasicInteraction {
   }
 
   trait RealOperations extends I386Operations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
   }
 
   trait ProtectedOperations extends I386Operations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
   }
 
   trait LongOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed class X64BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends HasOperandSizePrefixRequirements {
 

@@ -23,16 +23,20 @@ object String {
   trait Common[TS<:ValueSize, WS<:TS] {
     self: HasOperandSizePrefixRequirements =>
 
-    val noOperandSizePrefixRequirements = new OperandSizePrefixRequirement {
+    val noOperandSizePrefixRequirements: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = false
       override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+    }
+
+    implicit val noAddressSizePrefixRequirements: AddressSizePrefixRequirement = new AddressSizePrefixRequirement {
+      override def normalAddress(size: Operand with ValueSize): Boolean = false
     }
 
     protected def Static8(operand: Byte, mnemonic: String, destination: DestinationReference with ByteSize): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements) +
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
             OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
@@ -40,7 +44,7 @@ object String {
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements) +
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
             OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
@@ -48,7 +52,7 @@ object String {
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements) +
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
             OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
@@ -56,7 +60,7 @@ object String {
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements) +
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
             OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
@@ -64,7 +68,7 @@ object String {
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements) +
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
             OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
@@ -72,24 +76,24 @@ object String {
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-            OperandInfo.implicitOperand(register, OperandOrder.source)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
+            OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
     protected def RepNEStatic8(operand: Byte, mnemonic: String, destination: DestinationReference with ByteSize): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
+            OperandInfo.implicitOperand(Accumulator.LowByte, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
     protected def RepNEStatic16[Size <: WS](operand: Byte, mnemonic: String, register: AccumulatorRegister with Size, destination: DestinationReference with Size): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands +
-            OperandInfo.implicitAddress(destination, OperandOrder.destination) +
-            OperandInfo.implicitOperand(register, OperandOrder.source)
+            OperandInfo.implicitAddress(destination, OperandOrder.destination)(noOperandSizePrefixRequirements, noAddressSizePrefixRequirements) +
+            OperandInfo.implicitOperand(register, OperandOrder.source)(noOperandSizePrefixRequirements)
       }
 
     sealed class StringOperation(byteOperand: Byte, wideOperand: Byte, val mnemonic: String) {

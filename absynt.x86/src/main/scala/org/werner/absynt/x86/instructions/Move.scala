@@ -15,20 +15,20 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt._
 import org.werner.absynt.resource.{AbsoluteReference, UnlabeledEncodable}
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands.ImmediateValue.{ValueToDoubleWordImmediate, ValueToQuadWordImmediate, ValueToWordImmediate}
 import org.werner.absynt.x86.operands.Register.I8086GenericRegisters
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
-import org.werner.absynt.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizePrefixRequirement, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
+import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizePrefixRequirement, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 
 object Move extends I8086GenericRegisters {
 
   implicit val mnemonic: String = "mov"
 
   sealed trait Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     protected def RM16ToSReg[Size <: WordDoubleQuadSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size) =
       new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
@@ -40,8 +40,10 @@ object Move extends I8086GenericRegisters {
       new ModRRM(operand1, operand2, 0x88.toByte :: Nil, mnemonic, destination)
 
     protected def ALToMOffs8(memoryLocation: MemoryLocation with ByteSize): X86Operation =
-      new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
+      new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+
+        override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = Common.this.addressSizePrefixRequirement
 
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(AL, source)
@@ -56,8 +58,10 @@ object Move extends I8086GenericRegisters {
       new ModRRM(operand1, operand2, 0x89.toByte :: Nil, mnemonic, destination)
 
     protected def AXToMOffs16[Size <: WordDoubleQuadSize](accumulatorRegister: AccumulatorRegister with Size, memoryLocation: MemoryLocation with Size): Static with MemoryLocationOperation[Size] with NoImmediate =
-      new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
+      new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+
+        override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = Common.this.addressSizePrefixRequirement
 
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, source)
@@ -71,8 +75,9 @@ object Move extends I8086GenericRegisters {
       new ModRRM(operand1, operand2, 0x8A.toByte :: Nil, mnemonic, source)
 
     protected def MOffs8ToAL(memoryLocation: MemoryLocation with ByteSize): Static with MemoryLocationOperation[ByteSize] with NoImmediate =
-      new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
+      new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+        override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = Common.this.addressSizePrefixRequirement
 
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(AL, destination)
@@ -86,8 +91,9 @@ object Move extends I8086GenericRegisters {
       new ModRRM(operand1, operand2, 0x8B.toByte :: Nil, mnemonic, source)
 
     protected def MOffs16ToAX[Size <: WordDoubleQuadSize](memoryLocation: MemoryLocation with Size, accumulatorRegister: AccumulatorRegister with Size): Static with MemoryLocationOperation[Size] with NoImmediate =
-      new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
+      new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
         override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+        override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = Common.this.addressSizePrefixRequirement
 
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, destination)
@@ -159,7 +165,7 @@ object Move extends I8086GenericRegisters {
   }
 
   sealed trait I8086 extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     def apply(source: ByteRegister, destination: ByteRegister): X86Operation =
       apply(source, destination.asInstanceOf[ModRMEncodableOperand with ByteSize])
 
@@ -200,7 +206,7 @@ object Move extends I8086GenericRegisters {
   }
 
   sealed trait I386 extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     def apply(source: ByteRegister, destination: ByteRegister): X86Operation =
       apply(source, destination.asInstanceOf[ModRMEncodableOperand with ByteSize])
 
@@ -244,10 +250,11 @@ object Move extends I8086GenericRegisters {
   }
 
   trait LegacyOperations {
-    self: HasOperandSizePrefixRequirements =>
-    object Move extends I8086 with HasOperandSizePrefixRequirements {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    object Move extends I8086 with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LegacyOperations.this.addressSizePrefixRequirement
 
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize)(implicit wordImmediate: ValueToWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
@@ -260,10 +267,11 @@ object Move extends I8086GenericRegisters {
   }
 
   trait RealOperations {
-    self: HasOperandSizePrefixRequirements =>
-    object Move extends I386 with HasOperandSizePrefixRequirements {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    object Move extends I386 with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = RealOperations.this.addressSizePrefixRequirement
 
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize)(implicit wordImmediate: ValueToWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
@@ -276,10 +284,11 @@ object Move extends I8086GenericRegisters {
   }
 
   trait ProtectedOperations {
-    self: HasOperandSizePrefixRequirements =>
-    object Move extends I386 with HasOperandSizePrefixRequirements {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    object Move extends I386 with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ProtectedOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = ProtectedOperations.this.addressSizePrefixRequirement
 
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with DoubleWordSize)(implicit doubleWordImmediate: ValueToDoubleWordImmediate): AbsoluteReference =
         new MoveForLabel(targetLabel) {
@@ -292,10 +301,11 @@ object Move extends I8086GenericRegisters {
   }
 
   trait LongOperations {
-    self: HasOperandSizePrefixRequirements =>
-    object Move extends Common with HasOperandSizePrefixRequirements {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    object Move extends Common with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LongOperations.this.addressSizePrefixRequirement
 
       def apply[Size <: WordDoubleQuadSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister): X86Operation =
         RM16ToSReg(destination, source)

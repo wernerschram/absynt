@@ -15,15 +15,15 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.werner.absynt.x86.{HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements}
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
-import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizePrefixRequirement, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizePrefixRequirement, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
 sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
-  self: HasOperandSizePrefixRequirements =>
+  self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
   protected def Rel8(nearPointer: NearPointer with ByteSize): Static with NearPointerOperation[ByteSize] with NoImmediate =
     new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
@@ -50,7 +50,7 @@ sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: St
 
 sealed abstract class ShortRelativeJump(shortOpcode: Seq[Byte], mnemonic: String)
   extends Jump(shortOpcode, mnemonic) {
-  self: HasOperandSizePrefixRequirements =>
+  self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
   def apply(targetLabel: Label): RelativeReference = {
     LabelJumpOperation(
@@ -70,7 +70,7 @@ sealed abstract class ShortRelativeJump(shortOpcode: Seq[Byte], mnemonic: String
 
 sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
   extends Jump(shortOpcode, mnemonic) {
-  self: HasOperandSizePrefixRequirements =>
+  self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
   protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
     new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements {
@@ -93,7 +93,7 @@ sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val lo
 }
 
 sealed trait CallOperations {
-  self: HasOperandSizePrefixRequirements =>
+  self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
   val mnemonic = "call"
   val opcode = Seq(0xe8.toByte)
@@ -133,7 +133,7 @@ sealed trait CallOperations {
 
 object Jump {
   trait ReturnOperations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     object Return {
 
       val mnemonic: String = "ret"
@@ -160,9 +160,9 @@ object Jump {
         protected def Imm16(immediateValue: ImmediateValue with WordSize): X86Operation =
           new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize] with HasOperandSizePrefixRequirements {
             override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-            override def normalOperand(size: Operand with ValueSize): Boolean = false
-            override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
-          }
+              override def normalOperand(size: Operand with ValueSize): Boolean = false
+              override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+            }
 
             override def immediate: ImmediateValue with WordSize = immediateValue
 
@@ -177,12 +177,13 @@ object Jump {
   }
 
   trait LegacyOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
-      extends Jump(shortOpcode, mnemonic) with HasOperandSizePrefixRequirements {
+      extends Jump(shortOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LegacyOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with ByteWordSize): X86Operation =
         nearPointer match {
@@ -193,8 +194,9 @@ object Jump {
         }
 
       private def Rel16(nearPointer: NearPointer with WordSize) = {
-        new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements {
+        new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
           override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ShortOrLongRelativeJumpLegacy.this.operandSizePrefixRequirement
+          override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LegacyOperations.this.addressSizePrefixRequirement
 
           override val pointer: NearPointer with WordSize = nearPointer
 
@@ -203,19 +205,27 @@ object Jump {
         }
       }
 
-//      def apply(targetLabel: Label): NearJumpOperation[WordSize] = {
-//        new NearJumpOperation[WordSize](shortOpcode, longOpcode, mnemonic, targetLabel, 2) {
-//          override def encodableForShortPointer(offset: Byte): Resource with UnlabeledEncodable =
-//            Rel8(ShortPointer(offset))
-//
-//          override def encodableForLongPointer(offset: Int): Resource with UnlabeledEncodable =
-//            Rel16(LongPointer.realMode(offset))
-//        }
-//      }
+      def apply(targetLabel: Label): LabelJumpOperation = {
+        LabelJumpOperation(
+          Seq(
+            new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel8(ShortPointer(offset.toByte))
+            },
+            new JumpOption(longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel16(LongPointer.realMode(offset))
+            },
+          ),
+          mnemonic,
+          targetLabel
+        )
+      }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements {
+    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LegacyOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with WordSize): X86Operation =
         Rel16(nearPointer)
@@ -262,8 +272,9 @@ object Jump {
     object JumpIfBelow extends ShortOrLongRelativeJumpLegacy(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jb")
     object JumpIfBelowOrEqual extends ShortOrLongRelativeJumpLegacy(Seq(0x76.toByte), Seq(0x0F.toByte, 0x86.toByte), "jbe")
     object JumpIfCarry extends ShortOrLongRelativeJumpLegacy(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jc")
-    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Jump.operandSizePrefixRequirement
+    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.Jump.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LegacyOperations.this.addressSizePrefixRequirement
     }
     object JumpIfEqual extends ShortOrLongRelativeJumpLegacy(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), "je")
     object JumpIfGreater extends ShortOrLongRelativeJumpLegacy(Seq(0x7F.toByte), Seq(0x0F.toByte, 0x8F.toByte), "jg")
@@ -295,12 +306,13 @@ object Jump {
   }
 
   trait RealOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed abstract class ShortOrLongRelativeJumpReal(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
-      extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements {
+      extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = RealOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with ByteWordDoubleSize): X86Operation =
         nearPointer match {
@@ -334,8 +346,9 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements {
+    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = RealOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with WordDoubleSize): X86Operation =
         nearPointer match {
@@ -393,8 +406,9 @@ object Jump {
     object JumpIfBelow extends ShortOrLongRelativeJumpReal(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jb")
     object JumpIfBelowOrEqual extends ShortOrLongRelativeJumpReal(Seq(0x76.toByte), Seq(0x0F.toByte, 0x86.toByte), "jbe")
     object JumpIfCarry extends ShortOrLongRelativeJumpReal(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jc")
-    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Jump.operandSizePrefixRequirement
+    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = RealOperations.this.addressSizePrefixRequirement
     }
     object JumpIfEqual extends ShortOrLongRelativeJumpReal(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), "je")
     object JumpIfGreater extends ShortOrLongRelativeJumpReal(Seq(0x7F.toByte), Seq(0x0F.toByte, 0x8F.toByte), "jg")
@@ -424,12 +438,13 @@ object Jump {
   }
 
   trait ProtectedOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
-      extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements {
+      extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ProtectedOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = ProtectedOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with ByteWordDoubleSize): X86Operation =
         nearPointer match {
@@ -463,8 +478,9 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements {
+    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ProtectedOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = ProtectedOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with WordDoubleSize): X86Operation =
         nearPointer match {
@@ -522,8 +538,9 @@ object Jump {
     object JumpIfBelow extends ShortOrLongRelativeJumpProtected(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jb")
     object JumpIfBelowOrEqual extends ShortOrLongRelativeJumpProtected(Seq(0x76.toByte), Seq(0x0F.toByte, 0x86.toByte), "jbe")
     object JumpIfCarry extends ShortOrLongRelativeJumpProtected(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jc")
-    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Jump.operandSizePrefixRequirement
+    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ProtectedOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = ProtectedOperations.this.addressSizePrefixRequirement
     }
     object JumpIfEqual extends ShortOrLongRelativeJumpProtected(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), "je")
     object JumpIfGreater extends ShortOrLongRelativeJumpProtected(Seq(0x7F.toByte), Seq(0x0F.toByte, 0x8F.toByte), "jg")
@@ -553,12 +570,13 @@ object Jump {
   }
 
   trait LongOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
-      extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements {
+      extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
 
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LongOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with ByteDoubleSize): X86Operation =
         nearPointer match {
@@ -582,8 +600,9 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements {
+    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
       override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LongOperations.this.addressSizePrefixRequirement
 
       def apply(nearPointer: NearPointer with DoubleWordSize): X86Operation =
         Rel32(nearPointer)
@@ -628,8 +647,9 @@ object Jump {
     object JumpIfBelow extends ShortOrLongRelativeJumpLong(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jb")
     object JumpIfBelowOrEqual extends ShortOrLongRelativeJumpLong(Seq(0x76.toByte), Seq(0x0F.toByte, 0x86.toByte), "jbe")
     object JumpIfCarry extends ShortOrLongRelativeJumpLong(Seq(0x72.toByte), Seq(0x0F.toByte, 0x82.toByte), "jc")
-    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Jump.operandSizePrefixRequirement
+    object JumpIfCountZero extends ShortRelativeJump(Seq(0xE3.toByte), "jcx") with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
+      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
+      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LongOperations.this.addressSizePrefixRequirement
     }
     object JumpIfEqual extends ShortOrLongRelativeJumpLong(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), "je")
     object JumpIfGreater extends ShortOrLongRelativeJumpLong(Seq(0x7F.toByte), Seq(0x0F.toByte, 0x8F.toByte), "jg")

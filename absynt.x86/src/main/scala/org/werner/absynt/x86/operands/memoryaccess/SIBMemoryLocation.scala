@@ -23,7 +23,6 @@ sealed class SIBMemoryLocation(
     val index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize,
     val base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize,
     displacement: Option[ImmediateValue with ByteWordDoubleSize] = None, val scale: Int, segment: SegmentRegister)
-    (implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends IndirectMemoryLocation(0x04, displacement, segment) with ModRMEncodableOperand {
 
   self: ValueSize =>
@@ -35,7 +34,7 @@ sealed class SIBMemoryLocation(
   val baseCode: Byte = base.SIBBaseCode
   val indexCode: Byte = index.SIBIndexCode
 
-  override def addressOperands: Set[AddressOperandInfo] =
+  override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
     Set(AddressOperandInfo.SIBBase(base), AddressOperandInfo.SIBIndex(index, segmentOverride))
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ (getSIB +: displacement.toSeq.flatMap(_.value))
@@ -67,15 +66,15 @@ object SIBMemoryLocation {
       def instance(index: GeneralPurposeRegister with SIBIndexRegister with DoubleWordSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleWordSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister): SIBMemoryLocation with Size
     }
 
-    implicit def SIBforByteSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[ByteSize] =
+    implicit def SIBforByteSize: SIBForSize[ByteSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleWordSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleWordSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with ByteSize
 
-    implicit def SIBforWordSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[WordSize] =
+    implicit def SIBforWordSize: SIBForSize[WordSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleWordSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleWordSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with WordSize
 
-    implicit def SIBforDoubleWordSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[DoubleWordSize] =
+    implicit def SIBforDoubleWordSize: SIBForSize[DoubleWordSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleWordSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleWordSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with DoubleWordSize
 
@@ -102,19 +101,19 @@ object SIBMemoryLocation {
       def instance(index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister): SIBMemoryLocation with Size
     }
 
-    implicit def SIBforByteSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[ByteSize] =
+    implicit def SIBforByteSize: SIBForSize[ByteSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with ByteSize
 
-    implicit def SIBforWordSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[WordSize] =
+    implicit def SIBforWordSize: SIBForSize[WordSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with WordSize
 
-    implicit def SIBforDoubleWordSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[DoubleWordSize] =
+    implicit def SIBforDoubleWordSize: SIBForSize[DoubleWordSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with DoubleWordSize
 
-    implicit def SIBforQuadWordSize(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): SIBForSize[QuadWordSize] =
+    implicit def SIBforQuadWordSize: SIBForSize[QuadWordSize] =
       (index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: Option[ImmediateValue with ByteWordDoubleSize], scale: Int, segmentOverride: SegmentRegister) =>
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with QuadWordSize
 

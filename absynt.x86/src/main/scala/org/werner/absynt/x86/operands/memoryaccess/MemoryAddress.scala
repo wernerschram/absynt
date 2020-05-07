@@ -15,8 +15,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.ListExtensions.ListToImmediate
 import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
-import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
+import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement, OperandSizePrefixRequirement}
 
 sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {
@@ -27,7 +26,7 @@ sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segme
   override val registerOrMemoryModeCode: Byte = if (address.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
   final override val defaultSegment: SegmentRegister = Segment.Data
 
-  override def addressOperands: Set[AddressOperandInfo] =
+  override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
     Set(AddressOperandInfo.rmDisplacement(address, segmentOverride))
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ address.value

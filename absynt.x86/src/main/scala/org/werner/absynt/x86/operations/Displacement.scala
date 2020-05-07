@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands.memoryaccess.{FarPointer => FarPointerType, MemoryLocation => MemoryLocationType, NearPointer => NearPointerType}
 import org.werner.absynt.x86.operands.{FarPointerSize, ModRMEncodableOperand, ValueSize, WordDoubleSize}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
@@ -62,7 +62,7 @@ trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
 }
 
 trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
-  self: X86Operation with HasOperandSizePrefixRequirements =>
+  self: X86Operation with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
   def location: MemoryLocationType with Size
   def offsetOrder: OperandOrder

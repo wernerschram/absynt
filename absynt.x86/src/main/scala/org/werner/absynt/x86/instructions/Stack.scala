@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -22,7 +22,7 @@ object Stack {
   private val pushOpcode: String = "push"
 
   trait Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     type RMMaxSize <: WordDoubleQuadSize
     type ImmMaxSize <: ValueSize
@@ -88,7 +88,7 @@ object Stack {
   }
 
   trait LegacyOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordSize
     override type ImmMaxSize = ByteWordSize
@@ -112,7 +112,7 @@ object Stack {
   }
 
   trait RealOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -136,7 +136,7 @@ object Stack {
   }
 
   trait ProtectedOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -160,7 +160,7 @@ object Stack {
   }
 
   trait LongOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordQuadSize
     override type ImmMaxSize = ByteWordDoubleSize

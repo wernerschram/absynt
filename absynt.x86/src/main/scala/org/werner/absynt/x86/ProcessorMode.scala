@@ -37,6 +37,7 @@ trait HasAddressSizePrefixRequirements {
 sealed abstract class ProcessorMode
 extends ImmediateValue.I8086Implicits
   with HasOperandSizePrefixRequirements
+  with HasAddressSizePrefixRequirements
   with MemoryAddress.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
   with RegisterMemoryLocation.Operations
