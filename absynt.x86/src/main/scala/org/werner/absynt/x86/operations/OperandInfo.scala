@@ -82,7 +82,7 @@ object OperandInfo {
     new OperandInfo[ValueSize](operand, operandOrder) with NoOperandSizePrefix //XX
 
   def implicitAddress(memoryLocation: memoryaccess.MemoryLocation with ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement,  addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[_] =
-    new OperandInfo[ValueSize](memoryLocation, operandOrder) with NoOperandSizePrefix {
+    new OperandInfo[ValueSize](memoryLocation, operandOrder) with NormalOperandSizePrefix {
       override def addressOperands: Set[AddressOperandInfo] =
         memoryLocation.addressOperands
     } //XX
