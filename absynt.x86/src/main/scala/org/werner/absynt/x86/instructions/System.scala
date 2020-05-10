@@ -19,7 +19,7 @@ import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.HasOperandSizePrefixRequirements
 
 object System {
-  trait Common {
+  sealed trait Common {
     self: HasOperandSizePrefixRequirements =>
 
 

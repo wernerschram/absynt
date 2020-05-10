@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 
 object String {
 
-  trait Common[TS <: ValueSize, WS <: TS] {
+  sealed trait Common[TS <: ValueSize, WS <: TS] {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     val noOperandSizePrefixRequirements: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {

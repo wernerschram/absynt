@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 object Stack {
   private val pushOpcode: String = "push"
 
-  trait Common {
+  sealed trait Common {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     type RMMaxSize <: WordDoubleQuadSize
@@ -62,7 +62,7 @@ object Stack {
     protected def StaticFS() = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
     protected def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
 
-    trait PushOperations {
+    sealed trait PushOperations {
       def apply(segment: SegmentRegister): Static = segment match {
         case Segment.Code => StaticCS()
         case Segment.Stack => StaticSS()

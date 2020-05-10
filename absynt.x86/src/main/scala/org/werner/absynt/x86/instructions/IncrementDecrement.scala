@@ -20,7 +20,7 @@ import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePr
 
 object IncrementDecrement {
 
-  trait Common[TS<:ValueSize, WS <: TS] {
+  sealed trait Common[TS<:ValueSize, WS <: TS] {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     private def RM8(operand: ModRMEncodableOperand with ByteSize, rValue: Byte, mnemonic: String): X86Operation =
@@ -40,7 +40,7 @@ object IncrementDecrement {
     }
   }
 
-  trait Shorter[TS<:ValueSize, WS<:TS] extends Common[TS,WS] {
+  sealed trait Shorter[TS<:ValueSize, WS<:TS] extends Common[TS,WS] {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements with Common[TS, WS] =>
 
     private def R16[Size <: WS](register: GeneralPurposeRegister with Size, opcodeBase: Byte, mnemonic: String) =
@@ -65,7 +65,7 @@ object IncrementDecrement {
     }
   }
 
-  trait NoShorter[TS<:ValueSize, WS<:TS] extends Common[TS, WS] {
+  sealed trait NoShorter[TS<:ValueSize, WS<:TS] extends Common[TS, WS] {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     object Increment extends BaseOperation(0, "inc")

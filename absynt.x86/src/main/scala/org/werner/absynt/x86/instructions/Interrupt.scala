@@ -20,7 +20,7 @@ import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 
 object Interrupt {
-  trait BaseOperations {
+  sealed trait BaseOperations {
 
     protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String)(implicit byteImmediate: ValueToByteImmediate): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with HasNoOperandSizePrefixRequirements{

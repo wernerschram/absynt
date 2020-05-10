@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 
 object Test {
 
-  trait Common {
+  sealed trait Common {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     val mnemonic = "test"
 

@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 
 object BasicInteraction {
 
-  trait Common {
+  sealed trait Common {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize, opcodeBase: Byte, mnemonic: String): X86Operation =
       new Static((opcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
