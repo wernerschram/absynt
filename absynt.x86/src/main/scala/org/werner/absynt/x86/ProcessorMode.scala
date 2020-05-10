@@ -66,6 +66,7 @@ object ProcessorMode {
     with Test.LegacyOperations
     with Adjust.Operations
     with IncrementDecrement.LegacyOperations
+    with Flags.Operations
   {
     override type LongPointerSize = WordSize
 
@@ -99,6 +100,7 @@ object ProcessorMode {
     with Test.RealOperations
     with Adjust.Operations
     with IncrementDecrement.RealOperations
+    with Flags.Operations
   {
     override type LongPointerSize = WordSize
 
@@ -141,6 +143,7 @@ object ProcessorMode {
     with Test.ProtectedOperations
     with Adjust.Operations
     with IncrementDecrement.ProtectedOperations
+    with Flags.Operations
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -186,6 +189,7 @@ object ProcessorMode {
     with System.LongOperations
     with Test.LongOperations
     with IncrementDecrement.LongOperations
+    with Flags.Operations
   {
     override type LongPointerSize = DoubleWordSize
 
