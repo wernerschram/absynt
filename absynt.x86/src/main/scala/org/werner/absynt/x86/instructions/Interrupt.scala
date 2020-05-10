@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements}
+import org.werner.absynt.x86.HasNoOperandSizePrefixRequirements
 import org.werner.absynt.x86.operands.ImmediateValue.ValueToByteImmediate
 import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations._

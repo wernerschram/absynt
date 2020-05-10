@@ -15,7 +15,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.ListExtensions.ListToImmediate
 import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement, OperandSizePrefixRequirement}
+import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 
 sealed class MemoryAddress private(address: ImmediateValue with ValueSize, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {

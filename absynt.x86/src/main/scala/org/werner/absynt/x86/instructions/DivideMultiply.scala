@@ -14,8 +14,7 @@
 package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
-import org.werner.absynt.x86.operands.ImmediateValue.ValueToByteImmediate
-import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue, ModRMEncodableOperand, ValueSize, WordDoubleQuadSize}
+import org.werner.absynt.x86.operands.{ByteSize, ModRMEncodableOperand, ValueSize, WordDoubleQuadSize}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 
