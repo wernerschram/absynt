@@ -19,7 +19,6 @@ import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 
 object Stack {
-  private val pushOpcode: String = "push"
 
   sealed trait Common {
     self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
@@ -28,41 +27,43 @@ object Stack {
     type ImmMaxSize <: ValueSize
     type ImmExtendedMaxSize <: WordDoubleQuadSize
 
-    protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
-      new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), pushOpcode) with NoDisplacement with NoImmediate {
-        override def registerOrder: OperandOrder = destination
-      }
-
-    protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
-      new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, pushOpcode, destination) with NoDisplacement with NoImmediate
-
-
-    protected def Imm8(immediateValue: ImmediateValue with ByteSize): X86Operation =
-      new Static(0x6A.toByte :: Nil, pushOpcode) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
-        implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
-        override def immediate: ImmediateValue with ByteSize = immediateValue
-
-        override def immediateOrder: OperandOrder = destination
-      }
-
-    protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue with Size): X86Operation =
-      new Static(0x68.toByte :: Nil, pushOpcode) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
-        implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
-        override def immediate: ImmediateValue with Size = immediateValue
-
-        override def immediateOrder: OperandOrder = destination
-      }
-
-    protected def StaticCS() = new Static(0x0E.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticSS() = new Static(0x16.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticDS() = new Static(0x1E.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticES() = new Static(0x06.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticFS() = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-    protected def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, pushOpcode) with NoDisplacement with NoImmediate
-
     sealed trait PushOperations {
+      private val mnemonic: String = "push"
+
+      private def StaticCS() = new Static(0x0E.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
+      private def StaticSS() = new Static(0x16.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
+      private def StaticDS() = new Static(0x1E.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
+      private def StaticES() = new Static(0x06.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
+      private def StaticFS() = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
+      private def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
+
+      protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue with Size): X86Operation =
+        new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
+          implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+
+          override def immediate: ImmediateValue with Size = immediateValue
+
+          override def immediateOrder: OperandOrder = destination
+        }
+
+      protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+        new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), mnemonic) with NoDisplacement with NoImmediate {
+          override def registerOrder: OperandOrder = destination
+        }
+
+      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
+        new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
+
+
+      protected def Imm8(immediateValue: ImmediateValue with ByteSize): X86Operation =
+        new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
+          implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+
+          override def immediate: ImmediateValue with ByteSize = immediateValue
+
+          override def immediateOrder: OperandOrder = destination
+        }
+
       def apply(segment: SegmentRegister): Static = segment match {
         case Segment.Code => StaticCS()
         case Segment.Stack => StaticSS()
