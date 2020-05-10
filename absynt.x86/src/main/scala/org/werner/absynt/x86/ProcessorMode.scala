@@ -57,6 +57,7 @@ object ProcessorMode {
     with I8086Registers
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
+    with DivideMultiply.Operations
     with Interrupt.LegacyRealProtectedOperations
     with IO.LegacyOperations
     with Jump.LegacyOperations
@@ -64,6 +65,7 @@ object ProcessorMode {
     with String.LegacyOperations
     with Test.LegacyOperations
     with Adjust.Operations
+    with IncrementDecrement.LegacyOperations
   {
     override type LongPointerSize = WordSize
 
@@ -96,6 +98,7 @@ object ProcessorMode {
     with String.RealOperations
     with Test.RealOperations
     with Adjust.Operations
+    with IncrementDecrement.RealOperations
   {
     override type LongPointerSize = WordSize
 
@@ -137,6 +140,7 @@ object ProcessorMode {
     with System.ProtectedOperations
     with Test.ProtectedOperations
     with Adjust.Operations
+    with IncrementDecrement.ProtectedOperations
   {
     override type LongPointerSize = DoubleWordSize
 
@@ -181,6 +185,7 @@ object ProcessorMode {
     with String.LongOperations
     with System.LongOperations
     with Test.LongOperations
+    with IncrementDecrement.LongOperations
   {
     override type LongPointerSize = DoubleWordSize
 

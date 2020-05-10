@@ -1,0 +1,90 @@
+/*
+ * Copyright 2019 Werner Schram
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
+package org.werner.absynt.x86.instructions
+
+import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, destination}
+import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
+
+object IncrementDecrement {
+
+  trait Common[TS<:ValueSize, WS <: TS] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+
+    private def RM8(operand: ModRMEncodableOperand with ByteSize, rValue: Byte, mnemonic: String): X86Operation =
+      new ModRM(operand, 0xFE.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
+
+    private def RM16[Size <: WS](operand: ModRMEncodableOperand with Size, rValue: Byte, mnemonic: String): X86Operation =
+      new ModRM(operand, 0xFF.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
+
+    abstract class BaseOperation(extension: Byte, val mnemonic: String) {
+
+      def apply[Size <: TS](destination: ModRMEncodableOperand with Size): X86Operation = destination match {
+        case d: ModRMEncodableOperand with ByteSize =>
+          RM8(d, extension, mnemonic)
+        case d: ModRMEncodableOperand with WS =>
+          RM16(d, extension, mnemonic)
+      }
+    }
+  }
+
+  trait Shorter[TS<:ValueSize, WS<:TS] extends Common[TS,WS] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements with Common[TS, WS] =>
+
+    private def R16[Size <: WS](register: GeneralPurposeRegister with Size, opcodeBase: Byte, mnemonic: String) =
+      new RegisterEncoded[Size](register, Seq(opcodeBase), mnemonic) with NoDisplacement with NoImmediate {
+      override def registerOrder: OperandOrder = destination
+    }
+
+    trait ShorterOperation {
+      self: BaseOperation =>
+      val shortOpcodeBase: Byte
+
+      def apply[Size <: WS](destination: GeneralPurposeRegister with Size): X86Operation =
+        R16(destination, shortOpcodeBase, mnemonic)
+    }
+
+    object Increment extends BaseOperation(0, "inc") with ShorterOperation {
+      override val shortOpcodeBase: Byte = 0x40
+    }
+
+    object Decrement extends BaseOperation(1, "dec") with ShorterOperation {
+      override val shortOpcodeBase: Byte = 0x48
+    }
+  }
+
+  trait NoShorter[TS<:ValueSize, WS<:TS] extends Common[TS, WS] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+
+    object Increment extends BaseOperation(0, "inc")
+    object Decrement extends BaseOperation(1, "dec")
+  }
+
+  trait LegacyOperations extends Shorter[ByteWordSize, WordSize] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  }
+
+  trait RealOperations extends Shorter[ByteWordDoubleSize, WordDoubleSize] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  }
+
+  trait ProtectedOperations extends Shorter[ByteWordDoubleSize, WordDoubleSize] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  }
+
+  trait LongOperations extends NoShorter[ValueSize, WordDoubleQuadSize] {
+    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  }
+}
