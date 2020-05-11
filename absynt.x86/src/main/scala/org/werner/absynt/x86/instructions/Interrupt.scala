@@ -13,32 +13,30 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.HasNoOperandSizePrefixRequirements
 import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue}
-import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
+import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 object Interrupt {
   sealed trait BaseOperations {
-    self: ImmediateValue.I8086Implicits =>
+    self: ArchitectureBounds with ImmediateValue.I8086Implicits =>
 
     protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with HasNoOperandSizePrefixRequirements{
+      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
-          super.allOperands + OperandInfo.implicitOperand(byteImm(interrupt), destination)
+          super.allOperands + OperandInfo.implicitOperand(byteImm(interrupt), destination)(noOperandSizePrefixRequirement)
       }
 
     protected def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String): X86Operation =
-      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasNoOperandSizePrefixRequirements {
-
-        override def immediate: ImmediateValue with ByteSize = immediateValue
-
+      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
         override def immediateOrder: OperandOrder = destination
       }
   }
 
   trait LegacyRealProtectedOperations extends BaseOperations {
-    self: ImmediateValue.I8086Implicits =>
+    self: ArchitectureBounds with ImmediateValue.I8086Implicits =>
     object Interrupt {
       val mnemonic: String = "int"
 
@@ -52,7 +50,7 @@ object Interrupt {
   }
 
   trait LongOperations extends BaseOperations {
-    self: ImmediateValue.I8086Implicits =>
+    self: ProcessorMode.LongBounds with ImmediateValue.I8086Implicits =>
     object Interrupt {
       val mnemonic: String = "int"
 

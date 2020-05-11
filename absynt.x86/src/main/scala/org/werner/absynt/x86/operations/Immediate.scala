@@ -13,7 +13,6 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
 import org.werner.absynt.x86.operands.{ImmediateValue, ValueSize}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 
@@ -29,15 +28,13 @@ trait NoImmediate extends ImmediateBytes {
 }
 
 trait Immediate[Size<:ValueSize] extends ImmediateBytes {
+  self: X86Operation =>
 
-  // TODO: remove this selftype as HasOperandPrefixRequirements application is unclear at this point
-  self: X86Operation with HasOperandSizePrefixRequirements =>
-
-  def immediate: ImmediateValue with Size
+  def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with Size]
   def immediateOrder: OperandOrder
 
   protected override abstract def allOperands: Set[OperandInfo[_]] =
-    super.allOperands + OperandInfo.immediate(immediate, immediateOrder)
+    super.allOperands + OperandInfo.immediate(immediate.operand, immediateOrder)(immediate.operandSizePrefixRequirement)
 
-  override def immediateBytes: Seq[Byte] = immediate.value
+  override def immediateBytes: Seq[Byte] = immediate.operand.value
 }

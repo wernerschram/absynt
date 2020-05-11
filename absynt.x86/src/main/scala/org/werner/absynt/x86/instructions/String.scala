@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
+import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess.{DestinationReference, SourceReference}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
@@ -22,7 +22,7 @@ import org.werner.absynt.x86.operations._
 object String {
 
   sealed trait Common {
-    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     val noOperandSizePrefixRequirements: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = false

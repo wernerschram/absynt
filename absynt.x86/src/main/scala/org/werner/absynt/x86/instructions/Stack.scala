@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
+import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 object Stack {
 
   sealed trait Common {
-    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     type RMMaxSize <: MaxWideSize
     type ImmMaxSize <: MaxValueSize
@@ -38,11 +38,8 @@ object Stack {
       private def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
 
       protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue with Size): X86Operation =
-        new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
-          implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
-          override def immediate: ImmediateValue with Size = immediateValue
-
+        new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size] {
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with Size] = immediateValue
           override def immediateOrder: OperandOrder = destination
         }
 
@@ -56,11 +53,8 @@ object Stack {
 
 
       protected def Imm8(immediateValue: ImmediateValue with ByteSize): X86Operation =
-        new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
-          implicit override val operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
-          override def immediate: ImmediateValue with ByteSize = immediateValue
-
+        new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = destination
         }
 

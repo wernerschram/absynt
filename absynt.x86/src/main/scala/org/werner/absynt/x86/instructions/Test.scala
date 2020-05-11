@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
+import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -22,73 +22,55 @@ import org.werner.absynt.x86.operations._
 object Test {
 
   sealed trait Common {
-    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize): X86Operation =
-      new Static(0xA8.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
-
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
+      new Static(0xA8.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, destination)
 
         override val immediateOrder: OperandOrder = source
-        override val immediate: ImmediateValue with ByteSize = immediateValue
+        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
       }
 
     protected def Imm16ToAX(immediateValue: ImmediateValue with WordSize): X86Operation =
-      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize] with HasOperandSizePrefixRequirements {
-
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
+      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize] {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, destination)
 
         override val immediateOrder: OperandOrder = source
-        override val immediate: ImmediateValue with WordSize = immediateValue
+        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with WordSize] = immediateValue
       }
 
     protected def Imm32ToEAX(immediateValue: ImmediateValue with DoubleWordSize): X86Operation =
-      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] with HasOperandSizePrefixRequirements {
-
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
+      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
 
         override val immediateOrder: OperandOrder = source
-        override val immediate: ImmediateValue with DoubleWordSize = immediateValue
+        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with DoubleWordSize] = immediateValue
       }
 
     protected def Imm32ToRAX(immediateValue: ImmediateValue with DoubleWordSize): X86Operation =
-      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] with HasOperandSizePrefixRequirements {
-
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
+      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.QuadWord, destination)
 
         override val immediateOrder: OperandOrder = source
-        override val immediate: ImmediateValue with DoubleWordSize = immediateValue
+        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with DoubleWordSize] = immediateValue
       }
 
     protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue with ByteSize): X86Operation =
-      new ModRM(operand, 0xF6.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] with HasOperandSizePrefixRequirements {
-
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
+      new ModRM(operand, 0xF6.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
         override val immediateOrder: OperandOrder = source
-        override val immediate: ImmediateValue with ByteSize = immediateValue
+        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
       }
 
     protected def Imm16ToRM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, immediateValue: ImmediateValue with Size): X86Operation =
-      new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size] with HasOperandSizePrefixRequirements {
-
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
-
+      new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size] {
         override val immediateOrder: OperandOrder = source
-        override val immediate: ImmediateValue with Size = immediateValue
+        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with Size] = immediateValue
       }
 
     protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize): X86Operation =

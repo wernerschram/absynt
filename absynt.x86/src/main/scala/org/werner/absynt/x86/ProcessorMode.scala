@@ -16,7 +16,7 @@ package org.werner.absynt.x86
 import org.werner.absynt.x86.instructions._
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizePrefixRequirement}
+import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizePrefixRequirement, OperandWithAddressSizePrefixInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo}
 import org.werner.absynt.x86.operands.Register.I8086Registers
 
 trait HasOperandSizePrefixRequirements {
@@ -34,9 +34,24 @@ trait HasAddressSizePrefixRequirements {
   implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 }
 
-trait ArchitectureBound {
+
+trait ArchitectureBounds {
   type MaxValueSize <: ValueSize
   type MaxWideSize <: WordDoubleQuadSize
+
+  implicit def operandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
+    OperandWithOperandSizePrefixInfo(operand)
+
+  implicit def operandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithAddressSizePrefixInfo[T] =
+    OperandWithAddressSizePrefixInfo(operand)
+
+  implicit def operandWithSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithSizePrefixInfo[T] =
+    OperandWithSizePrefixInfo(operand)
+
+  def noOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    override def normalOperand(size: Operand with ValueSize): Boolean = false
+    override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+  }
 }
 
 sealed abstract class ProcessorMode
@@ -56,7 +71,7 @@ extends ImmediateValue.I8086Implicits
 }
 
 object ProcessorMode {
-  trait LegacyBounds extends ArchitectureBound {
+  trait LegacyBounds extends ArchitectureBounds {
     type MaxValueSize = ByteWordSize
     type MaxWideSize = WordSize
   }
@@ -89,7 +104,7 @@ object ProcessorMode {
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
   }
 
-  trait I386Bounds extends ArchitectureBound {
+  trait I386Bounds extends ArchitectureBounds {
     type MaxValueSize = ByteWordDoubleSize
     type MaxWideSize = WordDoubleSize
   }
@@ -181,7 +196,7 @@ object ProcessorMode {
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
   }
-  trait LongBounds extends ArchitectureBound {
+  trait LongBounds extends ArchitectureBounds {
     type MaxValueSize = ValueSize
     type MaxWideSize = WordDoubleQuadSize
   }
