@@ -17,9 +17,10 @@ import org.werner.absynt.ListExtensions._
 import org.werner.absynt._
 import org.werner.absynt.output.Elf._
 import org.werner.absynt.sections.Section
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ElfSuite extends WordSpec with Matchers {
+class ElfSuite extends AnyWordSpec with Matchers {
 
   def filler(count: Int): EncodedBytes =
     EncodedBytes(Seq.fill(count)(0x00.toByte))

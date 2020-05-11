@@ -13,9 +13,10 @@
 
 package org.werner.absynt.x86.operations
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class X86OperationSuite extends WordSpec with Matchers {
+class X86OperationSuite extends AnyWordSpec with Matchers {
 
   "an X86 instruction" when {
     "in protected mode" should {

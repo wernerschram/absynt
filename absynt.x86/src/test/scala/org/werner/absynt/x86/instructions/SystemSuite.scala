@@ -16,9 +16,10 @@ package org.werner.absynt.x86.instructions
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ReturnMode
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SystemSuite extends WordSpec with Matchers {
+class SystemSuite extends AnyWordSpec with Matchers {
 
   "a SysCall instruction" when {
 

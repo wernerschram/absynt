@@ -14,7 +14,7 @@
 package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
-import org.werner.absynt.x86.operands.{ByteSize, ModRMEncodableOperand, ValueSize, WordDoubleQuadSize}
+import org.werner.absynt.x86.operands.{ByteSize, ModRMEncodableOperand}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 

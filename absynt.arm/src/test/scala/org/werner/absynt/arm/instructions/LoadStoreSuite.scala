@@ -13,7 +13,6 @@
 
 package org.werner.absynt.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt._
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operands.Condition
@@ -21,8 +20,10 @@ import org.werner.absynt.arm.operations._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class LoadStoreSuite extends WordSpec with Matchers {
+class LoadStoreSuite extends AnyWordSpec with Matchers {
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {

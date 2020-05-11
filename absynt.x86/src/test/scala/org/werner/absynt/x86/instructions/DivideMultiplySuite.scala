@@ -13,11 +13,12 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DivideMultiplySuite extends WordSpec with Matchers {
+class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
   // IMUL, MUL, IDIV and DIV all inherit from BasicDivide.
   // BasicDivide is covered by the DIV tests, for the IMUL, MUL and IDIV there are some testcases to test the opcode.

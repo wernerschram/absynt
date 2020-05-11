@@ -14,9 +14,10 @@
 package org.werner.absynt.arm.instructions
 
 import org.werner.absynt.arm.operations.ARMOperation
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ARMInstructionSuite extends WordSpec with Matchers {
+class ARMInstructionSuite extends AnyWordSpec with Matchers {
 
   "an ARM instruction" when {
     "in a32 mode" should {

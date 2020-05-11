@@ -13,13 +13,14 @@
 
 package org.werner.absynt.arm.instructions
 
-import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt.Hex
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operands.Condition
 import org.werner.absynt.arm.operations.Fields
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class MoveStatusRegisterSuite extends WordSpec with Matchers {
+class MoveStatusRegisterSuite extends AnyWordSpec with Matchers {
 
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {

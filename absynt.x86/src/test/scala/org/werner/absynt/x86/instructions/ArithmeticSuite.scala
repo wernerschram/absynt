@@ -15,11 +15,12 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.{Accumulator, ByteSize, DoubleWordSize, GeneralPurposeRegister, ImmediateValue, QuadWordSize, WordSize}
+import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ArithmeticSuite extends WordSpec with Matchers {
+class ArithmeticSuite extends AnyWordSpec with Matchers {
 
   // ADC, ADD, AND, CMP, OR, SBB, SUB and XOR all inherits from BasicInteraction.
   // BasicInteraction is covered by the XOR tests, for the others there are some testcases to test the opcode.

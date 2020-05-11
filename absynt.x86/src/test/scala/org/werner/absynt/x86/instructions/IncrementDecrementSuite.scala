@@ -13,12 +13,13 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.{ByteSize, WordSize}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class IncrementDecrementSuite extends WordSpec with Matchers {
+class IncrementDecrementSuite extends AnyWordSpec with Matchers {
 
   "an Increment instruction" when {
     "in real mode" should {

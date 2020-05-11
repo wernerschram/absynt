@@ -13,11 +13,12 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class AdjustSuite extends WordSpec with Matchers {
+class AdjustSuite extends AnyWordSpec with Matchers {
 
   "an Adjust instruction" when {
     "in real mode" should {

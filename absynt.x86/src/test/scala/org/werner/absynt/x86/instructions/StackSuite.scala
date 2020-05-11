@@ -17,9 +17,10 @@ import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.{DoubleWordSize, QuadWordSize, WordSize}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class StackSuite extends WordSpec with Matchers {
+class StackSuite extends AnyWordSpec with Matchers {
 
   "an Push instruction" when {
     "in real mode" should {

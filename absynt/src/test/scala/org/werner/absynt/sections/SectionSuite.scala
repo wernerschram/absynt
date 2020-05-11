@@ -17,9 +17,10 @@ import org.werner.absynt._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.EncodableConversion._
 import org.werner.absynt.resource.Resource
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SectionSuite extends WordSpec with Matchers {
+class SectionSuite extends AnyWordSpec with Matchers {
 
   "a Section" when {
 

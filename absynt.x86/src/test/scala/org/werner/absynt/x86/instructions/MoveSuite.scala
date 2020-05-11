@@ -20,9 +20,10 @@ import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class MoveSuite extends WordSpec with Matchers {
+class MoveSuite extends AnyWordSpec with Matchers {
 
   "a Move instruction" when {
     "in real mode" should {

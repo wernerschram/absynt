@@ -2,9 +2,10 @@ scalaVersion in ThisBuild := "2.13.0"
 
 autoCompilerPlugins := true
 libraryDependencies in ThisBuild += compilerPlugin(scalafixSemanticdb) // enable SemanticDB
+scalafixDependencies in ThisBuild += "org.scalatest" %% "autofix" % "3.1.0.0" 
 
 
-val testVersion = "3.0.8"
+val testVersion = "3.1.1"
 val spec2Version = "4.7.0"
 
 scalacOptions in ThisBuild ++= Seq(
@@ -40,7 +41,6 @@ lazy val absynt = (project in file("absynt"))
   name := "absynt",
   bintrayRepository := "ivy",
   publishMavenStyle := false,
-  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
   libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test, 
 )
 
@@ -52,7 +52,6 @@ lazy val absyntInProc = (project in file("absynt.inproc"))
   bintrayRepository := "ivy",
   publishMavenStyle := false,
   libraryDependencies += "net.java.dev.jna" % "jna" % "5.3.1",
-  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
   libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 
@@ -63,7 +62,6 @@ lazy val absyntX86 = (project in file("absynt.x86"))
   name := "absynt.x86",
   bintrayRepository := "ivy",
   publishMavenStyle := false,
-  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
   libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 
@@ -74,7 +72,6 @@ lazy val absyntARM = (project in file("absynt.arm"))
   name := "absynt.arm",
   bintrayRepository := "ivy",
   publishMavenStyle := false,
-  libraryDependencies += "org.specs2" %% "specs2-core" % spec2Version % Test,
   libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 

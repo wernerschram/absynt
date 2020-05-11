@@ -13,9 +13,10 @@
 
 package org.werner.absynt
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class EncodedBytesSuite extends WordSpec with Matchers {
+class EncodedBytesSuite extends AnyWordSpec with Matchers {
 
   "an Encoded Byte List" should {
     "correctly encode 0x00, 0x01, 0x02" in {

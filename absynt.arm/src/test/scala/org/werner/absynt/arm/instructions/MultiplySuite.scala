@@ -16,9 +16,10 @@ package org.werner.absynt.arm.instructions
 import org.werner.absynt.Hex
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operands.Condition
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class MultiplySuite extends WordSpec with Matchers {
+class MultiplySuite extends AnyWordSpec with Matchers {
 
   "an MultiplyAccumulate instruction" when {
     "in a32 mode" should {

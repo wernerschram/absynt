@@ -13,10 +13,10 @@
 
 package org.werner.absynt
 
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class EncodedStringSuite extends WordSpec with Matchers {
+class EncodedStringSuite extends AnyWordSpec with Matchers {
 
   "an Encoded String" should {
     "correctly encode \"Test\"" in {

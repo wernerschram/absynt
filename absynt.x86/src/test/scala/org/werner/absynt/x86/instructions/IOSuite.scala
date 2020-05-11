@@ -15,9 +15,10 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class IOSuite extends WordSpec with Matchers {
+class IOSuite extends AnyWordSpec with Matchers {
 
   "an Input instruction" when {
     "in real mode" should {

@@ -15,9 +15,10 @@ package org.werner.absynt.arm.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.arm.ProcessorMode
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SoftwareInterruptSuite extends WordSpec with Matchers {
+class SoftwareInterruptSuite extends AnyWordSpec with Matchers {
 
   "a SoftwareInterrupt instruction" when {
     "in a32 mode" should {

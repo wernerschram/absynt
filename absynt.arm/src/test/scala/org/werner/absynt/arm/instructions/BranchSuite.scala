@@ -19,9 +19,10 @@ import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class BranchSuite extends WordSpec with Matchers {
+class BranchSuite extends AnyWordSpec with Matchers {
 
   "an Branch instruction" when {
     "in a32 mode" should {

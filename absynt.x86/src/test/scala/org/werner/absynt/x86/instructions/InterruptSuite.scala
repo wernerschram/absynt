@@ -15,9 +15,10 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class InterruptSuite extends WordSpec with Matchers {
+class InterruptSuite extends AnyWordSpec with Matchers {
 
   "an Interrupt instruction" when {
 

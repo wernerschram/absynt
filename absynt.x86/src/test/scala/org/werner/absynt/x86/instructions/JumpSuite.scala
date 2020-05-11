@@ -14,7 +14,6 @@
 package org.werner.absynt.x86.instructions
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{Matchers, WordSpec}
 import org.werner.absynt._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
@@ -23,8 +22,10 @@ import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.X86Operation
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class JumpSuite extends WordSpec with Matchers {
+class JumpSuite extends AnyWordSpec with Matchers {
 
   "an Jump instruction" when {
 

@@ -16,11 +16,12 @@ package org.werner.absynt
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource._
 import org.werner.absynt.sections.Section
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.reflect.ClassTag
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ApplicationSuite extends WordSpec with Matchers {
+class ApplicationSuite extends AnyWordSpec with Matchers {
 
   "an Application" when {
 

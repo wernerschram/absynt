@@ -16,9 +16,10 @@ package org.werner.absynt.arm.instructions
 import org.werner.absynt.Hex
 import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operations.UpdateMode
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class LoadStoreMultipleSuite extends WordSpec with Matchers {
+class LoadStoreMultipleSuite extends AnyWordSpec with Matchers {
 
   "a LoadMultiple instruction" when {
     "in a32 mode" should {
