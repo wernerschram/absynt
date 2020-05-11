@@ -13,17 +13,17 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{HasNoOperandSizePrefixRequirements}
+import org.werner.absynt.x86.HasNoOperandSizePrefixRequirements
 import org.werner.absynt.x86.operands.{Accumulator, ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, destination}
 import org.werner.absynt.x86.operations._
 
 object Adjust {
   trait Operations {
-    protected def Static(code: Byte, mnemonic: String) =
+    private def Static(code: Byte, mnemonic: String) =
       new Static(code :: Nil, mnemonic) with NoDisplacement with NoImmediate
 
-    protected def StaticImm(code: Byte, mnemonic: String, immediateValue: ImmediateValue with ByteSize) =
+    private def StaticImm(code: Byte, mnemonic: String, immediateValue: ImmediateValue with ByteSize) =
       new Static(code :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] with HasNoOperandSizePrefixRequirements {
         override def immediate: ImmediateValue with ByteSize = immediateValue
 

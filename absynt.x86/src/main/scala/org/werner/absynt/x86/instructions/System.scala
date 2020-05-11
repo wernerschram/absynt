@@ -32,10 +32,7 @@ object System {
         protected override def allOperands: Set[OperandInfo[_]] =
           super.allOperands + OperandInfo.implicitOperand(returnMode, destination)
       }
-  }
 
-  trait ProtectedOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
     object SystemEnter {
       def apply(): Static = staticEnter()
     }
@@ -43,6 +40,11 @@ object System {
     object SystemExit {
       def apply(returnMode: ReturnMode with DoubleQuadSize): Static = staticExit(returnMode)
     }
+  }
+
+  trait ProtectedOperations extends Common {
+    self: HasOperandSizePrefixRequirements =>
+
   }
 
   trait LongOperations extends Common {
@@ -61,17 +63,8 @@ object System {
       def apply(): Static = staticCall()
     }
 
-    object SystemEnter {
-      def apply(): Static = staticEnter()
-    }
-
     object SystemReturn {
       def apply(returnMode: ReturnMode with DoubleQuadSize): Static = staticReturn(returnMode)
     }
-
-    object SystemExit {
-      def apply(returnMode: ReturnMode with DoubleQuadSize): Static = staticExit(returnMode)
-    }
-
   }
 }

@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
+import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -22,7 +22,7 @@ import org.werner.absynt.x86.operations._
 object Test {
 
   sealed trait Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
     val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize): X86Operation =
@@ -96,18 +96,27 @@ object Test {
 
     protected def R16ToRM16[Size <: WordDoubleQuadSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size): X86Operation =
       new ModRRM(operand1, operand2, 0x85.toByte :: Nil, mnemonic, destination)
+
+    sealed abstract class TestBase {
+      def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize): X86Operation =
+        R8ToRM8(source, destination)
+
+      def apply(source: ByteRegister, destination: ByteRegister): X86Operation =
+        R8ToRM8(source, destination)
+
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size): X86Operation =
+        R16ToRM16(source, destination)
+
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+        R16ToRM16(source, destination)
+    }
   }
 
 
   trait LegacyOperations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    object Test {
-      def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
-        Imm8ToAL(immediate)
-
-      def apply(immediate: ImmediateValue with WordSize, destination: Accumulator.Word.type): X86Operation =
-        Imm16ToAX(immediate)
+    object Test extends TestBase  {
 
       def apply[Size <: ByteWordSize](immediate: ImmediateValue with Size, destination: ModRMEncodableOperand with Size): X86Operation =
         (immediate, destination) match {
@@ -116,26 +125,13 @@ object Test {
           case (imm: ImmediateValue with WordSize, d: ModRMEncodableOperand with WordSize) =>
             Imm16ToRM16(d, imm)
         }
-
-      def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize): X86Operation =
-        R8ToRM8(source, destination)
-
-      def apply(source: ByteRegister, destination: ByteRegister): X86Operation =
-        R8ToRM8(source, destination)
-
-      def apply(source: GeneralPurposeRegister with WordSize, destination: ModRMEncodableOperand with WordSize): X86Operation =
-        R16ToRM16(source, destination)
-
-      def apply(source: GeneralPurposeRegister with WordSize, destination: GeneralPurposeRegister with WordSize): X86Operation =
-        R16ToRM16(destination, source)
-
     }
   }
 
   trait I386Operations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.I386Bounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    object Test {
+    object Test extends TestBase  {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
         Imm8ToAL(immediate)
 
@@ -152,33 +148,21 @@ object Test {
           case (imm: ImmediateValue with WordDoubleSize, d: ModRMEncodableOperand with WordDoubleSize) =>
             Imm16ToRM16(d, imm)
         }
-
-      def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize): X86Operation =
-        R8ToRM8(source, destination)
-
-      def apply(source: ByteRegister, destination: ByteRegister): X86Operation =
-        R8ToRM8(source, destination)
-
-      def apply[Size <: WordDoubleSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size): X86Operation =
-        R16ToRM16(source, destination)
-
-      def apply[Size <: WordDoubleSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
-        R16ToRM16(destination, source)
     }
   }
 
   trait RealOperations extends I386Operations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
   }
 
   trait ProtectedOperations extends I386Operations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
   }
 
   trait LongOperations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    object Test {
+    object Test extends TestBase {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
         Imm8ToAL(immediate)
 
@@ -203,18 +187,6 @@ object Test {
           case _ =>
             throw new AssertionError
         }
-
-      def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize): X86Operation =
-        R8ToRM8(source, destination)
-
-      def apply(source: ByteRegister, destination: ByteRegister): X86Operation =
-        R8ToRM8(source, destination)
-
-      def apply[Size <: WordDoubleQuadSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size): X86Operation =
-        R16ToRM16(source, destination)
-
-      def apply[Size <: WordDoubleQuadSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
-        R16ToRM16(source, destination)
     }
   }
 }

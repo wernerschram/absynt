@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
+import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -21,11 +21,11 @@ import org.werner.absynt.x86.operations._
 object Stack {
 
   sealed trait Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    type RMMaxSize <: WordDoubleQuadSize
-    type ImmMaxSize <: ValueSize
-    type ImmExtendedMaxSize <: WordDoubleQuadSize
+    type RMMaxSize <: MaxWideSize
+    type ImmMaxSize <: MaxValueSize
+    type ImmExtendedMaxSize <: MaxWideSize
 
     sealed trait PushOperations {
       private val mnemonic: String = "push"
@@ -82,14 +82,13 @@ object Stack {
       def apply(immediate: ImmediateValue with ImmMaxSize): X86Operation =
         immediate match {
           case i: ByteSize => Imm8(i)
-          // unchecked: type erasure does apply but every ImmMaxSize that is not ByteSize is ImmExtendedMaxSize
           case i: ImmExtendedMaxSize @unchecked => Imm16(i)
         }
     }
   }
 
   trait LegacyOperations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordSize
     override type ImmMaxSize = ByteWordSize
@@ -113,7 +112,7 @@ object Stack {
   }
 
   trait RealOperations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -137,7 +136,7 @@ object Stack {
   }
 
   trait ProtectedOperations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -161,9 +160,9 @@ object Stack {
   }
 
   trait LongOperations extends Common {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    override type RMMaxSize = WordQuadSize
+    type RMMaxSize = WordQuadSize
     override type ImmMaxSize = ByteWordDoubleSize
     override type ImmExtendedMaxSize = WordDoubleSize
 

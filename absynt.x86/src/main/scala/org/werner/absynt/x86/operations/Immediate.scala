@@ -30,6 +30,7 @@ trait NoImmediate extends ImmediateBytes {
 
 trait Immediate[Size<:ValueSize] extends ImmediateBytes {
 
+  // TODO: remove this selftype as HasOperandPrefixRequirements application is unclear at this point
   self: X86Operation with HasOperandSizePrefixRequirements =>
 
   def immediate: ImmediateValue with Size

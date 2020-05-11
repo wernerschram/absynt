@@ -15,7 +15,7 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements}
+import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasNoOperandSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
@@ -23,113 +23,121 @@ import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
 import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizePrefixRequirement, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
 
 object Jump {
-  sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  trait Common {
+    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    protected def Rel8(nearPointer: NearPointer with ByteSize): Static with NearPointerOperation[ByteSize] with NoImmediate =
-      new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Jump.this.operandSizePrefixRequirement
+    sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
-        override val pointer: NearPointer with ByteSize = nearPointer
+      protected def Rel8(nearPointer: NearPointer with ByteSize): Static with NearPointerOperation[ByteSize] with NoImmediate =
+        new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-        override def pointerOrder: OperandOrder = destination
-      }
+          override val pointer: NearPointer with ByteSize = nearPointer
 
-    protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
-      new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
+          override def pointerOrder: OperandOrder = destination
+        }
 
-    protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements =
-      new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Jump.this.operandSizePrefixRequirement
+      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
+        new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
-        override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
-      }
+      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements =
+        new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
 
-    protected def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
-      new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
-  }
+          override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
+        }
 
-  sealed abstract class ShortRelativeJump(shortOpcode: Seq[Byte], mnemonic: String)
-    extends Jump(shortOpcode, mnemonic) {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
-
-    def apply(targetLabel: Label): RelativeReference = {
-      LabelJumpOperation(
-        Seq(new JumpOption(2, Byte.MinValue, Byte.MaxValue) {
-          override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
-            Rel8(ShortPointer(offset.toByte))
-        }),
-        mnemonic,
-        targetLabel
-      )
+      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
+        new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
     }
 
-    def apply(nearPointer: NearPointer with ByteSize): X86Operation =
-      Rel8(nearPointer)
-  }
+    sealed abstract class ShortRelativeJump(shortOpcode: Seq[Byte], mnemonic: String)
+      extends Jump(shortOpcode, mnemonic) {
+      self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-
-  sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
-    extends Jump(shortOpcode, mnemonic) {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
-
-    protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
-      new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ShortOrLongRelativeJumpI386.this.operandSizePrefixRequirement
-        override val pointer: NearPointer with WordSize = nearPointer
-
-        override def pointerOrder: OperandOrder = destination
+      def apply(targetLabel: Label): RelativeReference = {
+        LabelJumpOperation(
+          Seq(new JumpOption(2, Byte.MinValue, Byte.MaxValue) {
+            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              Rel8(ShortPointer(offset.toByte))
+          }),
+          mnemonic,
+          targetLabel
+        )
       }
+
+      def apply(nearPointer: NearPointer with ByteSize): X86Operation =
+        Rel8(nearPointer)
     }
 
-    protected def Rel32(nearPointer: NearPointer with DoubleWordSize): Static with NearPointerOperation[DoubleWordSize] with NoImmediate = {
-      new Static(longOpcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ShortOrLongRelativeJumpI386.this.operandSizePrefixRequirement
 
-        override val pointer: NearPointer with DoubleWordSize = nearPointer
+    sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
+      extends Jump(shortOpcode, mnemonic) {
 
-        override def pointerOrder: OperandOrder = destination
+      protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
+        new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+
+          override val pointer: NearPointer with WordSize = nearPointer
+
+          override def pointerOrder: OperandOrder = destination
+        }
+      }
+
+      protected def Rel32(nearPointer: NearPointer with DoubleWordSize): Static with NearPointerOperation[DoubleWordSize] with NoImmediate = {
+        new Static(longOpcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = Common.this.operandSizePrefixRequirement
+
+          override val pointer: NearPointer with DoubleWordSize = nearPointer
+
+          override def pointerOrder: OperandOrder = destination
+        }
       }
     }
   }
 
   sealed trait CallOperations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
-    val mnemonic = "call"
-    val opcode = Seq(0xe8.toByte)
+    sealed trait BaseCall {
 
-    protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
-      new Static(opcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = CallOperations.this.operandSizePrefixRequirement
+      val mnemonic = "call"
+      val opcode = Seq(0xe8.toByte)
 
-        override val pointer: NearPointer with WordSize = nearPointer
+      protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
+        new Static(opcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = CallOperations.this.operandSizePrefixRequirement
 
-        override def pointerOrder: OperandOrder = destination
+          override val pointer: NearPointer with WordSize = nearPointer
+
+          override def pointerOrder: OperandOrder = destination
+        }
       }
+
+      protected def Rel32(nearPointer: NearPointer with DoubleWordSize): Static with NearPointerOperation[DoubleWordSize] with NoImmediate = {
+        new Static(opcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = CallOperations.this.operandSizePrefixRequirement
+
+          override val pointer: NearPointer with DoubleWordSize = nearPointer
+
+          override def pointerOrder: OperandOrder = destination
+        }
+      }
+
+      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
+        new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) with NoDisplacement with NoImmediate
+
+      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements =
+        new Static(0x9A.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
+          override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = CallOperations.this.operandSizePrefixRequirement
+
+          override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
+        }
+
+      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
+        new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
     }
 
-    protected def Rel32(nearPointer: NearPointer with DoubleWordSize): Static with NearPointerOperation[DoubleWordSize] with NoImmediate = {
-      new Static(opcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = CallOperations.this.operandSizePrefixRequirement
-
-        override val pointer: NearPointer with DoubleWordSize = nearPointer
-
-        override def pointerOrder: OperandOrder = destination
-      }
-    }
-
-    protected def RM16[Size<:WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
-      new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) with NoDisplacement with NoImmediate
-
-    protected def Ptr1616[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements =
-      new Static(0x9A.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate with HasOperandSizePrefixRequirements {
-        override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = CallOperations.this.operandSizePrefixRequirement
-        override def pointer: FarPointer[Size] with FarPointerSize[Size] = farPointer
-      }
-
-    protected def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
-      new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
   }
 
   sealed trait ReturnOperations {
@@ -176,8 +184,8 @@ object Jump {
     }
   }
 
-  trait LegacyOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  trait LegacyOperations extends Common with ReturnOperations with CallOperations {
+    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
@@ -223,9 +231,7 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LegacyOperations.this.operandSizePrefixRequirement
-      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LegacyOperations.this.addressSizePrefixRequirement
+    object Call extends BaseCall {
 
       def apply(nearPointer: NearPointer with WordSize): X86Operation =
         Rel16(nearPointer)
@@ -305,8 +311,8 @@ object Jump {
 
   }
 
-  trait RealOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  trait RealOperations extends Common with ReturnOperations  with CallOperations {
+    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed abstract class ShortOrLongRelativeJumpReal(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
@@ -346,9 +352,7 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = RealOperations.this.operandSizePrefixRequirement
-      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = RealOperations.this.addressSizePrefixRequirement
+    object Call extends BaseCall {
 
       def apply(nearPointer: NearPointer with WordDoubleSize): X86Operation =
         nearPointer match {
@@ -437,8 +441,8 @@ object Jump {
     object JumpIfZero extends ShortOrLongRelativeJumpReal(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), "jz")
   }
 
-  trait ProtectedOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  trait ProtectedOperations extends Common with ReturnOperations with CallOperations {
+    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
@@ -478,9 +482,7 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = ProtectedOperations.this.operandSizePrefixRequirement
-      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = ProtectedOperations.this.addressSizePrefixRequirement
+    object Call extends BaseCall {
 
       def apply(nearPointer: NearPointer with WordDoubleSize): X86Operation =
         nearPointer match {
@@ -569,8 +571,8 @@ object Jump {
     object JumpIfZero extends ShortOrLongRelativeJumpProtected(Seq(0x74.toByte), Seq(0x0F.toByte, 0x84.toByte), "jz")
   }
 
-  trait LongOperations extends ReturnOperations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+  trait LongOperations extends Common with ReturnOperations with CallOperations {
+    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
     abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
@@ -600,9 +602,7 @@ object Jump {
       }
     }
 
-    object Call extends CallOperations with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements {
-      override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = LongOperations.this.operandSizePrefixRequirement
-      override implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = LongOperations.this.addressSizePrefixRequirement
+    object Call extends BaseCall {
 
       def apply(nearPointer: NearPointer with DoubleWordSize): X86Operation =
         Rel32(nearPointer)
@@ -611,7 +611,7 @@ object Jump {
         RM16(operand)
 
       object Far {
-        def apply(pointer: MemoryLocation with WordDoubleQuadSize): X86Operation =
+        def apply[Size<:MaxWideSize](pointer: MemoryLocation with Size): X86Operation =
           M1616(pointer)
       }
 

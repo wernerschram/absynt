@@ -34,6 +34,11 @@ trait HasAddressSizePrefixRequirements {
   implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 }
 
+trait ArchitectureBound {
+  type MaxValueSize <: ValueSize
+  type MaxWideSize <: WordDoubleQuadSize
+}
+
 sealed abstract class ProcessorMode
 extends ImmediateValue.I8086Implicits
   with HasOperandSizePrefixRequirements
@@ -43,7 +48,6 @@ extends ImmediateValue.I8086Implicits
   with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
 {
-  type LongPointerSize <: WordDoubleSize
 
   def pointer(location: Long): ImmediateValue with WordDoubleQuadSize
   def shortPointer(location: Byte): NearPointer with ByteSize = ShortPointer(location)
@@ -52,8 +56,13 @@ extends ImmediateValue.I8086Implicits
 }
 
 object ProcessorMode {
+  trait LegacyBounds extends ArchitectureBound {
+    type MaxValueSize = ByteWordSize
+    type MaxWideSize = WordSize
+  }
 
   object Legacy extends ProcessorMode
+    with LegacyBounds
     with I8086Registers
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
@@ -68,7 +77,6 @@ object ProcessorMode {
     with IncrementDecrement.LegacyOperations
     with Flags.Operations
   {
-    override type LongPointerSize = WordSize
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = false
@@ -81,7 +89,15 @@ object ProcessorMode {
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
   }
 
+  trait I386Bounds extends ArchitectureBound {
+    type MaxValueSize = ByteWordDoubleSize
+    type MaxWideSize = WordDoubleSize
+  }
+
+  trait RealBounds extends I386Bounds
+
   object Real extends ProcessorMode
+    with RealBounds
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -102,7 +118,6 @@ object ProcessorMode {
     with IncrementDecrement.RealOperations
     with Flags.Operations
   {
-    override type LongPointerSize = WordSize
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
@@ -123,7 +138,10 @@ object ProcessorMode {
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
   }
 
+  trait ProtectedBounds extends I386Bounds
+
   object Protected extends ProcessorMode
+    with ProtectedBounds
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -145,8 +163,6 @@ object ProcessorMode {
     with IncrementDecrement.ProtectedOperations
     with Flags.Operations
   {
-    override type LongPointerSize = DoubleWordSize
-
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
         case _: WordSize => true
@@ -165,8 +181,13 @@ object ProcessorMode {
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
   }
+  trait LongBounds extends ArchitectureBound {
+    type MaxValueSize = ValueSize
+    type MaxWideSize = WordDoubleQuadSize
+  }
 
   object Long extends ProcessorMode
+    with LongBounds
     with Register.X64Registers
     with ImmediateValue.I386Implicits
     with ImmediateValue.X64Implicits
@@ -191,8 +212,6 @@ object ProcessorMode {
     with IncrementDecrement.LongOperations
     with Flags.Operations
   {
-    override type LongPointerSize = DoubleWordSize
-
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
         case _: WordSize => true

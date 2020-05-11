@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
+import org.werner.absynt.x86.{ArchitectureBound, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements}
 import org.werner.absynt.x86.operands.{ByteSize, ModRMEncodableOperand, ValueSize, WordDoubleQuadSize}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -22,21 +22,21 @@ object DivideMultiply {
 
 
   trait Operations {
-    self: HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBound with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
 
 
     private def RM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xF6.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
-    private def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, extensionCode: Byte, mnemonic: String): X86Operation =
+    private def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand with Size, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xF7.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
     sealed class BasicDivideMultiply(extensionCode: Byte, val mnemonic: String){
 
-      def apply(operand: ModRMEncodableOperand with ValueSize): X86Operation =
+      def apply[Size <: MaxValueSize](operand: ModRMEncodableOperand with Size): X86Operation =
         operand match {
           case o: ByteSize => RM8(o, extensionCode, mnemonic)
-          case o: WordDoubleQuadSize => RM16(o, extensionCode, mnemonic)
+          case o: ModRMEncodableOperand with MaxWideSize => RM16(o, extensionCode, mnemonic)
         }
     }
 

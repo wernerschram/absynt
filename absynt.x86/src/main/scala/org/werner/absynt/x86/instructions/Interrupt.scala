@@ -14,18 +14,18 @@
 package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.HasNoOperandSizePrefixRequirements
-import org.werner.absynt.x86.operands.ImmediateValue.ValueToByteImmediate
 import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 
 object Interrupt {
   sealed trait BaseOperations {
+    self: ImmediateValue.I8086Implicits =>
 
-    protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String)(implicit byteImmediate: ValueToByteImmediate): X86Operation =
+    protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with HasNoOperandSizePrefixRequirements{
         protected override def allOperands: Set[OperandInfo[_]] =
-          super.allOperands + OperandInfo.implicitOperand(byteImmediate(interrupt), destination)
+          super.allOperands + OperandInfo.implicitOperand(byteImm(interrupt), destination)
       }
 
     protected def Imm8(immediateValue: ImmediateValue with ByteSize, mnemonic: String): X86Operation =
@@ -38,10 +38,11 @@ object Interrupt {
   }
 
   trait LegacyRealProtectedOperations extends BaseOperations {
+    self: ImmediateValue.I8086Implicits =>
     object Interrupt {
       val mnemonic: String = "int"
 
-      def apply(immediate: ImmediateValue with ByteSize)(implicit byteImmediate: ValueToByteImmediate): X86Operation = immediate.value.head match {
+      def apply(immediate: ImmediateValue with ByteSize): X86Operation = immediate.value.head match {
         case 0 => Static(0xCE.toByte, 0.toByte, mnemonic)
         case 1 => Static(0xF1.toByte, 1.toByte, mnemonic)
         case 3 => Static(0xCC.toByte, 3.toByte, mnemonic)
@@ -51,10 +52,11 @@ object Interrupt {
   }
 
   trait LongOperations extends BaseOperations {
+    self: ImmediateValue.I8086Implicits =>
     object Interrupt {
       val mnemonic: String = "int"
 
-      def apply(immediate: ImmediateValue with ByteSize)(implicit byteImmediate: ValueToByteImmediate): X86Operation = immediate.value.head match {
+      def apply(immediate: ImmediateValue with ByteSize): X86Operation = immediate.value.head match {
         case 1 => Static(0xF1.toByte, 1.toByte, mnemonic)
         case 3 => Static(0xCC.toByte, 3.toByte, mnemonic)
         case _ => Imm8(immediate, mnemonic)
