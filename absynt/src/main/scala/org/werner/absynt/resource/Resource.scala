@@ -18,6 +18,7 @@ import org.werner.absynt._
 sealed abstract class Resource
 
 sealed trait Labeled {
+  self: Resource =>
   def label: Label
   def resource: Resource
 }
@@ -28,8 +29,10 @@ sealed abstract class Encodable extends Resource {
   def size: Int
 }
 
+sealed abstract class LabeledEncodable extends Encodable with Labeled {}
+
 abstract class UnlabeledEncodable extends Encodable {
-  final def label(newLabel: Label): Encodable with Labeled = new Encodable with Labeled {
+  final def label(newLabel: Label): Encodable with Labeled = new LabeledEncodable {
     override def encodeByte: Seq[Byte] = UnlabeledEncodable.this.encodeByte
 
     override def size: Int = UnlabeledEncodable.this.size
@@ -63,10 +66,10 @@ sealed abstract class DependentResource extends Resource {
   }
 }
 
+sealed abstract class LabeledDependentResource extends DependentResource with Labeled {}
 abstract class UnlabeledDependentResource extends DependentResource {
 
-  final def label(newLabel: Label): DependentResource with Labeled = new DependentResource with Labeled {
-
+  final def label(newLabel: Label): DependentResource with Labeled = new LabeledDependentResource {
     override def label: Label = newLabel
 
     override val resource: Resource = UnlabeledDependentResource.this

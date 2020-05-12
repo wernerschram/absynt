@@ -79,11 +79,6 @@ class InProcApplication(val sections: Seq[Section]) extends Application with Aut
 
   override def startOffset: Int = startAddress.toInt
 
-  override def finalize(): Unit = {
-    close()
-    super.finalize()
-  }
-
   override def close(): Unit = {
     Libc.mprotect(new Pointer(startAddress), contentLength + pageSize - contentLength % pageSize, Libc.Protection.None)
     unsafe.freeMemory(allocationAddress)
@@ -110,15 +105,15 @@ object Libc {
   private val lib = Native.load("c", classOf[Libc])
 
   sealed case class Protection(code: Int) {
-    def |(p: Protection) =
+    def |(p: Protection): Protection =
       Protection(this.code | p.code)
   }
 
   object Protection {
-    val None = Protection(0)
-    val Read = Protection(1)
-    val Write = Protection(2)
-    val Exec = Protection(4)
+    val None: Protection = Protection(0)
+    val Read: Protection = Protection(1)
+    val Write: Protection = Protection(2)
+    val Exec: Protection = Protection(4)
   }
 
   def mprotect(addr: Pointer, len: Long, prot: Protection): Int = lib.mprotect(addr, len, prot.code)

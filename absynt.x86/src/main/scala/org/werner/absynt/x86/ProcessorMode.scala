@@ -23,17 +23,9 @@ trait HasOperandSizePrefixRequirements {
   implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
 }
 
-trait HasNoOperandSizePrefixRequirements extends HasOperandSizePrefixRequirements {
-  override implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-    override def normalOperand(size: Operand with ValueSize): Boolean = false
-    override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
-  }
-}
-
 trait HasAddressSizePrefixRequirements {
   implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 }
-
 
 trait ArchitectureBounds {
   type MaxValueSize <: ValueSize

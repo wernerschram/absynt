@@ -90,7 +90,7 @@ object String {
       def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference with Size): X86Operation =
         destination match {
           case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(destination))
-          case _: DestinationReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(destination))
+          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(destination))
         }
 
       object Repeat {
@@ -98,7 +98,7 @@ object String {
         def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference with Size): X86Operation =
           destination match {
             case _: DestinationReference with ByteSize => RepStatic8(byteOpcode, mnemonic, operands(destination))
-            case _: DestinationReference with MaxWideSize => RepStatic16(wideOpcode, mnemonic, operands(destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(destination))
           }
       }
     }
@@ -120,7 +120,7 @@ object String {
         destination: DestinationReference with Size): X86Operation =
         destination match {
           case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(register, destination))
-          case _: DestinationReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(register, destination))
+          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(register, destination))
         }
 
       object Repeat {
@@ -131,7 +131,7 @@ object String {
           destination match {
             case _: DestinationReference with ByteSize =>
               RepStatic8(byteOpcode, mnemonic, operands(register, destination))
-            case _: DestinationReference with MaxWideSize => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
           }
       }
     }
@@ -149,7 +149,7 @@ object String {
       def apply[Size <: MaxValueSize](source: SourceReference with Size, register: Data.Word.type): X86Operation =
         source match {
           case _: SourceReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source))
-          case _: SourceReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(source))
+          case _: SourceReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source))
         }
 
       object Repeat {
@@ -157,7 +157,7 @@ object String {
         def apply[Size <: MaxValueSize](source: SourceReference with Size, register: Data.Word.type): X86Operation =
           source match {
             case _: SourceReference with ByteSize => RepStatic8(byteOpcode, mnemonic, operands(source))
-            case _: SourceReference with MaxWideSize => RepStatic16(wideOpcode, mnemonic, operands(source))
+            case _: SourceReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(source))
           }
       }
     }
@@ -177,7 +177,7 @@ object String {
       def apply[Size <: MaxValueSize](source: SourceReference with Size, register: AccumulatorRegister with Size): X86Operation =
         source match {
           case _: SourceReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source, register))
-          case _: SourceReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(source, register))
+          case _: SourceReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, register))
         }
 
       object Repeat {
@@ -187,7 +187,7 @@ object String {
           register: AccumulatorRegister with Size): X86Operation =
           source match {
             case _: SourceReference with ByteSize => RepStatic8(byteOpcode, mnemonic, operands(source, register))
-            case _: SourceReference with MaxWideSize => RepStatic16(wideOpcode, mnemonic, operands(source, register))
+            case _: SourceReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(source, register))
           }
       }
     }
@@ -209,7 +209,7 @@ object String {
         destination: DestinationReference with Size): X86Operation =
         destination match {
           case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(register, destination))
-          case _: DestinationReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(register, destination))
+          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(register, destination))
         }
 
       object Repeat {
@@ -220,7 +220,7 @@ object String {
           destination match {
             case _: DestinationReference with ByteSize =>
               RepStatic8(byteOpcode, mnemonic, operands(register, destination))
-            case _: DestinationReference with MaxWideSize => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
           }
       }
     }
@@ -242,7 +242,7 @@ object String {
         destination: DestinationReference with Size): X86Operation =
         destination match {
           case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source, destination))
-          case _: DestinationReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(source, destination))
+          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, destination))
         }
 
       object RepeatEqual {
@@ -253,7 +253,7 @@ object String {
           destination match {
             case _: DestinationReference with ByteSize =>
               RepEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
 
@@ -265,7 +265,7 @@ object String {
           destination match {
             case _: DestinationReference with ByteSize =>
               RepNEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
     }
@@ -288,7 +288,7 @@ object String {
         destination: DestinationReference with Size): X86Operation =
         destination match {
           case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source, destination))
-          case _: DestinationReference with MaxWideSize => Static16(wideOpcode, mnemonic, operands(source, destination))
+          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, destination))
         }
 
       object RepeatEqual {
@@ -299,7 +299,7 @@ object String {
           destination match {
             case _: DestinationReference with ByteSize =>
               RepEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
 
@@ -311,7 +311,7 @@ object String {
           destination match {
             case _: DestinationReference with ByteSize =>
               RepNEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: DestinationReference with MaxWideSize @unchecked => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
     }

@@ -34,7 +34,7 @@ object IncrementDecrement {
       def apply[Size <: MaxValueSize](destination: ModRMEncodableOperand with Size): X86Operation = destination match {
         case d: ModRMEncodableOperand with ByteSize =>
           RM8(d, extension, mnemonic)
-        case d: ModRMEncodableOperand with MaxWideSize =>
+        case d: ModRMEncodableOperand with MaxWideSize @unchecked =>
           RM16(d, extension, mnemonic)
       }
     }

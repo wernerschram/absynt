@@ -27,7 +27,7 @@ case class LabelJumpOperation(ascendingSizeOptions: Seq[JumpOption], mnemonic: S
 
   override def toString = s"$mnemonic $target"
 
-  def offset(jumpSize: Int, distance: Int, offsetDirection: OffsetDirection): Int = offsetDirection match {
+  def offset(jumpSize: Int, distance: Int, offsetDirection: RelativeOffsetDirection): Int = offsetDirection match {
     case OffsetDirection.Self => -jumpSize
     case OffsetDirection.Forward => distance
     case OffsetDirection.Backward => -distance - jumpSize

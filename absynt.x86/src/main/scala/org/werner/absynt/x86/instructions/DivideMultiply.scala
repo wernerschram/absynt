@@ -36,7 +36,7 @@ object DivideMultiply {
       def apply[Size <: MaxValueSize](operand: ModRMEncodableOperand with Size): X86Operation =
         operand match {
           case o: ByteSize => RM8(o, extensionCode, mnemonic)
-          case o: ModRMEncodableOperand with MaxWideSize => RM16(o, extensionCode, mnemonic)
+          case o: ModRMEncodableOperand with MaxWideSize @unchecked => RM16(o, extensionCode, mnemonic)
         }
     }
 

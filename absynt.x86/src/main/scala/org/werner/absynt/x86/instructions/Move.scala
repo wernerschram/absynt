@@ -173,7 +173,7 @@ object Move extends I8086GenericRegisters {
         (source, destination) match {
           case (s: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, s)
-          case (s: ImmediateValue with MaxWideSize, d: ModRMEncodableOperand with MaxWideSize) =>
+          case (s: ImmediateValue with MaxWideSize @unchecked, d: ModRMEncodableOperand with MaxWideSize @unchecked) =>
             Imm16ToRM16(d, s)
         }
     }
