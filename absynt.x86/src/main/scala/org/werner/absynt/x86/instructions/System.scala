@@ -13,14 +13,14 @@
 
 package org.werner.absynt.x86.instructions
 
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 import org.werner.absynt.x86.operands.{DoubleQuadSize, ReturnMode}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
-import org.werner.absynt.x86.HasOperandSizePrefixRequirements
 
 object System {
   sealed trait Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
 
     def staticEnter(): Static =
@@ -43,12 +43,12 @@ object System {
   }
 
   trait ProtectedOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
 
   }
 
   trait LongOperations extends Common {
-    self: HasOperandSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
 
     def staticCall(): Static =
       new Static(0x0F.toByte :: 0x05.toByte :: Nil, "syscall") with NoDisplacement with NoImmediate

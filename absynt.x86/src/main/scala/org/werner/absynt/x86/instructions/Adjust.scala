@@ -13,14 +13,14 @@
 
 package org.werner.absynt.x86.instructions
 
+import org.werner.absynt.x86.ArchitectureBounds
 import org.werner.absynt.x86.operands.{Accumulator, ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, destination}
 import org.werner.absynt.x86.operations._
-import org.werner.absynt.x86.{ArchitectureBounds, HasOperandSizePrefixRequirements}
 
 object Adjust {
   trait Operations {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements =>
+    self: ArchitectureBounds =>
     private def Static(code: Byte, mnemonic: String) =
       new Static(code :: Nil, mnemonic) with NoDisplacement with NoImmediate
 

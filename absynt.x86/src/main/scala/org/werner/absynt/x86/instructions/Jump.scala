@@ -24,7 +24,7 @@ import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImm
 
 object Jump {
   trait Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
     sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
@@ -86,7 +86,7 @@ object Jump {
   }
 
   sealed trait CallOperations {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
     sealed trait BaseCall {
 
@@ -122,7 +122,7 @@ object Jump {
   }
 
   sealed trait ReturnOperations {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements =>
+    self: ArchitectureBounds =>
     object Return {
 
       val mnemonic: String = "ret"
@@ -165,7 +165,7 @@ object Jump {
   }
 
   trait LegacyOperations extends Common with ReturnOperations with CallOperations {
-    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds =>
 
     sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) {
@@ -280,7 +280,7 @@ object Jump {
   }
 
   trait RealOperations extends Common with ReturnOperations  with CallOperations {
-    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds =>
 
     sealed abstract class ShortOrLongRelativeJumpReal(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
@@ -403,7 +403,7 @@ object Jump {
   }
 
   trait ProtectedOperations extends Common with ReturnOperations with CallOperations {
-    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
 
     sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
@@ -527,7 +527,7 @@ object Jump {
   }
 
   trait LongOperations extends Common with ReturnOperations with CallOperations {
-    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
 
     abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) {

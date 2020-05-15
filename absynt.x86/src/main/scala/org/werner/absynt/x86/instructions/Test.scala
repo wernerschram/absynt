@@ -13,16 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 
 object Test {
 
   sealed trait Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds =>
     val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize): X86Operation =
@@ -96,7 +96,7 @@ object Test {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds =>
 
     object Test extends TestBase  {
 
@@ -111,7 +111,7 @@ object Test {
   }
 
   trait I386Operations extends Common {
-    self: ProcessorMode.I386Bounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.I386Bounds =>
 
     object Test extends TestBase  {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
@@ -134,15 +134,15 @@ object Test {
   }
 
   trait RealOperations extends I386Operations {
-    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds =>
   }
 
   trait ProtectedOperations extends I386Operations {
-    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
 
     object Test extends TestBase {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =

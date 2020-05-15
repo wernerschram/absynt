@@ -13,15 +13,15 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBounds, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 object IO extends {
 
   trait Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
     sealed trait I8086Input {
       val mnemonic: String = "in"
@@ -122,14 +122,14 @@ object IO extends {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds =>
 
     object Input extends I8086Input
     object Output extends I8086Output
   }
 
   trait I386Operations extends Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
     sealed trait I386Input extends I8086Input {
       private def Imm8ToEAX(immediateValue: ImmediateValue with ByteSize) =
@@ -185,15 +185,15 @@ object IO extends {
   }
 
   trait ProtectedOperations extends I386Operations {
-    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
   }
 
   trait RealOperations extends I386Operations {
-    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds =>
   }
 
   trait LongOperations extends I386Operations {
-    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
   }
 
 }

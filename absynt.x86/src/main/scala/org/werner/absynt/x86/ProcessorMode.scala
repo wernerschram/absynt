@@ -19,17 +19,13 @@ import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizePrefixRequirement, OperandWithAddressSizePrefixInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo}
 import org.werner.absynt.x86.operands.Register.I8086Registers
 
-trait HasOperandSizePrefixRequirements {
-  implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
-}
-
-trait HasAddressSizePrefixRequirements {
-  implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
-}
-
-trait ArchitectureBounds {
+sealed trait ArchitectureBounds {
+  self: ProcessorMode =>
   type MaxValueSize <: ValueSize
   type MaxWideSize <: WordDoubleQuadSize
+
+  implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
+  implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 
   implicit def operandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
     OperandWithOperandSizePrefixInfo(operand)
@@ -48,8 +44,6 @@ trait ArchitectureBounds {
 
 sealed abstract class ProcessorMode
 extends ImmediateValue.I8086Implicits
-  with HasOperandSizePrefixRequirements
-  with HasAddressSizePrefixRequirements
   with MemoryAddress.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
   with RegisterMemoryLocation.Operations
@@ -64,6 +58,7 @@ extends ImmediateValue.I8086Implicits
 
 object ProcessorMode {
   trait LegacyBounds extends ArchitectureBounds {
+    self: ProcessorMode =>
     type MaxValueSize = ByteWordSize
     type MaxWideSize = WordSize
   }
@@ -96,12 +91,15 @@ object ProcessorMode {
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
   }
 
-  trait I386Bounds extends ArchitectureBounds {
+  sealed trait I386Bounds extends ArchitectureBounds {
+    self: ProcessorMode =>
     type MaxValueSize = ByteWordDoubleSize
     type MaxWideSize = WordDoubleSize
   }
 
-  trait RealBounds extends I386Bounds
+  sealed trait RealBounds extends I386Bounds {
+    self: ProcessorMode =>
+  }
 
   object Real extends ProcessorMode
     with RealBounds
@@ -145,7 +143,9 @@ object ProcessorMode {
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
   }
 
-  trait ProtectedBounds extends I386Bounds
+  sealed trait ProtectedBounds extends I386Bounds {
+    self: ProcessorMode =>
+  }
 
   object Protected extends ProcessorMode
     with ProtectedBounds
@@ -188,7 +188,9 @@ object ProcessorMode {
 
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
   }
-  trait LongBounds extends ArchitectureBounds {
+  sealed trait LongBounds extends ArchitectureBounds {
+    self: ProcessorMode =>
+
     type MaxValueSize = ValueSize
     type MaxWideSize = WordDoubleQuadSize
   }

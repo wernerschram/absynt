@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 object Stack {
 
   sealed trait Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
     type RMMaxSize <: MaxWideSize
     type ImmMaxSize <: MaxValueSize
@@ -82,7 +82,7 @@ object Stack {
   }
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds =>
 
     override type RMMaxSize = WordSize
     override type ImmMaxSize = ByteWordSize
@@ -106,7 +106,7 @@ object Stack {
   }
 
   trait RealOperations extends Common {
-    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -130,7 +130,7 @@ object Stack {
   }
 
   trait ProtectedOperations extends Common {
-    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -154,7 +154,7 @@ object Stack {
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
 
     type RMMaxSize = WordQuadSize
     override type ImmMaxSize = ByteWordDoubleSize

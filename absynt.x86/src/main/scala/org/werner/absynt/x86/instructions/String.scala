@@ -13,16 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess.{DestinationReference, SourceReference}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 object String {
 
   sealed trait Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds =>
 
     val noOperandSizePrefixRequirements: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = false
@@ -318,18 +318,18 @@ object String {
   }
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds =>
   }
 
   trait RealOperations extends Common {
-    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds =>
   }
 
   trait ProtectedOperations extends Common {
-    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
   }
 }

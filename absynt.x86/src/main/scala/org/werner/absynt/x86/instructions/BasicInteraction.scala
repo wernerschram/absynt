@@ -13,16 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.{ArchitectureBounds, HasAddressSizePrefixRequirements, HasOperandSizePrefixRequirements, ProcessorMode}
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 
 object BasicInteraction {
 
   sealed trait Common {
-    self: ArchitectureBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ArchitectureBounds =>
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize, opcodeBase: Byte, mnemonic: String): X86Operation =
       new Static((opcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
         protected override def allOperands: Set[OperandInfo[_]] =
@@ -129,7 +129,7 @@ object BasicInteraction {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LegacyBounds =>
 
     sealed class I8086BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends BasicInteraction[MaxValueSize](opcodeBase, mnemonic) {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
@@ -162,7 +162,7 @@ object BasicInteraction {
   }
 
   trait I386Operations extends Common {
-    self: ProcessorMode.I386Bounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.I386Bounds =>
 
     sealed class I386BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends BasicInteraction[MaxValueSize](opcodeBase, mnemonic) {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
@@ -199,15 +199,15 @@ object BasicInteraction {
   }
 
   trait RealOperations extends I386Operations {
-    self: ProcessorMode.RealBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.RealBounds =>
   }
 
   trait ProtectedOperations extends I386Operations {
-    self: ProcessorMode.ProtectedBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.ProtectedBounds =>
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with HasOperandSizePrefixRequirements with HasAddressSizePrefixRequirements =>
+    self: ProcessorMode.LongBounds =>
 
     sealed class X64BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends BasicInteraction[MaxValueSize](opcodeBase, mnemonic) {
       def apply(immediate: ImmediateValue with DoubleWordSize, destination: Accumulator.DoubleWord.type): X86Operation =
