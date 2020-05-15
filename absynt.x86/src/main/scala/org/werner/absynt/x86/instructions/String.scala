@@ -321,12 +321,8 @@ object String {
     self: ProcessorMode.LegacyBounds =>
   }
 
-  trait RealOperations extends Common {
-    self: ProcessorMode.RealBounds =>
-  }
-
-  trait ProtectedOperations extends Common {
-    self: ProcessorMode.ProtectedBounds =>
+  trait I386Operations extends Common {
+    self: ProcessorMode.I386Bounds =>
   }
 
   trait LongOperations extends Common {

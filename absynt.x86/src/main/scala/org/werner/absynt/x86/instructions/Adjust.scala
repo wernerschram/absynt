@@ -20,7 +20,7 @@ import org.werner.absynt.x86.operations._
 
 object Adjust {
   trait Operations {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds with OperandSizeInfo =>
     private def Static(code: Byte, mnemonic: String) =
       new Static(code :: Nil, mnemonic) with NoDisplacement with NoImmediate
 

@@ -22,7 +22,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 object Test {
 
   sealed trait Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds with OperandSizeInfo =>
     val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue with ByteSize): X86Operation =
@@ -96,7 +96,7 @@ object Test {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds =>
+    self: ProcessorMode.LegacyBounds with OperandSizeInfo  =>
 
     object Test extends TestBase  {
 
@@ -111,7 +111,7 @@ object Test {
   }
 
   trait I386Operations extends Common {
-    self: ProcessorMode.I386Bounds =>
+    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
 
     object Test extends TestBase  {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
@@ -133,16 +133,8 @@ object Test {
     }
   }
 
-  trait RealOperations extends I386Operations {
-    self: ProcessorMode.RealBounds =>
-  }
-
-  trait ProtectedOperations extends I386Operations {
-    self: ProcessorMode.ProtectedBounds =>
-  }
-
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds =>
+    self: ProcessorMode.LongBounds with OperandSizeInfo  =>
 
     object Test extends TestBase {
       def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): X86Operation =

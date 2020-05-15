@@ -43,7 +43,7 @@ object System {
   }
 
   trait ProtectedOperations extends Common {
-    self: ProcessorMode.ProtectedBounds =>
+    self: ProcessorMode.I386Bounds =>
 
   }
 

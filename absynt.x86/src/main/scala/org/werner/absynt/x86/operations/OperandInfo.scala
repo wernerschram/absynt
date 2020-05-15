@@ -13,12 +13,29 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.RexRequirement
+import org.werner.absynt.x86.{ArchitectureBounds, RexRequirement}
 import org.werner.absynt.x86.operands._
 
 case class OperandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement)
 case class OperandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit val addressSizePrefixRequirement: AddressSizePrefixRequirement)
 case class OperandWithSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement, val addressSizePrefixRequirement: AddressSizePrefixRequirement)
+
+trait OperandSizeInfo {
+  self: ArchitectureBounds =>
+  implicit def operandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
+    OperandWithOperandSizePrefixInfo(operand)
+
+  implicit def operandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithAddressSizePrefixInfo[T] =
+    OperandWithAddressSizePrefixInfo(operand)
+
+  implicit def operandWithSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithSizePrefixInfo[T] =
+    OperandWithSizePrefixInfo(operand)
+
+  def noOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    override def normalOperand(size: Operand with ValueSize): Boolean = false
+    override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+  }
+}
 
 sealed abstract class OperandInfo[Size<:OperandSize](val operand: Operand with Size, val order: OperandInfo.OperandOrder.Value)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement) extends Ordered[OperandInfo[_]] {
   override def toString: String = operand.toString

@@ -76,12 +76,8 @@ object IncrementDecrement {
     self: ProcessorMode.LegacyBounds =>
   }
 
-  trait RealOperations extends Shorter {
-    self: ProcessorMode.RealBounds =>
-  }
-
-  trait ProtectedOperations extends Shorter {
-    self: ProcessorMode.ProtectedBounds =>
+  trait I386Operations extends Shorter {
+    self: ProcessorMode.I386Bounds =>
   }
 
   trait LongOperations extends NoShorter {

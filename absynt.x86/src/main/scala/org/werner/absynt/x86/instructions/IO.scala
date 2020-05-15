@@ -21,7 +21,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 object IO extends {
 
   trait Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds with OperandSizeInfo =>
 
     sealed trait I8086Input {
       val mnemonic: String = "in"
@@ -122,14 +122,14 @@ object IO extends {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds =>
+    self: ProcessorMode.LegacyBounds with OperandSizeInfo =>
 
     object Input extends I8086Input
     object Output extends I8086Output
   }
 
   trait I386Operations extends Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds with OperandSizeInfo =>
 
     sealed trait I386Input extends I8086Input {
       private def Imm8ToEAX(immediateValue: ImmediateValue with ByteSize) =
@@ -184,16 +184,8 @@ object IO extends {
     object Output extends I386Output
   }
 
-  trait ProtectedOperations extends I386Operations {
-    self: ProcessorMode.ProtectedBounds =>
-  }
-
-  trait RealOperations extends I386Operations {
-    self: ProcessorMode.RealBounds =>
-  }
-
   trait LongOperations extends I386Operations {
-    self: ProcessorMode.LongBounds =>
+    self: ProcessorMode.LongBounds with OperandSizeInfo =>
   }
 
 }

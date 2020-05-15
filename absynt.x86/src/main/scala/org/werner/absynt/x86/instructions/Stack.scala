@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 object Stack {
 
   sealed trait Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds with OperandSizeInfo  =>
 
     type RMMaxSize <: MaxWideSize
     type ImmMaxSize <: MaxValueSize
@@ -82,7 +82,7 @@ object Stack {
   }
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds =>
+    self: ProcessorMode.LegacyBounds with OperandSizeInfo  =>
 
     override type RMMaxSize = WordSize
     override type ImmMaxSize = ByteWordSize
@@ -106,7 +106,7 @@ object Stack {
   }
 
   trait RealOperations extends Common {
-    self: ProcessorMode.RealBounds =>
+    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -130,7 +130,7 @@ object Stack {
   }
 
   trait ProtectedOperations extends Common {
-    self: ProcessorMode.ProtectedBounds =>
+    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -154,7 +154,7 @@ object Stack {
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds =>
+    self: ProcessorMode.LongBounds with OperandSizeInfo  =>
 
     type RMMaxSize = WordQuadSize
     override type ImmMaxSize = ByteWordDoubleSize

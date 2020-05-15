@@ -14,10 +14,10 @@
 package org.werner.absynt.x86
 
 import org.werner.absynt.x86.instructions._
+import org.werner.absynt.x86.operands.Register.I8086Registers
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizePrefixRequirement, OperandWithAddressSizePrefixInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo}
-import org.werner.absynt.x86.operands.Register.I8086Registers
+import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizeInfo, OperandSizePrefixRequirement}
 
 sealed trait ArchitectureBounds {
   self: ProcessorMode =>
@@ -27,19 +27,6 @@ sealed trait ArchitectureBounds {
   implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
   implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
 
-  implicit def operandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
-    OperandWithOperandSizePrefixInfo(operand)
-
-  implicit def operandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithAddressSizePrefixInfo[T] =
-    OperandWithAddressSizePrefixInfo(operand)
-
-  implicit def operandWithSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithSizePrefixInfo[T] =
-    OperandWithSizePrefixInfo(operand)
-
-  def noOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-    override def normalOperand(size: Operand with ValueSize): Boolean = false
-    override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
-  }
 }
 
 sealed abstract class ProcessorMode
@@ -64,6 +51,7 @@ object ProcessorMode {
   }
 
   object Legacy extends ProcessorMode
+    with OperandSizeInfo
     with LegacyBounds
     with I8086Registers
     with Move.LegacyOperations
@@ -97,12 +85,9 @@ object ProcessorMode {
     type MaxWideSize = WordDoubleSize
   }
 
-  sealed trait RealBounds extends I386Bounds {
-    self: ProcessorMode =>
-  }
-
   object Real extends ProcessorMode
-    with RealBounds
+    with OperandSizeInfo
+    with I386Bounds
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -111,16 +96,16 @@ object ProcessorMode {
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
     with Move.RealOperations
-    with BasicInteraction.RealOperations
+    with BasicInteraction.I386Operations
     with DivideMultiply.Operations
     with Interrupt.LegacyRealProtectedOperations
-    with IO.RealOperations
+    with IO.I386Operations
     with Jump.RealOperations
     with Stack.RealOperations
-    with String.RealOperations
-    with Test.RealOperations
+    with String.I386Operations
+    with Test.I386Operations
     with Adjust.Operations
-    with IncrementDecrement.RealOperations
+    with IncrementDecrement.I386Operations
     with Flags.Operations
   {
 
@@ -143,12 +128,9 @@ object ProcessorMode {
     override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
   }
 
-  sealed trait ProtectedBounds extends I386Bounds {
-    self: ProcessorMode =>
-  }
-
   object Protected extends ProcessorMode
-    with ProtectedBounds
+    with OperandSizeInfo
+    with I386Bounds
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
@@ -157,17 +139,17 @@ object ProcessorMode {
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
     with Move.ProtectedOperations
-    with BasicInteraction.ProtectedOperations
+    with BasicInteraction.I386Operations
     with DivideMultiply.Operations
     with Interrupt.LegacyRealProtectedOperations
-    with IO.ProtectedOperations
+    with IO.I386Operations
     with Jump.ProtectedOperations
     with Stack.ProtectedOperations
-    with String.ProtectedOperations
+    with String.I386Operations
     with System.ProtectedOperations
-    with Test.ProtectedOperations
+    with Test.I386Operations
     with Adjust.Operations
-    with IncrementDecrement.ProtectedOperations
+    with IncrementDecrement.I386Operations
     with Flags.Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -196,6 +178,7 @@ object ProcessorMode {
   }
 
   object Long extends ProcessorMode
+    with OperandSizeInfo
     with LongBounds
     with Register.X64Registers
     with ImmediateValue.I386Implicits

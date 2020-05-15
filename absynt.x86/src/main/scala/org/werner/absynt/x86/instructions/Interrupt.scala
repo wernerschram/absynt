@@ -20,7 +20,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 object Interrupt {
   sealed trait BaseOperations {
-    self: ArchitectureBounds with ImmediateValue.I8086Implicits =>
+    self: ArchitectureBounds with ImmediateValue.I8086Implicits with OperandSizeInfo =>
 
     protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate {
@@ -36,7 +36,7 @@ object Interrupt {
   }
 
   trait LegacyRealProtectedOperations extends BaseOperations {
-    self: ArchitectureBounds with ImmediateValue.I8086Implicits =>
+    self: ArchitectureBounds with ImmediateValue.I8086Implicits with OperandSizeInfo =>
     object Interrupt {
       val mnemonic: String = "int"
 
@@ -50,7 +50,7 @@ object Interrupt {
   }
 
   trait LongOperations extends BaseOperations {
-    self: ProcessorMode.LongBounds with ImmediateValue.I8086Implicits =>
+    self: ProcessorMode.LongBounds with ImmediateValue.I8086Implicits with OperandSizeInfo =>
     object Interrupt {
       val mnemonic: String = "int"
 
