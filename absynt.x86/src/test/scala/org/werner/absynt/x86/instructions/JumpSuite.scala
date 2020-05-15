@@ -783,6 +783,22 @@ class JumpSuite extends AnyWordSpec with Matchers {
         Jump.Far(RegisterMemoryLocation[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
       }
 
+      "Encode a simple program with an indirect forward short jump instruction" in {
+        val targetLabel = Label.unique
+        val jump = Jump(targetLabel)
+
+        val p = Section.text(List[Resource](
+          jump,
+          EncodedBytes.fill(1, 0x00.toByte),
+          EncodedBytes.fill(1, 0x00.toByte).label(targetLabel),
+        ))
+
+        val app = Raw(p, 0)
+        val encodable = app.encodablesForDependencies(jump :: Nil)(jump)
+        withClue("Jump") {
+          encodable.encodeByte should be(Hex.lsb("EB 01"))
+        }
+      }
     }
   }
 

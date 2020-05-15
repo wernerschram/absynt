@@ -542,6 +542,10 @@ object Jump {
       def apply(targetLabel: Label): LabelJumpOperation = {
         LabelJumpOperation(
           Seq(
+            new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
+              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+                Rel8(ShortPointer(offset.toByte))
+            },
             new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
               override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
