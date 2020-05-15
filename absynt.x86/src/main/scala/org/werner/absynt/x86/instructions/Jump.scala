@@ -130,36 +130,36 @@ object Jump {
       private def Static =
         new Static(0xC3.toByte :: Nil, "ret") with NoDisplacement with NoImmediate
 
-      protected def Imm16(immediateValue: ImmediateValue with WordSize): X86Operation =
+      protected def Imm16(immediateValue: ImmediateValue[_] with WordSize): X86Operation =
         new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with WordSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with WordSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
           override def immediateOrder: OperandOrder = source
         }
 
 
       def apply(): X86Operation = Static
 
-      def apply(immediateValue: ImmediateValue with WordSize): X86Operation = Imm16(immediateValue)
+      def apply(immediateValue: ImmediateValue[_] with WordSize): X86Operation = Imm16(immediateValue)
 
       object Far {
         private def Static =
           new Static(0xCB.toByte :: Nil, "retf") with NoDisplacement with NoImmediate
 
-        protected def Imm16(immediateValue: ImmediateValue with WordSize): X86Operation =
+        protected def Imm16(immediateValue: ImmediateValue[_] with WordSize): X86Operation =
           new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize] {
             implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
               override def normalOperand(size: Operand with ValueSize): Boolean = false
               override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
             }
 
-            override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with WordSize] = immediateValue
+            override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with WordSize] = immediateValue
 
             override def immediateOrder: OperandOrder = source
           }
 
         def apply(): X86Operation = Static
 
-        def apply(immediateValue: ImmediateValue with WordSize): X86Operation = Imm16(immediateValue)
+        def apply(immediateValue: ImmediateValue[_] with WordSize): X86Operation = Imm16(immediateValue)
       }
     }
   }

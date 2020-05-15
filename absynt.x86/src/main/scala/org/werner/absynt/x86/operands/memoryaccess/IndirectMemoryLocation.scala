@@ -15,7 +15,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.x86.operands._
 
-abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue with ByteWordDoubleSize] = None,
+abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue[_] with ByteWordDoubleSize] = None,
                                       segment: SegmentRegister)
   extends MemoryLocation(displacement, segment) {
 

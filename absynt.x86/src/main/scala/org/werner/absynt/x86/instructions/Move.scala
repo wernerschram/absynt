@@ -90,29 +90,29 @@ object Move extends I8086GenericRegisters {
           override def offsetOrder: OperandOrder = source
         }
 
-      protected def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue with ByteSize): X86Operation =
+      protected def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue[_] with ByteSize): X86Operation =
         new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = source
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def Imm16ToR16[Size <: MaxWideSize](register: GeneralPurposeRegister with Size, immediateValue: ImmediateValue with Size): X86Operation =
+      protected def Imm16ToR16[Size <: MaxWideSize](register: GeneralPurposeRegister with Size, immediateValue: ImmediateValue[_] with Size): X86Operation =
         new RegisterEncoded[Size](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with Size] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size] = immediateValue
           override def immediateOrder: OperandOrder = source
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue with ByteSize): X86Operation =
+      protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue[_] with ByteSize): X86Operation =
         new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = source
         }
 
-      protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand with OperandSize, immediateValue: ImmediateValue with OperandSize): X86Operation =
+      protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand with OperandSize, immediateValue: ImmediateValue[_] with OperandSize): X86Operation =
         new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[OperandSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with OperandSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with OperandSize] = immediateValue
           override def immediateOrder: OperandOrder = source
         }
 
@@ -163,17 +163,17 @@ object Move extends I8086GenericRegisters {
       def apply[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size): X86Operation =
         RM16ToR16(destination, source)
 
-      def apply[Size <: MaxWideSize](source: ImmediateValue with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: ImmediateValue[_] with Size, destination: GeneralPurposeRegister with Size): X86Operation =
         Imm16ToR16(destination, source)
 
-      def apply(source: ImmediateValue with ByteSize, destination: ByteRegister): X86Operation =
+      def apply(source: ImmediateValue[_] with ByteSize, destination: ByteRegister): X86Operation =
         Imm8ToR8(destination, source)
 
-      def apply[Size <: MaxValueSize](source: ImmediateValue with Size, destination: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: MaxValueSize](source: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size): X86Operation =
         (source, destination) match {
-          case (s: ImmediateValue with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
+          case (s: ImmediateValue[_] with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, s)
-          case (s: ImmediateValue with MaxWideSize @unchecked, d: ModRMEncodableOperand with MaxWideSize @unchecked) =>
+          case (s: ImmediateValue[_] with MaxWideSize @unchecked, d: ModRMEncodableOperand with MaxWideSize @unchecked) =>
             Imm16ToRM16(d, s)
         }
     }

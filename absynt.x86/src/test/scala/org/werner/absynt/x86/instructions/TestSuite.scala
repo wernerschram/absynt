@@ -154,7 +154,7 @@ class TestSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent test rax, 0x88776655 as a string" in {
-        Test(0x88776655, RAX).toString shouldBe "test rax, 2289526357"
+        Test(0x88776655, RAX).toString shouldBe "test rax, -2005440939"
       }
 
       "correctly encode test BYTE PTR [rax+rbx*2], 0x11" in {

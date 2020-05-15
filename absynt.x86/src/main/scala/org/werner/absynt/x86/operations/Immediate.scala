@@ -30,11 +30,11 @@ trait NoImmediate extends ImmediateBytes {
 trait Immediate[Size<:ValueSize] extends ImmediateBytes {
   self: X86Operation =>
 
-  def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with Size]
+  def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size]
   def immediateOrder: OperandOrder
 
   protected override abstract def allOperands: Set[OperandInfo[_]] =
     super.allOperands + OperandInfo.immediate(immediate.operand, immediateOrder)(immediate.operandSizePrefixRequirement)
 
-  override def immediateBytes: Seq[Byte] = immediate.operand.value
+  override def immediateBytes: Seq[Byte] = immediate.operand.encodedValue
 }

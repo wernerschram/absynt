@@ -358,7 +358,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent mov DWORD PTR [eax+ebx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](EBX, EAX, 0x11111111, 2)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], 2576980377")
+        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](EBX, EAX, 0x11111111, 2)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], -1717986919")
       }
     }
 
@@ -625,7 +625,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent mov DWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], 2576980377")
+        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], -1717986919")
       }
 
       "correctly encode mov QWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {

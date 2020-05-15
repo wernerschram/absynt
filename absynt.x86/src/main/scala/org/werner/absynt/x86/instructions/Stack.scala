@@ -37,9 +37,9 @@ object Stack {
       private def StaticFS() = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
       private def StaticGS() = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate
 
-      protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue with Size): X86Operation =
+      protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue[_] with Size): X86Operation =
         new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with Size] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size] = immediateValue
           override def immediateOrder: OperandOrder = destination
         }
 
@@ -52,9 +52,9 @@ object Stack {
         new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
 
-      protected def Imm8(immediateValue: ImmediateValue with ByteSize): X86Operation =
+      protected def Imm8(immediateValue: ImmediateValue[_] with ByteSize): X86Operation =
         new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = destination
         }
 
@@ -73,7 +73,7 @@ object Stack {
       def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand with Size): X86Operation =
         RM16(operand)
 
-      def apply(immediate: ImmediateValue with ImmMaxSize): X86Operation =
+      def apply(immediate: ImmediateValue[_] with ImmMaxSize): X86Operation =
         immediate match {
           case i: ByteSize => Imm8(i)
           case i: ImmExtendedMaxSize @unchecked => Imm16(i)

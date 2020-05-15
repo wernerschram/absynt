@@ -343,7 +343,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent xor rax, 0x88776655 as a string" in {
-        Xor(0x88776655, RAX).toString shouldBe "xor rax, 2289526357"
+        Xor(0x88776655, RAX).toString shouldBe "xor rax, -2005440939"
       }
 
       "correctly encode xor BYTE PTR [rax+rbx*2], 0x11" in {

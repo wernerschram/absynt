@@ -15,27 +15,33 @@ package org.werner.absynt.x86.operands
 
 import org.werner.absynt.ListExtensions._
 
-
-sealed class ImmediateValue(val value: Seq[Byte])
+sealed class ImmediateValue[S : Integral](val value: S)
   extends Operand {
   self: ValueSize =>
 
-  val isPositive: Boolean = (value.last & 0x80.toByte) == 0
+  val num: Integral[S] = implicitly[Integral[S]]
+  import num._
 
-  override def toString: String = value.decimalString
+  val encodedValue: Seq[Byte] = value.encodeLittleEndian
+
+  val isPositive: Boolean = value.sign == one
+
+  override def toString: String = value.toString
 }
 
 object ImmediateValue {
 
-  type ValueToByteImmediate = Byte => ImmediateValue with ByteSize
-  type ValueToWordImmediate = Short => ImmediateValue with WordSize
-  type ValueToDoubleWordImmediate = Int => ImmediateValue with DoubleWordSize
-  type ValueToQuadWordImmediate = Long => ImmediateValue with QuadWordSize
+  def unapply[S:Integral](immediateValue: ImmediateValue[S]): Option[S] = Some(immediateValue.value)
 
-  val byteImmediate: ValueToByteImmediate = value => new ImmediateValue(value.encodeLittleEndian) with ByteSize {}
-  val wordImmediate: ValueToWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with WordSize {}
-  val doubleWordImmediate: ValueToDoubleWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with DoubleWordSize {}
-  val quadWordImmediate: ValueToQuadWordImmediate = value => new ImmediateValue(value.encodeLittleEndian) with QuadWordSize {}
+  type ValueToByteImmediate = Byte => ImmediateValue[Byte] with ByteSize
+  type ValueToWordImmediate = Short => ImmediateValue[Short] with WordSize
+  type ValueToDoubleWordImmediate = Int => ImmediateValue[Int] with DoubleWordSize
+  type ValueToQuadWordImmediate = Long => ImmediateValue[Long] with QuadWordSize
+
+  val byteImmediate: ValueToByteImmediate = value => new ImmediateValue(value) with ByteSize {}
+  val wordImmediate: ValueToWordImmediate = value => new ImmediateValue(value) with WordSize {}
+  val doubleWordImmediate: ValueToDoubleWordImmediate = value => new ImmediateValue(value) with DoubleWordSize {}
+  val quadWordImmediate: ValueToQuadWordImmediate = value => new ImmediateValue(value) with QuadWordSize {}
 
   trait I8086Implicits {
     implicit val byteImm: ValueToByteImmediate = byteImmediate

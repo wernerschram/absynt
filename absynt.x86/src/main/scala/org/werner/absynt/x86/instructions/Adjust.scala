@@ -24,9 +24,9 @@ object Adjust {
     private def Static(code: Byte, mnemonic: String) =
       new Static(code :: Nil, mnemonic) with NoDisplacement with NoImmediate
 
-    private def StaticImm(code: Byte, mnemonic: String, immediateValue: ImmediateValue with ByteSize) =
+    private def StaticImm(code: Byte, mnemonic: String, immediateValue: ImmediateValue[_] with ByteSize) =
       new Static(code :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         override def immediateOrder: OperandOrder = destination
       }
 
@@ -37,14 +37,14 @@ object Adjust {
 
     object AdjustBeforeDivide {
       def ascii(destination: Accumulator.Word.type): X86Operation = base(ImmediateValue.byteImmediate(10.toByte))
-      private def base(adjustmentBase: ImmediateValue with ByteSize): X86Operation = StaticImm(0xD5.toByte, "aad", adjustmentBase)
-      def base(destination: Accumulator.Word.type, adjustmentBase: ImmediateValue with ByteSize): X86Operation = base(adjustmentBase)
+      private def base(adjustmentBase: ImmediateValue[_] with ByteSize): X86Operation = StaticImm(0xD5.toByte, "aad", adjustmentBase)
+      def base(destination: Accumulator.Word.type, adjustmentBase: ImmediateValue[_] with ByteSize): X86Operation = base(adjustmentBase)
     }
 
     object AdjustAfterMultiply {
       def ascii(destination: Accumulator.Word.type): X86Operation = base(ImmediateValue.byteImmediate(10.toByte))
-      private def base(adjustmentBase: ImmediateValue with ByteSize): X86Operation = StaticImm(0xD4.toByte, "aam", adjustmentBase)
-      def base(destination: Accumulator.Word.type, adjustmentBase: ImmediateValue with ByteSize): X86Operation = base(adjustmentBase)
+      private def base(adjustmentBase: ImmediateValue[_] with ByteSize): X86Operation = StaticImm(0xD4.toByte, "aam", adjustmentBase)
+      def base(destination: Accumulator.Word.type, adjustmentBase: ImmediateValue[_] with ByteSize): X86Operation = base(adjustmentBase)
     }
 
     object AdjustAfterSubtraction {

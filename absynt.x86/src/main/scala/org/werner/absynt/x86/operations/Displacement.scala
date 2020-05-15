@@ -69,7 +69,7 @@ trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
   protected override abstract def allOperands: Set[OperandInfo[_]] =
     super.allOperands + OperandInfo.memoryOffset(location.operand, offsetOrder)(location.operandSizePrefixRequirement, location.addressSizePrefixRequirement)
 
-  override def displacementBytes: Seq[Byte] = location.operand.displacement.toSeq.flatMap(_.value)
+  override def displacementBytes: Seq[Byte] = location.operand.displacement.toSeq.flatMap(_.encodedValue)
 
   def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
     location.operand.addressOperands(location.addressSizePrefixRequirement)

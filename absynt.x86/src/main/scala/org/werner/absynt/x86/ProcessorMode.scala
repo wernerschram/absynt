@@ -37,7 +37,7 @@ extends ImmediateValue.I8086Implicits
   with FarPointer.I8086Implicits
 {
 
-  def pointer(location: Long): ImmediateValue with WordDoubleQuadSize
+  def pointer(location: Long): ImmediateValue[_] with WordDoubleQuadSize
   def shortPointer(location: Byte): NearPointer with ByteSize = ShortPointer(location)
   def wordPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
   def doubleWordPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
@@ -76,7 +76,7 @@ object ProcessorMode {
     implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement =
       (_: Operand with ValueSize) => false
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
+    override def pointer(location: Long): ImmediateValue[Short] with WordDoubleQuadSize = location.toShort
   }
 
   sealed trait I386Bounds extends ArchitectureBounds {
@@ -125,7 +125,7 @@ object ProcessorMode {
         case _ => false
       }
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toShort
+    override def pointer(location: Long): ImmediateValue[Short] with WordDoubleQuadSize = location.toShort
   }
 
   object Protected extends ProcessorMode
@@ -168,7 +168,7 @@ object ProcessorMode {
       case _ => false
     }
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location.toInt
+    override def pointer(location: Long): ImmediateValue[Int] with WordDoubleQuadSize = location.toInt
   }
   sealed trait LongBounds extends ArchitectureBounds {
     self: ProcessorMode =>
@@ -220,6 +220,6 @@ object ProcessorMode {
       case _ => false
     }
 
-    override def pointer(location: Long): ImmediateValue with WordDoubleQuadSize = location
+    override def pointer(location: Long): ImmediateValue[Long] with WordDoubleQuadSize = location
   }
 }

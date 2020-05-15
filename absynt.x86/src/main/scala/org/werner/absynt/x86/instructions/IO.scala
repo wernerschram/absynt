@@ -26,20 +26,20 @@ object IO extends {
     sealed trait I8086Input {
       val mnemonic: String = "in"
 
-      private def Imm8ToAL(immediateValue: ImmediateValue with ByteSize) =
+      private def Imm8ToAL(immediateValue: ImmediateValue[_] with ByteSize) =
         new Static(0xE4.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
           protected override def allOperands: Set[OperandInfo[_]] =
             super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, destination)
           override def immediateOrder: OperandOrder = source
-          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         }
 
-      private def Imm8ToAX(immediateValue: ImmediateValue with ByteSize) =
+      private def Imm8ToAX(immediateValue: ImmediateValue[_] with ByteSize) =
         new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
           protected override def allOperands: Set[OperandInfo[_]] =
             super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, destination)
           override def immediateOrder: OperandOrder = source
-          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         }
 
       private def DXToAL() = new Static(0xEC.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
@@ -56,10 +56,10 @@ object IO extends {
             OperandInfo.implicitOperand(Accumulator.Word, destination)
       }
 
-      def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.LowByte.type): Static =
+      def apply(immediate: ImmediateValue[_] with ByteSize, destination: Accumulator.LowByte.type): Static =
         Imm8ToAL(immediate)
 
-      def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.Word.type): Static =
+      def apply(immediate: ImmediateValue[_] with ByteSize, destination: Accumulator.Word.type): Static =
         Imm8ToAX(immediate)
 
       def apply(port: Data.Word.type, destination: Accumulator.LowByte.type): Static =
@@ -72,20 +72,20 @@ object IO extends {
     sealed trait I8086Output {
       val mnemonic: String = "out"
 
-      private def ALToImm8(immediateValue: ImmediateValue with ByteSize) =
+      private def ALToImm8(immediateValue: ImmediateValue[_] with ByteSize) =
         new Static(0xE6.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
           protected override def allOperands: Set[OperandInfo[_]] =
             super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, source)
           override def immediateOrder: OperandOrder = destination
-          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         }
 
-      private def AXToImm8(immediateValue: ImmediateValue with ByteSize) =
+      private def AXToImm8(immediateValue: ImmediateValue[_] with ByteSize) =
         new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
           protected override def allOperands: Set[OperandInfo[_]] =
             super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, source)
           override def immediateOrder: OperandOrder = destination
-          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         }
 
       private def ALToDX() =
@@ -104,10 +104,10 @@ object IO extends {
               OperandInfo.implicitOperand(Accumulator.Word, source)
         }
 
-      def apply(destination: Accumulator.LowByte.type, immediate: ImmediateValue with ByteSize): Static with Immediate[ByteSize] =
+      def apply(destination: Accumulator.LowByte.type, immediate: ImmediateValue[_] with ByteSize): Static with Immediate[ByteSize] =
         ALToImm8(immediate)
 
-      def apply(destination: Accumulator.Word.type, immediate: ImmediateValue with ByteSize): Static with Immediate[ByteSize] =
+      def apply(destination: Accumulator.Word.type, immediate: ImmediateValue[_] with ByteSize): Static with Immediate[ByteSize] =
         AXToImm8(immediate)
 
 
@@ -132,12 +132,12 @@ object IO extends {
     self: ArchitectureBounds with OperandSizeInfo =>
 
     sealed trait I386Input extends I8086Input {
-      private def Imm8ToEAX(immediateValue: ImmediateValue with ByteSize) =
+      private def Imm8ToEAX(immediateValue: ImmediateValue[_] with ByteSize) =
         new Static(0xE5.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
           protected override def allOperands: Set[OperandInfo[_]] =
             super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
           override def immediateOrder: OperandOrder = source
-          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         }
 
       private def DXToEAX() = new Static(0xED.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
@@ -147,7 +147,7 @@ object IO extends {
             OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
       }
 
-      def apply(immediate: ImmediateValue with ByteSize, destination: Accumulator.DoubleWord.type): Static =
+      def apply(immediate: ImmediateValue[_] with ByteSize, destination: Accumulator.DoubleWord.type): Static =
         Imm8ToEAX(immediate)
 
       def apply(port: Data.Word.type, destination: Accumulator.DoubleWord.type): Static =
@@ -156,12 +156,12 @@ object IO extends {
 
 
     sealed trait I386Output extends I8086Output {
-      private def EAXToImm8(immediateValue: ImmediateValue with ByteSize) =
+      private def EAXToImm8(immediateValue: ImmediateValue[_] with ByteSize) =
         new Static(0xE7.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
           protected override def allOperands: Set[OperandInfo[_]] =
             super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, source)
           override def immediateOrder: OperandOrder = destination
-          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue with ByteSize] = immediateValue
+          override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
         }
 
 
@@ -176,7 +176,7 @@ object IO extends {
       def apply(destination: Accumulator.DoubleWord.type, port: Data.Word.type): Static =
         EAXToDX()
 
-      def apply(destination: Accumulator.DoubleWord.type, immediate: ImmediateValue with ByteSize): Static with Immediate[ByteSize] =
+      def apply(destination: Accumulator.DoubleWord.type, immediate: ImmediateValue[_] with ByteSize): Static with Immediate[ByteSize] =
         EAXToImm8(immediate)
     }
 

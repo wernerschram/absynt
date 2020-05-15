@@ -17,41 +17,35 @@ import java.nio.ByteBuffer
 
 object ListExtensions {
 
-  implicit class ByteEncoder(value: Byte) {
-    def encodeLittleEndian : Seq[Byte] = value :: Nil
-    def encodeBigEndian : Seq[Byte] = value :: Nil
-  }
-
-  implicit class ShortEncoder(value: Short) {
+  implicit class IntegralEncoder[S:Integral](value: S) {
     def encodeLittleEndian : Seq[Byte] =
-      (0 to 1).map { x =>
-        ((value >> (8 * x)) & 0xff.toByte).toByte
+      value match {
+        case v: Byte => v :: Nil
+        case v: Short => (0 to 1).map { x =>
+            ((v >> (8 * x)) & 0xff.toByte).toByte
+          }
+        case v: Int => (0 to 3).map { x =>
+            ((v >> (8 * x)) & 0xff.toByte).toByte
+          }
+        case v: Long => (0 to 7).map { x =>
+          ((v >> (8 * x)) & 0xff.toByte).toByte
+        }
       }
 
-    def encodeBigEndian : Seq[Byte] = (1 to 0 by -1).map { x =>
-        ((value >> (8 * x)) & 0xff.toByte).toByte
-      }
-  }
-
-  implicit class IntEncoder(value: Int) {
-    def encodeLittleEndian : Seq[Byte] = (0 to 3).map { x =>
-        ((value >> (8 * x)) & 0xff.toByte).toByte
-      }
-
-    def encodeBigEndian : Seq[Byte] = (3 to 0 by -1).map { x =>
-        ((value >> (8 * x)) & 0xff.toByte).toByte
+    def encodeBigEndian : Seq[Byte] =
+      value match {
+        case v: Byte => v :: Nil
+        case v: Short => (1 to 0 by -1).map { x =>
+            ((v >> (8 * x)) & 0xff.toByte).toByte
+          }
+        case v: Int => (3 to 0 by -1).map { x =>
+          ((v >> (8 * x)) & 0xff.toByte).toByte
+        }
+        case v: Long => (7 to 0 by -1).map { x =>
+          ((v >> (8 * x)) & 0xff.toByte).toByte
+        }
       }
     }
-
-  implicit class LongEncoder(value: Long) {
-    def encodeLittleEndian : Seq[Byte] = (0 to 7).map { x =>
-        ((value >> (8 * x)) & 0xff.toByte).toByte
-      }
-
-    def encodeBigEndian : Seq[Byte] = (7 to 0 by -1).map { x =>
-        ((value >> (8 * x)) & 0xff.toByte).toByte
-      }
-  }
 
   implicit class ListToImmediate(value: Seq[Byte]) {
     def decimalString: String = decimal.toString
