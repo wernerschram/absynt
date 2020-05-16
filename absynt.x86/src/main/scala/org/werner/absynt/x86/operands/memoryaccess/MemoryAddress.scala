@@ -23,6 +23,7 @@ sealed class MemoryAddress private(address: ImmediateValue[_] with ValueSize, se
 
   override val modValue: Byte = 0x00.toByte
 
+  // TODO: WordSize is not valid in Long mode
   override val registerOrMemoryModeCode: Byte = if (address.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
   final override val defaultSegment: SegmentRegister = Segment.Data
 
