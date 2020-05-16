@@ -61,7 +61,7 @@ object ProcessorMode {
     with IO.LegacyOperations
     with Jump.LegacyOperations
     with Stack.LegacyOperations
-    with String.LegacyOperations
+    with String.Operations
     with Test.LegacyOperations
     with Adjust.Operations
     with IncrementDecrement.LegacyOperations
@@ -103,7 +103,7 @@ object ProcessorMode {
     with IO.I386Operations
     with Jump.RealOperations
     with Stack.RealOperations
-    with String.I386Operations
+    with String.Operations
     with Test.I386Operations
     with Adjust.Operations
     with IncrementDecrement.I386Operations
@@ -147,7 +147,7 @@ object ProcessorMode {
     with IO.I386Operations
     with Jump.ProtectedOperations
     with Stack.ProtectedOperations
-    with String.I386Operations
+    with String.Operations
     with System.ProtectedOperations
     with Test.I386Operations
     with Adjust.Operations
@@ -201,7 +201,7 @@ object ProcessorMode {
     with IO.LongOperations
     with Jump.LongOperations
     with Stack.LongOperations
-    with String.LongOperations
+    with String.Operations
     with System.LongOperations
     with Test.LongOperations
     with IncrementDecrement.LongOperations

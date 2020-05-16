@@ -21,7 +21,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 object String {
 
-  sealed trait Common {
+  trait Operations {
     self: ArchitectureBounds =>
 
     val noOperandSizePrefixRequirements: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -315,17 +315,5 @@ object String {
           }
       }
     }
-  }
-
-  trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds =>
-  }
-
-  trait I386Operations extends Common {
-    self: ProcessorMode.I386Bounds =>
-  }
-
-  trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds =>
   }
 }
