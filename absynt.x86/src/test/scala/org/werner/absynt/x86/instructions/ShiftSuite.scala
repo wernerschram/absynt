@@ -17,8 +17,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
+import org.werner.absynt.x86.operands.ByteSize
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 
 class ShiftSuite extends AnyWordSpec with Matchers {
 

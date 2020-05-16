@@ -105,31 +105,7 @@ object Stack {
 
   }
 
-  trait RealOperations extends Common {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
-
-    override type RMMaxSize = WordDoubleSize
-    override type ImmMaxSize = ByteWordDoubleSize
-    override type ImmExtendedMaxSize = WordDoubleSize
-
-    object Push extends PushOperations
-
-    object PushAll {
-      implicit val opcode: String = "pusha"
-
-      def apply(): Static =
-        new Static(0x60.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
-    }
-
-    object PushFlags {
-      implicit val opcode: String = "pushf"
-
-      def apply(): Static =
-        new Static(0x9C.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
-    }
-  }
-
-  trait ProtectedOperations extends Common {
+  trait I386Operations extends Common {
     self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
 
     override type RMMaxSize = WordDoubleSize
