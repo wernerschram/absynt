@@ -67,6 +67,7 @@ object ProcessorMode {
     with IncrementDecrement.LegacyOperations
     with Flags.Operations
     with Shift.Operations
+    with Convert.LegacyOperations
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -110,6 +111,7 @@ object ProcessorMode {
     with Flags.Operations
     with Shift.Operations
     with Exchange.Operations
+    with Convert.I386Operations
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -156,6 +158,7 @@ object ProcessorMode {
     with Flags.Operations
     with Shift.Operations
     with Exchange.Operations
+    with Convert.I386Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
@@ -210,6 +213,7 @@ object ProcessorMode {
     with Flags.Operations
     with Shift.Operations
     with Exchange.Operations
+    with Convert.LongOperations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
