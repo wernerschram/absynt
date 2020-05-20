@@ -31,9 +31,14 @@ trait OperandSizeInfo {
   implicit def operandWithSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithSizePrefixInfo[T] =
     OperandWithSizePrefixInfo(operand)
 
-  def noOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+  val noOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
     override def normalOperand(size: Operand with ValueSize): Boolean = false
     override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+  }
+
+  val alwaysOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    override def normalOperand(size: Operand with ValueSize): Boolean = true
+    override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = true
   }
 }
 

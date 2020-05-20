@@ -13,21 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
+import org.werner.absynt.x86.ArchitectureBounds
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess.{DestinationReference, SourceReference}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations._
-import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
 object String {
 
   trait Operations {
-    self: ArchitectureBounds =>
-
-    val noOperandSizePrefixRequirements: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-      override def normalOperand(size: Operand with ValueSize): Boolean = false
-      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
-    }
+    self: ArchitectureBounds with OperandSizeInfo =>
 
     protected def Static8(operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
@@ -84,7 +79,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](destination: DestinationReference with Size): Set[OperandInfo[_]] = Set(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
-        OperandInfo.implicitOperand(Data.Word, OperandOrder.source)(noOperandSizePrefixRequirements)
+        OperandInfo.implicitOperand(Data.Word, OperandOrder.source)(noOperandSizePrefixRequirement)
       )
 
       def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference with Size): X86Operation =
@@ -142,7 +137,7 @@ object String {
       private val mnemonic = "outs"
 
       private def operands[Size <: MaxValueSize](source: SourceReference with Size): Set[OperandInfo[_]] = Set(
-        OperandInfo.implicitOperand(Data.Word, OperandOrder.destination)(noOperandSizePrefixRequirements),
+        OperandInfo.implicitOperand(Data.Word, OperandOrder.destination)(noOperandSizePrefixRequirement),
         OperandInfo.implicitAddress(source, OperandOrder.source),
       )
 

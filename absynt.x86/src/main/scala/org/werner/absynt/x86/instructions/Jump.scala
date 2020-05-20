@@ -122,7 +122,7 @@ object Jump {
   }
 
   sealed trait ReturnOperations {
-    self: ArchitectureBounds with OperandSizeInfo  =>
+    self: ArchitectureBounds with OperandSizeInfo =>
     object Return {
 
       val mnemonic: String = "ret"
@@ -147,10 +147,7 @@ object Jump {
 
         protected def Imm16(immediateValue: ImmediateValue[_] with WordSize): X86Operation =
           new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize] {
-            implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-              override def normalOperand(size: Operand with ValueSize): Boolean = false
-              override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
-            }
+            implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = noOperandSizePrefixRequirement
 
             override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with WordSize] = immediateValue
 

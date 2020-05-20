@@ -379,8 +379,6 @@ object Register {
     val CS: SegmentRegister = Segment.Code
     val SS: SegmentRegister = Segment.Stack
     val DS: SegmentRegister = Segment.Data
-    val FS: SegmentRegister = Segment.MoreExtra
-    val GS: SegmentRegister = Segment.StillMoreExtra
   }
 
   trait I8086SpecificRegisters {
@@ -404,6 +402,9 @@ object Register {
 
     val ESI: SourceIndex.Protected.type = SourceIndex.Protected
     val EDI: DestinationIndex.Protected.type = DestinationIndex.Protected
+
+    val FS: SegmentRegister = Segment.MoreExtra
+    val GS: SegmentRegister = Segment.StillMoreExtra
   }
 
   trait I386Registers extends I8086GenericRegisters with I8086SpecificRegisters with I386GenericRegisters
