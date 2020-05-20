@@ -295,4 +295,31 @@ class StackSuite extends AnyWordSpec with Matchers {
       }
     }
   }
+
+  "a PopAll instruction" when {
+
+    "in real mode" should {
+
+      import ProcessorMode.Real._
+
+      "correctly encode popa" in {
+        PopAll().encodeByte should be(Hex.lsb("61"))
+      }
+
+      "correctly represent popa as a string" in {
+        PopAll().toString shouldBe "popa"
+      }
+    }
+  }
+
+  "a PopFlags instruction" when {
+    "in long mode" should {
+
+      import ProcessorMode.Long._
+
+      "correctly encode popf" in {
+        PopFlags().encodeByte should be(Hex.lsb("9D"))
+      }
+    }
+  }
 }
