@@ -1,3 +1,4 @@
+[![Download](https://api.bintray.com/packages/wernerschram/ivy/absynt-x86/images/download.svg) ](https://bintray.com/wernerschram/ivy/absynt-x86/_latestVersion)
 [![Build Status](https://travis-ci.org/wernerschram/absynt.svg?branch=master)](https://travis-ci.org/wernerschram/absynt)
 [![codecov](https://codecov.io/gh/wernerschram/absynt/branch/master/graph/badge.svg)](https://codecov.io/gh/wernerschram/absynt)
 
