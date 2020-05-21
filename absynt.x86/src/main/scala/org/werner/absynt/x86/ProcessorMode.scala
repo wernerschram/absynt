@@ -14,6 +14,7 @@
 package org.werner.absynt.x86
 
 import org.werner.absynt.x86.instructions._
+import org.werner.absynt.x86.instructions.branch.{Call, Jump}
 import org.werner.absynt.x86.operands.Register.I8086Registers
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
@@ -60,6 +61,7 @@ object ProcessorMode {
     with Interrupt.LegacyRealProtectedOperations
     with IO.LegacyOperations
     with Jump.LegacyOperations
+    with Call.LegacyOperations
     with Stack.LegacyOperations
     with String.Operations
     with Test.LegacyOperations
@@ -104,6 +106,7 @@ object ProcessorMode {
     with Interrupt.LegacyRealProtectedOperations
     with IO.I386Operations
     with Jump.RealOperations
+    with Call.RealOperations
     with Stack.I386Operations
     with String.Operations
     with Test.I386Operations
@@ -151,6 +154,7 @@ object ProcessorMode {
     with Interrupt.LegacyRealProtectedOperations
     with IO.I386Operations
     with Jump.ProtectedOperations
+    with Call.ProtectedOperations
     with Stack.I386Operations
     with String.Operations
     with System.ProtectedOperations
@@ -208,6 +212,7 @@ object ProcessorMode {
     with Interrupt.LongOperations
     with IO.LongOperations
     with Jump.LongOperations
+    with Call.LongOperations
     with Stack.LongOperations
     with String.Operations
     with System.LongOperations
