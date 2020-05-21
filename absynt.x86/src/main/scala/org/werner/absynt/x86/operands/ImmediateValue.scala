@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operands
 
 import org.werner.absynt.ListExtensions._
+import org.werner.absynt.x86.operands.memoryaccess.ProtectedSIB
 
 sealed class ImmediateValue[S : Integral](val value: S)
   extends Operand {
@@ -29,18 +30,26 @@ sealed class ImmediateValue[S : Integral](val value: S)
   override def toString: String = value.toString
 }
 
+final class IntImmediateValue(value: Int) extends ImmediateValue[Int](value) with DoubleWordSize with ProtectedSIB {
+  override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
+  override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = None
+  override def factor: Int = 1
+  override def displacement: Option[IntImmediateValue] = Some(this)
+
+}
+
 object ImmediateValue {
 
   def unapply[S:Integral](immediateValue: ImmediateValue[S]): Option[S] = Some(immediateValue.value)
 
   type ValueToByteImmediate = Byte => ImmediateValue[Byte] with ByteSize
   type ValueToWordImmediate = Short => ImmediateValue[Short] with WordSize
-  type ValueToDoubleWordImmediate = Int => ImmediateValue[Int] with DoubleWordSize
+  type ValueToDoubleWordImmediate = Int => IntImmediateValue
   type ValueToQuadWordImmediate = Long => ImmediateValue[Long] with QuadWordSize
 
   val byteImmediate: ValueToByteImmediate = value => new ImmediateValue(value) with ByteSize {}
   val wordImmediate: ValueToWordImmediate = value => new ImmediateValue(value) with WordSize {}
-  val doubleWordImmediate: ValueToDoubleWordImmediate = value => new ImmediateValue(value) with DoubleWordSize {}
+  val doubleWordImmediate: ValueToDoubleWordImmediate = value => new IntImmediateValue(value)
   val quadWordImmediate: ValueToQuadWordImmediate = value => new ImmediateValue(value) with QuadWordSize {}
 
   trait I8086Implicits {

@@ -13,15 +13,15 @@
 
 package org.werner.absynt.x86.instructions
 
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.werner.absynt._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 
 class MoveSuite extends AnyWordSpec with Matchers {
 
@@ -107,43 +107,43 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*1], edx" in {
-        Move(EDX, SIBMemoryLocation[DoubleWordSize](EBX, ECX, 1)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx*1], edx as a string" in {
-        Move(EDX, SIBMemoryLocation[DoubleWordSize](EBX, ECX, 1)).toString should be("mov DWORD PTR [ecx+ebx*1], edx")
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX)).toString should be("mov DWORD PTR [ecx+ebx*1], edx")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], edx" in {
-        Move(EDX, SIBMemoryLocation[DoubleWordSize](EBX, ECX, scale = 4)).encodeByte should be(Hex.lsb("67 66 89 14 99"))
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 66 89 14 99"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx*4], edx as a string" in {
-        Move(EDX, SIBMemoryLocation[DoubleWordSize](EBX, ECX, scale = 4)).toString should be("mov DWORD PTR [ecx+ebx*4], edx")
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], edx")
       }
 
       "correctly encode mov DWORD PTR gs:[ecx+ebx*4], edx" in {
-        Move(EDX, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](EBX, ECX, scale = 4, segment = GS)).encodeByte should be(Hex.lsb("65 67 66 89 14 99"))
+        Move(EDX, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](ECX+EBX*4, segment = GS)).encodeByte should be(Hex.lsb("65 67 66 89 14 99"))
       }
 
       "correctly represent mov DWORD PTR gs:[ecx+ebx*4], edx as a string" in {
-        Move(EDX, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](EBX, ECX, scale = 4, segment = GS)).toString should be("mov DWORD PTR gs:[ecx+ebx*4], edx")
+        Move(EDX, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](ECX+EBX*4, segment = GS)).toString should be("mov DWORD PTR gs:[ecx+ebx*4], edx")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], eax" in {
-        Move(EAX, SIBMemoryLocation[DoubleWordSize](EBX, ECX, scale = 4)).encodeByte should be(Hex.lsb("67 66 89 04 99"))
+        Move(EAX, SIBMemoryLocation[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 66 89 04 99"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx*4], eax as a string" in {
-        Move(EAX, SIBMemoryLocation[DoubleWordSize](EBX, ECX, scale = 4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
+        Move(EAX, SIBMemoryLocation[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
       }
 
       "correctly encode mov DWORD PTR [edi+edx*8+0x0110], ecx" in {
-        Move(ECX, SIBMemoryLocation[DoubleWordSize](EDX, EDI, 0x0110, 8)).encodeByte should be(Hex.lsb("67 66 89 8C D7 10 01 00 00"))
+        Move(ECX, SIBMemoryLocation[DoubleWordSize](EDI+EDX*8+0x0110)).encodeByte should be(Hex.lsb("67 66 89 8C D7 10 01 00 00"))
       }
 
       "correctly represent mov DWORD PTR [edi+edx*8+272], ecx as a string" in {
-        Move(ECX, SIBMemoryLocation[DoubleWordSize](EDX, EDI, 0x0110, 8)).toString should be("mov DWORD PTR [edi+edx*8+272], ecx")
+        Move(ECX, SIBMemoryLocation[DoubleWordSize](EDI+EDX*8+0x0110)).toString should be("mov DWORD PTR [edi+edx*8+272], ecx")
       }
 
       "correctly encode mov WORD PTR [bx+3D], bp" in {
@@ -354,11 +354,11 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov DWORD PTR [eax+ebx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](EBX, EAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
+        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](EAX+EBX*2+0x11111111)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov DWORD PTR [eax+ebx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](EBX, EAX, 0x11111111, 2)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], -1717986919")
+        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](EAX+EBX*2+0x11111111)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], -1717986919")
       }
     }
 

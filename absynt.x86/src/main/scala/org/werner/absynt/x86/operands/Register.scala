@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operands
 
 import org.werner.absynt.x86.RexRequirement
+import org.werner.absynt.x86.operands.memoryaccess.ProtectedSIB
 
 sealed abstract class Register extends Operand {
   self: ValueSize =>
@@ -73,8 +74,65 @@ sealed trait SIBIndexRegister extends ModRMEncodableOperand {
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
+sealed trait ProtectedSIBIndexRegister extends SIBIndexRegister with ProtectedSIB {
+  self: GeneralPurposeRegister with DoubleWordSize =>
+  override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
+  override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = Some(self)
+
+  override def factor: Int = 1.toByte
+  override def displacement: Option[IntImmediateValue] = None
+
+  final def +(displacement: IntImmediateValue): ProtectedSIBIndexReference =
+    ProtectedSIBIndexReference(this, factor, Some(displacement))
+
+  final def *(newFactor: Int): ProtectedSIBIndexReference =
+    ProtectedSIBIndexReference(this, newFactor, displacement)
+}
+
 sealed trait SIBBaseRegister extends ModRMEncodableOperand {
+  self: GeneralPurposeRegister =>
   val SIBBaseCode: Byte = registerOrMemoryModeCode
+}
+
+sealed trait ProtectedSIBBaseRegister extends SIBBaseRegister with ProtectedSIB {
+  self: GeneralPurposeRegister with DoubleWordSize =>
+
+  final def +(sib: ProtectedSIB): ProtectedSIBBaseIndexReference =
+    ProtectedSIBBaseIndexReference(Some(this), sib.index, sib.factor, sib.displacement)
+}
+
+sealed trait ProtectedSIBWithoutFactor extends ProtectedSIB {
+  self: GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize =>
+
+  final def *(newFactor: Int): ProtectedSIBIndexReference =
+    ProtectedSIBIndexReference(self, newFactor, displacement)
+}
+case class ProtectedSIBIndexReference(
+  indexRegister: GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize,
+  factor: Int = 1,
+  displacement: Option[IntImmediateValue] = None
+) extends ProtectedSIB {
+  override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
+  override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = Some(indexRegister)
+
+  final def +(newDisplacement: IntImmediateValue): ProtectedSIBIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
+
+  final def -(newDisplacement: IntImmediateValue): ProtectedSIBIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) - newDisplacement.value)))
+}
+
+case class ProtectedSIBBaseIndexReference(
+  base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize],
+  index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize],
+  factor: Int = 1,
+  displacement: Option[IntImmediateValue] = None
+) extends ProtectedSIB {
+  final def +(newDisplacement: IntImmediateValue): ProtectedSIBBaseIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
+
+  final def -(newDisplacement: IntImmediateValue): ProtectedSIBBaseIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) - newDisplacement.value)))
 }
 
 sealed trait ByteRegister extends GeneralPurposeRegister with ByteSize
@@ -93,7 +151,7 @@ sealed trait WordRegister extends GeneralPurposeRegister with WordSize {
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
 }
 
-sealed trait DoubleWordRegister extends GeneralPurposeRegister with SIBIndexRegister with SIBBaseRegister with DoubleWordSize {
+sealed trait DoubleWordRegister extends GeneralPurposeRegister with ProtectedSIBIndexRegister with ProtectedSIBBaseRegister with DoubleWordSize {
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
 }
 
@@ -356,6 +414,7 @@ object BaseIndexReference {
   object BP_SI extends BaseIndexReference(BasePointer.Real, SourceIndex.Real, 0x02)
   object BP_DI extends BaseIndexReference(BasePointer.Real, DestinationIndex.Real, 0x03)
 }
+
 
 object Register {
   trait I8086GenericRegisters {
