@@ -20,7 +20,7 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
-import org.werner.absynt.x86.operations.{ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import org.werner.absynt.x86.operations.{NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, NearPointer => NearPointerOperation}
 
 object Loop {
 

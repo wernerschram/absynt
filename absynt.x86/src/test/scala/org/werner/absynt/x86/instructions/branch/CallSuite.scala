@@ -14,7 +14,6 @@
 package org.werner.absynt.x86.instructions.branch
 
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.wordspec.AnyWordSpec
 import org.werner.absynt._
 import org.werner.absynt.output.raw.Raw
@@ -23,7 +22,6 @@ import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.X86Operation
 
 class CallSuite extends AnyWordSpec with Matchers {
   "a Call instruction" when {
