@@ -65,4 +65,19 @@ class InterruptSuite extends AnyWordSpec with Matchers {
       }
     }
   }
+
+  "an Interrupt instruction" when {
+
+    "in real mode" should {
+
+      import ProcessorMode.Real._
+
+      "correctly encode iret" in {
+        InterruptReturn().encodeByte should be (Hex.lsb("CF"))
+      }
+      "correctly represent iret as a string" in {
+        InterruptReturn().toString should be("iret")
+      }
+    }
+  }
 }

@@ -23,7 +23,7 @@ import org.werner.absynt.resource.{AbsoluteReference, RelativeReference}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.DoubleWordSize
-import org.werner.absynt.{EncodedString, Label}
+import org.werner.absynt.{EncodedBytes, EncodedString, Label}
 
 object HelloWorld extends App {
   createFile()
@@ -53,6 +53,12 @@ object HelloWorld extends App {
 
     val text2: Section = Section.text(
       Move(EBP, SIBMemoryLocation[DoubleWordSize](R9, R8, 0, 2)) ::
+        Pop(ES) ::
+        Pop(FS) ::
+        EncodedBytes(0x66.toByte) ::
+        Pop(FS) ::
+        EncodedBytes(Seq(0x66.toByte, 0x48.toByte)) ::
+        Pop(FS) ::
       Nil
     )
 

@@ -23,7 +23,7 @@ import org.werner.absynt.resource.{AbsoluteReference, RelativeReference}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
-import org.werner.absynt.{EncodedString, Label}
+import org.werner.absynt.{EncodedBytes, EncodedString, Label}
 
 object HelloWorld extends App {
   createFile()
@@ -52,9 +52,26 @@ object HelloWorld extends App {
       Nil
     )
 
+    val text2: Section = Section.text(
+        Convert.Split(AX) ::
+        Convert.Split(EAX) ::
+        Convert.ScaleUp(AL) ::
+        Convert.ScaleUp(AX) ::
+        Push(FS) ::
+          EncodedBytes(0x66.toByte) ::
+          Push(FS) ::
+          Pop(FS) ::
+          EncodedBytes(0x66.toByte) ::
+          Pop(FS) ::
+          Pop(GS) ::
+        EncodedBytes(0x66.toByte) ::
+        Pop(GS) ::
+        Nil
+    )
+
     val data: Section = Section.data(
       EncodedString(output).label(hello) ::
-      Nil, alignment = 4
+        Nil, alignment = 4
     )
 
     val path = Paths.get(System.getProperty("java.io.tmpdir"))
@@ -63,8 +80,8 @@ object HelloWorld extends App {
     val outputFilePath = outputPath.resolve("helloworld")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val exec = Executable(Architecture.X86, text :: data :: Nil, entry, 0x8048000)
-    (text.content zip text.content.encodables(exec.encodablesForDependencies(text.content.dependentResources))).foreach {
+    val exec = Executable(Architecture.X86, text :: text2 :: data :: Nil, entry, 0x8048000)
+    (text2.content zip text2.content.encodables(exec.encodablesForDependencies(text.content.dependentResources))).foreach {
       case (orig: RelativeReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (orig: AbsoluteReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (_, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded")

@@ -24,7 +24,7 @@ import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
 import org.werner.absynt.x86.operands.memoryaccess.DestinationReference
-import org.werner.absynt.{Label, UniqueLabel}
+import org.werner.absynt.{EncodedBytes, Label, UniqueLabel}
 
 object Boot extends App {
   createFile()
@@ -51,7 +51,8 @@ object Boot extends App {
     val bottomColor = Color(0, 0, 63)
 
     val section: Section = Section.text(
-
+      Pop(FS) ::
+        Pop.Unaligned(FS) ::
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
       //

@@ -33,6 +33,11 @@ object Interrupt {
         override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
         override def immediateOrder: OperandOrder = destination
       }
+
+    object InterruptReturn {
+      def apply(): X86Operation =
+        new Static(0xCF.toByte :: Nil, "iret") with NoDisplacement with NoImmediate
+    }
   }
 
   trait LegacyRealProtectedOperations extends BaseOperations {
