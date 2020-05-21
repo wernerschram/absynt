@@ -14,7 +14,7 @@
 package org.werner.absynt.x86
 
 import org.werner.absynt.x86.instructions._
-import org.werner.absynt.x86.instructions.branch.{Call, Jump}
+import org.werner.absynt.x86.instructions.branch.{Call, Jump, Loop}
 import org.werner.absynt.x86.operands.Register.I8086Registers
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
@@ -71,6 +71,7 @@ object ProcessorMode {
     with Shift.Operations
     with Convert.LegacyOperations
     with Generic.LegacyOperations
+    with Loop.Operations
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -117,6 +118,7 @@ object ProcessorMode {
     with Exchange.Operations
     with Convert.I386Operations
     with Generic.I386Operations
+    with Loop.Operations
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -166,6 +168,7 @@ object ProcessorMode {
     with Exchange.Operations
     with Convert.I386Operations
     with Generic.I386Operations
+    with Loop.Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
@@ -223,6 +226,7 @@ object ProcessorMode {
     with Exchange.Operations
     with Convert.LongOperations
     with Generic.I386Operations
+    with Loop.Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
