@@ -190,35 +190,35 @@ class TestSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode test BYTE PTR gs:[rax+rbx*2], 0x11" in {
-        Test(0x11.toByte, SIBMemoryLocation.withSegmentOverride[ByteSize](RAX+RBX*2, segment = GS)).encodeByte should be(Hex.lsb("65 F6 04 58 11"))
+        Test(0x11.toByte, SIBMemoryLocation[ByteSize](GS+RAX+RBX*2)).encodeByte should be(Hex.lsb("65 F6 04 58 11"))
       }
 
       "correctly represent test BYTE PTR gs:[rax+rbx*2], 0x11 as a string" in {
-        Test(0x11.toByte, SIBMemoryLocation.withSegmentOverride[ByteSize](RAX+RBX*2, segment = GS)).toString shouldBe "test BYTE PTR gs:[rax+rbx*2], 17"
+        Test(0x11.toByte, SIBMemoryLocation[ByteSize](GS+RAX+RBX*2)).toString shouldBe "test BYTE PTR gs:[rax+rbx*2], 17"
       }
 
       "correctly encode test WORD PTR es:[rax+rbx*2], 0x2211" in {
-        Test(0x2211.toShort, SIBMemoryLocation.withSegmentOverride[WordSize](RAX+RBX*2, segment = ES)).encodeByte should be(Hex.lsb("26 66 F7 04 58 11 22"))
+        Test(0x2211.toShort, SIBMemoryLocation[WordSize](ES+RAX+RBX*2)).encodeByte should be(Hex.lsb("26 66 F7 04 58 11 22"))
       }
 
       "correctly represent test WORD PTR es:[rax+rbx*2], 0x2211 as a string" in {
-        Test(0x2211.toShort, SIBMemoryLocation.withSegmentOverride[WordSize](RAX+RBX*2, segment = ES)).toString shouldBe "test WORD PTR es:[rax+rbx*2], 8721"
+        Test(0x2211.toShort, SIBMemoryLocation[WordSize](ES+RAX+RBX*2)).toString shouldBe "test WORD PTR es:[rax+rbx*2], 8721"
       }
 
       "correctly encode test DWORD PTR fs:[rax+rbx*2], 0x44332211" in {
-        Test(0x44332211, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](RAX+RBX*2, segment = FS)).encodeByte should be(Hex.lsb("64 F7 04 58 11 22 33 44"))
+        Test(0x44332211, SIBMemoryLocation[DoubleWordSize](FS+RAX+RBX*2)).encodeByte should be(Hex.lsb("64 F7 04 58 11 22 33 44"))
       }
 
       "correctly represent test DWORD PTR fs:[rax+rbx*2], 0x44332211 as a string" in {
-        Test(0x44332211, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](RAX+RBX*2, segment = FS)).toString shouldBe "test DWORD PTR fs:[rax+rbx*2], 1144201745"
+        Test(0x44332211, SIBMemoryLocation[DoubleWordSize](FS+RAX+RBX*2)).toString shouldBe "test DWORD PTR fs:[rax+rbx*2], 1144201745"
       }
 
       "correctly encode test QWORD PTR ss:[rax+rbx*2], 0x44332211" in {
-        Test(0x44332211, SIBMemoryLocation.withSegmentOverride[QuadWordSize](RAX+RBX*2, segment = SS)).encodeByte should be(Hex.lsb("36 48 F7 04 58 11 22 33 44"))
+        Test(0x44332211, SIBMemoryLocation[QuadWordSize](SS+RAX+RBX*2)).encodeByte should be(Hex.lsb("36 48 F7 04 58 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR ss:[rax+rbx*2], 0x44332211 as a string" in {
-        Test(0x44332211, SIBMemoryLocation.withSegmentOverride[QuadWordSize](RAX+RBX*2, segment = SS)).toString shouldBe "test QWORD PTR ss:[rax+rbx*2], 1144201745"
+        Test(0x44332211, SIBMemoryLocation[QuadWordSize](SS+RAX+RBX*2)).toString shouldBe "test QWORD PTR ss:[rax+rbx*2], 1144201745"
       }
 
       "correctly encode test QWORD PTR cs:[eax], 0x44332211" in {

@@ -66,6 +66,7 @@ trait ProtectedSIB {
   def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize]
   def scale: Int
   def displacement: Option[ImmediateValue[Int] with DoubleWordSize]
+  def segment: SegmentRegister
 }
 
 trait LongSIB {
@@ -73,6 +74,7 @@ trait LongSIB {
   def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize]
   def scale: Int
   def displacement: Option[ImmediateValue[Int] with DoubleWordSize]
+  def segment: SegmentRegister
 }
 
 object SIBMemoryLocation {
@@ -96,13 +98,7 @@ object SIBMemoryLocation {
 
     object SIBMemoryLocation {
       def apply[Size <: ValueSize : SIBForSize](sib: ProtectedSIB): SIBMemoryLocation with Size =
-        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, Segment.Data)
-
-      object withSegmentOverride {
-        def apply[Size <: ValueSize : SIBForSize](sib: ProtectedSIB, segment: SegmentRegister): SIBMemoryLocation with Size =
-          implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, segment)
-      }
-
+        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, sib.segment)
     }
   }
 
@@ -128,17 +124,8 @@ object SIBMemoryLocation {
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with QuadWordSize
 
     object SIBMemoryLocation {
-      def apply[Size <: ValueSize : SIBForSize](sib: ProtectedSIB): SIBMemoryLocation with Size =
-        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, Segment.Data)
-
       def apply[Size <: ValueSize : SIBForSize](sib: LongSIB): SIBMemoryLocation with Size =
-        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, Segment.Data)
-
-      object withSegmentOverride {
-        def apply[Size <: ValueSize : SIBForSize](sib: LongSIB, segment: SegmentRegister): SIBMemoryLocation with Size =
-          implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, segment)
-      }
-
+        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, sib.segment)
     }
 
   }

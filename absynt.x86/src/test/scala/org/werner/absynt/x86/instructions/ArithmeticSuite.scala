@@ -379,35 +379,35 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xor BYTE PTR gs:[rax+rbx*2], 0x11" in {
-        Xor(0x11.toByte, SIBMemoryLocation.withSegmentOverride[ByteSize](RAX+RBX*2, segment = GS)).encodeByte should be(Hex.lsb("65 80 34 58 11"))
+        Xor(0x11.toByte, SIBMemoryLocation[ByteSize](GS+RAX+RBX*2)).encodeByte should be(Hex.lsb("65 80 34 58 11"))
       }
 
       "correctly represent xor BYTE PTR gs:[rax+rbx*2], 0x11 as a string" in {
-        Xor(0x11.toByte, SIBMemoryLocation.withSegmentOverride[ByteSize](RAX+RBX*2, segment = GS)).toString shouldBe "xor BYTE PTR gs:[rax+rbx*2], 17"
+        Xor(0x11.toByte, SIBMemoryLocation[ByteSize](GS+RAX+RBX*2)).toString shouldBe "xor BYTE PTR gs:[rax+rbx*2], 17"
       }
 
       "correctly encode xor WORD PTR es:[rax+rbx*2], 0x2211" in {
-        Xor(0x2211.toShort, SIBMemoryLocation.withSegmentOverride[WordSize](RAX+RBX*2, segment = ES)).encodeByte should be(Hex.lsb("26 66 81 34 58 11 22"))
+        Xor(0x2211.toShort, SIBMemoryLocation[WordSize](ES+RAX+RBX*2)).encodeByte should be(Hex.lsb("26 66 81 34 58 11 22"))
       }
 
       "correctly represent xor WORD PTR es:[rax+rbx*2], 0x2211 as a string" in {
-        Xor(0x2211.toShort, SIBMemoryLocation.withSegmentOverride[WordSize](RAX+RBX*2, segment = ES)).toString shouldBe "xor WORD PTR es:[rax+rbx*2], 8721"
+        Xor(0x2211.toShort, SIBMemoryLocation[WordSize](ES+RAX+RBX*2)).toString shouldBe "xor WORD PTR es:[rax+rbx*2], 8721"
       }
 
       "correctly encode xor DWORD PTR fs:[rax+rbx*2], 0x44332211" in {
-        Xor(0x44332211, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](RAX+RBX*2, segment = FS)).encodeByte should be(Hex.lsb("64 81 34 58 11 22 33 44"))
+        Xor(0x44332211, SIBMemoryLocation[DoubleWordSize](FS+RAX+RBX*2)).encodeByte should be(Hex.lsb("64 81 34 58 11 22 33 44"))
       }
 
       "correctly represent xor DWORD PTR fs:[rax+rbx*2], 0x44332211 as a string" in {
-        Xor(0x44332211, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](RAX+RBX*2, segment = FS)).toString shouldBe "xor DWORD PTR fs:[rax+rbx*2], 1144201745"
+        Xor(0x44332211, SIBMemoryLocation[DoubleWordSize](FS+RAX+RBX*2)).toString shouldBe "xor DWORD PTR fs:[rax+rbx*2], 1144201745"
       }
 
       "correctly encode xor QWORD PTR ss:[rax+rbx*2], 0x44332211" in {
-        Xor(0x44332211, SIBMemoryLocation.withSegmentOverride[QuadWordSize](RAX+RBX*2, segment = SS)).encodeByte should be(Hex.lsb("36 48 81 34 58 11 22 33 44"))
+        Xor(0x44332211, SIBMemoryLocation[QuadWordSize](SS+RAX+RBX*2)).encodeByte should be(Hex.lsb("36 48 81 34 58 11 22 33 44"))
       }
 
       "correctly represent xor QWORD PTR ss:[rax+rbx*2], 0x44332211 as a string" in {
-        Xor(0x44332211, SIBMemoryLocation.withSegmentOverride[QuadWordSize](RAX+RBX*2, segment = SS)).toString shouldBe "xor QWORD PTR ss:[rax+rbx*2], 1144201745"
+        Xor(0x44332211, SIBMemoryLocation[QuadWordSize](SS+RAX+RBX*2)).toString shouldBe "xor QWORD PTR ss:[rax+rbx*2], 1144201745"
       }
 
       "correctly encode xor QWORD PTR cs:[eax], 0x44332211" in {

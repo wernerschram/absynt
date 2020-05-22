@@ -57,10 +57,11 @@ object ImmediateValue {
     implicit val doubleWordImm: ValueToDoubleWordImmediate = doubleWordImmediate
 
     case class ProtectedSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize) extends ProtectedSIB {
-      override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
-      override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = None
-      override def scale: Int = 1
-      override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = Some(value)
+      override val base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
+      override val index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = None
+      override val scale: Int = 1
+      override val displacement: Option[ImmediateValue[Int] with DoubleWordSize] = Some(value)
+      override val segment: SegmentRegister = Segment.Data
     }
 
     implicit def immediateValueIsProtectedSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBImmediate =
@@ -71,10 +72,11 @@ object ImmediateValue {
     implicit val quadWordImm: ValueToQuadWordImmediate = quadWordImmediate
 
     case class LongSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize) extends LongSIB {
-      override def base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = None
-      override def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = None
-      override def scale: Int = 1
-      override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = Some(value)
+      override val base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = None
+      override val index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = None
+      override val scale: Int = 1
+      override val displacement: Option[ImmediateValue[Int] with DoubleWordSize] = Some(value)
+      override val segment: SegmentRegister = Segment.Data
     }
 
     implicit def immediateValueIsLongSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize): LongSIBImmediate =

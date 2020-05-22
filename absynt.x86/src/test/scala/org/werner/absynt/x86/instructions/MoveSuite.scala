@@ -123,11 +123,11 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov DWORD PTR gs:[ecx+ebx*4], edx" in {
-        Move(EDX, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](ECX+EBX*4, segment = GS)).encodeByte should be(Hex.lsb("65 67 66 89 14 99"))
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](GS+ECX+EBX*4)).encodeByte should be(Hex.lsb("65 67 66 89 14 99"))
       }
 
       "correctly represent mov DWORD PTR gs:[ecx+ebx*4], edx as a string" in {
-        Move(EDX, SIBMemoryLocation.withSegmentOverride[DoubleWordSize](ECX+EBX*4, segment = GS)).toString should be("mov DWORD PTR gs:[ecx+ebx*4], edx")
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](GS+ECX+EBX*4)).toString should be("mov DWORD PTR gs:[ecx+ebx*4], edx")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], eax" in {
