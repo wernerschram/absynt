@@ -14,7 +14,7 @@
 package org.werner.absynt.x86.operands
 
 import org.werner.absynt.x86.RexRequirement
-import org.werner.absynt.x86.operands.memoryaccess.ProtectedSIB
+import org.werner.absynt.x86.operands.memoryaccess.{LongSIB, ProtectedSIB}
 
 sealed abstract class Register extends Operand {
   self: ValueSize =>
@@ -79,14 +79,30 @@ sealed trait ProtectedSIBIndexRegister extends SIBIndexRegister with ProtectedSI
   override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
   override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = Some(self)
 
-  override def factor: Int = 1.toByte
-  override def displacement: Option[IntImmediateValue] = None
+  override def scale: Int = 1.toByte
+  override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
 
-  final def +(displacement: IntImmediateValue): ProtectedSIBIndexReference =
-    ProtectedSIBIndexReference(this, factor, Some(displacement))
+  final def +(displacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBIndexReference =
+    ProtectedSIBIndexReference(this, scale, Some(displacement))
 
   final def *(newFactor: Int): ProtectedSIBIndexReference =
     ProtectedSIBIndexReference(this, newFactor, displacement)
+}
+
+sealed trait LongSIBIndexRegister extends SIBIndexRegister with LongSIB {
+  self: GeneralPurposeRegister with QuadWordSize =>
+  override def base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = None
+  override def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = Some(self)
+
+  override def scale: Int = 1.toByte
+  override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
+
+  final def +(displacement: ImmediateValue[Int] with DoubleWordSize): LongSIBIndexReference =
+    LongSIBIndexReference(this, scale, Some(displacement))
+
+  final def *(newFactor: Int): LongSIBIndexReference =
+    LongSIBIndexReference(this, newFactor, displacement)
+
 }
 
 sealed trait SIBBaseRegister extends ModRMEncodableOperand {
@@ -98,40 +114,69 @@ sealed trait ProtectedSIBBaseRegister extends SIBBaseRegister with ProtectedSIB 
   self: GeneralPurposeRegister with DoubleWordSize =>
 
   final def +(sib: ProtectedSIB): ProtectedSIBBaseIndexReference =
-    ProtectedSIBBaseIndexReference(Some(this), sib.index, sib.factor, sib.displacement)
+    ProtectedSIBBaseIndexReference(Some(this), sib.index, sib.scale, sib.displacement)
 }
 
-sealed trait ProtectedSIBWithoutFactor extends ProtectedSIB {
-  self: GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize =>
+sealed trait LongSIBBaseRegister extends SIBBaseRegister with LongSIB {
+  self: GeneralPurposeRegister with QuadWordSize =>
 
-  final def *(newFactor: Int): ProtectedSIBIndexReference =
-    ProtectedSIBIndexReference(self, newFactor, displacement)
+  final def +(sib: LongSIB): LongSIBBaseIndexReference =
+    LongSIBBaseIndexReference(Some(this), sib.index, sib.scale, sib.displacement)
 }
+
 case class ProtectedSIBIndexReference(
-  indexRegister: GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize,
-  factor: Int = 1,
-  displacement: Option[IntImmediateValue] = None
+                                       indexRegister: GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize,
+                                       scale: Int = 1,
+                                       displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
 ) extends ProtectedSIB {
   override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
   override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = Some(indexRegister)
 
-  final def +(newDisplacement: IntImmediateValue): ProtectedSIBIndexReference =
+  final def +(newDisplacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBIndexReference =
     this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
 
-  final def -(newDisplacement: IntImmediateValue): ProtectedSIBIndexReference =
+  final def -(newDisplacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) - newDisplacement.value)))
+}
+
+case class LongSIBIndexReference(
+                                  indexRegister: GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize,
+                                  scale: Int = 1,
+                                  displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
+) extends LongSIB {
+  override def base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = None
+  override def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = Some(indexRegister)
+
+  final def +(newDisplacement: ImmediateValue[Int] with DoubleWordSize): LongSIBIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
+
+  final def -(newDisplacement: ImmediateValue[Int] with DoubleWordSize): LongSIBIndexReference =
     this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) - newDisplacement.value)))
 }
 
 case class ProtectedSIBBaseIndexReference(
-  base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize],
-  index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize],
-  factor: Int = 1,
-  displacement: Option[IntImmediateValue] = None
+                                           base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize],
+                                           index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize],
+                                           scale: Int = 1,
+                                           displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
 ) extends ProtectedSIB {
-  final def +(newDisplacement: IntImmediateValue): ProtectedSIBBaseIndexReference =
+  final def +(newDisplacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBBaseIndexReference =
     this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
 
-  final def -(newDisplacement: IntImmediateValue): ProtectedSIBBaseIndexReference =
+  final def -(newDisplacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBBaseIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) - newDisplacement.value)))
+}
+
+case class LongSIBBaseIndexReference(
+                                      base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize],
+                                      index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize],
+                                      scale: Int = 1,
+                                      displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
+) extends LongSIB {
+  final def +(newDisplacement: ImmediateValue[Int] with DoubleWordSize): LongSIBBaseIndexReference =
+    this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
+
+  final def -(newDisplacement: ImmediateValue[Int] with DoubleWordSize): LongSIBBaseIndexReference =
     this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) - newDisplacement.value)))
 }
 
@@ -155,7 +200,7 @@ sealed trait DoubleWordRegister extends GeneralPurposeRegister with ProtectedSIB
   override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
 }
 
-sealed trait QuadWordRegister extends GeneralPurposeRegister with SIBIndexRegister with SIBBaseRegister with QuadWordSize {
+sealed trait QuadWordRegister extends GeneralPurposeRegister with LongSIBIndexRegister with LongSIBBaseRegister with QuadWordSize {
   override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
 }
 

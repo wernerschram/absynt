@@ -64,8 +64,15 @@ sealed class SIBMemoryLocation(
 trait ProtectedSIB {
   def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize]
   def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize]
-  def factor: Int
-  def displacement: Option[IntImmediateValue]
+  def scale: Int
+  def displacement: Option[ImmediateValue[Int] with DoubleWordSize]
+}
+
+trait LongSIB {
+  def base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize]
+  def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize]
+  def scale: Int
+  def displacement: Option[ImmediateValue[Int] with DoubleWordSize]
 }
 
 object SIBMemoryLocation {
@@ -89,12 +96,11 @@ object SIBMemoryLocation {
 
     object SIBMemoryLocation {
       def apply[Size <: ValueSize : SIBForSize](sib: ProtectedSIB): SIBMemoryLocation with Size =
-        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.factor, Segment.Data)
+        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, Segment.Data)
 
       object withSegmentOverride {
-
         def apply[Size <: ValueSize : SIBForSize](sib: ProtectedSIB, segment: SegmentRegister): SIBMemoryLocation with Size =
-          implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.factor, segment)
+          implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, segment)
       }
 
     }
@@ -122,26 +128,15 @@ object SIBMemoryLocation {
         new SIBMemoryLocation(index, base, displacement, scale, segmentOverride) with QuadWordSize
 
     object SIBMemoryLocation {
-      def apply[Size <: ValueSize : SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, scale: Int): SIBMemoryLocation with Size =
-        implicitly[SIBForSize[Size]].instance(Some(index), Some(base), None, scale, index.defaultSIBSegment)
+      def apply[Size <: ValueSize : SIBForSize](sib: ProtectedSIB): SIBMemoryLocation with Size =
+        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, Segment.Data)
 
-      def apply[Size <: ValueSize : SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: ImmediateValue[_] with ByteWordDoubleSize, scale: Int): SIBMemoryLocation with Size =
-        implicitly[SIBForSize[Size]].instance(Some(index), Some(base), Some(displacement), scale, index.defaultSIBSegment)
-
-
-
-//      def apply[Size <: ValueSize : SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, scale: Int): SIBMemoryLocation with Size =
-//        implicitly[SIBForSize[Size]].instance(Some(index), Some(base), None, scale, index.defaultSIBSegment)
-//
-//      def apply[Size <: ValueSize : SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: ImmediateValue[_] with ByteWordDoubleSize, scale: Int): SIBMemoryLocation with Size =
-//        implicitly[SIBForSize[Size]].instance(Some(index), Some(base), Some(displacement), scale, index.defaultSIBSegment)
+      def apply[Size <: ValueSize : SIBForSize](sib: LongSIB): SIBMemoryLocation with Size =
+        implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, Segment.Data)
 
       object withSegmentOverride {
-        def apply[Size <: ValueSize : SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, scale: Int, segment: SegmentRegister): SIBMemoryLocation with Size =
-          implicitly[SIBForSize[Size]].instance(Some(index), Some(base), None, scale, segment)
-
-        def apply[Size <: ValueSize : SIBForSize](index: GeneralPurposeRegister with SIBIndexRegister with DoubleQuadSize, base: GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize, displacement: ImmediateValue[_] with ByteWordDoubleSize, scale: Int, segment: SegmentRegister): SIBMemoryLocation with Size =
-          implicitly[SIBForSize[Size]].instance(Some(index), Some(base), Some(displacement), scale, segment)
+        def apply[Size <: ValueSize : SIBForSize](sib: LongSIB, segment: SegmentRegister): SIBMemoryLocation with Size =
+          implicitly[SIBForSize[Size]].instance(sib.index, sib.base, sib.displacement, sib.scale, segment)
       }
 
     }
