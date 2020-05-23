@@ -66,7 +66,7 @@ sealed abstract class SIBMemoryLocation(
 
   override def toString = s"$sizeName PTR $segmentPrefix[$baseIndexString$scaleString$displacementString]"
 
-  private def scaleString = if (scale > 0) s"*$scale" else ""
+  private def scaleString = if (scale > 1) s"*$scale" else ""
 
   private def displacementString = (displacementValue, base, index) match {
     case (None, _, _) => ""

@@ -667,6 +667,22 @@ class MoveSuite extends AnyWordSpec with Matchers {
       "correctly represent mov QWORD PTR [rbp+rbx], rbp as a string" in {
         Move(RBP, SIBMemoryLocation[QuadWordSize](RBP+RBX)).toString should be("mov QWORD PTR [rbp+rbx], rbp")
       }
+
+      "correctly encode mov QWORD PTR [eax+10], rbp" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](EAX+10)).encodeByte should be(Hex.lsb("67 48 89 ac 20 0a 00 00 00"))
+      }
+
+      "correctly represent mov QWORD PTR [eax+10], rbp as a string" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](EAX+10)).toString should be("mov QWORD PTR [eax+10], rbp")
+      }
+
+      "correctly encode mov QWORD PTR [rax], rbp" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 89 2c 20"))
+      }
+
+      "correctly represent mov QWORD PTR [rax], rbp as a string" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](RAX)).toString should be("mov QWORD PTR [rax], rbp")
+      }
     }
   }
 }

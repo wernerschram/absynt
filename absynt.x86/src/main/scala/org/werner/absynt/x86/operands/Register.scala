@@ -74,58 +74,66 @@ sealed trait SIBIndexRegister extends ModRMEncodableOperand {
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait ProtectedSIBIndexRegister extends SIBIndexRegister with ProtectedSIB {
+sealed trait ProtectedSIBIndexRegister extends SIBIndexRegister {
   self: GeneralPurposeRegister with DoubleWordSize =>
-  override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
-  override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = Some(self)
-
-  override def scale: Int = 1.toByte
-  override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
-
-  override def segment: SegmentRegister = Segment.Data
-
-  final def +(displacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBIndexReference =
-    ProtectedSIBIndexReference(this, scale, Some(displacement))
 
   final def *(newFactor: Int): ProtectedSIBIndexReference =
-    ProtectedSIBIndexReference(this, newFactor, displacement)
+    ProtectedSIBIndexReference(this, newFactor, None)
 }
 
-sealed trait LongSIBIndexRegister extends SIBIndexRegister with LongSIB {
+sealed trait LongSIBIndexRegister extends SIBIndexRegister {
   self: GeneralPurposeRegister with QuadWordSize =>
-  override def base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = None
-  override def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = Some(self)
-
-  override def scale: Int = 1.toByte
-  override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
-
-  override def segment: SegmentRegister = Segment.Data
-
-  final def +(displacement: ImmediateValue[Int] with DoubleWordSize): LongSIBIndexReference =
-    LongSIBIndexReference(this, scale, Some(displacement))
 
   final def *(newFactor: Int): LongSIBIndexReference =
-    LongSIBIndexReference(this, newFactor, displacement)
+    LongSIBIndexReference(this, newFactor, None)
 
 }
 
 sealed trait SIBBaseRegister extends ModRMEncodableOperand {
   self: GeneralPurposeRegister =>
+
   val SIBBaseCode: Byte = registerOrMemoryModeCode
 }
 
 sealed trait ProtectedSIBBaseRegister extends SIBBaseRegister with ProtectedSIB {
   self: GeneralPurposeRegister with DoubleWordSize =>
+  override def base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = Some(self)
+  override def index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = None
 
-  final def +(sib: ProtectedSIB): ProtectedSIBBaseIndexReference =
-    ProtectedSIBBaseIndexReference(Some(this), sib.index, sib.scale, sib.displacement)
+  override def scale: Int = 1.toByte
+  override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
+
+  override def segment: SegmentRegister = Segment.Data
+
+  final def +(sib: GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize): ProtectedSIBBaseIndexReference =
+    ProtectedSIBBaseIndexReference(this, Some(sib))
+
+  final def +(sib: ProtectedSIBIndexReference): ProtectedSIBBaseIndexReference =
+    ProtectedSIBBaseIndexReference(this, sib.index, sib.scale, sib.displacement)
+
+  final def +(displacement: ImmediateValue[Int] with DoubleWordSize) =
+    ProtectedSIBBaseIndexReference(this, None, 1, Some(displacement))
 }
 
 sealed trait LongSIBBaseRegister extends SIBBaseRegister with LongSIB {
   self: GeneralPurposeRegister with QuadWordSize =>
+  override def base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = Some(self)
+  override def index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = None
 
-  final def +(sib: LongSIB): LongSIBBaseIndexReference =
-    LongSIBBaseIndexReference(Some(this), sib.index, sib.scale, sib.displacement)
+  override def scale: Int = 1.toByte
+  override def displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
+
+  override def segment: SegmentRegister = Segment.Data
+
+  final def +(sib: GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize): LongSIBBaseIndexReference =
+    LongSIBBaseIndexReference(this, Some(sib))
+
+  final def +(sib: LongSIBIndexReference): LongSIBBaseIndexReference =
+    LongSIBBaseIndexReference(this, sib.index, sib.scale, sib.displacement)
+
+  final def +(displacement: ImmediateValue[Int] with DoubleWordSize) =
+    LongSIBBaseIndexReference(this, None, 1, Some(displacement))
+
 }
 
 case class ProtectedSIBIndexReference(
@@ -161,12 +169,13 @@ case class LongSIBIndexReference(
 }
 
 case class ProtectedSIBBaseIndexReference(
-  base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize],
+  baseRegister: GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize,
   index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize],
   scale: Int = 1,
   displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None,
   segment: SegmentRegister = Segment.Data
 ) extends ProtectedSIB {
+  override val base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = Some(baseRegister)
   final def +(newDisplacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBBaseIndexReference =
     this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
 
@@ -175,12 +184,13 @@ case class ProtectedSIBBaseIndexReference(
 }
 
 case class LongSIBBaseIndexReference(
-  base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize],
+  baseRegister: GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize,
   index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize],
   scale: Int = 1,
   displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None,
   segment: SegmentRegister = Segment.Data
 ) extends LongSIB {
+  override val base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = Some(baseRegister)
   final def +(newDisplacement: ImmediateValue[Int] with DoubleWordSize): LongSIBBaseIndexReference =
     this.copy(displacement = Some(ImmediateValue.doubleWordImmediate(displacement.map(_.value).getOrElse(0) + newDisplacement.value)))
 
@@ -198,7 +208,7 @@ sealed case class ProtectedSIBBaseWithSegment(
   override val displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
 
   final def +(sib: ProtectedSIB): ProtectedSIBBaseIndexReference =
-    ProtectedSIBBaseIndexReference(base, sib.index, sib.scale, sib.displacement, segment)
+    ProtectedSIBBaseIndexReference(baseRegister, sib.index, sib.scale, sib.displacement, segment)
 }
 
 sealed case class LongSIBBaseWithSegment(
@@ -211,7 +221,7 @@ sealed case class LongSIBBaseWithSegment(
   override val displacement: Option[ImmediateValue[Int] with DoubleWordSize] = None
 
   final def +(sib: LongSIB): LongSIBBaseIndexReference =
-    LongSIBBaseIndexReference(base, sib.index, sib.scale, sib.displacement, segment)
+    LongSIBBaseIndexReference(baseRegister, sib.index, sib.scale, sib.displacement, segment)
 }
 
 sealed trait ByteRegister extends GeneralPurposeRegister with ByteSize
@@ -302,13 +312,13 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
     ProtectedSIBBaseWithSegment(sib, this)
 
   def +(sib: ProtectedSIBBaseIndexReference): ProtectedSIBBaseIndexReference =
-    ProtectedSIBBaseIndexReference(sib.base, sib.index, sib.scale, sib.displacement, this)
+    ProtectedSIBBaseIndexReference(sib.baseRegister, sib.index, sib.scale, sib.displacement, this)
 
   def +(sib: GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize): LongSIBBaseWithSegment =
     LongSIBBaseWithSegment(sib, this)
 
   def +(sib: LongSIBBaseIndexReference): LongSIBBaseIndexReference =
-    LongSIBBaseIndexReference(sib.base, sib.index, sib.scale, sib.displacement, this)
+    LongSIBBaseIndexReference(sib.baseRegister, sib.index, sib.scale, sib.displacement, this)
 }
 
 
