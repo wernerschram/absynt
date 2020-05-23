@@ -106,12 +106,12 @@ class MoveSuite extends AnyWordSpec with Matchers {
         Move(SI, RegisterMemoryLocation[WordSize](SI)).toString should be("mov WORD PTR [si], si")
       }
 
-      "correctly encode mov DWORD PTR [ecx+ebx*1], edx" in {
+      "correctly encode mov DWORD PTR [ecx+ebx], edx" in {
         Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
       }
 
-      "correctly represent mov DWORD PTR [ecx+ebx*1], edx as a string" in {
-        Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX)).toString should be("mov DWORD PTR [ecx+ebx*1], edx")
+      "correctly represent mov DWORD PTR [ecx+ebx], edx as a string" in {
+        Move(EDX, SIBMemoryLocation[DoubleWordSize](ECX+EBX)).toString should be("mov DWORD PTR [ecx+ebx], edx")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], edx" in {
@@ -642,6 +642,30 @@ class MoveSuite extends AnyWordSpec with Matchers {
 
       "correctly represent mov DWORD PTR [r8+r9*2+0], ebp as a string" in {
         Move(EBP, SIBMemoryLocation[DoubleWordSize](R8+R9*2+0)).toString should be("mov DWORD PTR [r8+r9*2+0], ebp")
+      }
+
+      "correctly encode mov DWORD PTR [ecx+ebx*4], eax" in {
+        Move(EAX, SIBMemoryLocation[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 89 04 99"))
+      }
+
+      "correctly represent mov DWORD PTR [ecx+ebx*4], eax as a string" in {
+        Move(EAX, SIBMemoryLocation[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
+      }
+
+      "correctly encode mov QWORD PTR [2], rbp" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](immediateValueIsLongSIBImmediate(2))).encodeByte should be(Hex.lsb("48 89 2c 25 02 00 00 00"))
+      }
+
+      "correctly represent mov QWORD PTR [2], rbp as a string" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](immediateValueIsLongSIBImmediate(2))).toString should be("mov QWORD PTR [2], rbp")
+      }
+
+      "correctly encode mov QWORD PTR [rbp+rbx], rbp" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](RBP+RBX)).encodeByte should be(Hex.lsb("48 89 6c 1d 00"))
+      }
+
+      "correctly represent mov QWORD PTR [rbp+rbx], rbp as a string" in {
+        Move(RBP, SIBMemoryLocation[QuadWordSize](RBP+RBX)).toString should be("mov QWORD PTR [rbp+rbx], rbp")
       }
     }
   }
