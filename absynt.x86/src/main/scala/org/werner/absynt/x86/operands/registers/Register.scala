@@ -64,8 +64,8 @@ object Accumulator {
   case object LowByte extends AccumulatorRegister with LowByteRegister
   case object HighByte extends AccumulatorRegister with HighByteRegister
   case object Word extends AccumulatorRegister with WordRegister
-  case object DoubleWord extends AccumulatorRegister with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends AccumulatorRegister with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends AccumulatorRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends AccumulatorRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class CountRegister extends GeneralPurposeRegister(0x01, "cx") {
@@ -76,8 +76,8 @@ object Count {
   case object LowByte extends CountRegister with LowByteRegister
   case object HighByte extends CountRegister with HighByteRegister
   case object Word extends CountRegister with WordRegister
-  case object DoubleWord extends CountRegister with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends CountRegister with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends CountRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends CountRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class DataRegister extends GeneralPurposeRegister(0x02, "dx") {
@@ -88,8 +88,8 @@ object Data {
   case object LowByte extends DataRegister with LowByteRegister
   case object HighByte extends DataRegister with HighByteRegister
   case object Word extends DataRegister with WordRegister
-  case object DoubleWord extends DataRegister with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends DataRegister with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends DataRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends DataRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class BaseRegister extends GeneralPurposeRegister(0x03, "bx") {
@@ -99,17 +99,17 @@ sealed abstract class BaseRegister extends GeneralPurposeRegister(0x03, "bx") {
 object Base {
   case object LowByte extends BaseRegister with LowByteRegister
   case object HighByte extends BaseRegister with HighByteRegister
-  case object Word extends BaseRegister with WordRegister with RealModeBaseRegister with RealModeIndexRegister {
+  case object Word extends BaseRegister with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
     override val indexCode: Byte = 0x07.toByte
 
-    override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
+    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference =
       index match {
         case SourceIndex.Real => BaseIndexReference.BX_SI
         case DestinationIndex.Real => BaseIndexReference.BX_DI
       }
   }
-  case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
   case object X64Word extends BaseRegister with WordRegister
 }
 
@@ -155,24 +155,24 @@ sealed abstract class BasePointer extends GeneralPurposeRegister(0x05, "bp") {
 }
 
 object BasePointer {
-  case object Real extends BasePointer with WordRegister with RealModeBaseRegister with RealModeIndexRegister {
+  case object Real extends BasePointer with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
     override val indexCode: Byte = 0x06.toByte
 
     override val onlyWithDisplacement: Boolean = true
 
-    override def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference =
+    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference =
       index match {
         case SourceIndex.Real => BaseIndexReference.BP_SI
         case DestinationIndex.Real => BaseIndexReference.BP_DI
       }
   }
-  case object Protected extends BasePointer with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister {
+  case object Protected extends BasePointer with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister {
     override val onlyWithDisplacement: Boolean = true
   }
 
   case object X64Real extends BasePointer with WordSize
 
-  case object Long extends BasePointer with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object Long extends BasePointer with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 
   case object LongLowByte extends BasePointer with LowByteRegister
 }
@@ -183,15 +183,15 @@ sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si") {
 
 object SourceIndex {
 
-  final case object Real extends SourceIndex with WordRegister with CombinableRealModeIndexRegister {
+  final case object Real extends SourceIndex with WordRegister with CombinableRealRMIndexRegister {
     override val indexCode: Byte = 0x04.toByte
   }
 
-  final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister {
+  final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
   }
 
-  final case object Long extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister {
+  final case object Long extends SourceIndex with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
   }
 
@@ -205,14 +205,14 @@ sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di"
 }
 
 object DestinationIndex {
-  final case object Real extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
+  final case object Real extends DestinationIndex with WordRegister with CombinableRealRMIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }
 
-  final case object Protected extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
+  final case object Protected extends DestinationIndex with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
 
-  final case object Long extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  final case object Long extends DestinationIndex with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 
   final case object X64Real extends DestinationIndex with WordRegister
 
@@ -226,8 +226,8 @@ sealed abstract class Rex8 extends GeneralPurposeRexRegister(0x00, "r8") {
 object Register8 {
   case object LowByte extends Rex8 with LowByteRegister
   case object Word extends Rex8 with WordRegister
-  case object DoubleWord extends Rex8 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex8 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex8 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex8 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class Rex9 extends GeneralPurposeRexRegister(0x01, "r9") {
@@ -237,8 +237,8 @@ sealed abstract class Rex9 extends GeneralPurposeRexRegister(0x01, "r9") {
 object Register9 {
   case object LowByte extends Rex9 with LowByteRegister
   case object Word extends Rex9 with WordRegister
-  case object DoubleWord extends Rex9 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex9 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex9 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex9 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class Rex10 extends GeneralPurposeRexRegister(0x02, "r10") {
@@ -248,8 +248,8 @@ sealed abstract class Rex10 extends GeneralPurposeRexRegister(0x02, "r10") {
 object Register10 {
   case object LowByte extends Rex10 with LowByteRegister
   case object Word extends Rex10 with WordRegister
-  case object DoubleWord extends Rex10 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex10 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex10 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex10 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class Rex11 extends GeneralPurposeRexRegister(0x03, "r11") {
@@ -259,8 +259,8 @@ sealed abstract class Rex11 extends GeneralPurposeRexRegister(0x03, "r11") {
 object Register11 {
   case object LowByte extends Rex11 with LowByteRegister
   case object Word extends Rex11 with WordRegister
-  case object DoubleWord extends Rex11 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex11 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex11 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex11 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class Rex12 extends GeneralPurposeRexRegister(0x04, "r12") {
@@ -281,8 +281,8 @@ sealed abstract class Rex13 extends GeneralPurposeRexRegister(0x05, "r13") {
 object Register13 {
   case object LowByte extends Rex13 with LowByteRegister
   case object Word extends Rex13 with WordRegister
-  case object DoubleWord extends Rex13 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex13 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex13 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex13 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14") {
@@ -292,8 +292,8 @@ sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14") {
 object Register14 {
   case object LowByte extends Rex14 with LowByteRegister
   case object Word extends Rex14 with WordRegister
-  case object DoubleWord extends Rex14 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex14 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex14 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex14 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15") {
@@ -303,8 +303,8 @@ sealed abstract class Rex15 extends GeneralPurposeRexRegister(0x07, "r15") {
 object Register15 {
   case object LowByte extends Rex15 with LowByteRegister
   case object Word extends Rex15 with WordRegister
-  case object DoubleWord extends Rex15 with DoubleWordRegister with ProtectedModeIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex15 with QuadWordRegister with ProtectedModeIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex15 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
+  case object QuadWord extends Rex15 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
 }
 
 object Register {

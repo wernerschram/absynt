@@ -14,43 +14,7 @@
 package org.werner.absynt.x86.operands.registers
 
 import org.werner.absynt.x86.operands.memoryaccess.{LongSIB, ProtectedSIB}
-import org.werner.absynt.x86.operands.{DoubleWordSize, ImmediateValue, ModRMEncodableOperand, QuadWordSize, WordSize}
-
-sealed trait RegisterReference {
-  val defaultSegment: SegmentRegister = Segment.Data
-  val indexCode: Byte
-
-  def onlyWithDisplacement: Boolean = false
-}
-
-sealed trait IndexRegister extends RegisterReference {
-  self: GeneralPurposeRegister =>
-}
-
-trait RealModeIndexRegister extends IndexRegister {
-  self: GeneralPurposeRegister =>
-}
-
-trait CombinableRealModeIndexRegister extends RealModeIndexRegister {
-  self: GeneralPurposeRegister =>
-
-  def +(base: RealModeBaseRegister): BaseIndexReference =
-    base.combinedIndex(this)
-}
-
-trait RealModeBaseRegister extends ModRMEncodableOperand {
-  self: GeneralPurposeRegister =>
-
-  def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference
-
-  final def +(index: CombinableRealModeIndexRegister): BaseIndexReference =
-    combinedIndex(index)
-}
-
-trait ProtectedModeIndexRegister extends IndexRegister {
-  self: GeneralPurposeRegister =>
-  override val indexCode: Byte = self.registerOrMemoryModeCode
-}
+import org.werner.absynt.x86.operands.{DoubleWordSize, ImmediateValue, ModRMEncodableOperand, QuadWordSize}
 
 sealed trait SIBIndexRegister extends ModRMEncodableOperand {
   val defaultSIBSegment: SegmentRegister = Segment.Data
@@ -95,7 +59,7 @@ trait ProtectedSIBBaseRegister extends SIBBaseRegister with ProtectedSIB {
   final def +(sib: ProtectedSIBIndexReference): ProtectedSIBBaseIndexReference =
     ProtectedSIBBaseIndexReference(this, sib.index, sib.scale, sib.displacement)
 
-  final def +(displacement: ImmediateValue[Int] with DoubleWordSize) =
+  final def +(displacement: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBBaseIndexReference =
     ProtectedSIBBaseIndexReference(this, None, 1, Some(displacement))
 }
 
@@ -115,7 +79,7 @@ trait LongSIBBaseRegister extends SIBBaseRegister with LongSIB {
   final def +(sib: LongSIBIndexReference): LongSIBBaseIndexReference =
     LongSIBBaseIndexReference(this, sib.index, sib.scale, sib.displacement)
 
-  final def +(displacement: ImmediateValue[Int] with DoubleWordSize) =
+  final def +(displacement: ImmediateValue[Int] with DoubleWordSize): LongSIBBaseIndexReference =
     LongSIBBaseIndexReference(this, None, 1, Some(displacement))
 
 }
@@ -227,20 +191,3 @@ sealed case class LongSIBBaseWithSegment(
     LongSIBBaseIndexReference(baseRegister, sib.index, sib.scale, sib.displacement, segment)
 }
 
-sealed abstract class BaseIndexReference(
-                                          val base: GeneralPurposeRegister with RealModeBaseRegister with WordSize,
-                                          val index: GeneralPurposeRegister with CombinableRealModeIndexRegister with WordSize,
-                                          override val indexCode: Byte)
-  extends RegisterReference {
-
-  override val defaultSegment: SegmentRegister = index.defaultSegment
-
-  override def toString = s"$base+$index"
-}
-
-object BaseIndexReference {
-  object BX_SI extends BaseIndexReference(Base.Word, SourceIndex.Real, 0x00)
-  object BX_DI extends BaseIndexReference(Base.Word, DestinationIndex.Real, 0x01)
-  object BP_SI extends BaseIndexReference(BasePointer.Real, SourceIndex.Real, 0x02)
-  object BP_DI extends BaseIndexReference(BasePointer.Real, DestinationIndex.Real, 0x03)
-}

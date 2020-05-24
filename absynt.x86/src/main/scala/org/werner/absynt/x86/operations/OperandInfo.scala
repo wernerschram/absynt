@@ -15,7 +15,7 @@ package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.{ArchitectureBounds, RexRequirement}
 import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operands.registers.{RealModeBaseRegister, DataRegister, GeneralPurposeRegister, IndexRegister, SIBBaseRegister, SIBIndexRegister, SegmentRegister}
+import org.werner.absynt.x86.operands.registers.{RealRMBaseRegister, DataRegister, GeneralPurposeRegister, RMIndexRegister, SIBBaseRegister, SIBIndexRegister, SegmentRegister}
 
 case class OperandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement)
 case class OperandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit val addressSizePrefixRequirement: AddressSizePrefixRequirement)
@@ -161,12 +161,12 @@ sealed class AddressOperandInfo(val operand: Operand with ValueSize, val segment
 }
 
 object AddressOperandInfo {
-  def rmIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister with IndexRegister with RegisterSize, segmentOverride: Option[SegmentRegister])(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister with RMIndexRegister with RegisterSize, segmentOverride: Option[SegmentRegister])(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOperandRM)
     }
 
-  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister with RealModeBaseRegister with RegisterSize)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister with RealRMBaseRegister with RegisterSize)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register)
 
   def rmDisplacement(displacement: ImmediateValue[_] with ValueSize, segmentOverride: Option[SegmentRegister])(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
