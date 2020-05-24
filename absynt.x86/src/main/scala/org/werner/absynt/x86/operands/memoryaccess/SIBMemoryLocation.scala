@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.ListExtensions._
+import org.werner.absynt.x86.operands.registers.{BasePointer, GeneralPurposeRegister, LongSIBBaseRegister, LongSIBIndexRegister, ProtectedSIBBaseRegister, ProtectedSIBIndexRegister, SIBBaseRegister, SIBIndexRegister, Segment, SegmentRegister}
 import org.werner.absynt.x86.operands.{ModRMEncodableOperand, _}
 import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 

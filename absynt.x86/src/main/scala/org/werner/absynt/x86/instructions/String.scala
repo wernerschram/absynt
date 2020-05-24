@@ -16,6 +16,7 @@ package org.werner.absynt.x86.instructions
 import org.werner.absynt.x86.ArchitectureBounds
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess.{DestinationReference, SourceReference}
+import org.werner.absynt.x86.operands.registers.{AccumulatorRegister, Data}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations._
 

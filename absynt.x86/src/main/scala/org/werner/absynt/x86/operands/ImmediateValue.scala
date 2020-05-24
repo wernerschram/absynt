@@ -15,6 +15,7 @@ package org.werner.absynt.x86.operands
 
 import org.werner.absynt.ListExtensions._
 import org.werner.absynt.x86.operands.memoryaccess.{LongSIB, ProtectedSIB}
+import org.werner.absynt.x86.operands.registers.{GeneralPurposeRegister, LongSIBBaseRegister, LongSIBIndexRegister, ProtectedSIBBaseRegister, ProtectedSIBIndexRegister, Segment, SegmentRegister}
 
 import scala.language.implicitConversions
 

@@ -15,6 +15,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.ListExtensions.ListToImmediate
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.{Segment, SegmentRegister}
 import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 
 sealed class MemoryAddress private(address: ImmediateValue[_] with ValueSize, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)

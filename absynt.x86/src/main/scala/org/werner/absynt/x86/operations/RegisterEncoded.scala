@@ -13,7 +13,8 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.operands.{GeneralPurposeRegister, ValueSize}
+import org.werner.absynt.x86.operands.ValueSize
+import org.werner.absynt.x86.operands.registers.GeneralPurposeRegister
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.OperandOrder
 
 abstract class RegisterEncoded[Size <: ValueSize](register: GeneralPurposeRegister with Size,

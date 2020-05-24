@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.GeneralPurposeRegister
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, destination}
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}

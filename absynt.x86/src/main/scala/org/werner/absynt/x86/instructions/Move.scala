@@ -15,12 +15,13 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt._
 import org.werner.absynt.resource.{AbsoluteReference, UnlabeledEncodable}
-import org.werner.absynt.x86.operands.Register.I8086GenericRegisters
+import org.werner.absynt.x86.operands.registers.Register.I8086GenericRegisters
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 import org.werner.absynt.x86._
+import org.werner.absynt.x86.operands.registers.{Accumulator, AccumulatorRegister, ByteRegister, GeneralPurposeRegister, GeneralPurposeRexRegister, HighByteRegister, SegmentRegister}
 
 object Move extends I8086GenericRegisters {
 

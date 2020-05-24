@@ -15,9 +15,10 @@ package org.werner.absynt.x86
 
 import org.werner.absynt.x86.instructions._
 import org.werner.absynt.x86.instructions.branch.{Call, Jump, Loop}
-import org.werner.absynt.x86.operands.Register.I8086Registers
+import org.werner.absynt.x86.operands.registers.Register.I8086Registers
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
+import org.werner.absynt.x86.operands.registers.Register
 import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizeInfo, OperandSizePrefixRequirement}
 
 sealed trait ArchitectureBounds {

@@ -16,6 +16,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 import org.werner.absynt.ListExtensions._
 import org.werner.absynt.x86.operands.ImmediateValue.ValueToByteImmediate
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.{BaseIndexReference, DestinationIndex, GeneralPurposeRegister, IndexRegister, RegisterReference, SegmentRegister, SourceIndex}
 import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 
 import scala.language.implicitConversions

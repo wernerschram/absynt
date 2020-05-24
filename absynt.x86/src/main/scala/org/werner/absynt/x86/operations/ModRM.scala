@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.{GeneralPurposeRegister, SegmentRegister}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, _}
 
 sealed trait ModRMBytes {

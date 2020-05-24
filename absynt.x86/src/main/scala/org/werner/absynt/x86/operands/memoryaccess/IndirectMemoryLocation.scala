@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.SegmentRegister
 
 abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue[_] with ByteWordDoubleSize] = None,
                                       segment: SegmentRegister)

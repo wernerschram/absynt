@@ -16,6 +16,7 @@ package org.werner.absynt.x86.operations
 import org.werner.absynt.resource.UnlabeledEncodable
 import org.werner.absynt.x86.RexRequirement
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.{Segment, SegmentRegister}
 
 abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
   self: ModRMBytes with DisplacementBytes with ImmediateBytes =>

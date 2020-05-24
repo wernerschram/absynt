@@ -15,6 +15,7 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.ArchitectureBounds
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.{AccumulatorRegister, GeneralPurposeRegister}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.OperandOrder
 import org.werner.absynt.x86.operations._

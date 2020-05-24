@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.SegmentRegister
 import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 
 abstract class MemoryLocation(val displacement: Option[ImmediateValue[_]], val segment: SegmentRegister)
