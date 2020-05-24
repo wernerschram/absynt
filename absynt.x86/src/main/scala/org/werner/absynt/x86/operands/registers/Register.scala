@@ -102,13 +102,13 @@ object Base {
   case object Word extends BaseRegister with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
     override val indexCode: Byte = 0x07.toByte
 
-    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference =
+    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize] =
       index match {
         case SourceIndex.Real => BaseIndexReference.BX_SI
         case DestinationIndex.Real => BaseIndexReference.BX_DI
       }
 
-    override val segment: SegmentRegister = Segment.Data
+    override val defaultSegment: SegmentRegister = Segment.Data
   }
   case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
   case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
@@ -160,17 +160,15 @@ object BasePointer {
   case object Real extends BasePointer with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
     override val indexCode: Byte = 0x06.toByte
 
-    override val onlyWithDisplacement: Boolean = true
-    override val segment: SegmentRegister = Segment.Data
+    override val defaultSegment: SegmentRegister = Segment.Data
 
-    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference =
+    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize] =
       index match {
         case SourceIndex.Real => BaseIndexReference.BP_SI
         case DestinationIndex.Real => BaseIndexReference.BP_DI
       }
   }
   case object Protected extends BasePointer with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister {
-    override val onlyWithDisplacement: Boolean = true
   }
 
   case object X64Real extends BasePointer with WordSize
@@ -188,7 +186,7 @@ object SourceIndex {
 
   final case object Real extends SourceIndex with WordRegister with CombinableRealRMIndexRegister {
     override val indexCode: Byte = 0x04.toByte
-    override val segment: SegmentRegister = Segment.Data
+    override val defaultSegment: SegmentRegister = Segment.Data
   }
 
   final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister {
@@ -210,7 +208,7 @@ sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di"
 
 object DestinationIndex {
   final case object Real extends DestinationIndex with WordRegister with CombinableRealRMIndexRegister {
-    override val segment: SegmentRegister = Segment.Extra
+    override val defaultSegment: SegmentRegister = Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }
 
@@ -333,6 +331,15 @@ object Register {
     val CS: SegmentRegister = Segment.Code
     val SS: SegmentRegister = Segment.Stack
     val DS: SegmentRegister = Segment.Data
+
+    implicit def destinationRMIndexRegisterIsRegisterReference[Size<:WordDoubleQuadSize](index: DestinationIndex with RMIndexRegister with Size): DestinationIndexReference[DestinationIndex with RMIndexRegister with Size] =
+      DestinationIndexReference(index)
+
+    implicit def sourceRMIndexRegisterIsRegisterReference[Size<:WordDoubleQuadSize](index: SourceIndex with RMIndexRegister with Size): SourceIndexReference[SourceIndex with RMIndexRegister with Size] =
+      SourceIndexReference(index)
+
+    implicit def generalRMIndexRegisterIsRegisterReference[Register<: GeneralPurposeRegister, Size<:WordDoubleQuadSize](index: Register with RMIndexRegister with Size): BaseIndexReference[Register with RMIndexRegister with Size] =
+      BaseIndexReference[Register with RMIndexRegister with Size](None, index, index.indexCode, index.defaultSegment)
   }
 
   trait I8086SpecificRegisters {
@@ -341,6 +348,7 @@ object Register {
 
     val SI: SourceIndex.Real.type = SourceIndex.Real
     val DI: DestinationIndex.Real.type = DestinationIndex.Real
+
   }
 
   trait I8086Registers extends I8086GenericRegisters with I8086SpecificRegisters

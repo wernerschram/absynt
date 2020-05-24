@@ -13,17 +13,34 @@
 
 package org.werner.absynt.x86.operands.registers
 
-import org.werner.absynt.x86.operands.WordSize
+import org.werner.absynt.x86.operands.{WordDoubleQuadSize, WordDoubleSize, WordSize}
 
-sealed trait RMRegisterReference {
-  def segment: SegmentRegister
+sealed trait RMRegisterReference[Size <: WordDoubleQuadSize] {
+  val base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size]
+  val index: GeneralPurposeRegister with RMIndexRegister with Size
   val indexCode: Byte
-
-  def onlyWithDisplacement: Boolean = false
+  def segment: SegmentRegister
+}
+sealed case class DestinationIndexReference[Size <: WordDoubleQuadSize](destinationIndex: DestinationIndex with RMIndexRegister with Size) extends RMRegisterReference[Size] {
+  override val base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size] = None
+  override val index: GeneralPurposeRegister with RMIndexRegister with Size = destinationIndex
+  override val indexCode: Byte = destinationIndex.indexCode
+  override def segment: SegmentRegister = destinationIndex.defaultSegment
+  override def toString: String = index.toString
 }
 
-sealed trait RMIndexRegister extends RMRegisterReference {
+sealed case class SourceIndexReference[Size <: WordDoubleQuadSize](sourceIndex: SourceIndex with RMIndexRegister with Size) extends RMRegisterReference[Size] {
+  override val base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size] = None
+  override val index: GeneralPurposeRegister with RMIndexRegister with Size = sourceIndex
+  override val indexCode: Byte = sourceIndex.indexCode
+  override def segment: SegmentRegister = sourceIndex.defaultSegment
+  override def toString: String = index.toString
+}
+
+sealed trait RMIndexRegister {
   self: GeneralPurposeRegister =>
+  val indexCode: Byte
+  def defaultSegment: SegmentRegister
 }
 
 trait RealRMIndexRegister extends RMIndexRegister {
@@ -33,38 +50,46 @@ trait RealRMIndexRegister extends RMIndexRegister {
 trait CombinableRealRMIndexRegister extends RealRMIndexRegister {
   self: GeneralPurposeRegister =>
 
-  def +(base: RealRMBaseRegister): BaseIndexReference =
+  def +(base: RealRMBaseRegister): BaseIndexReference[WordSize] =
     base.combinedIndex(this)
 }
 
 trait RealRMBaseRegister {
   self: GeneralPurposeRegister =>
 
-  def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference
+  def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize]
 
-  final def +(index: CombinableRealRMIndexRegister): BaseIndexReference =
+  final def +(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize] =
     combinedIndex(index)
 }
 
 trait ProtectedRMIndexRegister extends RMIndexRegister {
   self: GeneralPurposeRegister =>
   override val indexCode: Byte = self.registerOrMemoryModeCode
+  override def defaultSegment: SegmentRegister = Segment.Data
 }
 
-sealed abstract class BaseIndexReference(
-  val base: GeneralPurposeRegister with RealRMBaseRegister with WordSize,
-  val index: GeneralPurposeRegister with CombinableRealRMIndexRegister with WordSize,
-  override val indexCode: Byte)
-extends RMRegisterReference {
-
-  override val segment: SegmentRegister = index.segment
-
-  override def toString = s"$base+$index"
+sealed class BaseIndexReference[Size <: WordDoubleQuadSize](
+  val base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size],
+  val index: GeneralPurposeRegister with RMIndexRegister with Size,
+  override val indexCode: Byte,
+  override val segment: SegmentRegister
+)
+extends RMRegisterReference[Size] {
+  override def toString = s"${base.map(_+"+").getOrElse("")}$index"
 }
 
 object BaseIndexReference {
-  object BX_SI extends BaseIndexReference(Base.Word, SourceIndex.Real, 0x00)
-  object BX_DI extends BaseIndexReference(Base.Word, DestinationIndex.Real, 0x01)
-  object BP_SI extends BaseIndexReference(BasePointer.Real, SourceIndex.Real, 0x02)
-  object BP_DI extends BaseIndexReference(BasePointer.Real, DestinationIndex.Real, 0x03)
+  def apply[Size <: WordDoubleQuadSize](
+    base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size],
+    index: GeneralPurposeRegister with RMIndexRegister with Size,
+    indexCode: Byte,
+    segment: SegmentRegister,
+  ) = new BaseIndexReference[Size](base, index, indexCode, segment)
+
+
+  object BX_SI extends BaseIndexReference[WordSize](Some(Base.Word), SourceIndex.Real, 0x00, SourceIndex.Real.defaultSegment)
+  object BX_DI extends BaseIndexReference[WordSize](Some(Base.Word), DestinationIndex.Real, 0x01, DestinationIndex.Real.defaultSegment)
+  object BP_SI extends BaseIndexReference[WordSize](Some(BasePointer.Real), SourceIndex.Real, 0x02, SourceIndex.Real.defaultSegment)
+  object BP_DI extends BaseIndexReference[WordSize](Some(BasePointer.Real), DestinationIndex.Real, 0x03, DestinationIndex.Real.defaultSegment)
 }
