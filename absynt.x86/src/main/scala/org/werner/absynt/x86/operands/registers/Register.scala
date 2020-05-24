@@ -281,8 +281,8 @@ sealed abstract class Rex13 extends GeneralPurposeRexRegister(0x05, "r13") {
 object Register13 {
   case object LowByte extends Rex13 with LowByteRegister
   case object Word extends Rex13 with WordRegister
-  case object DoubleWord extends Rex13 with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
-  case object QuadWord extends Rex13 with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
+  case object DoubleWord extends Rex13 with DoubleWordRegister
+  case object QuadWord extends Rex13 with QuadWordRegister
 }
 
 sealed abstract class Rex14 extends GeneralPurposeRexRegister(0x06, "r14") {
