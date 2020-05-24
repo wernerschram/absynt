@@ -21,17 +21,25 @@ import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRe
 
 import scala.language.implicitConversions
 
-sealed class RegisterMemoryLocation(val reference: RMRegisterReference, displacement: Option[ImmediateValue[_] with ByteWordDoubleSize], segment: SegmentRegister)
+sealed class RegisterMemoryLocation(val reference: RMRegisterReference, displacementValue: Option[ImmediateValue[_] with ByteWordDoubleSize], segment: SegmentRegister)
                                    (implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement)
-  extends IndirectMemoryLocation(reference.indexCode,
-     if (reference.onlyWithDisplacement)
-      Some(displacement.getOrElse(byteImmediate(0.toByte)))
-    else
-      displacement, segment)
-    with ModRMEncodableOperand {
+  extends MemoryLocation(
+    if (reference.onlyWithDisplacement) Some(displacementValue.getOrElse(byteImmediate(0.toByte))) else displacementValue,
+    segment
+  ) with ModRMEncodableOperand {
   self: ValueSize =>
 
-  override val defaultSegment: SegmentRegister = reference.defaultSegment
+  override val registerOrMemoryModeCode: Byte = reference.indexCode
+
+  override val modValue: Byte = {
+    displacement match {
+      case None => 0x00
+      case Some(_: ByteSize) => 0x01
+      case _ => 0x02
+    }
+  }
+
+  override val defaultSegment: SegmentRegister = reference.segment
 
   override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] = reference match {
     case bi: BaseIndexReference => Set(AddressOperandInfo.rmBase(bi.base), AddressOperandInfo.rmIndex(bi.index, segmentOverride))
@@ -40,16 +48,16 @@ sealed class RegisterMemoryLocation(val reference: RMRegisterReference, displace
 
   override def toString: String = s"$sizeName PTR $segmentPrefix[$reference$displacementString]"
 
-  private def displacementString = displacement match {
+  private def displacementString = displacementValue match {
     case None => ""
     case Some(d) => s"+${d.encodedValue.decimalString}"
   }
 
   val actualDisplacement: Seq[Byte] =
     if (reference.onlyWithDisplacement)
-      displacement.map(_.encodedValue).getOrElse(Seq(0.toByte))
+      displacementValue.map(_.encodedValue).getOrElse(Seq(0.toByte))
     else
-      displacement.toSeq.flatMap(_.encodedValue)
+      displacementValue.toSeq.flatMap(_.encodedValue)
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
 }
@@ -129,10 +137,10 @@ object RegisterMemoryLocation {
 
     object RegisterMemoryLocation {
       def apply[Size <: ValueSize : RMForSize](index: RMRegisterReference)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation with Size =
-        implicitly[RMForSize[Size]].instance(index, None, index.defaultSegment)
+        implicitly[RMForSize[Size]].instance(index, None, index.segment)
 
       def apply[Size <: ValueSize : RMForSize](index: RMRegisterReference, displacement: ImmediateValue[_] with ByteWordDoubleSize)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation with Size =
-        implicitly[RMForSize[Size]].instance(index, Some(displacement), index.defaultSegment)
+        implicitly[RMForSize[Size]].instance(index, Some(displacement), index.segment)
 
       object withSegmentOverride {
         def apply[Size <: ValueSize : RMForSize](index: RMRegisterReference, segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation with Size =
@@ -146,15 +154,12 @@ object RegisterMemoryLocation {
 
     object DestinationReference {
       implicit def apply[Size <: ValueSize : RMForSize](index: DestinationIndex with RMIndexRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference with Size =
-        implicitly[RMForSize[Size]].DestinationReference(index, None, index.defaultSegment)
+        implicitly[RMForSize[Size]].DestinationReference(index, None, index.segment)
     }
 
     object SourceReference {
       implicit def apply[Size <: ValueSize : RMForSize](index: SourceIndex with RMIndexRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference with Size =
-        implicitly[RMForSize[Size]].SourceReference(index, None, index.defaultSegment)
+        implicitly[RMForSize[Size]].SourceReference(index, None, index.segment)
     }
-
-
   }
-
 }

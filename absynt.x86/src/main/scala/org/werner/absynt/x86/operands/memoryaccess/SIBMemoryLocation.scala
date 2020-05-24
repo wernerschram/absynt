@@ -23,8 +23,8 @@ sealed abstract class SIBMemoryLocation(
     val base: Option[GeneralPurposeRegister with SIBBaseRegister with DoubleQuadSize],
     displacementValue: Option[ImmediateValue[_] with ByteWordDoubleSize] = None, val scale: Int, segment: SegmentRegister)
   extends MemoryLocation(
-    if (base.contains(BasePointer.Protected) || base.contains(BasePointer.Long)) displacementValue orElse Some(ImmediateValue.byteImmediate(0)) else displacementValue
-    , segment
+    if (base.contains(BasePointer.Protected) || base.contains(BasePointer.Long)) displacementValue orElse Some(ImmediateValue.byteImmediate(0)) else displacementValue,
+    segment
   ) with ModRMEncodableOperand {
 
   self: ValueSize =>

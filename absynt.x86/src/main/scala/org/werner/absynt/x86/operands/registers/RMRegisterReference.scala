@@ -13,10 +13,10 @@
 
 package org.werner.absynt.x86.operands.registers
 
-import org.werner.absynt.x86.operands.{ModRMEncodableOperand, WordSize}
+import org.werner.absynt.x86.operands.WordSize
 
 sealed trait RMRegisterReference {
-  val defaultSegment: SegmentRegister = Segment.Data
+  def segment: SegmentRegister
   val indexCode: Byte
 
   def onlyWithDisplacement: Boolean = false
@@ -37,7 +37,7 @@ trait CombinableRealRMIndexRegister extends RealRMIndexRegister {
     base.combinedIndex(this)
 }
 
-trait RealRMBaseRegister extends ModRMEncodableOperand {
+trait RealRMBaseRegister {
   self: GeneralPurposeRegister =>
 
   def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference
@@ -57,7 +57,7 @@ sealed abstract class BaseIndexReference(
   override val indexCode: Byte)
 extends RMRegisterReference {
 
-  override val defaultSegment: SegmentRegister = index.defaultSegment
+  override val segment: SegmentRegister = index.segment
 
   override def toString = s"$base+$index"
 }

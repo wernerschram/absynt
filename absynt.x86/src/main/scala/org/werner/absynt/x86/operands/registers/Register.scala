@@ -107,6 +107,8 @@ object Base {
         case SourceIndex.Real => BaseIndexReference.BX_SI
         case DestinationIndex.Real => BaseIndexReference.BX_DI
       }
+
+    override val segment: SegmentRegister = Segment.Data
   }
   case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
   case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
@@ -159,6 +161,7 @@ object BasePointer {
     override val indexCode: Byte = 0x06.toByte
 
     override val onlyWithDisplacement: Boolean = true
+    override val segment: SegmentRegister = Segment.Data
 
     override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference =
       index match {
@@ -185,14 +188,15 @@ object SourceIndex {
 
   final case object Real extends SourceIndex with WordRegister with CombinableRealRMIndexRegister {
     override val indexCode: Byte = 0x04.toByte
+    override val segment: SegmentRegister = Segment.Data
   }
 
   final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister {
-    override val defaultSegment: SegmentRegister = Segment.Extra
+    override val segment: SegmentRegister = Segment.Extra
   }
 
   final case object Long extends SourceIndex with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister {
-    override val defaultSegment: SegmentRegister = Segment.Extra
+    override val segment: SegmentRegister = Segment.Extra
   }
 
   final case object X64Real extends SourceIndex with WordRegister
@@ -206,7 +210,7 @@ sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di"
 
 object DestinationIndex {
   final case object Real extends DestinationIndex with WordRegister with CombinableRealRMIndexRegister {
-    override val defaultSegment: SegmentRegister = Segment.Extra
+    override val segment: SegmentRegister = Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }
 
