@@ -102,13 +102,14 @@ object Base {
   case object Word extends BaseRegister with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
     override val indexCode: Byte = 0x07.toByte
 
-    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize] =
+    override def combinedIndex(index: RealRMIndexRegister): BaseIndexReference[WordSize] =
       index match {
         case SourceIndex.Real => BaseIndexReference.BX_SI
         case DestinationIndex.Real => BaseIndexReference.BX_DI
       }
 
     override val defaultSegment: SegmentRegister = Segment.Data
+
   }
   case object DoubleWord extends BaseRegister with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister
   case object QuadWord extends BaseRegister with QuadWordRegister with ProtectedRMIndexRegister with LongSIBIndexRegister
@@ -117,6 +118,18 @@ object Base {
 
 sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: String) extends Register with WordSize {
   override def toString: String = mnemonic
+
+  def +(base: WordRegister with RealRMBaseRegister): RMBaseWithSegment[WordSize] =
+    RMBaseWithSegment(base, this)
+
+  def +(base: DoubleWordRegister with RealRMBaseRegister): RMBaseWithSegment[DoubleWordSize] =
+    RMBaseWithSegment(base, this)
+
+  def +(base: QuadWordRegister with RealRMBaseRegister): RMBaseWithSegment[QuadWordRegister] =
+    RMBaseWithSegment(base, this)
+
+  def ++(index: DoubleWordRegister with ProtectedRMIndexRegister): BaseIndexReference[DoubleWordRegister with ProtectedRMIndexRegister] =
+    BaseIndexReference(None, index, index.indexCode, this)
 
   def +(sib: GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize): ProtectedSIBBaseWithSegment =
     ProtectedSIBBaseWithSegment(sib, this)
@@ -162,7 +175,7 @@ object BasePointer {
 
     override val defaultSegment: SegmentRegister = Segment.Data
 
-    override def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize] =
+    override def combinedIndex(index: RealRMIndexRegister): BaseIndexReference[WordSize] =
       index match {
         case SourceIndex.Real => BaseIndexReference.BP_SI
         case DestinationIndex.Real => BaseIndexReference.BP_DI
@@ -184,11 +197,10 @@ sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si") {
 
 object SourceIndex {
 
-  final case object Real extends SourceIndex with WordRegister with CombinableRealRMIndexRegister {
+  final case object Real extends SourceIndex with WordRegister with RealRMIndexRegister {
     override val indexCode: Byte = 0x04.toByte
     override val defaultSegment: SegmentRegister = Segment.Data
   }
-
   final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedRMIndexRegister with ProtectedSIBIndexRegister {
     override val segment: SegmentRegister = Segment.Extra
   }
@@ -207,7 +219,7 @@ sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di"
 }
 
 object DestinationIndex {
-  final case object Real extends DestinationIndex with WordRegister with CombinableRealRMIndexRegister {
+  final case object Real extends DestinationIndex with WordRegister with RealRMIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }
@@ -338,8 +350,8 @@ object Register {
     implicit def sourceRMIndexRegisterIsRegisterReference[Size<:WordDoubleQuadSize](index: SourceIndex with RMIndexRegister with Size): SourceIndexReference[SourceIndex with RMIndexRegister with Size] =
       SourceIndexReference(index)
 
-    implicit def generalRMIndexRegisterIsRegisterReference[Register<: GeneralPurposeRegister, Size<:WordDoubleQuadSize](index: Register with RMIndexRegister with Size): BaseIndexReference[Register with RMIndexRegister with Size] =
-      BaseIndexReference[Register with RMIndexRegister with Size](None, index, index.indexCode, index.defaultSegment)
+    implicit def generalRMIndexRegisterIsRegisterReference[Register<: GeneralPurposeRegister, Size<:WordDoubleQuadSize](index: Register with RMIndexRegister with Size): BaseIndexReference[Size] =
+      BaseIndexReference[Size](None, index, index.indexCode, index.defaultSegment)
   }
 
   trait I8086SpecificRegisters {

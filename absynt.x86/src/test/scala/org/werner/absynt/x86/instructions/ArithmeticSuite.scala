@@ -302,7 +302,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xor esi, DWORD PTR gs:[eax+0x12]" in {
-        Xor(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](EAX, 0x12.toByte, GS), ESI).encodeByte should be(Hex.lsb("65 33 70 12"))
+        Xor(RegisterMemoryLocation[DoubleWordSize](GS++EAX, 0x12.toByte), ESI).encodeByte should be(Hex.lsb("65 33 70 12"))
       }
 
       "correctly represent xor esi, DWORD PTR gs:[eax+0x12] as a string" in {

@@ -63,7 +63,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent mov BYTE PTR [bp+si+0x7D], bh as a string" in {
-        Move(BH, RegisterMemoryLocation[ByteSize](SI+BP, 0x7D.toByte)).toString should be("mov BYTE PTR [bp+si+125], bh")
+        Move(BH, RegisterMemoryLocation[ByteSize](BP+SI, 0x7D.toByte)).toString should be("mov BYTE PTR [bp+si+125], bh")
       }
 
      "correctly encode mov WORD PTR [bp], bp" in {

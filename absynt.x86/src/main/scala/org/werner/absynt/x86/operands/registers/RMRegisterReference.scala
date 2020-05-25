@@ -13,7 +13,7 @@
 
 package org.werner.absynt.x86.operands.registers
 
-import org.werner.absynt.x86.operands.{WordDoubleQuadSize, WordDoubleSize, WordSize}
+import org.werner.absynt.x86.operands.{WordDoubleQuadSize, WordSize}
 
 sealed trait RMRegisterReference[Size <: WordDoubleQuadSize] {
   val base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size]
@@ -47,19 +47,12 @@ trait RealRMIndexRegister extends RMIndexRegister {
   self: GeneralPurposeRegister =>
 }
 
-trait CombinableRealRMIndexRegister extends RealRMIndexRegister {
-  self: GeneralPurposeRegister =>
-
-  def +(base: RealRMBaseRegister): BaseIndexReference[WordSize] =
-    base.combinedIndex(this)
-}
-
 trait RealRMBaseRegister {
   self: GeneralPurposeRegister =>
 
-  def combinedIndex(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize]
+  def combinedIndex(index: RealRMIndexRegister): BaseIndexReference[WordSize]
 
-  final def +(index: CombinableRealRMIndexRegister): BaseIndexReference[WordSize] =
+  final def +(index: RealRMIndexRegister): BaseIndexReference[WordSize] =
     combinedIndex(index)
 }
 
@@ -79,6 +72,15 @@ extends RMRegisterReference[Size] {
   override def toString = s"${base.map(_+"+").getOrElse("")}$index"
 }
 
+sealed case class RMBaseWithSegment[Size <: WordDoubleQuadSize](
+  baseRegister: GeneralPurposeRegister with RealRMBaseRegister with Size,
+  segment: SegmentRegister
+) {
+  final def +(index: GeneralPurposeRegister with RealRMIndexRegister with Size): BaseIndexReference[Size] =
+    BaseIndexReference(Some(baseRegister), index, BaseIndexReference.indexCode(baseRegister, index), segment)
+
+}
+
 object BaseIndexReference {
   def apply[Size <: WordDoubleQuadSize](
     base: Option[GeneralPurposeRegister with RealRMBaseRegister with Size],
@@ -87,6 +89,13 @@ object BaseIndexReference {
     segment: SegmentRegister,
   ) = new BaseIndexReference[Size](base, index, indexCode, segment)
 
+  def indexCode(base: GeneralPurposeRegister with RealRMBaseRegister, index: GeneralPurposeRegister with RMIndexRegister): Byte =
+    (base, index) match {
+      case (Base.Word, SourceIndex.Real) => 0
+      case (Base.Word, DestinationIndex.Real) => 1
+      case (BasePointer.Real, SourceIndex.Real) => 2
+      case (BasePointer.Real, DestinationIndex.Real) => 3
+    }
 
   object BX_SI extends BaseIndexReference[WordSize](Some(Base.Word), SourceIndex.Real, 0x00, SourceIndex.Real.defaultSegment)
   object BX_DI extends BaseIndexReference[WordSize](Some(Base.Word), DestinationIndex.Real, 0x01, DestinationIndex.Real.defaultSegment)

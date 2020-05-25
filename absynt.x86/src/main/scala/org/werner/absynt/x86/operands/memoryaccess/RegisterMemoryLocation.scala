@@ -40,7 +40,7 @@ sealed class RegisterMemoryLocation[Ref <: RMRegisterReference[_]](val reference
     }
   }
 
-  override val defaultSegment: SegmentRegister = reference.segment
+  override val defaultSegment: SegmentRegister = reference.index.defaultSegment
 
   override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] = reference match {
     case bi: RMRegisterReference[_] =>
