@@ -16,8 +16,9 @@ package org.werner.absynt.x86.operands.registers
 import org.werner.absynt.x86.operands.memoryaccess.{LongSIB, ProtectedSIB}
 import org.werner.absynt.x86.operands.{DoubleWordSize, ImmediateValue, ModRMEncodableOperand, QuadWordSize}
 
-sealed trait SIBIndexRegister extends ModRMEncodableOperand {
-  val defaultSIBSegment: SegmentRegister = Segment.Data
+sealed trait SIBIndexRegister extends OverridableSegment {
+  self: GeneralPurposeRegister =>
+  override val defaultSegment: SegmentRegister = Segment.Data
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 

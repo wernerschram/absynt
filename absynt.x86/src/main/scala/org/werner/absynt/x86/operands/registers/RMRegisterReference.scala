@@ -37,18 +37,17 @@ sealed case class SourceIndexReference[Size <: WordDoubleQuadSize](sourceIndex: 
   override def toString: String = index.toString
 }
 
-sealed trait RMIndexRegister {
+sealed trait RMIndexRegister extends OverridableSegment {
   self: GeneralPurposeRegister =>
   val indexCode: Byte
-  def defaultSegment: SegmentRegister
 }
 
-trait RealRMIndexRegister extends RMIndexRegister {
+trait RealRMIndexRegister extends RMIndexRegister with OverridableSegment {
   self: GeneralPurposeRegister =>
 }
 
 trait RealRMBaseRegister {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister with OverridableSegment =>
 
   def combinedIndex(index: RealRMIndexRegister): BaseIndexReference[WordSize]
 
@@ -56,10 +55,10 @@ trait RealRMBaseRegister {
     combinedIndex(index)
 }
 
-trait ProtectedRMIndexRegister extends RMIndexRegister {
+trait ProtectedRMIndexRegister extends RMIndexRegister with OverridableSegment {
   self: GeneralPurposeRegister =>
   override val indexCode: Byte = self.registerOrMemoryModeCode
-  override def defaultSegment: SegmentRegister = Segment.Data
+  override val defaultSegment: SegmentRegister = Segment.Data
 }
 
 sealed class BaseIndexReference[Size <: WordDoubleQuadSize](

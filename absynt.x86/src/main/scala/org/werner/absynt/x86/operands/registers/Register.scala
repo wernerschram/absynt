@@ -27,6 +27,11 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
   val registerOrMemoryModeCode: Byte = registerCode
 }
 
+trait OverridableSegment {
+  self: GeneralPurposeRegister =>
+  def defaultSegment: SegmentRegister
+}
+
 sealed abstract class GeneralPurposeRexRegister(registerCode: Byte, mnemonic: String)
   extends GeneralPurposeRegister(registerCode, mnemonic) {
   self: ValueSize =>

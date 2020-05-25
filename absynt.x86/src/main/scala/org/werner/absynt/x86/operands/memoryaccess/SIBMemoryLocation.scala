@@ -44,7 +44,7 @@ sealed abstract class SIBMemoryLocation(
   assume((1 :: 2 :: 4 :: 8 :: Nil).contains(scale))
 
   // TODO: simplify: default is always data
-  override val defaultSegment: SegmentRegister = index.map(_.defaultSIBSegment).getOrElse(Segment.Data)
+  override val defaultSegment: SegmentRegister = index.map(_.defaultSegment).getOrElse(Segment.Data)
   val baseCode: Byte = base.map(_.SIBBaseCode).getOrElse(5.toByte)
   val indexCode: Byte = index.map(_.SIBIndexCode).getOrElse(4.toByte)
 
