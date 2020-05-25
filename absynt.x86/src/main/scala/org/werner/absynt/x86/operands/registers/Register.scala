@@ -27,6 +27,21 @@ sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemoni
   val registerOrMemoryModeCode: Byte = registerCode
 }
 
+trait ReferenceBaseRegister {
+  self: GeneralPurposeRegister with OverridableSegment =>
+
+}
+
+trait ReferenceIndexRegister {
+  self: GeneralPurposeRegister with OverridableSegment =>
+
+}
+
+trait CombinableReferenceIndexRegister extends ReferenceIndexRegister {
+  self: GeneralPurposeRegister with OverridableSegment =>
+
+}
+
 trait OverridableSegment {
   self: GeneralPurposeRegister =>
   def defaultSegment: SegmentRegister
@@ -104,7 +119,7 @@ sealed abstract class BaseRegister extends GeneralPurposeRegister(0x03, "bx") {
 object Base {
   case object LowByte extends BaseRegister with LowByteRegister
   case object HighByte extends BaseRegister with HighByteRegister
-  case object Word extends BaseRegister with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
+  case object Word extends BaseRegister with WordRegister with RealRMBaseRegister with RealRMIndexRegister with ReferenceIndexRegister {
     override val indexCode: Byte = 0x07.toByte
 
     override def combinedIndex(index: RealRMIndexRegister): BaseIndexReference[WordSize] =
@@ -175,7 +190,7 @@ sealed abstract class BasePointer extends GeneralPurposeRegister(0x05, "bp") {
 }
 
 object BasePointer {
-  case object Real extends BasePointer with WordRegister with RealRMBaseRegister with RealRMIndexRegister {
+  case object Real extends BasePointer with WordRegister with RealRMBaseRegister with RealRMIndexRegister with ReferenceIndexRegister {
     override val indexCode: Byte = 0x06.toByte
 
     override val defaultSegment: SegmentRegister = Segment.Data
@@ -202,7 +217,7 @@ sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si") {
 
 object SourceIndex {
 
-  final case object Real extends SourceIndex with WordRegister with RealRMIndexRegister {
+  final case object Real extends SourceIndex with WordRegister with RealRMIndexRegister with CombinableReferenceIndexRegister {
     override val indexCode: Byte = 0x04.toByte
     override val defaultSegment: SegmentRegister = Segment.Data
   }
@@ -224,7 +239,7 @@ sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di"
 }
 
 object DestinationIndex {
-  final case object Real extends DestinationIndex with WordRegister with RealRMIndexRegister {
+  final case object Real extends DestinationIndex with WordRegister with RealRMIndexRegister with CombinableReferenceIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }

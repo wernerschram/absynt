@@ -38,12 +38,12 @@ sealed case class SourceIndexReference[Size <: WordDoubleQuadSize](sourceIndex: 
 }
 
 sealed trait RMIndexRegister extends OverridableSegment {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister with ReferenceIndexRegister =>
   val indexCode: Byte
 }
 
-trait RealRMIndexRegister extends RMIndexRegister with OverridableSegment {
-  self: GeneralPurposeRegister =>
+trait RealRMIndexRegister extends RMIndexRegister  with OverridableSegment {
+  self: GeneralPurposeRegister with ReferenceIndexRegister =>
 }
 
 trait RealRMBaseRegister {
@@ -55,7 +55,7 @@ trait RealRMBaseRegister {
     combinedIndex(index)
 }
 
-trait ProtectedRMIndexRegister extends RMIndexRegister with OverridableSegment {
+trait ProtectedRMIndexRegister extends RMIndexRegister with CombinableReferenceIndexRegister with OverridableSegment {
   self: GeneralPurposeRegister =>
   override val indexCode: Byte = self.registerOrMemoryModeCode
   override val defaultSegment: SegmentRegister = Segment.Data
