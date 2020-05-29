@@ -50,10 +50,10 @@ class CallSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode call FAR DWORD PTR edx" in {
-        Call(RegisterMemoryLocation[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 12"))
+        Call(RegisterReference.doubleWord[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 12"))
       }
       "correctly represent call FAR DWORD PTR edx as a string" in {
-        Call(RegisterMemoryLocation[DoubleWordSize](EDX)).toString should be("call DWORD PTR [edx]")
+        Call(RegisterReference.doubleWord[DoubleWordSize](EDX)).toString should be("call DWORD PTR [edx]")
       }
 
       "correctly encode call FAR 0x1000:0x2000" in {
@@ -71,17 +71,17 @@ class CallSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode call FAR WORD PTR [bp+si]" in {
-        Call.Far(RegisterMemoryLocation[WordSize](BP + SI)).encodeByte should be(Hex.lsb("FF 1A"))
+        Call.Far(RegisterReference.word[WordSize](BP + SI)).encodeByte should be(Hex.lsb("FF 1A"))
       }
       "correctly represent call FAR WORD PTR [bp+si] as a string" in {
-        Call.Far(RegisterMemoryLocation[WordSize](BP + SI)).toString should be("call FAR WORD PTR [bp+si]")
+        Call.Far(RegisterReference.word[WordSize](BP + SI)).toString should be("call FAR WORD PTR [bp+si]")
       }
 
       "correctly encode call FAR DWORD PTR [bp+si]" in {
-        Call.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("66 FF 1A"))
+        Call.Far(RegisterReference.word[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("66 FF 1A"))
       }
       "correctly represent call FAR DWORD PTR [bp+si] as a string" in {
-        Call.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).toString should be("call FAR DWORD PTR [bp+si]")
+        Call.Far(RegisterReference.word[DoubleWordSize](BP + SI)).toString should be("call FAR DWORD PTR [bp+si]")
       }
 
       "Encode a simple program with an indirect backward short call instruction" in {
@@ -146,10 +146,10 @@ class CallSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode call FAR DWORD PTR edx" in {
-        Call(RegisterMemoryLocation[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("FF 12"))
+        Call(RegisterReference.doubleWord[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("FF 12"))
       }
       "correctly represent call FAR DWORD PTR edx as a string" in {
-        Call(RegisterMemoryLocation[DoubleWordSize](EDX)).toString should be("call DWORD PTR [edx]")
+        Call(RegisterReference.doubleWord[DoubleWordSize](EDX)).toString should be("call DWORD PTR [edx]")
       }
 
       "correctly encode call FAR 0x1000:0x2000" in {
@@ -167,17 +167,17 @@ class CallSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode call FAR WORD PTR [bp+si]" in {
-        Call.Far(RegisterMemoryLocation[WordSize](BP + SI)).encodeByte should be(Hex.lsb("67 66 FF 1A"))
+        Call.Far(RegisterReference.word[WordSize](BP + SI)).encodeByte should be(Hex.lsb("67 66 FF 1A"))
       }
       "correctly represent call FAR WORD PTR [bp+si] as a string" in {
-        Call.Far(RegisterMemoryLocation[WordSize](BP + SI)).toString should be("call FAR WORD PTR [bp+si]")
+        Call.Far(RegisterReference.word[WordSize](BP + SI)).toString should be("call FAR WORD PTR [bp+si]")
       }
 
       "correctly encode call FAR DWORD PTR [bp+si]" in {
-        Call.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("67 FF 1A"))
+        Call.Far(RegisterReference.word[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("67 FF 1A"))
       }
       "correctly represent call FAR DWORD PTR [bp+si] as a string" in {
-        Call.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).toString should be("call FAR DWORD PTR [bp+si]")
+        Call.Far(RegisterReference.word[DoubleWordSize](BP + SI)).toString should be("call FAR DWORD PTR [bp+si]")
       }
 
       "Encode a simple program with an indirect backward short call instruction" in {
@@ -228,31 +228,31 @@ class CallSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode call FAR DWORD PTR edx" in {
-        Call(RegisterMemoryLocation[QuadWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 12"))
+        Call(RegisterReference.doubleWord[QuadWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 12"))
       }
       "correctly represent call FAR DWORD PTR edx as a string" in {
-        Call(RegisterMemoryLocation[QuadWordSize](EDX)).toString should be("call QWORD PTR [edx]")
+        Call(RegisterReference.doubleWord[QuadWordSize](EDX)).toString should be("call QWORD PTR [edx]")
       }
 
       "correctly encode call FAR WORD PTR [edx]" in {
-        Call.Far(RegisterMemoryLocation[WordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 1A"))
+        Call.Far(RegisterReference.doubleWord[WordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 1A"))
       }
       "correctly represent call FAR WORD PTR [edx] as a string" in {
-        Call.Far(RegisterMemoryLocation[WordSize](EDX)).toString should be("call FAR WORD PTR [edx]")
+        Call.Far(RegisterReference.doubleWord[WordSize](EDX)).toString should be("call FAR WORD PTR [edx]")
       }
 
       "correctly encode call FAR DWORD PTR [edx]" in {
-        Call.Far(RegisterMemoryLocation[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 1A"))
+        Call.Far(RegisterReference.doubleWord[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 1A"))
       }
       "correctly represent call FAR DWORD PTR [edx] as a string" in {
-        Call.Far(RegisterMemoryLocation[DoubleWordSize](EDX)).toString should be("call FAR DWORD PTR [edx]")
+        Call.Far(RegisterReference.doubleWord[DoubleWordSize](EDX)).toString should be("call FAR DWORD PTR [edx]")
       }
 
       "correctly encode call FAR QWORD PTR [rdx]" in {
-        Call.Far(RegisterMemoryLocation[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 1A"))
+        Call.Far(RegisterReference.quadWord[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 1A"))
       }
       "correctly represent call FAR QWORD PTR [rdx] as a string" in {
-        Call.Far(RegisterMemoryLocation[QuadWordSize](RDX)).toString should be("call FAR QWORD PTR [rdx]")
+        Call.Far(RegisterReference.quadWord[QuadWordSize](RDX)).toString should be("call FAR QWORD PTR [rdx]")
       }
 
       "Encode a simple program with an indirect backward long call instruction" in {

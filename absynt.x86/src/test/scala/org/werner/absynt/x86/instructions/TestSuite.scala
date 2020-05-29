@@ -85,19 +85,19 @@ class TestSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode test WORD PTR [bx], 0x3412" in {
-        Test(0x3412.toShort, RegisterMemoryLocation[WordSize](BX)).encodeByte should be(Hex.lsb("F7 07 12 34"))
+        Test(0x3412.toShort, RegisterReference.word[WordSize](BX)).encodeByte should be(Hex.lsb("F7 07 12 34"))
       }
 
       "correctly represent test WORD PTR [bx], 0x3412 as a string" in {
-        Test(0x3412.toShort, RegisterMemoryLocation[WordSize](BX)).toString shouldBe "test WORD PTR [bx], 13330"
+        Test(0x3412.toShort, RegisterReference.word[WordSize](BX)).toString shouldBe "test WORD PTR [bx], 13330"
       }
 
       "correctly encode test BYTE PTR [bx], al" in {
-        Test(AL, RegisterMemoryLocation[ByteSize](BX)).encodeByte should be(Hex.lsb("84 07"))
+        Test(AL, RegisterReference.word[ByteSize](BX)).encodeByte should be(Hex.lsb("84 07"))
       }
 
       "correctly represent test BYTE PTR [bx], al as a string" in {
-        Test(AL, RegisterMemoryLocation[ByteSize](BX)).toString shouldBe "test BYTE PTR [bx], al"
+        Test(AL, RegisterReference.word[ByteSize](BX)).toString shouldBe "test BYTE PTR [bx], al"
       }
     }
 
@@ -158,99 +158,99 @@ class TestSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode test BYTE PTR [rax+rbx*2], 0x11" in {
-        Test(0x11.toByte, SIBMemoryLocation[ByteSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("F6 04 58 11"))
+        Test(0x11.toByte, RegisterReference.quadWord[ByteSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("F6 04 58 11"))
       }
 
       "correctly represent test BYTE PTR [rax+rbx*2], 0x11 as a string" in {
-        Test(0x11.toByte, SIBMemoryLocation[ByteSize](RAX+RBX*2)).toString shouldBe "test BYTE PTR [rax+rbx*2], 17"
+        Test(0x11.toByte, RegisterReference.quadWord[ByteSize](RAX+RBX*2)).toString shouldBe "test BYTE PTR [rax+rbx*2], 17"
       }
 
       "correctly encode test WORD PTR [rax+rbx*2], 0x2211" in {
-        Test(0x2211.toShort, SIBMemoryLocation[WordSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("66 F7 04 58 11 22"))
+        Test(0x2211.toShort, RegisterReference.quadWord[WordSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("66 F7 04 58 11 22"))
       }
 
       "correctly represent test WORD PTR [rax+rbx*2], 0x2211 as a string" in {
-        Test(0x2211.toShort, SIBMemoryLocation[WordSize](RAX+RBX*2)).toString shouldBe "test WORD PTR [rax+rbx*2], 8721"
+        Test(0x2211.toShort, RegisterReference.quadWord[WordSize](RAX+RBX*2)).toString shouldBe "test WORD PTR [rax+rbx*2], 8721"
       }
 
       "correctly encode test DWORD PTR [rax+rbx*2], 0x44332211" in {
-        Test(0x44332211, SIBMemoryLocation[DoubleWordSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("F7 04 58 11 22 33 44"))
+        Test(0x44332211, RegisterReference.quadWord[DoubleWordSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("F7 04 58 11 22 33 44"))
       }
 
       "correctly represent test DWORD PTR [rax+rbx*2], 0x44332211 as a string" in {
-        Test(0x44332211, SIBMemoryLocation[DoubleWordSize](RAX+RBX*2)).toString shouldBe "test DWORD PTR [rax+rbx*2], 1144201745"
+        Test(0x44332211, RegisterReference.quadWord[DoubleWordSize](RAX+RBX*2)).toString shouldBe "test DWORD PTR [rax+rbx*2], 1144201745"
       }
 
       "correctly encode test QWORD PTR [rax+rbx*2], 0x44332211" in {
-        Test(0x44332211, SIBMemoryLocation[QuadWordSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("48 F7 04 58 11 22 33 44"))
+        Test(0x44332211, RegisterReference.quadWord[QuadWordSize](RAX+RBX*2)).encodeByte should be(Hex.lsb("48 F7 04 58 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR [rax+rbx*2], 0x44332211 as a string" in {
-        Test(0x44332211, SIBMemoryLocation[QuadWordSize](RAX+RBX*2)).toString shouldBe "test QWORD PTR [rax+rbx*2], 1144201745"
+        Test(0x44332211, RegisterReference.quadWord[QuadWordSize](RAX+RBX*2)).toString shouldBe "test QWORD PTR [rax+rbx*2], 1144201745"
       }
 
       "correctly encode test BYTE PTR gs:[rax+rbx*2], 0x11" in {
-        Test(0x11.toByte, SIBMemoryLocation[ByteSize](GS+RAX+RBX*2)).encodeByte should be(Hex.lsb("65 F6 04 58 11"))
+        Test(0x11.toByte, RegisterReference.quadWord[ByteSize](GS+RAX+RBX*2)).encodeByte should be(Hex.lsb("65 F6 04 58 11"))
       }
 
       "correctly represent test BYTE PTR gs:[rax+rbx*2], 0x11 as a string" in {
-        Test(0x11.toByte, SIBMemoryLocation[ByteSize](GS+RAX+RBX*2)).toString shouldBe "test BYTE PTR gs:[rax+rbx*2], 17"
+        Test(0x11.toByte, RegisterReference.quadWord[ByteSize](GS+RAX+RBX*2)).toString shouldBe "test BYTE PTR gs:[rax+rbx*2], 17"
       }
 
       "correctly encode test WORD PTR es:[rax+rbx*2], 0x2211" in {
-        Test(0x2211.toShort, SIBMemoryLocation[WordSize](ES+RAX+RBX*2)).encodeByte should be(Hex.lsb("26 66 F7 04 58 11 22"))
+        Test(0x2211.toShort, RegisterReference.quadWord[WordSize](ES+RAX+RBX*2)).encodeByte should be(Hex.lsb("26 66 F7 04 58 11 22"))
       }
 
       "correctly represent test WORD PTR es:[rax+rbx*2], 0x2211 as a string" in {
-        Test(0x2211.toShort, SIBMemoryLocation[WordSize](ES+RAX+RBX*2)).toString shouldBe "test WORD PTR es:[rax+rbx*2], 8721"
+        Test(0x2211.toShort, RegisterReference.quadWord[WordSize](ES+RAX+RBX*2)).toString shouldBe "test WORD PTR es:[rax+rbx*2], 8721"
       }
 
       "correctly encode test DWORD PTR fs:[rax+rbx*2], 0x44332211" in {
-        Test(0x44332211, SIBMemoryLocation[DoubleWordSize](FS+RAX+RBX*2)).encodeByte should be(Hex.lsb("64 F7 04 58 11 22 33 44"))
+        Test(0x44332211, RegisterReference.quadWord[DoubleWordSize](FS+RAX+RBX*2)).encodeByte should be(Hex.lsb("64 F7 04 58 11 22 33 44"))
       }
 
       "correctly represent test DWORD PTR fs:[rax+rbx*2], 0x44332211 as a string" in {
-        Test(0x44332211, SIBMemoryLocation[DoubleWordSize](FS+RAX+RBX*2)).toString shouldBe "test DWORD PTR fs:[rax+rbx*2], 1144201745"
+        Test(0x44332211, RegisterReference.quadWord[DoubleWordSize](FS+RAX+RBX*2)).toString shouldBe "test DWORD PTR fs:[rax+rbx*2], 1144201745"
       }
 
       "correctly encode test QWORD PTR ss:[rax+rbx*2], 0x44332211" in {
-        Test(0x44332211, SIBMemoryLocation[QuadWordSize](SS+RAX+RBX*2)).encodeByte should be(Hex.lsb("36 48 F7 04 58 11 22 33 44"))
+        Test(0x44332211, RegisterReference.quadWord[QuadWordSize](SS+RAX+RBX*2)).encodeByte should be(Hex.lsb("36 48 F7 04 58 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR ss:[rax+rbx*2], 0x44332211 as a string" in {
-        Test(0x44332211, SIBMemoryLocation[QuadWordSize](SS+RAX+RBX*2)).toString shouldBe "test QWORD PTR ss:[rax+rbx*2], 1144201745"
+        Test(0x44332211, RegisterReference.quadWord[QuadWordSize](SS+RAX+RBX*2)).toString shouldBe "test QWORD PTR ss:[rax+rbx*2], 1144201745"
       }
 
       "correctly encode test QWORD PTR cs:[eax], 0x44332211" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[QuadWordSize](EAX, segment = CS)).encodeByte should be(Hex.lsb("2e 67 48 F7 00 11 22 33 44"))
+        Test(0x44332211, RegisterReference.doubleWord[QuadWordSize](CS+EAX)).encodeByte should be(Hex.lsb("2e 67 48 F7 00 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR cs:[eax], 0x44332211 as a string" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[QuadWordSize](EAX, segment = CS)).toString shouldBe "test QWORD PTR cs:[eax], 1144201745"
+        Test(0x44332211, RegisterReference.doubleWord[QuadWordSize](CS+EAX)).toString shouldBe "test QWORD PTR cs:[eax], 1144201745"
       }
 
       "correctly encode test DWORD PTR cs:[rbx], 0x44332211" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e F7 03 11 22 33 44"))
+        Test(0x44332211, RegisterReference.quadWord[DoubleWordSize](CS+RBX)).encodeByte should be(Hex.lsb("2e F7 03 11 22 33 44"))
       }
 
       "correctly represent test DWORD PTR cs:[rbx], 0x44332211 as a string" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](RBX, segment = CS)).toString shouldBe "test DWORD PTR cs:[rbx], 1144201745"
+        Test(0x44332211, RegisterReference.quadWord[DoubleWordSize](CS+RBX)).toString shouldBe "test DWORD PTR cs:[rbx], 1144201745"
       }
 
       "correctly encode test WORD PTR cs:[rbx], 0x2211" in {
-        Test(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride[WordSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 66 F7 03 11 22"))
+        Test(0x2211.toShort, RegisterReference.quadWord[WordSize](CS+RBX)).encodeByte should be(Hex.lsb("2e 66 F7 03 11 22"))
       }
 
       "correctly represent test WORD PTR cs:[rbx], 0x2211 as a string" in {
-        Test(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride[WordSize](RBX, segment = CS)).toString shouldBe "test WORD PTR cs:[rbx], 8721"
+        Test(0x2211.toShort, RegisterReference.quadWord[WordSize](CS+RBX)).toString shouldBe "test WORD PTR cs:[rbx], 8721"
       }
 
       "correctly encode test BYTE PTR cs:[rbx], 0x11" in {
-        Test(0x11.toByte, RegisterMemoryLocation.withSegmentOverride[ByteSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e F6 03 11"))
+        Test(0x11.toByte, RegisterReference.quadWord[ByteSize](CS+RBX)).encodeByte should be(Hex.lsb("2e F6 03 11"))
       }
 
       "correctly represent test BYTE PTR cs:[rbx], 0x11 as a string" in {
-        Test(0x11.toByte, RegisterMemoryLocation.withSegmentOverride[ByteSize](RBX, segment = CS)).toString shouldBe "test BYTE PTR cs:[rbx], 17"
+        Test(0x11.toByte, RegisterReference.quadWord[ByteSize](CS+RBX)).toString shouldBe "test BYTE PTR cs:[rbx], 17"
       }
 
 
@@ -264,46 +264,46 @@ class TestSuite extends AnyWordSpec with Matchers {
 
       "correctly encode test DWORD PTR [rax+rbx*2], 0x44" in {
         an[AssertionError] should be thrownBy {
-          Test(0x44.toByte, SIBMemoryLocation[DoubleWordSize](RAX+RBX*2))
+          Test(0x44.toByte, RegisterReference.quadWord[DoubleWordSize](RAX+RBX*2))
         }
       }
 
       "correctly encode test QWORD PTR [rax+rbx*2], 0x44" in {
         an[AssertionError] should be thrownBy {
-          Test(0x44.toByte, SIBMemoryLocation[QuadWordSize](RAX+RBX*2))
+          Test(0x44.toByte, RegisterReference.quadWord[QuadWordSize](RAX+RBX*2))
         }
       }
 
       "correctly encode test BYTE PTR [rbx], al" in {
-        Test(AL, RegisterMemoryLocation[ByteSize](RBX)).encodeByte should be(Hex.lsb("84 03"))
+        Test(AL, RegisterReference.quadWord[ByteSize](RBX)).encodeByte should be(Hex.lsb("84 03"))
       }
 
       "correctly represent test BYTE PTR [rbx], al as a string" in {
-        Test(AL, RegisterMemoryLocation[ByteSize](RBX)).toString shouldBe "test BYTE PTR [rbx], al"
+        Test(AL, RegisterReference.quadWord[ByteSize](RBX)).toString shouldBe "test BYTE PTR [rbx], al"
       }
 
       "correctly encode test BYTE PTR [rbx], ah" in {
-        Test(AH, RegisterMemoryLocation[ByteSize](RBX)).encodeByte should be(Hex.lsb("84 23"))
+        Test(AH, RegisterReference.quadWord[ByteSize](RBX)).encodeByte should be(Hex.lsb("84 23"))
       }
 
       "correctly represent test BYTE PTR [rbx], ah as a string" in {
-        Test(AH, RegisterMemoryLocation[ByteSize](RBX)).toString shouldBe "test BYTE PTR [rbx], ah"
+        Test(AH, RegisterReference.quadWord[ByteSize](RBX)).toString shouldBe "test BYTE PTR [rbx], ah"
       }
 
       "correctly encode test BYTE PTR [rbx], r15l" in {
-        Test(R15L, RegisterMemoryLocation[ByteSize](RBX)).encodeByte should be(Hex.lsb("44 84 3B"))
+        Test(R15L, RegisterReference.quadWord[ByteSize](RBX)).encodeByte should be(Hex.lsb("44 84 3B"))
       }
 
       "correctly represent test BYTE PTR [rbx], r15l as a string" in {
-        Test(R15L, RegisterMemoryLocation[ByteSize](RBX)).toString shouldBe "test BYTE PTR [rbx], r15l"
+        Test(R15L, RegisterReference.quadWord[ByteSize](RBX)).toString shouldBe "test BYTE PTR [rbx], r15l"
       }
 
       "correctly encode test QWORD PTR [rax], rax" in {
-        Test(RAX, RegisterMemoryLocation[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 85 00"))
+        Test(RAX, RegisterReference.quadWord[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 85 00"))
       }
 
       "correctly represent test QWORD PTR [rax], rax as a string" in {
-        Test(RAX, RegisterMemoryLocation[QuadWordSize](RAX)).toString shouldBe "test QWORD PTR [rax], rax"
+        Test(RAX, RegisterReference.quadWord[QuadWordSize](RAX)).toString shouldBe "test QWORD PTR [rax], rax"
       }
 
       "correctly encode test RAX, RDI" in {

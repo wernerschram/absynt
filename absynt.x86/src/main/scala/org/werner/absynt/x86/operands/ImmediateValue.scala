@@ -14,13 +14,8 @@
 package org.werner.absynt.x86.operands
 
 import org.werner.absynt.ListExtensions._
-import org.werner.absynt.x86.operands.memoryaccess.{LongSIB, ProtectedSIB}
-import org.werner.absynt.x86.operands.registers.{GeneralPurposeRegister, LongSIBBaseRegister, LongSIBIndexRegister, ProtectedSIBBaseRegister, ProtectedSIBIndexRegister, Segment, SegmentRegister}
 
-import scala.language.implicitConversions
-
-sealed class ImmediateValue[S : Integral](val value: S)
-  extends Operand {
+sealed class ImmediateValue[S: Integral](val value: S) extends Operand {
   self: ValueSize =>
 
   val num: Integral[S] = implicitly[Integral[S]]
@@ -35,14 +30,12 @@ sealed class ImmediateValue[S : Integral](val value: S)
 
 object ImmediateValue {
 
-  def unapply[S:Integral](immediateValue: ImmediateValue[S]): Option[S] = Some(immediateValue.value)
+  def unapply[S: Integral](immediateValue: ImmediateValue[S]): Option[S] = Some(immediateValue.value)
 
   type ValueToByteImmediate = Byte => ImmediateValue[Byte] with ByteSize
   type ValueToWordImmediate = Short => ImmediateValue[Short] with WordSize
   type ValueToDoubleWordImmediate = Int => ImmediateValue[Int] with DoubleWordSize
   type ValueToQuadWordImmediate = Long => ImmediateValue[Long] with QuadWordSize
-
-
 
   val byteImmediate: ValueToByteImmediate = value => new ImmediateValue(value) with ByteSize {}
   val wordImmediate: ValueToWordImmediate = value => new ImmediateValue(value) with WordSize {}
@@ -56,31 +49,9 @@ object ImmediateValue {
 
   trait I386Implicits {
     implicit val doubleWordImm: ValueToDoubleWordImmediate = doubleWordImmediate
-
-    case class ProtectedSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize) extends ProtectedSIB {
-      override val base: Option[GeneralPurposeRegister with ProtectedSIBBaseRegister with DoubleWordSize] = None
-      override val index: Option[GeneralPurposeRegister with ProtectedSIBIndexRegister with DoubleWordSize] = None
-      override val scale: Int = 1
-      override val displacement: Option[ImmediateValue[Int] with DoubleWordSize] = Some(value)
-      override val segment: SegmentRegister = Segment.Data
-    }
-
-    implicit def immediateValueIsProtectedSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize): ProtectedSIBImmediate =
-      ProtectedSIBImmediate(value)
   }
 
   trait X64Implicits {
     implicit val quadWordImm: ValueToQuadWordImmediate = quadWordImmediate
-
-    case class LongSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize) extends LongSIB {
-      override val base: Option[GeneralPurposeRegister with LongSIBBaseRegister with QuadWordSize] = None
-      override val index: Option[GeneralPurposeRegister with LongSIBIndexRegister with QuadWordSize] = None
-      override val scale: Int = 1
-      override val displacement: Option[ImmediateValue[Int] with DoubleWordSize] = Some(value)
-      override val segment: SegmentRegister = Segment.Data
-    }
-
-    implicit def immediateValueIsLongSIBImmediate(value: ImmediateValue[Int] with DoubleWordSize): LongSIBImmediate =
-      LongSIBImmediate(value)
   }
 }

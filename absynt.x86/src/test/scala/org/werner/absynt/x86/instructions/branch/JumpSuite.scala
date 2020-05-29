@@ -109,10 +109,10 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp WORD PTR [bp+si]" in {
-        Jump(RegisterMemoryLocation[WordSize](BP + SI)).encodeByte should be(Hex.lsb("FF 22"))
+        Jump(RegisterReference.word[WordSize](BP + SI)).encodeByte should be(Hex.lsb("FF 22"))
       }
       "correctly represent jmp WORD PTR [bp+si] as a string" in {
-        Jump(RegisterMemoryLocation[WordSize](BP + SI)).toString should be("jmp WORD PTR [bp+si]")
+        Jump(RegisterReference.word[WordSize](BP + SI)).toString should be("jmp WORD PTR [bp+si]")
       }
 
       "correctly encode jmp eax" in {
@@ -123,17 +123,17 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp WORD PTR [eax]" in {
-        Jump(RegisterMemoryLocation[WordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20"))
+        Jump(RegisterReference.doubleWord[WordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20"))
       }
       "correctly represent jmp WORD PTR [eax] as a string" in {
-        Jump(RegisterMemoryLocation[WordSize](EAX)).toString should be("jmp WORD PTR [eax]")
+        Jump(RegisterReference.doubleWord[WordSize](EAX)).toString should be("jmp WORD PTR [eax]")
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX + SI, segment = FS)).encodeByte should be(Hex.lsb("64 66 FF 20"))
+        Jump(RegisterReference.word[DoubleWordSize](FS+BX+SI)).encodeByte should be(Hex.lsb("64 66 FF 20"))
       }
       "correctly represent jmp DWORD PTR fs:[bx+si] as a string" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX + SI, segment = FS)).toString should be("jmp DWORD PTR fs:[bx+si]")
+        Jump(RegisterReference.word[DoubleWordSize](FS+BX+SI)).toString should be("jmp DWORD PTR fs:[bx+si]")
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -151,17 +151,17 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation[WordSize](BP + SI)).encodeByte should be(Hex.lsb("FF 2A"))
+        Jump.Far(RegisterReference.word[WordSize](BP + SI)).encodeByte should be(Hex.lsb("FF 2A"))
       }
       "correctly represent jmp FAR WORD PTR [bp+si] as a string" in {
-        Jump.Far(RegisterMemoryLocation[WordSize](BP + SI)).toString should be("jmp FAR WORD PTR [bp+si]")
+        Jump.Far(RegisterReference.word[WordSize](BP + SI)).toString should be("jmp FAR WORD PTR [bp+si]")
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("66 FF 2A"))
+        Jump.Far(RegisterReference.word[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("66 FF 2A"))
       }
       "correctly represent jmp FAR DWORD PTR [bp+si] as a string" in {
-        Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).toString should be("jmp FAR DWORD PTR [bp+si]")
+        Jump.Far(RegisterReference.word[DoubleWordSize](BP + SI)).toString should be("jmp FAR DWORD PTR [bp+si]")
       }
 
       "Encode a simple program with an indirect forward short jump instruction" in {
@@ -590,7 +590,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR [bp+si]" in {
-        Jump(RegisterMemoryLocation[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("67 FF 22"))
+        Jump(RegisterReference.word[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("67 FF 22"))
       }
 
       "correctly encode jmp eax" in {
@@ -598,11 +598,11 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR [eax]" in {
-        Jump(RegisterMemoryLocation[DoubleWordSize](EAX)).encodeByte should be(Hex.lsb("FF 20"))
+        Jump(RegisterReference.doubleWord[DoubleWordSize](EAX)).encodeByte should be(Hex.lsb("FF 20"))
       }
 
       "correctly encode jmp DWORD PTR fs:[bx+si]" in {
-        Jump(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](BX + SI, segment = FS)).encodeByte should be(Hex.lsb("64 67 FF 20"))
+        Jump(RegisterReference.word[DoubleWordSize](FS+BX+SI)).encodeByte should be(Hex.lsb("64 67 FF 20"))
       }
 
       "correctly encode jmp FAR 0x1000:0x2000" in {
@@ -614,11 +614,11 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp FAR WORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation[WordSize](BP + SI)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterReference.word[WordSize](BP+SI)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [bp+si]" in {
-        Jump.Far(RegisterMemoryLocation[DoubleWordSize](BP + SI)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterReference.word[DoubleWordSize](BP+SI)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "Encode a simple program with an indirect backward short jump instruction" in {
@@ -764,7 +764,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp DWORD PTR [eax]" in {
-        Jump(RegisterMemoryLocation[QuadWordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20"))
+        Jump(RegisterReference.doubleWord[QuadWordSize](EAX)).encodeByte should be(Hex.lsb("67 FF 20"))
       }
 
       "correctly encode jmp rax" in {
@@ -772,15 +772,15 @@ class JumpSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode jmp FAR WORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation[WordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
+        Jump.Far(RegisterReference.doubleWord[WordSize](EDX)).encodeByte should be(Hex.lsb("67 66 FF 2A"))
       }
 
       "correctly encode jmp FAR DWORD PTR [edx]" in {
-        Jump.Far(RegisterMemoryLocation[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
+        Jump.Far(RegisterReference.doubleWord[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("67 FF 2A"))
       }
 
       "correctly encode jmp FAR QWORD PTR [rdx]" in {
-        Jump.Far(RegisterMemoryLocation[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
+        Jump.Far(RegisterReference.quadWord[QuadWordSize](RDX)).encodeByte should be(Hex.lsb("48 FF 2A"))
       }
 
       "Encode a simple program with an indirect forward short jump instruction" in {

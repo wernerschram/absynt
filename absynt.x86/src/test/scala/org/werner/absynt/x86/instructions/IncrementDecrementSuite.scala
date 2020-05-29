@@ -34,10 +34,10 @@ class IncrementDecrementSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode inc BYTE PTR [bp+di]" in {
-        Increment(RegisterMemoryLocation[ByteSize](BP+DI)).encodeByte should be(Hex.lsb("FE 03"))
+        Increment(RegisterReference.word[ByteSize](BP+DI)).encodeByte should be(Hex.lsb("FE 03"))
       }
       "correctly represent inc BYTE PTR [bp+di] as a string" in {
-        Increment(RegisterMemoryLocation[ByteSize](BP+DI)).toString should be("inc BYTE PTR [bp+di]")
+        Increment(RegisterReference.word[ByteSize](BP+DI)).toString should be("inc BYTE PTR [bp+di]")
       }
 
       "correctly encode inc ax" in {
@@ -48,10 +48,10 @@ class IncrementDecrementSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode inc WORD PTR [bp+di]" in {
-        Increment(RegisterMemoryLocation[WordSize](BP+DI)).encodeByte should be(Hex.lsb("FF 03"))
+        Increment(RegisterReference.word[WordSize](BP+DI)).encodeByte should be(Hex.lsb("FF 03"))
       }
       "correctly represent inc WORD PTR [bp+di] as a string" in {
-        Increment(RegisterMemoryLocation[WordSize](BP+DI)).toString should be("inc WORD PTR [bp+di]")
+        Increment(RegisterReference.word[WordSize](BP+DI)).toString should be("inc WORD PTR [bp+di]")
       }
 
       "correctly encode inc esp" in {

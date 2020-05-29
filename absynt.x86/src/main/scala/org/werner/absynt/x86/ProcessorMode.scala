@@ -35,7 +35,6 @@ sealed abstract class ProcessorMode
 extends ImmediateValue.I8086Implicits
   with MemoryAddress.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
-  with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
 {
 
@@ -73,6 +72,7 @@ object ProcessorMode {
     with Convert.LegacyOperations
     with Generic.LegacyOperations
     with Loop.Operations
+    with MemoryLocation.LegacyOperations
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -120,6 +120,7 @@ object ProcessorMode {
     with Convert.I386Operations
     with Generic.I386Operations
     with Loop.Operations
+    with MemoryLocation.RealOperations
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
@@ -170,6 +171,7 @@ object ProcessorMode {
     with Convert.I386Operations
     with Generic.I386Operations
     with Loop.Operations
+    with MemoryLocation.RealOperations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {
@@ -228,6 +230,7 @@ object ProcessorMode {
     with Convert.LongOperations
     with Generic.I386Operations
     with Loop.Operations
+    with MemoryLocation.X64Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
       override def normalOperand(size: Operand with ValueSize): Boolean = size match {

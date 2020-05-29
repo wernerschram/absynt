@@ -32,7 +32,7 @@ class StackSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
-        Push(RegisterMemoryLocation[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 FF 30"))
+        Push(RegisterReference.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 FF 30"))
       }
 
       "correctly encode push bx" in {
@@ -143,7 +143,7 @@ class StackSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode push QWORD PTR [rax]" in {
-        Push(RegisterMemoryLocation[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 FF 30"))
+        Push(RegisterReference.quadWord[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 FF 30"))
       }
 
       "correctly encode push bx" in {
@@ -204,10 +204,10 @@ class StackSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode pop DWORD PTR [bx+si]" in {
-        Pop(RegisterMemoryLocation[DoubleWordSize](BX.combinedIndex(SI))).encodeByte should be(Hex.lsb("66 8F 30"))
+        Pop(RegisterReference.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 8F 30"))
       }
       "correctly represent pop DWORD PTR [bx+si] as a string" in {
-        Pop(RegisterMemoryLocation[DoubleWordSize](BX+SI)).toString should be("pop DWORD PTR [bx+si]")
+        Pop(RegisterReference.word[DoubleWordSize](BX+SI)).toString should be("pop DWORD PTR [bx+si]")
       }
 
       "correctly encode pop bx" in {
