@@ -291,11 +291,11 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov WORD PTR [0x2D], ax" in {
-        Move(AX, MemoryAddress[WordSize](0x2D.toByte)).encodeByte should be(Hex.lsb("A3 2D"))
+        Move(AX, MemoryAddress[WordSize](0x2D)).encodeByte should be(Hex.lsb("A3 2D 00"))
       }
 
       "correctly represent mov WORD PTR [45], ax as a string" in {
-        Move(AX, MemoryAddress[WordSize](0x2D.toByte)).toString should be("mov WORD PTR [45], ax")
+        Move(AX, MemoryAddress[WordSize](0x2D)).toString should be("mov WORD PTR [45], ax")
       }
 
       "correctly encode mov dl, 0x12" in {

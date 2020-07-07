@@ -28,13 +28,13 @@ sealed abstract class SIBMemoryLocation[AddressSize <: WordDoubleQuadSize](
       if ((reference.base.contains(BasePointer.Protected) || reference.base.contains(BasePointer.Long)) && (reference.displacement.toByte == reference.displacement))
         Some(ImmediateValue.byteImmediate(reference.displacement.toByte))
       else if (reference.scale > 1 && reference.base.isEmpty)
-        Some(ImmediateValue.doubleWordImmediate(reference.displacement))
+        Some(ImmediateValue.doubleWordImmediate(reference.displacement.toInt))
       else if (reference.displacement == 0)
         None
       else if (reference.displacement.toByte == reference.displacement)
         Some(ImmediateValue.byteImmediate(reference.displacement.toByte))
       else
-        Some(ImmediateValue.doubleWordImmediate(reference.displacement)),
+        Some(ImmediateValue.doubleWordImmediate(reference.displacement.toInt)),
       reference.segment,
     )
     with ModRMEncodableOperand {

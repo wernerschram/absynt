@@ -36,7 +36,7 @@ class RegisterMemoryLocation[Size <: WordDoubleQuadSize](
       else if (reference.displacement.toShort == reference.displacement)
         Some(ImmediateValue.wordImmediate(reference.displacement.toShort))
       else
-        Some(ImmediateValue.doubleWordImmediate(reference.displacement)),
+        Some(ImmediateValue.doubleWordImmediate(reference.displacement.toInt)),
       reference.segment,
     )
     with ModRMEncodableOperand {

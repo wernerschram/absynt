@@ -15,7 +15,6 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.{DoubleWordSize, QuadWordSize, WordSize}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -28,7 +27,7 @@ class StackSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode push WORD PTR [0x0001]" in {
-        Push(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
+        Push(RegisterReference.word[WordSize](0x0001)).encodeByte should be(Hex.lsb("FF 36 01 00"))
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
@@ -197,14 +196,14 @@ class StackSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode pop WORD PTR [0x0001]" in {
-        Pop(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("8F 36 01 00"))
+        Pop(RegisterReference.word[WordSize](0x0001)).encodeByte should be(Hex.lsb("8F 06 01 00"))
       }
       "correctly represent pop WORD PTR [0x0001] as a string" in {
-        Pop(MemoryAddress[WordSize](0x0001.toShort)).toString should be("pop WORD PTR [1]")
+        Pop(RegisterReference.word[WordSize](0x0001)).toString should be("pop WORD PTR [1]")
       }
 
       "correctly encode pop DWORD PTR [bx+si]" in {
-        Pop(RegisterReference.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 8F 30"))
+        Pop(RegisterReference.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 8F 00"))
       }
       "correctly represent pop DWORD PTR [bx+si] as a string" in {
         Pop(RegisterReference.word[DoubleWordSize](BX+SI)).toString should be("pop DWORD PTR [bx+si]")

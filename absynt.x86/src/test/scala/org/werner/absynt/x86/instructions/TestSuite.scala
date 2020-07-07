@@ -15,7 +15,6 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -106,19 +105,19 @@ class TestSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode test DWORD PTR [0x11111111], 0x44332211" in {
-        Test(0x44332211, MemoryAddress[DoubleWordSize](0x11111111)).encodeByte should be(Hex.lsb("F7 05 11 11 11 11 11 22 33 44"))
+        Test(0x44332211, RegisterReference.doubleWord[DoubleWordSize](0x11111111)).encodeByte should be(Hex.lsb("F7 05 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent test DWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Test(0x44332211, MemoryAddress[DoubleWordSize](0x11111111)).toString shouldBe "test DWORD PTR [286331153], 1144201745"
+        Test(0x44332211, RegisterReference.doubleWord[DoubleWordSize](0x11111111)).toString shouldBe "test DWORD PTR [286331153], 1144201745"
       }
 
       "correctly encode test DWORD PTR [0x1234], edx" in {
-        Test(EDX, MemoryAddress[DoubleWordSize](0X1234.toShort)).encodeByte should be(Hex.lsb("67 85 16 34 12"))
+        Test(EDX, RegisterReference.word[DoubleWordSize](0X1234)).encodeByte should be(Hex.lsb("67 85 16 34 12"))
       }
 
       "correctly represent test DWORD PTR [0x1234], edx as a string" in {
-        Test(EDX, MemoryAddress[DoubleWordSize](0x1234.toShort)).toString shouldBe "test DWORD PTR [4660], edx"
+        Test(EDX, RegisterReference.word[DoubleWordSize](0x1234)).toString shouldBe "test DWORD PTR [4660], edx"
       }
     }
 
@@ -127,16 +126,16 @@ class TestSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode test QWORD PTR [0x11111111], 0x44332211" in {
-        Test(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).encodeByte should be(Hex.lsb("67 48 F7 05 11 11 11 11 11 22 33 44"))
+        Test(0x44332211, RegisterReference.doubleWord[QuadWordSize](0x11111111)).encodeByte should be(Hex.lsb("67 48 F7 05 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Test(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).toString shouldBe "test QWORD PTR [286331153], 1144201745"
+        Test(0x44332211, RegisterReference.doubleWord[QuadWordSize](0x11111111)).toString shouldBe "test QWORD PTR [286331153], 1144201745"
       }
 
       "throw an AssertionError for test WORD PTR [0x11111111], 0x44332211" in {
         an[AssertionError] should be thrownBy {
-          Test(0x44332211, MemoryAddress[WordSize](0x11111111))
+          Test(0x44332211, RegisterReference.doubleWord[WordSize](0x11111111))
         }
       }
 

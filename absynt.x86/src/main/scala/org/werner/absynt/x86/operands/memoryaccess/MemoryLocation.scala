@@ -13,7 +13,10 @@
 
 package org.werner.absynt.x86.operands.memoryaccess
 
+import org.werner.absynt.x86.ArchitectureBounds
+import org.werner.absynt.x86.ProcessorMode.I386Bounds
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.memoryaccess.MemoryAddress.MemoryAddressForSize
 import org.werner.absynt.x86.operands.memoryaccess.RegisterMemoryLocation.RMForSize
 import org.werner.absynt.x86.operands.memoryaccess.SIBMemoryLocation.SIBForSize
 import org.werner.absynt.x86.operands.registers._
@@ -31,7 +34,7 @@ abstract class MemoryLocation(val displacement: Option[ImmediateValue[_]], val s
 
   def segmentPrefix: String = segmentOverride match {
     case Some(segmentRegister) => s"$segmentRegister:"
-    case None => ""
+    case None                  => ""
   }
 }
 
@@ -68,7 +71,7 @@ object MemoryLocation {
     base: Option[BaseReg],
     index: Option[IndexReg],
     segment: SegmentRegister,
-    displacement: Int,
+    displacement: Long,
     scale: Int,
   ) {
 
@@ -124,22 +127,30 @@ object MemoryLocation {
       BaseIndexReference[Nothing, IndexReg, WordSize](None, index, index.defaultSegment)
 
     implicit def immediateValueIsBaseIndexReference(
-      immediateValue: Int
+      immediateValue: Long
     ): BaseIndexReference[Nothing, Nothing, Nothing] =
       new BaseIndexReference[Nothing, Nothing, Nothing](None, None, Segment.Data, immediateValue, 1)
 
     trait I8086RegisterReference {
 
       def word[
-        Size <: ValueSize : RMForSize
+        Size <: ValueSize : RMForSize : MemoryAddressForSize
       ](
         baseIndexReference: BaseIndexReference[
           GeneralPurposeRegister with BasePointerRegister with WordSize,
           GeneralPurposeRegister with IndexRegister with WordSize,
           WordSize,
         ]
-      ): MemoryLocation with Size =
-        implicitly[RMForSize[Size]].instance[WordSize](baseIndexReference)
+      ): MemoryLocation with Size = baseIndexReference match {
+        case BaseIndexReference(None, None, segment, displacement, _) =>
+          implicitly[MemoryAddressForSize[Size]].instance(displacement, segment)
+        case reference: BaseIndexReference[
+          GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
+          GeneralPurposeRegister with IndexRegister with DoubleWordSize,
+          DoubleWordSize,
+        ] =>
+          implicitly[RMForSize[Size]].instance[WordSize](reference)
+      }
     }
 
     trait I8086DestinationReference {
@@ -180,6 +191,7 @@ object MemoryLocation {
   }
 
   trait I386Operations extends I8086Operations {
+    self: ArchitectureBounds with MemoryAddress.I386Implicits =>
 
     trait NoFactor[
       +BaseReg <: GeneralPurposeRegister with BasePointerRegister with Size,
@@ -209,7 +221,7 @@ object MemoryLocation {
     trait I386RegisterReference extends I8086RegisterReference {
 
       def doubleWord[
-        Size <: ValueSize : RMForSize : SIBForSize
+        Size <: ValueSize : RMForSize : SIBForSize : MemoryAddressForSize
       ](
         baseIndexReference: BaseIndexReference[
           GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
@@ -218,6 +230,11 @@ object MemoryLocation {
         ]
       ): MemoryLocation with Size =
         baseIndexReference match {
+          case BaseIndexReference(None, None, segment, displacement, _) =>
+            if (displacement.toShort == displacement)
+              implicitly[MemoryAddressForSize[Size]].instance(displacement.toShort, segment)
+            else
+              implicitly[MemoryAddressForSize[Size]].instance(displacement.toInt, segment)
           case reference: BaseIndexReference[
                 GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
                 GeneralPurposeRegister with IndexRegister with DoubleWordSize,
@@ -262,6 +279,7 @@ object MemoryLocation {
   }
 
   trait RealOperations extends I386Operations {
+    self: I386Bounds with MemoryAddress.I386Implicits =>
 
     object RegisterReference extends I386RegisterReference {
 
@@ -272,6 +290,7 @@ object MemoryLocation {
   }
 
   trait X64Operations extends I386Operations {
+    self: ArchitectureBounds with MemoryAddress.X64Implicits =>
 
     implicit def quadWordBaseRegisterIsBaseRefrence[
       BaseReg <: GeneralPurposeRegister with IndexRegister with BasePointerRegister with QuadWordSize
@@ -289,7 +308,7 @@ object MemoryLocation {
     object RegisterReference extends I386RegisterReference {
 
       def quadWord[
-        Size <: ValueSize : RMForSize : SIBForSize
+        Size <: ValueSize : RMForSize : SIBForSize : MemoryAddressForSize
       ](
         baseIndexReference: BaseIndexReference[
           GeneralPurposeRegister with BasePointerRegister with QuadWordSize,
@@ -298,6 +317,8 @@ object MemoryLocation {
         ]
       ): MemoryLocation with Size =
         baseIndexReference match {
+          case BaseIndexReference(None, None, segment, displacement, _) =>
+            implicitly[MemoryAddressForSize[Size]].instance(displacement.toInt, segment)
           case reference: BaseIndexReference[
                 GeneralPurposeRegister with BasePointerRegister with QuadWordSize,
                 GeneralPurposeRegister with IndexRegister with QuadWordSize,
