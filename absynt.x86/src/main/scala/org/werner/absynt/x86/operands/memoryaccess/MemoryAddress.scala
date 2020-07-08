@@ -56,9 +56,6 @@ object MemoryAddress {
     def instance(address: Long, segment: SegmentRegister = Segment.Data): MemoryAddress with Size
   }
 
-  def apply[Size<:ValueSize:MemoryAddressForSize](address: Long, segment: SegmentRegister = Segment.Data): MemoryAddress with Size =
-    implicitly[MemoryAddressForSize[Size]].instance(address, segment)
-
   trait I8086Implicits {
     implicit def ByteMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[ByteSize] =
       (address: Long, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize

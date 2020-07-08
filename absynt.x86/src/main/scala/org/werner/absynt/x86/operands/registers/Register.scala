@@ -151,6 +151,9 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
 
   final def +[AddressSize <: WordDoubleQuadSize, BaseReg <: GeneralPurposeRegister with BasePointerRegister with AddressSize](base: BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize]): BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize] =
     BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize](base.base, base.index, this, base.displacement, base.scale)
+
+  final def +(displacement: Int): BaseIndexReference[Nothing, Nothing, Nothing] =
+    new BaseIndexReference[Nothing, Nothing, Nothing](None, None, this, displacement, 1)
 }
 
 

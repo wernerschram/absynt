@@ -231,10 +231,7 @@ object MemoryLocation {
       ): MemoryLocation with Size =
         baseIndexReference match {
           case BaseIndexReference(None, None, segment, displacement, _) =>
-            if (displacement.toShort == displacement)
-              implicitly[MemoryAddressForSize[Size]].instance(displacement.toShort, segment)
-            else
-              implicitly[MemoryAddressForSize[Size]].instance(displacement.toInt, segment)
+            implicitly[MemoryAddressForSize[Size]].instance(displacement, segment)
           case reference: BaseIndexReference[
                 GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
                 GeneralPurposeRegister with IndexRegister with DoubleWordSize,
@@ -318,7 +315,7 @@ object MemoryLocation {
       ): MemoryLocation with Size =
         baseIndexReference match {
           case BaseIndexReference(None, None, segment, displacement, _) =>
-            implicitly[MemoryAddressForSize[Size]].instance(displacement.toInt, segment)
+            implicitly[MemoryAddressForSize[Size]].instance(displacement, segment)
           case reference: BaseIndexReference[
                 GeneralPurposeRegister with BasePointerRegister with QuadWordSize,
                 GeneralPurposeRegister with IndexRegister with QuadWordSize,

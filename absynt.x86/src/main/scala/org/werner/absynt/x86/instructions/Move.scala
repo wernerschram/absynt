@@ -125,14 +125,21 @@ object Move extends I8086GenericRegisters {
         override def possibleSizes: Set[Int] = Set(size)
       }
 
-      def apply(source: Accumulator.LowByte.type, destination: MemoryAddress with ByteSize): X86Operation =
-        ALToMOffs8(destination)
-
       def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize): X86Operation =
-        R8ToRM8(source, destination)
+        (source, destination) match {
+          case (_: Accumulator.LowByte.type, destination: MemoryAddress with ByteSize) =>
+            ALToMOffs8(destination)
+          case _ =>
+            R8ToRM8 (source, destination)
+        }
 
-      def apply(source: MemoryAddress with ByteSize, accumulator: Accumulator.LowByte.type): X86Operation =
-        MOffs8ToAL(source)
+      def apply(source: ModRMEncodableOperand with ByteSize, accumulator: Accumulator.LowByte.type): X86Operation =
+        source match {
+          case source: MemoryAddress with ByteSize =>
+            MOffs8ToAL (source)
+          case _ =>
+            RM8ToR8(accumulator, source)
+        }
 
       def apply(source: ModRMEncodableOperand with ByteSize, destination: ByteRegister): X86Operation =
         RM8ToR8(destination, source)
@@ -149,17 +156,24 @@ object Move extends I8086GenericRegisters {
       def apply[Size <: MaxWideSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size): X86Operation =
         SRegToRM16(source, destination)
 
-      def apply[Size <: MaxWideSize](accumulator: AccumulatorRegister with Size, destination: MemoryAddress with Size): X86Operation =
-        AXToMOffs16(accumulator, destination)
-
       def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size): X86Operation =
-        R16ToRM16(source, destination)
+        (source, destination) match {
+          case (acc: AccumulatorRegister with Size, a: MemoryAddress with Size) =>
+            AXToMOffs16(acc, a)
+          case _ =>
+            R16ToRM16(source, destination)
+        }
 
       def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
         R16ToRM16(source, destination.asInstanceOf[ModRMEncodableOperand with Size])
 
-      def apply[Size <: MaxWideSize](source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size): X86Operation =
-        MOffs16ToAX(source, accumulator)
+      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, accumulator: AccumulatorRegister with Size): X86Operation =
+        source match {
+          case a: MemoryAddress with Size =>
+            MOffs16ToAX(a, accumulator)
+          case _ =>
+            RM16ToR16(accumulator, source)
+        }
 
       def apply[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size): X86Operation =
         RM16ToR16(destination, source)
