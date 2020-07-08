@@ -52,19 +52,19 @@ class ExchangeSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xchg WORD PTR [si], si" in {
-        Exchange(SI, RegisterReference.word[WordSize](SI)).encodeByte should be(Hex.lsb("86 34"))
+        Exchange(SI, Pointer.word[WordSize](SI)).encodeByte should be(Hex.lsb("86 34"))
       }
 
       "correctly represent xchg WORD PTR [si], si as a string" in {
-        Exchange(SI, RegisterReference.word[WordSize](SI)).toString should be("xchg WORD PTR [si], si")
+        Exchange(SI, Pointer.word[WordSize](SI)).toString should be("xchg WORD PTR [si], si")
       }
 
       "correctly encode xchg WORD si, PTR [si]" in {
-        Exchange(RegisterReference.word[WordSize](SI), SI).encodeByte should be(Hex.lsb("86 34"))
+        Exchange(Pointer.word[WordSize](SI), SI).encodeByte should be(Hex.lsb("86 34"))
       }
 
       "correctly represent xchg si, WORD PTR [si] as a string" in {
-        Exchange(RegisterReference.word[WordSize](SI), SI).toString should be("xchg si, WORD PTR [si]")
+        Exchange(Pointer.word[WordSize](SI), SI).toString should be("xchg si, WORD PTR [si]")
       }
     }
 
@@ -97,19 +97,19 @@ class ExchangeSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xchg WORD PTR [si], si" in {
-        Exchange(SI, RegisterReference.word[WordSize](SI)).encodeByte should be(Hex.lsb("67 66 86 34"))
+        Exchange(SI, Pointer.word[WordSize](SI)).encodeByte should be(Hex.lsb("67 66 86 34"))
       }
 
       "correctly represent xchg WORD PTR [si], si as a string" in {
-        Exchange(SI, RegisterReference.word[WordSize](SI)).toString should be("xchg WORD PTR [si], si")
+        Exchange(SI, Pointer.word[WordSize](SI)).toString should be("xchg WORD PTR [si], si")
       }
 
       "correctly encode xchg WORD si, PTR [si]" in {
-        Exchange(RegisterReference.word[WordSize](SI), SI).encodeByte should be(Hex.lsb("67 66 86 34"))
+        Exchange(Pointer.word[WordSize](SI), SI).encodeByte should be(Hex.lsb("67 66 86 34"))
       }
 
       "correctly represent xchg si, WORD PTR [si] as a string" in {
-        Exchange(RegisterReference.word[WordSize](SI), SI).toString should be("xchg si, WORD PTR [si]")
+        Exchange(Pointer.word[WordSize](SI), SI).toString should be("xchg si, WORD PTR [si]")
       }
 
     }
@@ -143,19 +143,19 @@ class ExchangeSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xchg WORD PTR [si], si" in {
-        Exchange(SI, RegisterReference.doubleWord[WordSize](ESI)).encodeByte should be(Hex.lsb("67 66 86 36"))
+        Exchange(SI, Pointer.doubleWord[WordSize](ESI)).encodeByte should be(Hex.lsb("67 66 86 36"))
       }
 
       "correctly represent xchg WORD PTR [si], si as a string" in {
-        Exchange(SI, RegisterReference.doubleWord[WordSize](ESI)).toString should be("xchg WORD PTR [esi], si")
+        Exchange(SI, Pointer.doubleWord[WordSize](ESI)).toString should be("xchg WORD PTR [esi], si")
       }
 
       "correctly encode xchg WORD si, PTR [si]" in {
-        Exchange(RegisterReference.doubleWord[WordSize](ESI), SI).encodeByte should be(Hex.lsb("67 66 86 36"))
+        Exchange(Pointer.doubleWord[WordSize](ESI), SI).encodeByte should be(Hex.lsb("67 66 86 36"))
       }
 
       "correctly represent xchg si, WORD PTR [si] as a string" in {
-        Exchange(RegisterReference.doubleWord[WordSize](ESI), SI).toString should be("xchg si, WORD PTR [esi]")
+        Exchange(Pointer.doubleWord[WordSize](ESI), SI).toString should be("xchg si, WORD PTR [esi]")
       }
     }
   }

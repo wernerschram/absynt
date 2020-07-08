@@ -39,47 +39,47 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov BYTE PTR [si], ch" in {
-        Move(CH, RegisterReference.word[ByteSize](SI)).encodeByte should be(Hex.lsb("88 2C"))
+        Move(CH, Pointer.word[ByteSize](SI)).encodeByte should be(Hex.lsb("88 2C"))
       }
 
       "correctly represent mov BYTE PTR [si], ch as a string" in {
-        Move(CH, RegisterReference.word[ByteSize](SI)).toString should be("mov BYTE PTR [si], ch")
+        Move(CH, Pointer.word[ByteSize](SI)).toString should be("mov BYTE PTR [si], ch")
       }
 
       "correctly encode mov BYTE PTR fs:[si], ch" in {
-        Move(CH, RegisterReference.word[ByteSize](FS+SI)).encodeByte should be(Hex.lsb("64 88 2C"))
+        Move(CH, Pointer.word[ByteSize](FS+SI)).encodeByte should be(Hex.lsb("64 88 2C"))
       }
 
       "correctly represent mov BYTE PTR fs:[si], ch as a string" in {
-        Move(CH, RegisterReference.word[ByteSize](FS+SI)).toString should be("mov BYTE PTR fs:[si], ch")
+        Move(CH, Pointer.word[ByteSize](FS+SI)).toString should be("mov BYTE PTR fs:[si], ch")
       }
 
       "correctly encode BYTE PTR mov cs:[di], ch" in {
-        Move(CH, RegisterReference.word[ByteSize](CS+DI)).encodeByte should be(Hex.lsb("2E 88 2D"))
+        Move(CH, Pointer.word[ByteSize](CS+DI)).encodeByte should be(Hex.lsb("2E 88 2D"))
       }
 
       "correctly encode mov BYTE PTR [bp+si+0x7D], bh" in {
-        Move(BH, RegisterReference.word[ByteSize](BP + SI + 0x7D)).encodeByte should be(Hex.lsb("88 7A 7D"))
+        Move(BH, Pointer.word[ByteSize](BP + SI + 0x7D)).encodeByte should be(Hex.lsb("88 7A 7D"))
       }
 
       "correctly represent mov BYTE PTR [bp+si+0x7D], bh as a string" in {
-        Move(BH, RegisterReference.word[ByteSize](BP+SI+0x7D)).toString should be("mov BYTE PTR [bp+si+125], bh")
+        Move(BH, Pointer.word[ByteSize](BP+SI+0x7D)).toString should be("mov BYTE PTR [bp+si+125], bh")
       }
 
      "correctly encode mov WORD PTR [bp], bp" in {
-        Move(BP, RegisterReference.word[WordSize](BP)).encodeByte should be(Hex.lsb("89 6E 00"))
+        Move(BP, Pointer.word[WordSize](BP)).encodeByte should be(Hex.lsb("89 6E 00"))
       }
 
       "correctly represent mov WORD PTR [bp], bp as a string" in {
-        Move(BP, RegisterReference.word[WordSize](BP)).toString should be("mov WORD PTR [bp], bp")
+        Move(BP, Pointer.word[WordSize](BP)).toString should be("mov WORD PTR [bp], bp")
       }
 
       "correctly encode mov BYTE PTR [bp]+0x1234, cl" in {
-        Move(CL, RegisterReference.word[ByteSize](BP+0x1234)).encodeByte should be(Hex.lsb("88 8E 34 12"))
+        Move(CL, Pointer.word[ByteSize](BP+0x1234)).encodeByte should be(Hex.lsb("88 8E 34 12"))
       }
 
       "correctly represent mov BYTE PTR [bp]+0x1234, cl as a string" in {
-        Move(CL, RegisterReference.word[ByteSize](BP+0x1234)).toString should be("mov BYTE PTR [bp+4660], cl")
+        Move(CL, Pointer.word[ByteSize](BP+0x1234)).toString should be("mov BYTE PTR [bp+4660], cl")
       }
 
       "correctly encode mov bx, ax" in {
@@ -99,115 +99,115 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov WORD PTR [si], si" in {
-        Move(SI, RegisterReference.word[WordSize](SI)).encodeByte should be(Hex.lsb("89 34"))
+        Move(SI, Pointer.word[WordSize](SI)).encodeByte should be(Hex.lsb("89 34"))
       }
 
       "correctly represent mov WORD PTR [si], si as a string" in {
-        Move(SI, RegisterReference.word[WordSize](SI)).toString should be("mov WORD PTR [si], si")
+        Move(SI, Pointer.word[WordSize](SI)).toString should be("mov WORD PTR [si], si")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx], edx" in {
-        Move(EDX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
+        Move(EDX, Pointer.doubleWord[DoubleWordSize](ECX+EBX)).encodeByte should be(Hex.lsb("67 66 89 14 19"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx], edx as a string" in {
-        Move(EDX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX)).toString should be("mov DWORD PTR [ecx+ebx], edx")
+        Move(EDX, Pointer.doubleWord[DoubleWordSize](ECX+EBX)).toString should be("mov DWORD PTR [ecx+ebx], edx")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], edx" in {
-        Move(EDX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 66 89 14 99"))
+        Move(EDX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 66 89 14 99"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx*4], edx as a string" in {
-        Move(EDX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], edx")
+        Move(EDX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], edx")
       }
 
       "correctly encode mov DWORD PTR gs:[ecx+ebx*4], edx" in {
-        Move(EDX, RegisterReference.doubleWord[DoubleWordSize](GS+ECX+EBX*4)).encodeByte should be(Hex.lsb("65 67 66 89 14 99"))
+        Move(EDX, Pointer.doubleWord[DoubleWordSize](GS+ECX+EBX*4)).encodeByte should be(Hex.lsb("65 67 66 89 14 99"))
       }
 
       "correctly represent mov DWORD PTR gs:[ecx+ebx*4], edx as a string" in {
-        Move(EDX, RegisterReference.doubleWord[DoubleWordSize](GS+ECX+EBX*4)).toString should be("mov DWORD PTR gs:[ecx+ebx*4], edx")
+        Move(EDX, Pointer.doubleWord[DoubleWordSize](GS+ECX+EBX*4)).toString should be("mov DWORD PTR gs:[ecx+ebx*4], edx")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], eax" in {
-        Move(EAX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 66 89 04 99"))
+        Move(EAX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 66 89 04 99"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx*4], eax as a string" in {
-        Move(EAX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
+        Move(EAX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
       }
 
       "correctly encode mov DWORD PTR [edi+edx*8+0x0110], ecx" in {
-        Move(ECX, RegisterReference.doubleWord[DoubleWordSize](EDI+EDX*8+0x0110)).encodeByte should be(Hex.lsb("67 66 89 8C D7 10 01 00 00"))
+        Move(ECX, Pointer.doubleWord[DoubleWordSize](EDI+EDX*8+0x0110)).encodeByte should be(Hex.lsb("67 66 89 8C D7 10 01 00 00"))
       }
 
       "correctly represent mov DWORD PTR [edi+edx*8+272], ecx as a string" in {
-        Move(ECX, RegisterReference.doubleWord[DoubleWordSize](EDI+EDX*8+0x0110)).toString should be("mov DWORD PTR [edi+edx*8+272], ecx")
+        Move(ECX, Pointer.doubleWord[DoubleWordSize](EDI+EDX*8+0x0110)).toString should be("mov DWORD PTR [edi+edx*8+272], ecx")
       }
 
       "correctly encode mov WORD PTR [bx+3D], bp" in {
-        Move(BP, RegisterReference.word[WordSize](BX+0x3D)).encodeByte should be(Hex.lsb("89 6F 3D"))
+        Move(BP, Pointer.word[WordSize](BX+0x3D)).encodeByte should be(Hex.lsb("89 6F 3D"))
       }
 
       "correctly represent mov WORD PTR [bx+61], bp as a string" in {
-        Move(BP, RegisterReference.word[WordSize](BX+0x3D)).toString should be("mov WORD PTR [bx+61], bp")
+        Move(BP, Pointer.word[WordSize](BX+0x3D)).toString should be("mov WORD PTR [bx+61], bp")
       }
 
       "correctly encode mov WORD PTR [bp+di+0xDEAD], cx" in {
-        Move(CX, RegisterReference.word[WordSize](BP+DI+0x1234)).encodeByte should be(Hex.lsb("89 8B 34 12"))
+        Move(CX, Pointer.word[WordSize](BP+DI+0x1234)).encodeByte should be(Hex.lsb("89 8B 34 12"))
       }
 
       "correctly represent mov WORD PTR [bp+di+57005], cx as a string" in {
-        Move(CX, RegisterReference.word[WordSize](BP+DI+0x1234)).toString should be("mov WORD PTR [bp+di+4660], cx")
+        Move(CX, Pointer.word[WordSize](BP+DI+0x1234)).toString should be("mov WORD PTR [bp+di+4660], cx")
       }
 
       "correctly encode mov cl, BYTE PTR [bp+si]" in {
-        Move(RegisterReference.word[ByteSize](BP+SI), CL).encodeByte should be(Hex.lsb("8A 0A"))
+        Move(Pointer.word[ByteSize](BP+SI), CL).encodeByte should be(Hex.lsb("8A 0A"))
       }
 
       "correctly represent mov cl, BYTE PTR [bp+si] as a string" in {
-        Move(RegisterReference.word[ByteSize](BP+SI), CL).toString should be("mov cl, BYTE PTR [bp+si]")
+        Move(Pointer.word[ByteSize](BP+SI), CL).toString should be("mov cl, BYTE PTR [bp+si]")
       }
 
       "correctly encode mov dl, BYTE PTR [bx+di+0x70]" in {
-        Move(RegisterReference.word[ByteSize](BX+DI+0x70), DL).encodeByte should be(Hex.lsb("8A 51 70"))
+        Move(Pointer.word[ByteSize](BX+DI+0x70), DL).encodeByte should be(Hex.lsb("8A 51 70"))
       }
 
       "correctly represent mov dl, BYTE PTR [bx+di+112] as a string" in {
-        Move(RegisterReference.word[ByteSize](BX+DI+0x70), DL).toString should be("mov dl, BYTE PTR [bx+di+112]")
+        Move(Pointer.word[ByteSize](BX+DI+0x70), DL).toString should be("mov dl, BYTE PTR [bx+di+112]")
       }
 
       "correctly encode mov dh, BYTE PTR [bp]+0x1BBA" in {
-        Move(RegisterReference.word[ByteSize](BP+0x1BBA), DH).encodeByte should be(Hex.lsb("8A B6 BA 1B"))
+        Move(Pointer.word[ByteSize](BP+0x1BBA), DH).encodeByte should be(Hex.lsb("8A B6 BA 1B"))
       }
 
       "correctly represent dh, BYTE PTR [bp+7098] as a string" in {
-        Move(RegisterReference.word[ByteSize](BP+0x1BBA), DH).toString should be("mov dh, BYTE PTR [bp+7098]")
+        Move(Pointer.word[ByteSize](BP+0x1BBA), DH).toString should be("mov dh, BYTE PTR [bp+7098]")
       }
 
       "correctly encode mov dx, WORD PTR [si]" in {
-        Move(RegisterReference.word[WordSize](SI), DX).encodeByte should be(Hex.lsb("8B 14"))
+        Move(Pointer.word[WordSize](SI), DX).encodeByte should be(Hex.lsb("8B 14"))
       }
 
       "correctly represent mov dx, WORD PTR [si] as a string" in {
-        Move(RegisterReference.word[WordSize](SI), DX).toString should be("mov dx, WORD PTR [si]")
+        Move(Pointer.word[WordSize](SI), DX).toString should be("mov dx, WORD PTR [si]")
       }
 
       "correctly encode mov sp, WORD PTR [bp+di+0x12]" in {
-        Move(RegisterReference.word[WordSize](BP+DI+0x12), SP).encodeByte should be(Hex.lsb("8B 63 12"))
+        Move(Pointer.word[WordSize](BP+DI+0x12), SP).encodeByte should be(Hex.lsb("8B 63 12"))
       }
 
       "correctly represent mov sp, WORD PTR [bp+di+18] as a string" in {
-        Move(RegisterReference.word[WordSize](BP+DI+0x12), SP).toString should be("mov sp, WORD PTR [bp+di+18]")
+        Move(Pointer.word[WordSize](BP+DI+0x12), SP).toString should be("mov sp, WORD PTR [bp+di+18]")
       }
 
       "correctly encode mov di, WORD PTR [di+0xBEEF]" in {
-        Move(RegisterReference.word[WordSize](DI+0x7FFF), DI).encodeByte should be(Hex.lsb("8B BD FF 7F"))
+        Move(Pointer.word[WordSize](DI+0x7FFF), DI).encodeByte should be(Hex.lsb("8B BD FF 7F"))
       }
 
       "correctly represent mov di, WORD PTR [di+48879] as a string" in {
-        Move(RegisterReference.word[WordSize](DI+0x7FFF), DI).toString should be("mov di, WORD PTR [di+32767]")
+        Move(Pointer.word[WordSize](DI+0x7FFF), DI).toString should be("mov di, WORD PTR [di+32767]")
       }
 
       "correctly encode mov dx, cs" in {
@@ -219,19 +219,19 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov WORD PTR [bx], es" in {
-        Move(ES, RegisterReference.word[WordSize](BX)).encodeByte should be(Hex.lsb("8C 07"))
+        Move(ES, Pointer.word[WordSize](BX)).encodeByte should be(Hex.lsb("8C 07"))
       }
 
       "correctly represent mov WORD PTR [bx], es as a string" in {
-        Move(ES, RegisterReference.word[WordSize](BX)).toString should be("mov WORD PTR [bx], es")
+        Move(ES, Pointer.word[WordSize](BX)).toString should be("mov WORD PTR [bx], es")
       }
 
       "correctly encode mov WORD PTR [si+0x1234], fs" in {
-        Move(FS, RegisterReference.word[WordSize](SI+0x1234)).encodeByte should be(Hex.lsb("8C A4 34 12"))
+        Move(FS, Pointer.word[WordSize](SI+0x1234)).encodeByte should be(Hex.lsb("8C A4 34 12"))
       }
 
       "correctly represent mov WORD PTR [si+4660], fs as a string" in {
-        Move(FS, RegisterReference.word[WordSize](SI+0x1234)).toString should be("mov WORD PTR [si+4660], fs")
+        Move(FS, Pointer.word[WordSize](SI+0x1234)).toString should be("mov WORD PTR [si+4660], fs")
       }
 
       "correctly encode mov gs, si" in {
@@ -243,59 +243,59 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov ss, WORD PTR [bp+si]" in {
-        Move(RegisterReference.word[WordSize](BP+SI), SS).encodeByte should be(Hex.lsb("8E 12"))
+        Move(Pointer.word[WordSize](BP+SI), SS).encodeByte should be(Hex.lsb("8E 12"))
       }
 
       "correctly represent mov ss, WORD PTR [bp+si] as a string" in {
-        Move(RegisterReference.word[WordSize](BP+SI), SS).toString should be("mov ss, WORD PTR [bp+si]")
+        Move(Pointer.word[WordSize](BP+SI), SS).toString should be("mov ss, WORD PTR [bp+si]")
       }
 
       "correctly encode mov ds, WORD PTR [bx+0x127]" in {
-        Move(RegisterReference.word[WordSize](BX+0x7F), DS).encodeByte should be(Hex.lsb("8E 5F 7F"))
+        Move(Pointer.word[WordSize](BX+0x7F), DS).encodeByte should be(Hex.lsb("8E 5F 7F"))
       }
 
       "correctly represent mov ds, WORD PTR [bx+127] as a string" in {
-        Move(RegisterReference.word[WordSize](BX+0x7F), DS).toString should be("mov ds, WORD PTR [bx+127]")
+        Move(Pointer.word[WordSize](BX+0x7F), DS).toString should be("mov ds, WORD PTR [bx+127]")
       }
 
       "correctly encode mov al, BYTE PTR [0x0022]" in {
-        Move(RegisterReference.word[ByteSize](0x0022.toShort), AL).encodeByte should be(Hex.lsb("A0 22 00"))
+        Move(Pointer.word[ByteSize](0x0022.toShort), AL).encodeByte should be(Hex.lsb("A0 22 00"))
       }
 
       "correctly represent mov al, BYTE PTR [34] as a string" in {
-        Move(RegisterReference.word[ByteSize](0x0022.toShort), AL).toString should be("mov al, BYTE PTR [34]")
+        Move(Pointer.word[ByteSize](0x0022.toShort), AL).toString should be("mov al, BYTE PTR [34]")
       }
 
       "correctly encode mov ax, WORD PTR [0x6677]" in {
-        Move(RegisterReference.word[WordSize](0x6677.toShort), AX).encodeByte should be(Hex.lsb("A1 77 66"))
+        Move(Pointer.word[WordSize](0x6677.toShort), AX).encodeByte should be(Hex.lsb("A1 77 66"))
       }
 
       "correctly represent mov ax, WORD PTR [26231] as a string" in {
-        Move(RegisterReference.word[WordSize](0x6677.toShort), AX).toString should be("mov ax, WORD PTR [26231]")
+        Move(Pointer.word[WordSize](0x6677.toShort), AX).toString should be("mov ax, WORD PTR [26231]")
       }
 
       "correctly encode mov ax, WORD PTR ss:[0x6677]" in {
-        Move(RegisterReference.word[WordSize](SS+0x6677.toShort), AX).encodeByte should be(Hex.lsb("36 A1 77 66"))
+        Move(Pointer.word[WordSize](SS+0x6677.toShort), AX).encodeByte should be(Hex.lsb("36 A1 77 66"))
       }
 
       "correctly represent mov ax, WORD PTR ss:[26231] as a string" in {
-        Move(RegisterReference.word[WordSize](SS+0x6677.toShort), AX).toString should be("mov ax, WORD PTR ss:[26231]")
+        Move(Pointer.word[WordSize](SS+0x6677.toShort), AX).toString should be("mov ax, WORD PTR ss:[26231]")
       }
 
       "correctly encode mov BYTE PTR [0xDEAF], al" in {
-        Move(AL, RegisterReference.word[ByteSize](0xDEAF.toShort)).encodeByte should be(Hex.lsb("A2 AF DE"))
+        Move(AL, Pointer.word[ByteSize](0xDEAF.toShort)).encodeByte should be(Hex.lsb("A2 AF DE"))
       }
 
       "correctly represent mov BYTE PTR [57007], al as a string" in {
-        Move(AL, RegisterReference.word[ByteSize](0xDEAF.toShort)).toString should be("mov BYTE PTR [57007], al")
+        Move(AL, Pointer.word[ByteSize](0xDEAF.toShort)).toString should be("mov BYTE PTR [57007], al")
       }
 
       "correctly encode mov WORD PTR [0x2D], ax" in {
-        Move(AX, RegisterReference.word[WordSize](0x2D)).encodeByte should be(Hex.lsb("A3 2D 00"))
+        Move(AX, Pointer.word[WordSize](0x2D)).encodeByte should be(Hex.lsb("A3 2D 00"))
       }
 
       "correctly represent mov WORD PTR [45], ax as a string" in {
-        Move(AX, RegisterReference.word[WordSize](0x2D)).toString should be("mov WORD PTR [45], ax")
+        Move(AX, Pointer.word[WordSize](0x2D)).toString should be("mov WORD PTR [45], ax")
       }
 
       "correctly encode mov dl, 0x12" in {
@@ -338,27 +338,27 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov BYTE PTR [bp+di], 0x13" in {
-        Move(0x13.toByte, RegisterReference.word[ByteSize](BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
+        Move(0x13.toByte, Pointer.word[ByteSize](BP+DI)).encodeByte should be(Hex.lsb("C6 03 13"))
       }
 
       "correctly represent mov BYTE PTR [bp+di], 19 as a string" in {
-        Move(0x13.toByte, RegisterReference.word[ByteSize](BP+DI)).toString should be("mov BYTE PTR [bp+di], 19")
+        Move(0x13.toByte, Pointer.word[ByteSize](BP+DI)).toString should be("mov BYTE PTR [bp+di], 19")
       }
 
       "correctly encode mov WORD PTR [bx+0x10], 0x5656" in {
-        Move(0x5656.toShort, RegisterReference.word[WordSize](BX+0x10.toByte)).encodeByte should be(Hex.lsb("C7 47 10 56 56"))
+        Move(0x5656.toShort, Pointer.word[WordSize](BX+0x10.toByte)).encodeByte should be(Hex.lsb("C7 47 10 56 56"))
       }
 
       "correctly represent mov WORD PTR [bx+16], 22102 as a string" in {
-        Move(0x5656.toShort, RegisterReference.word[WordSize](BX+0x10.toByte)).toString should be("mov WORD PTR [bx+16], 22102")
+        Move(0x5656.toShort, Pointer.word[WordSize](BX+0x10.toByte)).toString should be("mov WORD PTR [bx+16], 22102")
       }
 
       "correctly encode mov DWORD PTR [eax+ebx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, RegisterReference.doubleWord[DoubleWordSize](EAX+EBX*2+0x11111111)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
+        Move(0x99999999, Pointer.doubleWord[DoubleWordSize](EAX+EBX*2+0x11111111)).encodeByte should be(Hex.lsb("67 66 C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov DWORD PTR [eax+ebx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, RegisterReference.doubleWord[DoubleWordSize](EAX+EBX*2+0x11111111)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], -1717986919")
+        Move(0x99999999, Pointer.doubleWord[DoubleWordSize](EAX+EBX*2+0x11111111)).toString should be("mov DWORD PTR [eax+ebx*2+286331153], -1717986919")
       }
     }
 
@@ -367,35 +367,35 @@ class MoveSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode mov DWORD PTR [0xDEADBEEF], eax" in {
-        Move(EAX, RegisterReference.doubleWord[DoubleWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
+        Move(EAX, Pointer.doubleWord[DoubleWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
       }
 
       "correctly represent mov DWORD PTR [3735928559], eax as a string" in {
-        Move(EAX, RegisterReference.doubleWord[DoubleWordSize](0xDEADBEEF)).toString should be("mov DWORD PTR [3735928559], eax")
+        Move(EAX, Pointer.doubleWord[DoubleWordSize](0xDEADBEEF)).toString should be("mov DWORD PTR [3735928559], eax")
       }
 
       "correctly encode mov eax, DWORD PTR [0xFAFAFAFA]" in {
-        Move(RegisterReference.doubleWord[DoubleWordSize](0xFAFAFAFA), EAX).encodeByte should be(Hex.lsb("A1 FA FA FA FA"))
+        Move(Pointer.doubleWord[DoubleWordSize](0xFAFAFAFA), EAX).encodeByte should be(Hex.lsb("A1 FA FA FA FA"))
       }
 
       "correctly represent mov eax, DWORD PTR [4210752250] as a string" in {
-        Move(RegisterReference.doubleWord[DoubleWordSize](0xFAFAFAFA), EAX).toString should be("mov eax, DWORD PTR [4210752250]")
+        Move(Pointer.doubleWord[DoubleWordSize](0xFAFAFAFA), EAX).toString should be("mov eax, DWORD PTR [4210752250]")
       }
 
       "correctly encode mov DWORD PTR [edx], ebp" in {
-        Move(EBP, RegisterReference.doubleWord[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("89 2A"))
+        Move(EBP, Pointer.doubleWord[DoubleWordSize](EDX)).encodeByte should be(Hex.lsb("89 2A"))
       }
 
       "correctly represent mov DWORD PTR [edx], ebp as a string" in {
-        Move(EBP, RegisterReference.doubleWord[DoubleWordSize](EDX)).toString should be("mov DWORD PTR [edx], ebp")
+        Move(EBP, Pointer.doubleWord[DoubleWordSize](EDX)).toString should be("mov DWORD PTR [edx], ebp")
       }
 
      "correctly encode mov DWORD PTR [ebp], ebp" in {
-        Move(EBP, RegisterReference.doubleWord[DoubleWordSize](EBP)).encodeByte should be(Hex.lsb("89 6D 00"))
+        Move(EBP, Pointer.doubleWord[DoubleWordSize](EBP)).encodeByte should be(Hex.lsb("89 6D 00"))
       }
 
       "correctly represent mov DWORD PTR [ebp], ebp as a string" in {
-        Move(EBP, RegisterReference.doubleWord[DoubleWordSize](EBP)).toString should be("mov DWORD PTR [ebp], ebp")
+        Move(EBP, Pointer.doubleWord[DoubleWordSize](EBP)).toString should be("mov DWORD PTR [ebp], ebp")
       }
 
       "correctly encode mov ecx, [label]" in {
@@ -472,27 +472,27 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov r13l, BYTE PTR [eax]" in {
-        Move(RegisterReference.doubleWord[ByteSize](EAX), R13L).encodeByte should be(Hex.lsb("67 44 8A 28"))
+        Move(Pointer.doubleWord[ByteSize](EAX), R13L).encodeByte should be(Hex.lsb("67 44 8A 28"))
       }
 
       "correctly represent mov r13l, BYTE PTR [eax] as a string" in {
-        Move(RegisterReference.doubleWord[ByteSize](EAX), R13L).toString should be("mov r13l, BYTE PTR [eax]")
+        Move(Pointer.doubleWord[ByteSize](EAX), R13L).toString should be("mov r13l, BYTE PTR [eax]")
       }
 
       "correctly encode mov r15w, WORD PTR [eax]" in {
-        Move(RegisterReference.doubleWord[WordSize](EAX), R15W).encodeByte should be(Hex.lsb("67 66 44 8B 38"))
+        Move(Pointer.doubleWord[WordSize](EAX), R15W).encodeByte should be(Hex.lsb("67 66 44 8B 38"))
       }
 
       "correctly represent mov r15w, WORD PTR [eax] as a string" in {
-        Move(RegisterReference.doubleWord[WordSize](EAX), R15W).toString should be("mov r15w, WORD PTR [eax]")
+        Move(Pointer.doubleWord[WordSize](EAX), R15W).toString should be("mov r15w, WORD PTR [eax]")
       }
 
       "correctly encode mov ax, WORD PTR [eax]" in {
-        Move(RegisterReference.doubleWord[WordSize](EAX), AX).encodeByte should be(Hex.lsb("67 66 8B 00"))
+        Move(Pointer.doubleWord[WordSize](EAX), AX).encodeByte should be(Hex.lsb("67 66 8B 00"))
       }
 
       "correctly represent mov ax, WORD PTR [eax] as a string" in {
-        Move(RegisterReference.doubleWord[WordSize](EAX), AX).toString should be("mov ax, WORD PTR [eax]")
+        Move(Pointer.doubleWord[WordSize](EAX), AX).toString should be("mov ax, WORD PTR [eax]")
       }
 
 
@@ -529,19 +529,19 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov rax, QWORD PTR [0xA4A3A2A1F4F3F2F1]" in {
-        Move(RegisterReference.quadWord[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).encodeByte should be(Hex.lsb("48 A1 F1 F2 F3 F4 A1 A2 A3 A4"))
+        Move(Pointer.quadWord[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).encodeByte should be(Hex.lsb("48 A1 F1 F2 F3 F4 A1 A2 A3 A4"))
       }
 
       "correctly represent mov rax, QWORD PTR [-6583239413802470671] as a string" in {
-        Move(RegisterReference.quadWord[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
+        Move(Pointer.quadWord[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX).toString should be("mov rax, QWORD PTR [-6583239413802470671]")
       }
 
       "correctly encode mov QWORD PTR [0xDEADBEEF], rax" in {
-        Move(RAX, RegisterReference.quadWord[QuadWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
+        Move(RAX, Pointer.quadWord[QuadWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
       }
 
       "correctly represent mov QWORD PTR [3735928559], rax as a string" in {
-        Move(RAX, RegisterReference.quadWord[QuadWordSize](0xDEADBEEF)).toString should be("mov QWORD PTR [3735928559], rax")
+        Move(RAX, Pointer.quadWord[QuadWordSize](0xDEADBEEF)).toString should be("mov QWORD PTR [3735928559], rax")
       }
 
       "correctly encode mov edx, 0x12" in {
@@ -605,83 +605,83 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov BYTE PTR [rbx], 0x13" in {
-        Move(0x13.toByte, RegisterReference.quadWord[ByteSize](RBX)).encodeByte should be(Hex.lsb("C6 03 13"))
+        Move(0x13.toByte, Pointer.quadWord[ByteSize](RBX)).encodeByte should be(Hex.lsb("C6 03 13"))
       }
 
       "correctly represent mov BYTE PTR [rbx], 19 as a string" in {
-        Move(0x13.toByte, RegisterReference.quadWord[ByteSize](RBX)).toString should be("mov BYTE PTR [rbx], 19")
+        Move(0x13.toByte, Pointer.quadWord[ByteSize](RBX)).toString should be("mov BYTE PTR [rbx], 19")
       }
 
       "correctly encode mov WORD PTR [rbx+0x10], 0x5656" in {
-        Move(0x5656.toShort, RegisterReference.quadWord[WordSize](RBX+0x10)).encodeByte should be(Hex.lsb("66 C7 43 10 56 56"))
+        Move(0x5656.toShort, Pointer.quadWord[WordSize](RBX+0x10)).encodeByte should be(Hex.lsb("66 C7 43 10 56 56"))
       }
 
       "correctly represent mov WORD PTR [rbx+16], 22102 as a string" in {
-        Move(0x5656.toShort, RegisterReference.quadWord[WordSize](RBX+0x10)).toString should be("mov WORD PTR [rbx+16], 22102")
+        Move(0x5656.toShort, Pointer.quadWord[WordSize](RBX+0x10)).toString should be("mov WORD PTR [rbx+16], 22102")
       }
 
       "correctly encode mov DWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999, RegisterReference.quadWord[DoubleWordSize](RAX+RBX*2+0x11111111)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
+        Move(0x99999999, Pointer.quadWord[DoubleWordSize](RAX+RBX*2+0x11111111)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov DWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999, RegisterReference.quadWord[DoubleWordSize](RAX+RBX*2+0x11111111)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], -1717986919")
+        Move(0x99999999, Pointer.quadWord[DoubleWordSize](RAX+RBX*2+0x11111111)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], -1717986919")
       }
 
       "correctly encode mov QWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {
-        Move(0x99999999L, RegisterReference.quadWord[QuadWordSize](RAX+RBX*2+0x11111111)).encodeByte should be(Hex.lsb("48 C7 84 58 11 11 11 11 99 99 99 99 00 00 00 00"))
+        Move(0x99999999L, Pointer.quadWord[QuadWordSize](RAX+RBX*2+0x11111111)).encodeByte should be(Hex.lsb("48 C7 84 58 11 11 11 11 99 99 99 99 00 00 00 00"))
       }
 
       "correctly represent mov QWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
-        Move(0x99999999L, RegisterReference.quadWord[QuadWordSize](RAX+RBX*2+0x11111111)).toString should be("mov QWORD PTR [rax+rbx*2+286331153], 2576980377")
+        Move(0x99999999L, Pointer.quadWord[QuadWordSize](RAX+RBX*2+0x11111111)).toString should be("mov QWORD PTR [rax+rbx*2+286331153], 2576980377")
       }
 
       "correctly encode mov DWORD PTR [r8+r9*2], ebp" in {
-        Move(EBP, RegisterReference.quadWord[DoubleWordSize](R8+R9*2+0)).encodeByte should be(Hex.lsb("43 89 2c 48"))
+        Move(EBP, Pointer.quadWord[DoubleWordSize](R8+R9*2+0)).encodeByte should be(Hex.lsb("43 89 2c 48"))
       }
 
       "correctly represent mov DWORD PTR [r8+r9*2], ebp as a string" in {
-        Move(EBP, RegisterReference.quadWord[DoubleWordSize](R8+R9*2+0)).toString should be("mov DWORD PTR [r8+r9*2], ebp")
+        Move(EBP, Pointer.quadWord[DoubleWordSize](R8+R9*2+0)).toString should be("mov DWORD PTR [r8+r9*2], ebp")
       }
 
       "correctly encode mov DWORD PTR [ecx+ebx*4], eax" in {
-        Move(EAX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 89 04 99"))
+        Move(EAX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).encodeByte should be(Hex.lsb("67 89 04 99"))
       }
 
       "correctly represent mov DWORD PTR [ecx+ebx*4], eax as a string" in {
-        Move(EAX, RegisterReference.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
+        Move(EAX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
       }
 
       "correctly encode mov QWORD PTR [2], rbp" ignore {
-        Move(RBP, RegisterReference.word[QuadWordSize](2)).encodeByte should be(Hex.lsb("48 89 2c 25 02 00 00 00"))
+        Move(RBP, Pointer.word[QuadWordSize](2)).encodeByte should be(Hex.lsb("48 89 2c 25 02 00 00 00"))
       }
 
       "correctly represent mov QWORD PTR [2], rbp as a string" ignore {
-        Move(RBP, RegisterReference.word[QuadWordSize](2)).toString should be("mov QWORD PTR [2], rbp")
+        Move(RBP, Pointer.word[QuadWordSize](2)).toString should be("mov QWORD PTR [2], rbp")
       }
 
       "correctly encode mov QWORD PTR [rbp+rbx], rbp" in {
-        Move(RBP, RegisterReference.quadWord[QuadWordSize](RBP+RBX)).encodeByte should be(Hex.lsb("48 89 6c 1d 00"))
+        Move(RBP, Pointer.quadWord[QuadWordSize](RBP+RBX)).encodeByte should be(Hex.lsb("48 89 6c 1d 00"))
       }
 
       "correctly represent mov QWORD PTR [rbp+rbx], rbp as a string" in {
-        Move(RBP, RegisterReference.quadWord[QuadWordSize](RBP+RBX)).toString should be("mov QWORD PTR [rbp+rbx], rbp")
+        Move(RBP, Pointer.quadWord[QuadWordSize](RBP+RBX)).toString should be("mov QWORD PTR [rbp+rbx], rbp")
       }
 
       "correctly encode mov QWORD PTR [eax+10], rbp" in {
-        Move(RBP, RegisterReference.doubleWord[QuadWordSize](EAX+10)).encodeByte should be(Hex.lsb("67 48 89 68 0a"))
+        Move(RBP, Pointer.doubleWord[QuadWordSize](EAX+10)).encodeByte should be(Hex.lsb("67 48 89 68 0a"))
       }
 
       "correctly represent mov QWORD PTR [eax+10], rbp as a string" in {
-        Move(RBP, RegisterReference.doubleWord[QuadWordSize](EAX+10)).toString should be("mov QWORD PTR [eax+10], rbp")
+        Move(RBP, Pointer.doubleWord[QuadWordSize](EAX+10)).toString should be("mov QWORD PTR [eax+10], rbp")
       }
 
       "correctly encode mov QWORD PTR [rax], rbp" in {
-        Move(RBP, RegisterReference.quadWord[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 89 28"))
+        Move(RBP, Pointer.quadWord[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 89 28"))
       }
 
       "correctly represent mov QWORD PTR [rax], rbp as a string" in {
-        Move(RBP, RegisterReference.quadWord[QuadWordSize](RAX)).toString should be("mov QWORD PTR [rax], rbp")
+        Move(RBP, Pointer.quadWord[QuadWordSize](RAX)).toString should be("mov QWORD PTR [rax], rbp")
       }
     }
   }

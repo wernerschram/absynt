@@ -27,11 +27,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode sal BYTE PTR [0x0001], 1" in {
-        ShiftArithmeticLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 26 01 00"))
+        ShiftArithmeticLeft(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 26 01 00"))
       }
 
       "correctly represent sal BYTE PTR [0x0001], 1 as a string" in {
-        ShiftArithmeticLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("sal BYTE PTR [1], 1")
+        ShiftArithmeticLeft(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("sal BYTE PTR [1], 1")
       }
 
       "correctly encode sal al, 2" in {
@@ -65,11 +65,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Protected._
 
       "correctly encode sal BYTE PTR [0x0001], 1" in {
-        ShiftArithmeticLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("67 D0 26 01 00"))
+        ShiftArithmeticLeft(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("67 D0 26 01 00"))
       }
 
       "correctly represent sal BYTE PTR [0x0001], 1 as a string" in {
-        ShiftArithmeticLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("sal BYTE PTR [1], 1")
+        ShiftArithmeticLeft(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("sal BYTE PTR [1], 1")
       }
 
       "correctly encode sal al, 2" in {
@@ -103,11 +103,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Long._
       "correctly encode sal BYTE PTR [0x0001], 1" in {
         //TODO: this is not allowed in long mode
-        ShiftArithmeticLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 26 01 00"))
+        ShiftArithmeticLeft(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 26 01 00"))
       }
 
       "correctly represent sal BYTE PTR [0x0001], 1 as a string" in {
-        ShiftArithmeticLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("sal BYTE PTR [1], 1")
+        ShiftArithmeticLeft(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("sal BYTE PTR [1], 1")
       }
 
       "correctly encode sal al, 2" in {
@@ -142,11 +142,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode sar BYTE PTR [0x0001], 1" in {
-        ShiftArithmeticRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 3E 01 00"))
+        ShiftArithmeticRight(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 3E 01 00"))
       }
 
       "correctly represent sar BYTE PTR [0x0001], 1 as a string" in {
-        ShiftArithmeticRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("sar BYTE PTR [1], 1")
+        ShiftArithmeticRight(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("sar BYTE PTR [1], 1")
       }
     }
   }
@@ -157,11 +157,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode shl BYTE PTR [0x0001], 1" in {
-        ShiftLogicalLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 26 01 00"))
+        ShiftLogicalLeft(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 26 01 00"))
       }
 
       "correctly represent shl BYTE PTR [0x0001], 1 as a string" in {
-        ShiftLogicalLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("shl BYTE PTR [1], 1")
+        ShiftLogicalLeft(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("shl BYTE PTR [1], 1")
       }
     }
   }
@@ -172,11 +172,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode shr BYTE PTR [0x0001], 1" in {
-        ShiftLogicalRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 2E 01 00"))
+        ShiftLogicalRight(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 2E 01 00"))
       }
 
       "correctly represent shr BYTE PTR [0x0001], 1 as a string" in {
-        ShiftLogicalRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("shr BYTE PTR [1], 1")
+        ShiftLogicalRight(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("shr BYTE PTR [1], 1")
       }
     }
   }
@@ -187,11 +187,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode rcl BYTE PTR [0x0001], 1" in {
-        RotateCarryLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 16 01 00"))
+        RotateCarryLeft(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 16 01 00"))
       }
 
       "correctly represent rcl BYTE PTR [0x0001], 1 as a string" in {
-        RotateCarryLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("rcl BYTE PTR [1], 1")
+        RotateCarryLeft(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("rcl BYTE PTR [1], 1")
       }
     }
   }
@@ -202,11 +202,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode rcr BYTE PTR [0x0001], 1" in {
-        RotateCarryRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 1E 01 00"))
+        RotateCarryRight(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 1E 01 00"))
       }
 
       "correctly represent rcr BYTE PTR [0x0001], 1 as a string" in {
-        RotateCarryRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("rcr BYTE PTR [1], 1")
+        RotateCarryRight(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("rcr BYTE PTR [1], 1")
       }
     }
   }
@@ -217,11 +217,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode rol BYTE PTR [0x0001], 1" in {
-        RotateLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 06 01 00"))
+        RotateLeft(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 06 01 00"))
       }
 
       "correctly represent rol BYTE PTR [0x0001], 1 as a string" in {
-        RotateLeft(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("rol BYTE PTR [1], 1")
+        RotateLeft(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("rol BYTE PTR [1], 1")
       }
     }
   }
@@ -232,11 +232,11 @@ class ShiftSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode ror BYTE PTR [0x0001], 1" in {
-        RotateRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 0E 01 00"))
+        RotateRight(1.toByte, Pointer.word[ByteSize](0x0001)).encodeByte should be(Hex.lsb("D0 0E 01 00"))
       }
 
       "correctly represent ror BYTE PTR [0x0001], 1 as a string" in {
-        RotateRight(1.toByte, RegisterReference.word[ByteSize](0x0001)).toString should be("ror BYTE PTR [1], 1")
+        RotateRight(1.toByte, Pointer.word[ByteSize](0x0001)).toString should be("ror BYTE PTR [1], 1")
       }
     }
   }

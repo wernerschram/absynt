@@ -27,11 +27,11 @@ class StackSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode push WORD PTR [0x0001]" in {
-        Push(RegisterReference.word[WordSize](0x0001)).encodeByte should be(Hex.lsb("FF 36 01 00"))
+        Push(Pointer.word[WordSize](0x0001)).encodeByte should be(Hex.lsb("FF 36 01 00"))
       }
 
       "correctly encode push DWORD PTR [bx+si]" in {
-        Push(RegisterReference.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 FF 30"))
+        Push(Pointer.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 FF 30"))
       }
 
       "correctly encode push bx" in {
@@ -142,7 +142,7 @@ class StackSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode push QWORD PTR [rax]" in {
-        Push(RegisterReference.quadWord[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 FF 30"))
+        Push(Pointer.quadWord[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 FF 30"))
       }
 
       "correctly encode push bx" in {
@@ -196,17 +196,17 @@ class StackSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Real._
 
       "correctly encode pop WORD PTR [0x0001]" in {
-        Pop(RegisterReference.word[WordSize](0x0001)).encodeByte should be(Hex.lsb("8F 06 01 00"))
+        Pop(Pointer.word[WordSize](0x0001)).encodeByte should be(Hex.lsb("8F 06 01 00"))
       }
       "correctly represent pop WORD PTR [0x0001] as a string" in {
-        Pop(RegisterReference.word[WordSize](0x0001)).toString should be("pop WORD PTR [1]")
+        Pop(Pointer.word[WordSize](0x0001)).toString should be("pop WORD PTR [1]")
       }
 
       "correctly encode pop DWORD PTR [bx+si]" in {
-        Pop(RegisterReference.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 8F 00"))
+        Pop(Pointer.word[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 8F 00"))
       }
       "correctly represent pop DWORD PTR [bx+si] as a string" in {
-        Pop(RegisterReference.word[DoubleWordSize](BX+SI)).toString should be("pop DWORD PTR [bx+si]")
+        Pop(Pointer.word[DoubleWordSize](BX+SI)).toString should be("pop DWORD PTR [bx+si]")
       }
 
       "correctly encode pop bx" in {

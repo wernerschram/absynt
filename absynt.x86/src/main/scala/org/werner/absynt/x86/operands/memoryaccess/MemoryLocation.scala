@@ -131,7 +131,7 @@ object MemoryLocation {
     ): BaseIndexReference[Nothing, Nothing, Nothing] =
       new BaseIndexReference[Nothing, Nothing, Nothing](None, None, Segment.Data, immediateValue, 1)
 
-    trait I8086RegisterReference {
+    trait I8086Pointer {
 
       def word[
         Size <: ValueSize : RMForSize : MemoryAddressForSize
@@ -182,7 +182,7 @@ object MemoryLocation {
 
   trait LegacyOperations extends I8086Operations {
 
-    object RegisterReference extends I8086RegisterReference {
+    object Pointer extends I8086Pointer {
 
       object Destination extends I8086DestinationReference
 
@@ -218,7 +218,7 @@ object MemoryLocation {
       new BaseIndexReference[Nothing, IndexReg, DoubleWordSize](None, Some(index), index.defaultSegment, 0, 1)
         with NoFactor[Nothing, IndexReg, DoubleWordSize]
 
-    trait I386RegisterReference extends I8086RegisterReference {
+    trait I386Pointer extends I8086Pointer {
 
       def doubleWord[
         Size <: ValueSize : RMForSize : SIBForSize : MemoryAddressForSize
@@ -278,7 +278,7 @@ object MemoryLocation {
   trait RealOperations extends I386Operations {
     self: I386Bounds with MemoryAddress.I386Implicits =>
 
-    object RegisterReference extends I386RegisterReference {
+    object Pointer extends I386Pointer {
 
       object Destination extends I386DestinationReference
 
@@ -302,7 +302,7 @@ object MemoryLocation {
       new BaseIndexReference[Nothing, IndexReg, QuadWordSize](None, Some(index), index.defaultSegment, 0, 1)
         with NoFactor[Nothing, IndexReg, QuadWordSize]
 
-    object RegisterReference extends I386RegisterReference {
+    object Pointer extends I386Pointer {
 
       def quadWord[
         Size <: ValueSize : RMForSize : SIBForSize : MemoryAddressForSize
