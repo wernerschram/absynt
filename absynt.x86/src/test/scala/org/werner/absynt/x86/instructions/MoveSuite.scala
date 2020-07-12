@@ -683,6 +683,15 @@ class MoveSuite extends AnyWordSpec with Matchers {
       "correctly represent mov QWORD PTR [rax], rbp as a string" in {
         Move(RBP, Pointer.quadWord[QuadWordSize](RAX)).toString should be("mov QWORD PTR [rax], rbp")
       }
+
+      "correctly encode mov r15, DWORD PTR [r11*2]" in {
+        Move(Pointer.quadWord[DoubleWordSize](R11*2), R15).encodeByte should be(Hex.lsb("4E 8B 3C 5D 00 00 00 00"))
+      }
+
+      "correctly represent mov r15, DWORD PTR [r11*2] as a string" in {
+        Move(Pointer.quadWord[DoubleWordSize](R11*2), R15).toString should be("mov r15, DWORD PTR [r11*2]")
+      }
+
     }
   }
 }

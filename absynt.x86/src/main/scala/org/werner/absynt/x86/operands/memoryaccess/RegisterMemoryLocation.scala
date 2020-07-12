@@ -25,18 +25,12 @@ class RegisterMemoryLocation[Size <: WordDoubleQuadSize](
     Size,
   ]
 ) extends MemoryLocation(
-      if (
-        reference.displacement == 0 && !reference.index.contains(BasePointer.Real) && !reference.index.contains(
-          BasePointer.Protected
-        ) && !reference.index.contains(BasePointer.Long)
-      )
+      if (!RegisterMemoryLocation.requiresDisplacement(reference))
         None
       else if (reference.displacement.toByte == reference.displacement)
         Some(ImmediateValue.byteImmediate(reference.displacement.toByte))
-      else if (reference.displacement.toShort == reference.displacement)
-        Some(ImmediateValue.wordImmediate(reference.displacement.toShort))
       else
-        Some(ImmediateValue.doubleWordImmediate(reference.displacement.toInt)),
+        Some(ImmediateValue.wordImmediate(reference.displacement.toShort)),
       reference.segment,
     )
     with ModRMEncodableOperand {
@@ -96,6 +90,10 @@ class SourceReference[Size <: WordDoubleQuadSize](
 }
 
 object RegisterMemoryLocation {
+
+  private def requiresDisplacement(reference: BaseIndexReference[_,_,_]): Boolean =
+    reference.index.contains(BasePointer.Real) || reference.index.contains(BasePointer.Protected) || reference.displacement != 0
+
 
   abstract class RMForSize[Size <: ValueSize] {
 
