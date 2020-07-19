@@ -69,26 +69,6 @@ class RegisterMemoryLocation[Size <: WordDoubleQuadSize](
     super.getExtendedBytes(rValue) ++ displacement.map(_.encodedValue).getOrElse(Seq.empty)
 }
 
-class DestinationReference[Size <: WordDoubleQuadSize](
-  reference: BaseIndexReference[
-    GeneralPurposeRegister with BasePointerRegister with Size,
-    DestinationIndex with IndexRegister with Size,
-    Size,
-  ]
-) extends RegisterMemoryLocation[Size](reference) {
-  self: ValueSize =>
-}
-
-class SourceReference[Size <: WordDoubleQuadSize](
-  reference: BaseIndexReference[
-    Nothing,
-    SourceIndex with IndexRegister with Size,
-    Size,
-  ]
-) extends RegisterMemoryLocation(reference) {
-  self: ValueSize =>
-}
-
 object RegisterMemoryLocation {
 
   private def requiresDisplacement(reference: BaseIndexReference[_,_,_]): Boolean =
@@ -104,22 +84,6 @@ object RegisterMemoryLocation {
         AddressSize,
       ]
     ): RegisterMemoryLocation[AddressSize] with Size
-
-    def destinationReference[AddressSize <: WordDoubleQuadSize](
-      reference: BaseIndexReference[
-        Nothing,
-        DestinationIndex with IndexRegister with AddressSize,
-        AddressSize,
-      ]
-    ): DestinationReference[AddressSize] with Size
-
-    def sourceReference[AddressSize <: WordDoubleQuadSize](
-      reference: BaseIndexReference[
-        Nothing,
-        SourceIndex with IndexRegister with AddressSize,
-        AddressSize,
-      ]
-    ): SourceReference[AddressSize] with Size
   }
 
   trait I8086Implicits {
@@ -136,23 +100,7 @@ object RegisterMemoryLocation {
         ): RegisterMemoryLocation[AddressSize] with ByteSize =
           new RegisterMemoryLocation[AddressSize](reference) with ByteSize
 
-        override def destinationReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            DestinationIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): DestinationReference[AddressSize] with ByteSize =
-          new DestinationReference[AddressSize](reference) with ByteSize
 
-        override def sourceReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            SourceIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): SourceReference[AddressSize] with ByteSize =
-          new SourceReference[AddressSize](reference) with ByteSize
       }
 
     implicit def RMforWordSize: RMForSize[WordSize] =
@@ -166,24 +114,6 @@ object RegisterMemoryLocation {
           ]
         ): RegisterMemoryLocation[AddressSize] with WordSize =
           new RegisterMemoryLocation[AddressSize](reference) with WordSize
-
-        override def destinationReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            DestinationIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): DestinationReference[AddressSize] with WordSize =
-          new DestinationReference[AddressSize](reference) with WordSize
-
-        override def sourceReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            SourceIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): SourceReference[AddressSize] with WordSize =
-          new SourceReference[AddressSize](reference) with WordSize
       }
   }
 
@@ -200,24 +130,6 @@ object RegisterMemoryLocation {
           ]
         ): RegisterMemoryLocation[AddressSize] with DoubleWordSize =
           new RegisterMemoryLocation[AddressSize](reference) with DoubleWordSize
-
-        override def destinationReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            DestinationIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): DestinationReference[AddressSize] with DoubleWordSize =
-          new DestinationReference[AddressSize](reference) with DoubleWordSize
-
-        override def sourceReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            SourceIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): SourceReference[AddressSize] with DoubleWordSize =
-          new SourceReference[AddressSize](reference) with DoubleWordSize
       }
   }
 
@@ -234,24 +146,6 @@ object RegisterMemoryLocation {
           ]
         ): RegisterMemoryLocation[AddressSize] with QuadWordSize =
           new RegisterMemoryLocation[AddressSize](reference) with QuadWordSize
-
-        override def destinationReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            DestinationIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): DestinationReference[AddressSize] with QuadWordSize =
-          new DestinationReference[AddressSize](reference) with QuadWordSize
-
-        override def sourceReference[AddressSize <: WordDoubleQuadSize](
-          reference: BaseIndexReference[
-            Nothing,
-            SourceIndex with IndexRegister with AddressSize,
-            AddressSize,
-          ]
-        ): SourceReference[AddressSize] with QuadWordSize =
-          new SourceReference[AddressSize](reference) with QuadWordSize
       }
   }
 

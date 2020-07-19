@@ -16,6 +16,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 import org.werner.absynt.x86.ArchitectureBounds
 import org.werner.absynt.x86.ProcessorMode.I386Bounds
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.memoryaccess.IndexReference.IndexForSize
 import org.werner.absynt.x86.operands.memoryaccess.MemoryAddress.MemoryAddressForSize
 import org.werner.absynt.x86.operands.memoryaccess.RegisterMemoryLocation.RMForSize
 import org.werner.absynt.x86.operands.memoryaccess.SIBMemoryLocation.SIBForSize
@@ -155,27 +156,27 @@ object MemoryLocation {
 
     trait I8086DestinationReference {
 
-      def word[Size <: ValueSize : RMForSize](
+      def word[Size <: ValueSize : IndexForSize](
         index: BaseIndexReference[
           Nothing,
           DestinationIndex with IndexRegister with WordSize,
           WordSize,
         ]
       ): DestinationReference[WordSize] with Size = {
-        implicitly[RMForSize[Size]].destinationReference(index)
+        implicitly[IndexForSize[Size]].destinationReference(index)
       }
     }
 
     trait I8086SourceReference {
 
-      def word[Size <: ValueSize : RMForSize](
+      def word[Size <: ValueSize : IndexForSize](
         index: BaseIndexReference[
           Nothing,
           SourceIndex with IndexRegister with WordSize,
           WordSize,
         ]
       ): SourceReference[WordSize] with Size = {
-        implicitly[RMForSize[Size]].sourceReference(index)
+        implicitly[IndexForSize[Size]].sourceReference(index)
       }
     }
   }
@@ -249,27 +250,27 @@ object MemoryLocation {
 
     trait I386DestinationReference extends I8086DestinationReference {
 
-      def doubleWord[Size <: ValueSize : RMForSize](
+      def doubleWord[Size <: ValueSize : IndexForSize](
         index: BaseIndexReference[
           Nothing,
           DestinationIndex with IndexRegister with DoubleWordSize,
           DoubleWordSize,
         ]
       ): DestinationReference[DoubleWordSize] with Size = {
-        implicitly[RMForSize[Size]].destinationReference(index)
+        implicitly[IndexForSize[Size]].destinationReference(index)
       }
     }
 
     trait I386SourceReference extends I8086SourceReference {
 
-      def doubleWord[Size <: ValueSize : RMForSize](
+      def doubleWord[Size <: ValueSize : IndexForSize](
         index: BaseIndexReference[
           Nothing,
           SourceIndex with IndexRegister with DoubleWordSize,
           DoubleWordSize,
         ]
       ): SourceReference[DoubleWordSize] with Size = {
-        implicitly[RMForSize[Size]].sourceReference(index)
+        implicitly[IndexForSize[Size]].sourceReference(index)
       }
     }
 
@@ -332,16 +333,16 @@ object MemoryLocation {
 
       object Destination extends I386DestinationReference {
 
-        def quadWord[Size <: ValueSize : RMForSize](
+        def quadWord[Size <: ValueSize : IndexForSize](
           index: DestinationIndex with IndexRegister with QuadWordSize
-        ): DestinationReference[QuadWordSize] with Size = implicitly[RMForSize[Size]].destinationReference(index)
+        ): DestinationReference[QuadWordSize] with Size = implicitly[IndexForSize[Size]].destinationReference(index)
       }
 
       object Source extends I386SourceReference {
 
-        def quadWord[Size <: ValueSize : RMForSize](
+        def quadWord[Size <: ValueSize : IndexForSize](
           index: SourceIndex with IndexRegister with QuadWordSize
-        ): SourceReference[QuadWordSize] with Size = implicitly[RMForSize[Size]].sourceReference(index)
+        ): SourceReference[QuadWordSize] with Size = implicitly[IndexForSize[Size]].sourceReference(index)
       }
     }
   }

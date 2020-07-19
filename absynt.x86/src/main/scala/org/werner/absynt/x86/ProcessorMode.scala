@@ -33,6 +33,7 @@ sealed trait ArchitectureBounds {
 
 sealed abstract class ProcessorMode
 extends ImmediateValue.I8086Implicits
+  with IndexReference.I8086Implicits
   with RegisterMemoryLocation.I8086Implicits
   with FarPointer.I8086Implicits
 {
@@ -98,6 +99,7 @@ object ProcessorMode {
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
+    with IndexReference.I386Implicits
     with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
@@ -148,6 +150,7 @@ object ProcessorMode {
     with Register.I386Registers
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
+    with IndexReference.I386Implicits
     with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
@@ -205,6 +208,8 @@ object ProcessorMode {
     with ImmediateValue.I386Implicits
     with ImmediateValue.X64Implicits
     with MemoryAddress.X64Implicits
+    with IndexReference.I386Implicits
+    with IndexReference.X64Implicits
     with RegisterMemoryLocation.I386Implicits
     with RegisterMemoryLocation.X64Implicits
     with SIBMemoryLocation.LongOperations
