@@ -333,27 +333,15 @@ object MemoryLocation {
       object Destination extends I386DestinationReference {
 
         def quadWord[Size <: ValueSize : RMForSize](
-          index: BaseIndexReference[
-            Nothing,
-            DestinationIndex with IndexRegister with QuadWordSize,
-            QuadWordSize,
-          ]
-        ): DestinationReference[QuadWordSize] with Size = {
-          implicitly[RMForSize[Size]].destinationReference(index)
-        }
+          index: DestinationIndex with IndexRegister with QuadWordSize
+        ): DestinationReference[QuadWordSize] with Size = implicitly[RMForSize[Size]].destinationReference(index)
       }
 
       object Source extends I386SourceReference {
 
         def quadWord[Size <: ValueSize : RMForSize](
-          index: BaseIndexReference[
-            Nothing,
-            SourceIndex with IndexRegister with QuadWordSize,
-            QuadWordSize,
-          ]
-        ): SourceReference[QuadWordSize] with Size = {
-          implicitly[RMForSize[Size]].sourceReference(index)
-        }
+          index: SourceIndex with IndexRegister with QuadWordSize
+        ): SourceReference[QuadWordSize] with Size = implicitly[RMForSize[Size]].sourceReference(index)
       }
     }
   }

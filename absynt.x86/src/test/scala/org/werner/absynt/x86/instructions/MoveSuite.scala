@@ -20,7 +20,6 @@ import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 
 class MoveSuite extends AnyWordSpec with Matchers {
