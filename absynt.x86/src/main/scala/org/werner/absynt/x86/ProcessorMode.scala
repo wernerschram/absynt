@@ -15,7 +15,6 @@ package org.werner.absynt.x86
 
 import org.werner.absynt.x86.instructions._
 import org.werner.absynt.x86.instructions.branch.{Call, Jump, Loop}
-import org.werner.absynt.x86.operands.registers.Register.I8086Registers
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.registers.Register
@@ -54,7 +53,7 @@ object ProcessorMode {
   object Legacy extends ProcessorMode
     with OperandSizeInfo
     with LegacyBounds
-    with I8086Registers
+    with Register.I8086Registers
     with MemoryAddress.I8086Implicits
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations

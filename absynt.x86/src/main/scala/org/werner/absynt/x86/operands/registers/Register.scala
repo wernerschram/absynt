@@ -15,7 +15,7 @@ package org.werner.absynt.x86.operands.registers
 
 import org.werner.absynt.x86.RexRequirement
 import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operands.memoryaccess.MemoryLocation.{BaseIndexReference, BaseReference}
+import org.werner.absynt.x86.operands.memoryaccess.MemoryLocation.{BaseIndexReference, BaseReference, DirectReference}
 
 sealed abstract class Register extends Operand {
   self: ValueSize =>
@@ -150,10 +150,10 @@ sealed abstract class SegmentRegister(val registerCode: Byte, val mnemonic: Stri
     BaseReference[QuadWordRegister with BaseReg, QuadWordSize](base, this)
 
   final def +[AddressSize <: WordDoubleQuadSize, BaseReg <: GeneralPurposeRegister with BasePointerRegister with AddressSize](base: BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize]): BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize] =
-    BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize](base.base, base.index, this, base.displacement, base.scale)
+    new BaseIndexReference[BaseReg, GeneralPurposeRegister with IndexRegister with AddressSize, AddressSize](base.base, base.index, this, base.displacement, base.scale)
 
-  final def +(displacement: Int): BaseIndexReference[Nothing, Nothing, Nothing] =
-    new BaseIndexReference[Nothing, Nothing, Nothing](None, None, this, displacement, 1)
+  final def +(displacement: Int): DirectReference =
+    new DirectReference(None, None, this, displacement, 1)
 }
 
 

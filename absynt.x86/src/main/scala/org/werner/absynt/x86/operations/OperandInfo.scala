@@ -14,6 +14,7 @@
 package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.memoryaccess.IndexReference
 import org.werner.absynt.x86.operands.registers._
 import org.werner.absynt.x86.{ArchitectureBounds, RexRequirement}
 
@@ -108,7 +109,7 @@ object OperandInfo {
   def implicitPort(operand: DataRegister with ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[_] =
     new OperandInfo[ValueSize](operand, operandOrder) with NoOperandSizePrefix //XX
 
-  def implicitAddress(memoryLocation: memoryaccess.MemoryLocation with ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement,  addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[_] =
+  def implicitAddress(memoryLocation: IndexReference[_] with ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[_] =
     new OperandInfo[ValueSize](memoryLocation, operandOrder) with NormalOperandSizePrefix {
       override def addressOperands: Set[AddressOperandInfo] =
         memoryLocation.addressOperands

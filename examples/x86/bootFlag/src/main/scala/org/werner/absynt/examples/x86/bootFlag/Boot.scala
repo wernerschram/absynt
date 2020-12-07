@@ -23,8 +23,7 @@ import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
-import org.werner.absynt.x86.operands.memoryaccess.DestinationReference
-import org.werner.absynt.{EncodedBytes, Label, UniqueLabel}
+import org.werner.absynt.{Label, UniqueLabel}
 
 object Boot extends App {
   createFile()
@@ -51,8 +50,6 @@ object Boot extends App {
     val bottomColor = Color(0, 0, 63)
 
     val section: Section = Section.text(
-      Pop(FS) ::
-        Pop.Unaligned(FS) ::
       Move(0x13.toShort, AX) ::
       Interrupt(0x10.toByte) ::
       //
@@ -70,15 +67,15 @@ object Boot extends App {
       //
       Move(0x0.toByte, AL) ::
       Move((320*67).toShort, CX) ::
-      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
+      StoreString.Repeat(AL, Pointer.Destination.word[ByteSize](DI)) ::
       //
       Move(0x1.toByte, AL) ::
       Move((320*66).toShort, CX) ::
-      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
+      StoreString.Repeat(AL, Pointer.Destination.word[ByteSize](DI)) ::
       //
       Move(0x2.toByte, AL) ::
       Move((320*67).toShort, CX) ::
-      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
+      StoreString.Repeat(AL, Pointer.Destination.word[ByteSize](DI)) ::
 
       { val label: UniqueLabel = Label.unique; Jump(label).label(label) } ::
       Nil

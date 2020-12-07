@@ -13,42 +13,32 @@
 
 package org.werner.absynt.x86.operands.memoryaccess
 
-import org.werner.absynt.x86.operands.{
-  ByteSize,
-  DoubleWordSize,
-  QuadWordSize,
-  ValueSize,
-  WordDoubleQuadSize,
-  WordSize
-}
-import org.werner.absynt.x86.operands.memoryaccess.MemoryLocation.BaseIndexReference
-import org.werner.absynt.x86.operands.registers.{
-  BasePointerRegister,
-  DestinationIndex,
-  GeneralPurposeRegister,
-  IndexRegister,
-  SourceIndex
+import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.registers.{DestinationIndex, GeneralPurposeRegister, IndexRegister, SourceIndex}
+import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
+
+abstract class IndexReference[Size <: WordDoubleQuadSize](
+    val reference: GeneralPurposeRegister with IndexRegister with Size
+) extends Operand {
+  self: ValueSize =>
+
+  def addressOperands(
+      implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
+    : Set[AddressOperandInfo] =
+    Set(AddressOperandInfo.rmIndex(reference, None))
+
+  override def toString: String = s"$sizeName PTR [$reference]"
 }
 
-class IndexReference {}
-
-class DestinationReference[Size <: WordDoubleQuadSize](
-    reference: BaseIndexReference[
-      GeneralPurposeRegister with BasePointerRegister with Size,
-      DestinationIndex with IndexRegister with Size,
-      Size,
-    ]
-) extends RegisterMemoryLocation[Size](reference) {
+abstract class DestinationReference[Size <: WordDoubleQuadSize](
+    reference: DestinationIndex with IndexRegister with Size
+) extends IndexReference(reference) {
   self: ValueSize =>
 }
 
 class SourceReference[Size <: WordDoubleQuadSize](
-    reference: BaseIndexReference[
-      Nothing,
-      SourceIndex with IndexRegister with Size,
-      Size,
-    ]
-) extends RegisterMemoryLocation(reference) {
+    reference: SourceIndex with IndexRegister with Size
+) extends IndexReference(reference) {
   self: ValueSize =>
 }
 
@@ -57,19 +47,11 @@ object IndexReference {
   abstract class IndexForSize[Size <: ValueSize] {
 
     def destinationReference[AddressSize <: WordDoubleQuadSize](
-        reference: BaseIndexReference[
-          Nothing,
-          DestinationIndex with IndexRegister with AddressSize,
-          AddressSize,
-        ]
+        reference: DestinationIndex with IndexRegister with AddressSize
     ): DestinationReference[AddressSize] with Size
 
     def sourceReference[AddressSize <: WordDoubleQuadSize](
-        reference: BaseIndexReference[
-          Nothing,
-          SourceIndex with IndexRegister with AddressSize,
-          AddressSize,
-        ]
+        reference: SourceIndex with IndexRegister with AddressSize
     ): SourceReference[AddressSize] with Size
   }
 
@@ -77,20 +59,12 @@ object IndexReference {
     implicit def indexForByteSize: IndexForSize[ByteSize] =
       new IndexForSize[ByteSize] {
         override def destinationReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              DestinationIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: DestinationIndex with IndexRegister with AddressSize
         ): DestinationReference[AddressSize] with ByteSize =
           new DestinationReference[AddressSize](reference) with ByteSize
 
         override def sourceReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              SourceIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: SourceIndex with IndexRegister with AddressSize
         ): SourceReference[AddressSize] with ByteSize =
           new SourceReference[AddressSize](reference) with ByteSize
       }
@@ -98,20 +72,12 @@ object IndexReference {
     implicit def IndexForWordSize: IndexForSize[WordSize] =
       new IndexForSize[WordSize] {
         override def destinationReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              DestinationIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: DestinationIndex with IndexRegister with AddressSize
         ): DestinationReference[AddressSize] with WordSize =
           new DestinationReference[AddressSize](reference) with WordSize
 
         override def sourceReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              SourceIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: SourceIndex with IndexRegister with AddressSize
         ): SourceReference[AddressSize] with WordSize =
           new SourceReference[AddressSize](reference) with WordSize
       }
@@ -121,20 +87,12 @@ object IndexReference {
     implicit def IndexForDoubleWordSize: IndexForSize[DoubleWordSize] =
       new IndexForSize[DoubleWordSize] {
         override def destinationReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              DestinationIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: DestinationIndex with IndexRegister with AddressSize
         ): DestinationReference[AddressSize] with DoubleWordSize =
           new DestinationReference[AddressSize](reference) with DoubleWordSize
 
         override def sourceReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              SourceIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: SourceIndex with IndexRegister with AddressSize
         ): SourceReference[AddressSize] with DoubleWordSize =
           new SourceReference[AddressSize](reference) with DoubleWordSize
       }
@@ -144,20 +102,12 @@ object IndexReference {
     implicit def IndexForQuadWordSize: IndexForSize[QuadWordSize] =
       new IndexForSize[QuadWordSize] {
         override def destinationReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              DestinationIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: DestinationIndex with IndexRegister with AddressSize
         ): DestinationReference[AddressSize] with QuadWordSize =
           new DestinationReference[AddressSize](reference) with QuadWordSize
 
         override def sourceReference[AddressSize <: WordDoubleQuadSize](
-            reference: BaseIndexReference[
-              Nothing,
-              SourceIndex with IndexRegister with AddressSize,
-              AddressSize,
-            ]
+            reference: SourceIndex with IndexRegister with AddressSize
         ): SourceReference[AddressSize] with QuadWordSize =
           new SourceReference[AddressSize](reference) with QuadWordSize
       }

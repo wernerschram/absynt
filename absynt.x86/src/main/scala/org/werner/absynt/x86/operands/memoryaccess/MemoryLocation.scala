@@ -46,8 +46,8 @@ object MemoryLocation {
     Size <: WordDoubleQuadSize,
   ](
     baseRegister: BaseReg,
-    segment: SegmentRegister,
-  ) {
+    override val segment: SegmentRegister,
+  ) extends BaseIndexReference[Nothing, BaseReg, Size](None, Some(baseRegister), segment, 0, 1)  {
 
     final def +[
       IndexReg <: GeneralPurposeRegister with CombinableIndexRegister with Size
@@ -60,25 +60,24 @@ object MemoryLocation {
         index.scale,
       )
 
-    final def +(displacement: Int): BaseIndexReference[Nothing, BaseReg, Size] =
+    override final def +(displacement: Int): BaseIndexReference[Nothing, BaseReg, Size] =
       BaseIndexReference[Nothing, BaseReg, Size](None, baseRegister, segment, displacement)
   }
 
-  sealed case class BaseIndexReference[
+  sealed class BaseIndexReference[
     +BaseReg <: GeneralPurposeRegister with BasePointerRegister with Size,
     +IndexReg <: GeneralPurposeRegister with IndexRegister with Size,
     +Size <: WordDoubleQuadSize,
   ](
-    base: Option[BaseReg],
-    index: Option[IndexReg],
-    segment: SegmentRegister,
-    displacement: Long,
-    scale: Int,
+    val base: Option[BaseReg],
+    val index: Option[IndexReg],
+    val segment: SegmentRegister,
+    val displacement: Long,
+    val scale: Int,
   ) {
-
     final val shouldUseSIB: Boolean = index.exists(_.isInstanceOf[DoubleQuadSize])
 
-    final def +(displacement: Int) =
+    def +(displacement: Int) =
       new BaseIndexReference[BaseReg, IndexReg, Size](
         base,
         index,
@@ -99,6 +98,8 @@ object MemoryLocation {
     override def toString = s"$baseIndexString$scaleString$displacementString"
   }
 
+  type DirectReference = BaseIndexReference[Nothing, Nothing, Nothing]
+
   object BaseIndexReference {
 
     def apply[
@@ -112,7 +113,14 @@ object MemoryLocation {
       displacement: Int = 0,
       scale: Int = 1,
     ): BaseIndexReference[BaseReg, IndexReg, Size] =
-      BaseIndexReference[BaseReg, IndexReg, Size](base, Some(index), segment, displacement, scale)
+      new BaseIndexReference[BaseReg, IndexReg, Size](base, Some(index), segment, displacement, scale)
+
+    def unapply[
+      BaseReg <: GeneralPurposeRegister with BasePointerRegister with Size,
+      IndexReg <: GeneralPurposeRegister with IndexRegister with Size,
+      Size <: WordDoubleQuadSize,
+    ](arg: BaseIndexReference[BaseReg, IndexReg, Size]): Option[(Option[BaseReg], Option[IndexReg], SegmentRegister, Long, Int)] =
+      Some((arg.base, arg.index, arg.segment, arg.displacement, arg.scale))
   }
 
   trait I8086Operations {
@@ -129,8 +137,7 @@ object MemoryLocation {
 
     implicit def immediateValueIsBaseIndexReference(
       immediateValue: Long
-    ): BaseIndexReference[Nothing, Nothing, Nothing] =
-      new BaseIndexReference[Nothing, Nothing, Nothing](None, None, Segment.Data, immediateValue, 1)
+    ): DirectReference = new DirectReference(None, None, Segment.Data, immediateValue, 1)
 
     trait I8086Pointer {
 
@@ -145,23 +152,20 @@ object MemoryLocation {
       ): MemoryLocation with Size = baseIndexReference match {
         case BaseIndexReference(None, None, segment, displacement, _) =>
           implicitly[MemoryAddressForSize[Size]].instance(displacement, segment)
-        case reference: BaseIndexReference[
-          GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
-          GeneralPurposeRegister with IndexRegister with DoubleWordSize,
-          DoubleWordSize,
-        ] =>
+        case reference =>
           implicitly[RMForSize[Size]].instance[WordSize](reference)
       }
+
+      def word[Size <: ValueSize : MemoryAddressForSize](
+        baseIndexReference: DirectReference
+      ): MemoryAddress with Size =
+        implicitly[MemoryAddressForSize[Size]].instance(baseIndexReference.displacement, baseIndexReference.segment)
     }
 
     trait I8086DestinationReference {
 
       def word[Size <: ValueSize : IndexForSize](
-        index: BaseIndexReference[
-          Nothing,
-          DestinationIndex with IndexRegister with WordSize,
-          WordSize,
-        ]
+        index: DestinationIndex with IndexRegister with WordSize
       ): DestinationReference[WordSize] with Size = {
         implicitly[IndexForSize[Size]].destinationReference(index)
       }
@@ -170,11 +174,7 @@ object MemoryLocation {
     trait I8086SourceReference {
 
       def word[Size <: ValueSize : IndexForSize](
-        index: BaseIndexReference[
-          Nothing,
-          SourceIndex with IndexRegister with WordSize,
-          WordSize,
-        ]
+        index: SourceIndex with IndexRegister with WordSize
       ): SourceReference[WordSize] with Size = {
         implicitly[IndexForSize[Size]].sourceReference(index)
       }
@@ -202,7 +202,7 @@ object MemoryLocation {
       self: BaseIndexReference[BaseReg, IndexReg, Size] =>
 
       def *(newScale: Int): BaseIndexReference[BaseReg, IndexReg, Size] = {
-        BaseIndexReference[BaseReg, IndexReg, Size](base, index, segment, displacement, newScale)
+        new BaseIndexReference[BaseReg, IndexReg, Size](base, index, segment, displacement, newScale)
       }
     }
 
@@ -233,29 +233,26 @@ object MemoryLocation {
         baseIndexReference match {
           case BaseIndexReference(None, None, segment, displacement, _) =>
             implicitly[MemoryAddressForSize[Size]].instance(displacement, segment)
-          case reference: BaseIndexReference[
-                GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
-                GeneralPurposeRegister with IndexRegister with DoubleWordSize,
-                DoubleWordSize,
-              ] if !reference.shouldUseSIB =>
+          case reference if !reference.shouldUseSIB =>
             implicitly[RMForSize[Size]].instance[DoubleWordSize](reference)
-          case reference: BaseIndexReference[
-                GeneralPurposeRegister with BasePointerRegister with DoubleWordSize,
-                GeneralPurposeRegister with IndexRegister with DoubleWordSize,
-                DoubleWordSize,
-              ] =>
+          case reference =>
             implicitly[SIBForSize[Size]].instance(reference)
         }
+
+      def doubleWord[
+        Size <: ValueSize : MemoryAddressForSize
+      ](
+         baseIndexReference: DirectReference
+       ): MemoryAddress with Size =
+        implicitly[MemoryAddressForSize[Size]].instance(baseIndexReference.displacement, baseIndexReference.segment)
+
+
     }
 
     trait I386DestinationReference extends I8086DestinationReference {
 
       def doubleWord[Size <: ValueSize : IndexForSize](
-        index: BaseIndexReference[
-          Nothing,
-          DestinationIndex with IndexRegister with DoubleWordSize,
-          DoubleWordSize,
-        ]
+        index: DestinationIndex with IndexRegister with DoubleWordSize
       ): DestinationReference[DoubleWordSize] with Size = {
         implicitly[IndexForSize[Size]].destinationReference(index)
       }
@@ -264,11 +261,7 @@ object MemoryLocation {
     trait I386SourceReference extends I8086SourceReference {
 
       def doubleWord[Size <: ValueSize : IndexForSize](
-        index: BaseIndexReference[
-          Nothing,
-          SourceIndex with IndexRegister with DoubleWordSize,
-          DoubleWordSize,
-        ]
+        index: SourceIndex with IndexRegister with DoubleWordSize
       ): SourceReference[DoubleWordSize] with Size = {
         implicitly[IndexForSize[Size]].sourceReference(index)
       }
@@ -317,19 +310,19 @@ object MemoryLocation {
         baseIndexReference match {
           case BaseIndexReference(None, None, segment, displacement, _) =>
             implicitly[MemoryAddressForSize[Size]].instance(displacement, segment)
-          case reference: BaseIndexReference[
-                GeneralPurposeRegister with BasePointerRegister with QuadWordSize,
-                GeneralPurposeRegister with IndexRegister with QuadWordSize,
-                QuadWordSize,
-              ] if !reference.shouldUseSIB =>
+          case reference if !reference.shouldUseSIB =>
             implicitly[RMForSize[Size]].instance[QuadWordSize](reference)
-          case reference: BaseIndexReference[
-                GeneralPurposeRegister with BasePointerRegister with QuadWordSize,
-                GeneralPurposeRegister with IndexRegister with QuadWordSize,
-                QuadWordSize,
-              ] =>
+          case reference =>
             implicitly[SIBForSize[Size]].instance(reference)
         }
+
+      def quadWord[
+        Size <: ValueSize : MemoryAddressForSize
+      ](
+         baseIndexReference: DirectReference
+       ): MemoryAddress with Size =
+        implicitly[MemoryAddressForSize[Size]].instance(baseIndexReference.displacement, baseIndexReference.segment)
+
 
       object Destination extends I386DestinationReference {
 
