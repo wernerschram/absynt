@@ -75,7 +75,7 @@ object MemoryLocation {
     val displacement: Long,
     val scale: Int,
   ) {
-    final val shouldUseSIB: Boolean = index.exists(_.isInstanceOf[DoubleQuadSize])
+    final val shouldUseSIB: Boolean = index.exists(_.isInstanceOf[DoubleQuadSize]) || index.isEmpty
 
     def +(displacement: Int) =
       new BaseIndexReference[BaseReg, IndexReg, Size](

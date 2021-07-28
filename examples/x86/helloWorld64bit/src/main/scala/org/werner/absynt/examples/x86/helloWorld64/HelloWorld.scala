@@ -22,8 +22,8 @@ import org.werner.absynt.resource.EncodableConversion._
 import org.werner.absynt.resource.{AbsoluteReference, RelativeReference}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
-import org.werner.absynt.x86.operands.DoubleWordSize
-import org.werner.absynt.{EncodedString, Label}
+import org.werner.absynt.x86.operands.{DoubleWordSize, QuadWordSize}
+import org.werner.absynt.{EncodedBytes, EncodedString, Hex, Label}
 
 object HelloWorld extends App {
   createFile()
@@ -51,6 +51,14 @@ object HelloWorld extends App {
       Nil
     )
 
+    val text2: Section = Section.text(
+      Move(Pointer.quadWord[QuadWordSize](0xA4A3A2A1F4F3F2F1L), RAX) ::
+        Move(RBP, Pointer.word[QuadWordSize](2)) ::
+        EncodedBytes(Hex.lsb("48 89 2c 25 02 00 00 00")) ::
+          EncodedBytes(Hex.lsb("48 89 2d 02 00 00 00")) ::
+        Nil
+    )
+
     val data: Section = Section.data(
       EncodedString(output).label(hello) ::
       Nil, alignment = 4
@@ -62,7 +70,7 @@ object HelloWorld extends App {
     val outputFilePath = outputPath.resolve("helloworld")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val exec = Executable(Architecture.X86_64, text :: data :: Nil, entry, 0x8048000)
+    val exec = Executable(Architecture.X86_64, text :: text2 :: data :: Nil, entry, 0x8048000)
     (text.content zip text.content.encodables(exec.encodablesForDependencies(text.content.dependentResources))).foreach {
       case (orig: RelativeReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (orig: AbsoluteReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")

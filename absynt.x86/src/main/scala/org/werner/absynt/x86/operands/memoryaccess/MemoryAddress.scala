@@ -18,7 +18,7 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.registers.{Segment, SegmentRegister}
 import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 
-sealed class MemoryAddress private(address: Long, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
+abstract sealed class MemoryAddress protected(address: Long, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends MemoryLocation(
     if (address.toShort == address)
       Some(ImmediateValue.wordImmediate(address.toShort))
@@ -31,7 +31,7 @@ sealed class MemoryAddress private(address: Long, segment: SegmentRegister = Seg
 
   override val modValue: Byte = 0x00.toByte
 
-  private val addressImmediate =
+  protected val addressImmediate: ImmediateValue[_] with WordDoubleQuadSize =
     if (address.toShort == address)
       ImmediateValue.wordImmediate(address.toShort)
     else if (address.toInt == address)
@@ -40,15 +40,46 @@ sealed class MemoryAddress private(address: Long, segment: SegmentRegister = Seg
     ImmediateValue.quadWordImmediate(address)
 
   // TODO: WordSize is not valid in Long mode
-  override val registerOrMemoryModeCode: Byte = if (addressImmediate.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
+  override val registerOrMemoryModeCode: Byte
+
   final override val defaultSegment: SegmentRegister = Segment.Data
 
   override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
     Set(AddressOperandInfo.rmDisplacement(addressImmediate, segmentOverride))
 
+  override def toString = s"$sizeName PTR $segmentPrefix[${addressImmediate.encodedValue.decimalString}]"
+}
+
+sealed class RealProtectedModeMemoryAddress protected(address: Long, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
+  extends MemoryAddress(address, segment) {
+    self: ValueSize =>
+
+  protected override val addressImmediate: ImmediateValue[_] with WordDoubleQuadSize =
+    if (address.toShort == address)
+      ImmediateValue.wordImmediate(address.toShort)
+    else
+      ImmediateValue.doubleWordImmediate(address.toInt)
+
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ addressImmediate.encodedValue
 
-  override def toString = s"$sizeName PTR $segmentPrefix[${addressImmediate.encodedValue.decimalString}]"
+  override val registerOrMemoryModeCode: Byte = if (addressImmediate.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
+
+}
+
+class LongModeMemoryAddress protected(address: Long, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
+  extends MemoryAddress(address, segment) {
+    self: ValueSize =>
+  override val registerOrMemoryModeCode: Byte = 0x04.toByte
+
+  protected override val addressImmediate: ImmediateValue[_] with WordDoubleQuadSize =
+    if (address.toInt == address)
+      ImmediateValue.doubleWordImmediate(address.toInt)
+    else
+      ImmediateValue.quadWordImmediate(address)
+
+  private val SIB = Seq(0x25.toByte)
+
+  override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ SIB ++ addressImmediate.encodedValue
 }
 
 object MemoryAddress {
@@ -58,18 +89,28 @@ object MemoryAddress {
 
   trait I8086Implicits {
     implicit def ByteMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[ByteSize] =
-      (address: Long, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
+      (address: Long, segment: SegmentRegister) => new RealProtectedModeMemoryAddress(address, segment) with ByteSize
+
     implicit def WordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[WordSize] =
-      (address: Long, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
+      (address: Long, segment: SegmentRegister) => new RealProtectedModeMemoryAddress(address, segment) with WordSize
   }
 
   trait I386Implicits extends I8086Implicits {
     implicit def DoubleWordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[DoubleWordSize] =
-      (address: Long, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
+      (address: Long, segment: SegmentRegister) => new RealProtectedModeMemoryAddress(address, segment) with DoubleWordSize
   }
 
   trait X64Implicits extends I386Implicits {
+    override implicit def ByteMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[ByteSize] =
+      (address: Long, segment: SegmentRegister) => new LongModeMemoryAddress(address, segment) with ByteSize
+
+    override implicit def WordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[WordSize] =
+      (address: Long, segment: SegmentRegister) => new LongModeMemoryAddress(address, segment) with WordSize
+
+    override implicit def DoubleWordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[DoubleWordSize] =
+      (address: Long, segment: SegmentRegister) => new LongModeMemoryAddress(address, segment) with DoubleWordSize
+
     implicit def QuadWordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[QuadWordSize] =
-      (address: Long, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
+      (address: Long, segment: SegmentRegister) => new LongModeMemoryAddress(address, segment) with QuadWordSize
   }
 }

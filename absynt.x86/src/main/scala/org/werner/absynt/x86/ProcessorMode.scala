@@ -15,7 +15,7 @@ package org.werner.absynt.x86
 
 import org.werner.absynt.x86.instructions._
 import org.werner.absynt.x86.instructions.branch.{Call, Jump, Loop}
-import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.operands.{DoubleWordSize, _}
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.registers.Register
 import org.werner.absynt.x86.operations.{AddressSizePrefixRequirement, OperandSizeInfo, OperandSizePrefixRequirement}
@@ -241,12 +241,16 @@ object ProcessorMode {
         case _ => false
       }
       override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
-        case _: FarWordSize => true
+//        case _: FarWordSize => true
         case _ => false
       }
     }
 
     implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = {
+      //TODO: Is this correct?
+      case _: MemoryAddress with DoubleWordSize =>
+        println("DEBUGGERDEDEBUG")
+        false
       case _: DoubleWordSize => true
       case _ => false
     }

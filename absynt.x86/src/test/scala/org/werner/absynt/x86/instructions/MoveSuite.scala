@@ -20,6 +20,8 @@ import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
+import org.werner.absynt.x86.operands.memoryaccess.MemoryAddress
+import org.werner.absynt.x86.operands.memoryaccess.MemoryLocation.DirectReference
 import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 
 class MoveSuite extends AnyWordSpec with Matchers {
@@ -651,11 +653,13 @@ class MoveSuite extends AnyWordSpec with Matchers {
         Move(EAX, Pointer.doubleWord[DoubleWordSize](ECX+EBX*4)).toString should be("mov DWORD PTR [ecx+ebx*4], eax")
       }
 
-      "correctly encode mov QWORD PTR [2], rbp" ignore {
+      "correctly encode mov QWORD PTR [2], rbp" in {
+        val x: DirectReference = 2
+        println(s"SHOULD ${x.index} ${x.shouldUseSIB}")
         Move(RBP, Pointer.word[QuadWordSize](2)).encodeByte should be(Hex.lsb("48 89 2c 25 02 00 00 00"))
       }
 
-      "correctly represent mov QWORD PTR [2], rbp as a string" ignore {
+      "correctly represent mov QWORD PTR [2], rbp as a string" in {
         Move(RBP, Pointer.word[QuadWordSize](2)).toString should be("mov QWORD PTR [2], rbp")
       }
 
