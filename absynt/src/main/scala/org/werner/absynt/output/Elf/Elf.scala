@@ -18,7 +18,6 @@ import org.werner.absynt.resource._
 import org.werner.absynt.sections.Section
 import org.werner.absynt.resource.EncodableConversion._
 import org.werner.absynt.resource.{Resource, UnlabeledEncodable}
-import org.werner.absynt.sections.Section
 
 abstract class Elf(
   val architecture: Architecture,

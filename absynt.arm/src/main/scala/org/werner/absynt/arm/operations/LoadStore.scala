@@ -70,9 +70,9 @@ abstract sealed class LoadStoreOffset private(val updateDirection: UpdateDirecti
 object LoadStoreOffset {
   implicit def apply(offset: Short, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
-      override val encode: Int = 0x04000000 | offset | updateDirection.bitMask
+      override val encode: Int = 0x04000000 | offset | this.updateDirection.bitMask
 
-      override def toString: String = s"#${updateDirection.sign}$offset"
+      override def toString: String = s"#${this.updateDirection.sign}$offset"
     }
 
   val noOffset: LoadStoreOffset = apply(0.toShort)
@@ -84,18 +84,18 @@ object LoadStoreOffset {
 
   implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
-      override val encode: Int = 0x06000000 | offsetRegister.registerCode | updateDirection.bitMask
+      override val encode: Int = 0x06000000 | offsetRegister.registerCode | this.updateDirection.bitMask
 
-      override def toString: String = s"${updateDirection.sign}$offsetRegister"
+      override def toString: String = s"${this.updateDirection.sign}$offsetRegister"
     }
 
   implicit def apply(offsetRegister: GeneralRegister): LoadStoreOffset = apply(offsetRegister, UpdateDirection.Increment)
 
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
-      override val encode: Int = 0x06000000 | offset.encode | updateDirection.bitMask
+      override val encode: Int = 0x06000000 | offset.encode | this.updateDirection.bitMask
 
-      override def toString: String = s"${updateDirection.sign}$offset"
+      override def toString: String = s"${this.updateDirection.sign}$offset"
     }
 
   implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue]): LoadStoreOffset = apply(offset, UpdateDirection.Increment)
@@ -108,9 +108,9 @@ abstract sealed class LoadStoreMiscellaneousOffset private(val updateDirection: 
 object LoadStoreMiscellaneousOffset {
   def apply(offset: Byte, updateDirection: UpdateDirection.UpdateDirection): LoadStoreMiscellaneousOffset =
     new LoadStoreMiscellaneousOffset(updateDirection) {
-      override val encode: Int = 0x00400090 | updateDirection.bitMask | ((offset & 0xf0) << 4) | (offset & 0x0f)
+      override val encode: Int = 0x00400090 | this.updateDirection.bitMask | ((offset & 0xf0) << 4) | (offset & 0x0f)
 
-      override def toString: String = s"#${updateDirection.sign}$offset"
+      override def toString: String = s"#${this.updateDirection.sign}$offset"
     }
 
   implicit def apply(offset: Byte): LoadStoreMiscellaneousOffset = if (offset >= 0)
@@ -120,9 +120,9 @@ object LoadStoreMiscellaneousOffset {
 
   def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection): LoadStoreMiscellaneousOffset =
     new LoadStoreMiscellaneousOffset(updateDirection) {
-      override val encode: Int = 0x00000090 | offsetRegister.registerCode | updateDirection.bitMask
+      override val encode: Int = 0x00000090 | offsetRegister.registerCode | this.updateDirection.bitMask
 
-      override def toString: String = s"${updateDirection.sign}$offsetRegister"
+      override def toString: String = s"${this.updateDirection.sign}$offsetRegister"
     }
 
   implicit def apply(offsetRegister: GeneralRegister): LoadStoreMiscellaneousOffset = apply(offsetRegister, UpdateDirection.Increment)

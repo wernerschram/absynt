@@ -21,6 +21,7 @@ import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
 import org.werner.absynt.x86._
+import scala.reflect.runtime.universe._
 
 object Move extends I8086GenericRegisters {
 
@@ -169,13 +170,14 @@ object Move extends I8086GenericRegisters {
       def apply(source: ImmediateValue[_] with ByteSize, destination: ByteRegister): X86Operation =
         Imm8ToR8(destination, source)
 
-      def apply[Size <: MaxValueSize](source: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size): X86Operation =
-        (source, destination) match {
-          case (s: ImmediateValue[_] with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
-            Imm8ToRM8(d, s)
-          case (s: ImmediateValue[_] with MaxWideSize @unchecked, d: ModRMEncodableOperand with MaxWideSize @unchecked) =>
-            Imm16ToRM16(d, s)
+      def apply[Size <: MaxValueSize: TypeTag](source: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size): X86Operation = {
+        typeOf[Size] match {
+          case t if t <:< typeOf[ByteSize] =>
+            Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand with ByteSize], source.asInstanceOf[ImmediateValue[_] with ByteSize])
+          case t if t <:< typeOf[WordDoubleQuadSize] =>
+            Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand with MaxWideSize], source.asInstanceOf[ImmediateValue[_] with MaxWideSize])
         }
+      }
     }
   }
 

@@ -13,9 +13,6 @@
 
 package org.werner.absynt.examples.x86.bootFlag
 
-import java.io.FileOutputStream
-import java.nio.file.{Files, Paths}
-
 import org.werner.absynt.ListExtensions._
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.EncodableConversion._
@@ -23,8 +20,10 @@ import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
-import org.werner.absynt.x86.operands.memoryaccess.DestinationReference
-import org.werner.absynt.{EncodedBytes, Label, UniqueLabel}
+import org.werner.absynt.{Label, UniqueLabel}
+
+import java.io.FileOutputStream
+import java.nio.file.{Files, Paths}
 
 object Boot extends App {
   createFile()

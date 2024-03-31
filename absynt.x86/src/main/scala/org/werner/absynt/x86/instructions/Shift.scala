@@ -61,15 +61,17 @@ object Shift {
       }
 
     sealed abstract class ShiftInstruction(extensionCode: Byte, mnemonic: String) {
-      def apply[Size <: MaxValueSize](immediateValue: ImmediateValue[Byte] with ByteSize, destination: ModRMEncodableOperand with Size): X86Operation =
-        (immediateValue, destination) match {
-          case (ImmediateValue(value), d: ModRMEncodableOperand with ByteSize) if value == 1 => OneToRM8(d, extensionCode, mnemonic)
-          case (ImmediateValue(value), d: ModRMEncodableOperand with WordDoubleQuadSize) if value == 1 => OneToRM16(d, extensionCode, mnemonic)
-          case (ImmediateValue(value), d: ModRMEncodableOperand with ByteSize) => Imm8ToRM8((value & 7).toByte, d, extensionCode, mnemonic)
-          case (ImmediateValue(value), d: ModRMEncodableOperand with WordSize) => Imm8ToRM16((value & 15).toByte, d, extensionCode, mnemonic)
-          case (ImmediateValue(value), d: ModRMEncodableOperand with DoubleWordSize) => Imm8ToRM16((value & 31).toByte, d, extensionCode, mnemonic)
-          case (ImmediateValue(value), d: ModRMEncodableOperand with QuadWordSize) => Imm8ToRM16((value & 63).toByte, d, extensionCode, mnemonic)
+      def apply[Size <: MaxValueSize](immediateValue: ImmediateValue[Byte] with ByteSize, destination: ModRMEncodableOperand with Size): X86Operation = {
+        val value = immediateValue.value
+        destination match {
+          case d: ModRMEncodableOperand with ByteSize if value == 1 => OneToRM8(d, extensionCode, mnemonic)
+          case d: ModRMEncodableOperand with WordDoubleQuadSize if value == 1 => OneToRM16(d, extensionCode, mnemonic)
+          case d: ModRMEncodableOperand with ByteSize => Imm8ToRM8((value & 7).toByte, d, extensionCode, mnemonic)
+          case d: ModRMEncodableOperand with WordSize => Imm8ToRM16((value & 15).toByte, d, extensionCode, mnemonic)
+          case d: ModRMEncodableOperand with DoubleWordSize => Imm8ToRM16((value & 31).toByte, d, extensionCode, mnemonic)
+          case d: ModRMEncodableOperand with QuadWordSize => Imm8ToRM16((value & 63).toByte, d, extensionCode, mnemonic)
         }
+      }
 
       def apply[Size <: MaxValueSize](countRegister: Count.LowByte.type, destination: ModRMEncodableOperand with Size): X86Operation =
         destination match {

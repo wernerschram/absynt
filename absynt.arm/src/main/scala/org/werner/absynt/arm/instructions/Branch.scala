@@ -43,15 +43,15 @@ class Branch(code: Byte, val opcode: String) {
   private def Immediate[AddressType<:RelativePointer](destination: AddressType, condition: Condition = Condition.Always) =
     new BranchImmediate[AddressType](destination, condition, code, opcode)
 
-  def apply(targetLabel: Label, condition: Condition)(): RelativeReference =
+  def apply(targetLabel: Label, condition: Condition): RelativeReference =
     new BranchReference(opcode, targetLabel, condition) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
-        Immediate(RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), condition)
+        Immediate(RelativeA32Pointer(ArmRelativeOffset.positionalOffset(distance)(offsetDirection)), this.condition)
     }
 }
 
 class BranchExchange(registerCode: Byte, val opcode: String) {
-  def apply(destination: GeneralRegister, condition: Condition = Condition.Always)(): BranchRegister =
+  def apply(destination: GeneralRegister, condition: Condition = Condition.Always): BranchRegister =
     Register(destination, condition)
 
   private def Register(destination: GeneralRegister, condition: Condition = Condition.Always) =

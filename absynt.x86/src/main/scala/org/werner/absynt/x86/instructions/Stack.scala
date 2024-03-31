@@ -18,6 +18,7 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
+import scala.reflect.runtime.universe._
 
 object Stack {
 
@@ -108,11 +109,12 @@ object Stack {
       def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand with Size): X86Operation =
         RM16(operand)
 
-      def apply(immediate: ImmediateValue[_] with ImmMaxSize): X86Operation =
-        immediate match {
-          case i: ByteSize => Imm8(i)
-          case i: ImmExtendedMaxSize @unchecked => Imm16(i)
+      def apply[Size <: ImmMaxSize: TypeTag](immediate: ImmediateValue[_] with Size): X86Operation = {
+        typeOf[Size] match {
+          case t if t <:< typeOf[ImmediateValue[_] with ByteSize] => Imm8(immediate.asInstanceOf[ImmediateValue[_] with ByteSize])
+          case t if t <:< typeOf[WordDoubleQuadSize] => Imm16(immediate.asInstanceOf[ImmediateValue[_] with ImmExtendedMaxSize])
         }
+      }
     }
 
     object PushFlags {

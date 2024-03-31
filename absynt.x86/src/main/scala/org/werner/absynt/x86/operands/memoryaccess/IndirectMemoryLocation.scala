@@ -22,8 +22,7 @@ abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displa
   val modValue: Byte = {
     displacement match {
       case None => 0x00
-      case Some(d) if d.isInstanceOf[ByteSize] => 0x01
-      case Some(d) if d.isInstanceOf[WordDoubleSize] => 0x02
+      case Some(d) => if (d.isInstanceOf[ByteSize]) 0x01 else 0x02
     }
   }
 }

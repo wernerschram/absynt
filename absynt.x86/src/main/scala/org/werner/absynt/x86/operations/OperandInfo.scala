@@ -15,6 +15,7 @@ package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.{ArchitectureBounds, RexRequirement}
 import org.werner.absynt.x86.operands._
+import scala.language.implicitConversions
 
 case class OperandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement)
 case class OperandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit val addressSizePrefixRequirement: AddressSizePrefixRequirement)
