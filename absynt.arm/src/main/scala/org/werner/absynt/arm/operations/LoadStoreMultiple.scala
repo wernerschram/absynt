@@ -40,11 +40,11 @@ class LoadStoreMultiple(direction: LoadStoreMultipleDirection, val condition: Co
   val registerBits: Int =
     registers.foldLeft(0)((result, instance) => result | (1 << instance.registerCode))
 
-  override def toString = s"$mnemonicString${addressingMode.mnemonicExtension} $baseRegisterString, $registerString"
+  override def toString: String = s"$mnemonicString${addressingMode.mnemonicExtension} $baseRegisterString, $registerString"
 
   def baseRegisterString: String = baseRegister.toString()
 
-  def registerString = s"{${registers.map { x => x.toString }.mkString(", ")}}"
+  def registerString: String = s"{${registers.map { x => x.toString }.mkString(", ")}}"
 }
 
 trait UpdateBase extends LoadStoreMultiple {
@@ -52,7 +52,7 @@ trait UpdateBase extends LoadStoreMultiple {
   override def encodeWord: Int =
     super.encodeWord | 0x00200000
 
-  override def baseRegisterString = s"${super.baseRegisterString}!"
+  override def baseRegisterString: String = s"${super.baseRegisterString}!"
 }
 
 trait UserModeRegisters extends LoadStoreMultiple {
@@ -62,7 +62,7 @@ trait UserModeRegisters extends LoadStoreMultiple {
   override def encodeWord: Int =
     super.encodeWord | 0x00400000
 
-  override def registerString = s"${super.registerString}^"
+  override def registerString: String = s"${super.registerString}^"
 }
 
 class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateMode, updateBase: Boolean,
@@ -74,5 +74,5 @@ class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateM
       addressingMode.bitMask |
       (baseRegister.registerCode << 16)
 
-  override def toString = s"$mnemonicString${addressingMode.mnemonicExtension} $baseRegister${if (updateBase) "!" else ""}"
+  override def toString: String = s"$mnemonicString${addressingMode.mnemonicExtension} $baseRegister${if (updateBase) "!" else ""}"
 }

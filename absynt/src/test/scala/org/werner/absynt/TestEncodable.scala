@@ -66,7 +66,7 @@ case class NonLinearRelativeTestReference(override val target: Label) extends Re
     else if (dependencySize < 20) 3
     else 2
 
-  override def possibleSizes = Set(1, 2, 3)
+  override def possibleSizes: Set[Int] = Set(1, 2, 3)
 }
 
 case class AbsoluteTestEncodable(distance: Int) extends UnlabeledEncodable {

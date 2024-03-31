@@ -37,5 +37,5 @@ class BranchRegister(destination: GeneralRegister, val condition: Condition, val
   override def encodeWord: Int =
     super.encodeWord | 0x012FFF00 | ((code & 0x0F) << 4) | destination.registerCode
 
-  override def toString = s"$mnemonicString ${destination.toString}"
+  override def toString: String = s"$mnemonicString ${destination.toString}"
 }

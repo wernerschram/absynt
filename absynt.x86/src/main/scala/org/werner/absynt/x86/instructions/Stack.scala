@@ -93,7 +93,7 @@ object Stack {
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
+      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize): ModRM[ModRMEncodableOperand with RMMaxSize] with NoDisplacement with NoImmediate =
         new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
 
@@ -139,7 +139,7 @@ object Stack {
     type RMMaxSize <: MaxWideSize
 
     sealed class PopOperations {
-      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
+      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize): ModRM[ModRMEncodableOperand with RMMaxSize] with NoDisplacement with NoImmediate =
         new ModRM(operand, 0x8F.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
       protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =

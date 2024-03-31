@@ -19,5 +19,5 @@ class SoftwareInterrupt(override val opcode: String, interrupt: Int, condition: 
   extends ARMOperation {
   override def encodeWord: Int = (condition.value << 28) | 0x0f000000 | interrupt
 
-  override def toString = s"$mnemonicString ${interrupt.toString}"
+  override def toString: String = s"$mnemonicString ${interrupt.toString}"
 }

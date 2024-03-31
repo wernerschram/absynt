@@ -30,7 +30,7 @@ object Call {
     sealed trait BaseCall {
 
       val mnemonic = "call"
-      val opcode = Seq(0xe8.toByte)
+      val opcode: Seq[Byte] = Seq(0xe8.toByte)
 
       protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
         new Static(opcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
@@ -48,7 +48,7 @@ object Call {
         }
       }
 
-      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
+      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size): ModRM[ModRMEncodableOperand with Size] with NoDisplacement with NoImmediate =
         new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
       protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate =
@@ -56,7 +56,7 @@ object Call {
           override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] with FarPointerSize[Size]] = farPointer
         }
 
-      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
+      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize): ModRM[MemoryLocation with WordDoubleQuadSize] with NoDisplacement with NoImmediate =
         new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
     }
 

@@ -27,7 +27,7 @@ class Miscellaneous(val code: Byte, override val opcode: String, value: Short, c
     result
   }
 
-  override def toString = s"$mnemonicString $value"
+  override def toString: String = s"$mnemonicString $value"
 }
 
 sealed abstract class Effect(val iMod: Byte, val mnemonicExtension: String)
@@ -91,5 +91,5 @@ class ProcessorState(val code: Byte, val opcode: String, val condition: Conditio
   override def encodeWord: Int =
     super.encodeWord | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue
 
-  override def toString = s"$mnemonicString$postFixString"
+  override def toString: String = s"$mnemonicString$postFixString"
 }

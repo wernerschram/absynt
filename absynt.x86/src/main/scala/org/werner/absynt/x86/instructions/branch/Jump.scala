@@ -34,7 +34,7 @@ object Jump {
           override def pointerOrder: OperandOrder = destination
         }
 
-      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size) =
+      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size): ModRM[ModRMEncodableOperand with Size] with NoDisplacement with NoImmediate =
         new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
       protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate =
@@ -42,7 +42,7 @@ object Jump {
           override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] with FarPointerSize[Size]] = operandWithOperandSizePrefixInfo(farPointer)
         }
 
-      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize) =
+      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize): ModRM[MemoryLocation with WordDoubleQuadSize] with NoDisplacement with NoImmediate =
         new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
     }
 

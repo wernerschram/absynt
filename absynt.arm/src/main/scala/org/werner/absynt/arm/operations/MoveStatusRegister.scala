@@ -24,7 +24,7 @@ class MoveFromStatusRegister(override val opcode: String, source: StatusRegister
   override def encodeWord: Int =
     super.encodeWord | 0x010f0000 | (source.registerCode << 22) | (destination.registerCode << 12)
 
-  override def toString = s"$mnemonicString ${destination.toString}, ${source.toString}"
+  override def toString: String = s"$mnemonicString ${destination.toString}, ${source.toString}"
 }
 
 object Fields extends Enumeration {
@@ -54,5 +54,5 @@ class MoveToStatusRegister private(override val opcode: String, destination: Sta
   override def encodeWord: Int =
     super.encodeWord | 0x0120f000 | (destination.registerCode << 22 | fields.toBitMask(0).toInt | sourceValue)
 
-  override def toString = s"$mnemonicString ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
+  override def toString: String = s"$mnemonicString ${destination.toString}_${Fields.fieldsToString(fields)}, $sourceString"
 }

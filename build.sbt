@@ -3,18 +3,17 @@ ThisBuild / organization := "org.werner"
 ThisBuild / licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
 
 autoCompilerPlugins := true
-ThisBuild / libraryDependencies += compilerPlugin(scalafixSemanticdb) // enable SemanticDB
-ThisBuild / scalafixDependencies += "org.scalatest" %% "autofix" % "3.1.0.0" 
+//ThisBuild / libraryDependencies += compilerPlugin(scalafixSemanticdb) // enable SemanticDB
+//ThisBuild / scalafixDependencies += "org.scalatest" %% "autofix" % "3.1.0.0"
 
-val testVersion = "3.1.1"
+val testVersion = "3.2.9"
 val spec2Version = "4.7.0"
 
 ThisBuild / scalacOptions ++= Seq(
 	"-feature",
   "-unchecked",
   "-deprecation",
-	"-Yrangepos",           // required by SemanticDB compiler plugin
-	"-Ywarn-unused:imports" // required by `RemoveUnused` rule
+	"-Wunused:imports" // required by `RemoveUnused` rule
 )
 
 git.useGitDescribe := true

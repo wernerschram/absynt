@@ -347,7 +347,7 @@ sealed abstract class BaseIndexReference(
 
   override val defaultSegment: SegmentRegister = index.defaultSegment
 
-  override def toString = s"$base+$index"
+  override def toString: String = s"$base+$index"
 }
 
 object BaseIndexReference {

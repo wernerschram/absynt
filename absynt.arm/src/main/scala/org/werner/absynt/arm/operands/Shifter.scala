@@ -28,7 +28,7 @@ trait RightShiftValue extends ShiftValue
 trait RotateValue extends ShiftValue
 
 abstract class ImmediateShiftValue(val value: Byte) extends ShiftValue {
-  override def toString = s"#$value"
+  override def toString: String = s"#$value"
 }
 
 class LeftImmediateShiftValue private[operands](value: Byte) extends ImmediateShiftValue(value) with LeftShiftValue {
@@ -69,7 +69,7 @@ abstract class Shifter {
 class ShiftRegister private[operands](shifterCode: Int, mnemonic: String, register: GeneralRegister) extends Shifter {
   override val encode: Int = shifterCode | register.registerCode
 
-  override def toString = s"$register, $mnemonic"
+  override def toString: String = s"$register, $mnemonic"
 }
 
 class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: Int, mnemonic: String, register: GeneralRegister,
@@ -77,14 +77,14 @@ class ShiftRegisterWithShift[+T <: ShiftValue] private[operands](shifterCode: In
   extends ShiftRegister(shifterCode, mnemonic, register) {
   override val encode: Int = shifterCode | shiftValue.encodeShiftValue | register.registerCode
 
-  override def toString = s"$register, $mnemonic $shiftValue"
+  override def toString: String = s"$register, $mnemonic $shiftValue"
 }
 
 case class RightRotateImmediate private[operands](immediate: Byte, rotateValue: Byte) extends Shifter {
   assume((rotateValue >= 0) && (rotateValue <= 30) && (rotateValue % 2 == 0))
   override val encode: Int = 0x02000000 | (rotateValue << 7) | (immediate & 0xff)
 
-  override def toString = s"#$immediate, $rotateValue"
+  override def toString: String = s"#$immediate, $rotateValue"
 }
 
 object Shifter {

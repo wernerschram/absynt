@@ -23,7 +23,7 @@ class DataProcessingOperation(val opcode: String, code: Byte, val condition: Con
   override def encodeWord: Int =
     super.encodeWord | (code << 21) | (register1.registerCode << 16) | (destination.registerCode << 12) | operand2.encode
 
-  override def toString = s"$mnemonicString ${destination.toString}, ${register1.toString}, ${operand2.toString}"
+  override def toString: String = s"$mnemonicString ${destination.toString}, ${register1.toString}, ${operand2.toString}"
 }
 
 class DataProcessingNoDestinationInstruction(val opcode: String, code: Byte, val condition: Condition,
@@ -32,7 +32,7 @@ class DataProcessingNoDestinationInstruction(val opcode: String, code: Byte, val
   override def encodeWord: Int =
     super.encodeWord | 0x00100000 | (code << 21) | (register1.registerCode << 16) | operand2.encode
 
-  override def toString = s"$mnemonicString ${register1.toString}, ${operand2.toString}"
+  override def toString: String = s"$mnemonicString ${register1.toString}, ${operand2.toString}"
 }
 
 class DataProcessingNoRegisterInstruction(val opcode: String, code: Byte, val condition: Condition, operand2: Shifter,
@@ -41,5 +41,5 @@ class DataProcessingNoRegisterInstruction(val opcode: String, code: Byte, val co
   override def encodeWord: Int =
     super.encodeWord | (code << 21) | (destination.registerCode << 12) | operand2.encode
 
-  override def toString = s"$mnemonicString ${destination.toString}, ${operand2.toString}"
+  override def toString: String = s"$mnemonicString ${destination.toString}, ${operand2.toString}"
 }

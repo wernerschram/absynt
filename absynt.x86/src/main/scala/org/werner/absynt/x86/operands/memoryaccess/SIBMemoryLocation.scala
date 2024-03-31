@@ -48,7 +48,7 @@ sealed class SIBMemoryLocation(
     ((scaleCode << 6) | (indexCode << 3) | baseCode).toByte
   }
 
-  override def toString = s"$sizeName PTR $segmentPrefix[$base+$index$scaleString$displacementString]"
+  override def toString: String = s"$sizeName PTR $segmentPrefix[$base+$index$scaleString$displacementString]"
 
   private def scaleString = s"*$scale"
 

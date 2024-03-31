@@ -32,10 +32,10 @@ object Move extends I8086GenericRegisters {
 
     trait BasicMove {
 
-      protected def RM16ToSReg[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size) =
+      protected def RM16ToSReg[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size): ModSegmentRM[ModRMEncodableOperand with Size] with NoDisplacement with NoImmediate =
         new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
 
-      protected def SRegToRM16[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size) =
+      protected def SRegToRM16[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size): ModSegmentRM[ModRMEncodableOperand with Size] with NoDisplacement with NoImmediate =
         new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
 
       protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize) =

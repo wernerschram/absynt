@@ -27,7 +27,7 @@ abstract class BranchReference(val opcode: String, targetLabel: Label, val condi
 
   override def possibleSizes: Set[Int] = Set(4)
 
-  override def toString = s"$mnemonicString $target"
+  override def toString: String = s"$mnemonicString $target"
 }
 
 class Branch(code: Byte, val opcode: String) {

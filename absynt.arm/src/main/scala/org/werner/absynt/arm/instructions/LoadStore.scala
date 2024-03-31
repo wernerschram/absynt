@@ -28,7 +28,7 @@ abstract class LoadStoreReference(val opcode: String, targetLabel: Label, val co
 
   override def possibleSizes: Set[Int] = Set(4)
 
-  override def toString = s"$mnemonicString $target"
+  override def toString: String = s"$mnemonicString $target"
 }
 
 class LoadStoreRegister(

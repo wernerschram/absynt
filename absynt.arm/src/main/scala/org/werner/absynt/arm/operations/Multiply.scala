@@ -27,7 +27,7 @@ class MultiplyOperation(val code: Byte, override val opcode: String, destination
       (source.registerCode << 8) |
       multiplyValue.registerCode
 
-  override def toString = s"$mnemonicString ${destination.toString}, ${multiplyValue.toString}, ${source.toString}"
+  override def toString: String = s"$mnemonicString ${destination.toString}, ${multiplyValue.toString}, ${source.toString}"
 }
 
 class MultiplyWithRegisterOperation(code: Byte, opcode: String, destination: GeneralRegister, source: GeneralRegister,
@@ -37,5 +37,5 @@ class MultiplyWithRegisterOperation(code: Byte, opcode: String, destination: Gen
   override def encodeWord: Int =
     super.encodeWord | (addValue.registerCode << 12)
 
-  override def toString = s"${super.toString()}, ${addValue.toString}"
+  override def toString: String = s"${super.toString()}, ${addValue.toString}"
 }

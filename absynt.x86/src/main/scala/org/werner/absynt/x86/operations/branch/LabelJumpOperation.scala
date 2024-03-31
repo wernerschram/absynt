@@ -25,7 +25,7 @@ case class LabelJumpOperation(ascendingSizeOptions: Seq[JumpOption], mnemonic: S
 
   override def possibleSizes: Set[Int] = ascendingSizeOptions.map(_.encodedLength).toSet
 
-  override def toString = s"$mnemonic $target"
+  override def toString: String = s"$mnemonic $target"
 
   def offset(jumpSize: Int, distance: Int, offsetDirection: RelativeOffsetDirection): Int = offsetDirection match {
     case OffsetDirection.Self => -jumpSize

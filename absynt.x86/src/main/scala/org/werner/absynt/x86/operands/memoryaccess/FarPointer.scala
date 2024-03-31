@@ -20,7 +20,7 @@ sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateVa
   extends Operand {
   self: FarPointerSize[Size] =>
 
-  override def toString =
+  override def toString: String =
     s"FAR 0x${segment.encodedValue.bigEndianHexString}:0x${offset.encodedValue.bigEndianHexString}"
 
   def encodeByte: Seq[Byte] = offset.encodedValue ++ segment.encodedValue

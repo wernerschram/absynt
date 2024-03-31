@@ -34,24 +34,24 @@ abstract sealed class LoadStoreAddressingType(pBit: Boolean, wBit: Boolean, val 
 abstract sealed class LoadStoreAddressingTypeNormal private(pBit: Boolean, wBit: Boolean) extends LoadStoreAddressingType(pBit, wBit, "")
 
 abstract sealed class LoadStoreAddressingTypeUser private(pBit: Boolean, wBit: Boolean) extends LoadStoreAddressingType(pBit, wBit, "t") {
-  protected override def formatParameters(baseRegister: GeneralRegister, offset: String) =
+  protected override def formatParameters(baseRegister: GeneralRegister, offset: String): String =
     s"[$baseRegister], $offset"
 }
 
 object LoadStoreAddressingTypeNormal {
 
   object PostIndexedNormal extends LoadStoreAddressingTypeNormal(false, false) {
-    protected override def formatParameters(baseRegister: GeneralRegister, offset: String) =
+    protected override def formatParameters(baseRegister: GeneralRegister, offset: String): String =
       s"[$baseRegister], $offset"
   }
 
   object OffsetNormal extends LoadStoreAddressingTypeNormal(true, false) {
-    protected override def formatParameters(baseRegister: GeneralRegister, offset: String) =
+    protected override def formatParameters(baseRegister: GeneralRegister, offset: String): String =
       s"[$baseRegister, $offset]"
   }
 
   object PreIndexedNormal extends LoadStoreAddressingTypeNormal(true, true) {
-    protected override def formatParameters(baseRegister: GeneralRegister, offset: String) =
+    protected override def formatParameters(baseRegister: GeneralRegister, offset: String): String =
       s"[$baseRegister, $offset]!"
   }
 
@@ -171,7 +171,7 @@ class LoadStore(val opcode: String, val condition: Condition, register: GeneralR
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
-  override def toString =
+  override def toString: String =
     s"$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
 
 }
@@ -186,6 +186,6 @@ class LoadStoreMiscelaneous(val opcode: String, val condition: Condition, regist
       operation.bitMask | addressingType.bitMask |
       (baseRegister.registerCode << 16) | (register.registerCode << 12) | offset.encode
 
-  override def toString =
+  override def toString: String =
     s"$mnemonicString${operation.opcodeExtension}${addressingType.opcodeExtension} $register, ${addressingType.formatParameters(baseRegister, offset)}"
 }

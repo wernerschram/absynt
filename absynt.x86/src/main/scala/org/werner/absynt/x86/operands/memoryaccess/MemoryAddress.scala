@@ -32,7 +32,7 @@ sealed class MemoryAddress private(address: ImmediateValue[_] with ValueSize, se
 
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ address.encodedValue
 
-  override def toString = s"$sizeName PTR $segmentPrefix[${address.encodedValue.decimalString}]"
+  override def toString: String = s"$sizeName PTR $segmentPrefix[${address.encodedValue.decimalString}]"
 }
 
 object MemoryAddress {
