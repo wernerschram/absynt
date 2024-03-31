@@ -28,16 +28,16 @@ object Label {
   }
 
   private var lastId = 0
-}
 
-case class StringLabel private (value: String) extends Label {
-  def matches(label: Label): Boolean = this.equals(label)
+  case class StringLabel private[Label] (value: String) extends Label {
+    def matches(label: Label): Boolean = this.equals(label)
 
-  override def toString: String = value
-}
+    override def toString: String = value
+  }
 
-case class UniqueLabel private (id: Int) extends Label {
-  def matches(label: Label): Boolean = this.equals(label)
+  case class UniqueLabel private[Label] (id: Int) extends Label {
+    def matches(label: Label): Boolean = this.equals(label)
 
-  override def toString: String = s"__$id"
+    override def toString: String = s"__$id"
+  }
 }

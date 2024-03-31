@@ -93,7 +93,7 @@ class ElfSuite extends AnyWordSpec with Matchers {
       val sectionHeaderOffset = stringSectionFileOffset + stringSectionSize
 
       val programHeader =
-        (0x7F.toByte +: "ELF".toCharArray.map(_.toByte)) ++
+        (0x7F.toByte +: "ELF".toCharArray.map(_.toByte)).toSeq ++
         Seq[Byte](1, 1, 1, 0, 0).flatMap(_.encodeLittleEndian) ++
         Seq.fill[Byte](7)(0).flatMap(_.encodeLittleEndian) ++
         Seq[Short](2, 3).flatMap(_.encodeLittleEndian) ++
@@ -122,13 +122,13 @@ class ElfSuite extends AnyWordSpec with Matchers {
         Seq(1, 1, 6, section1MemoryOffset, section1FileOffset, section1Size, 0, 0, 16, 0).flatMap(_.encodeLittleEndian), // Section1
         Seq(10, 1, 3, section2MemoryOffset, section2FileOffset, section2Size, 0, 0, 16, 0).flatMap(_.encodeLittleEndian), // Section2
         Seq(19, 3, 0, stringSectionMemoryOffset, stringSectionFileOffset, stringSectionSize, 0, 0, 1, 1).flatMap(_.encodeLittleEndian) // strings
-      )
+      ).flatten
 
       executable.encodeByte shouldBe
         programHeader ++
         applicationHeaders.flatten ++
         content ++
-        sectionHeaders.flatten
+        sectionHeaders
     }
   }
 }
