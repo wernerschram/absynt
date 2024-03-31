@@ -67,7 +67,7 @@ class InProcApplication(val sections: Seq[Section]) extends Application with Aut
 
   def functionForLabel[Out: ReturnType, In1](label: Label): In1 => Out = {
     val function = Function.getFunction(labelPointers(label))
-    arg1: In1 => implicitly[ReturnType[Out]].invoke(function, Array(arg1.asInstanceOf[AnyRef]))
+    (arg1: In1) => implicitly[ReturnType[Out]].invoke(function, Array(arg1.asInstanceOf[AnyRef]))
   }
 
   def functionForLabel[Out: ReturnType, In1, In2](label: Label): (In1, In2) => Out = {
