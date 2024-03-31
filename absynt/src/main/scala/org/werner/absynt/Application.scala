@@ -115,7 +115,7 @@ abstract class Application {
       if (childSizeFunctions.isEmpty)
         (totalDependencySizes + (current -> KnownDependencySize(fixedSize, offsetDirection)), restrictions ++ totalRestrictions)
       else {
-        val dependencySize = ((assumptions: Map[DependentResource, Int])) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
+        val dependencySize = (assumptions: Map[DependentResource, Int]) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
         // TODO: Deactivated optimization. investigation needed.
 //        if (totalRestrictions.contains(current)) {
 //          val combinations = possibleSizeCombinations(totalRestrictions)
@@ -139,7 +139,7 @@ abstract class Application {
 
     if (visiting.contains(child))
     // cyclic dependency: add a dependency which can be resolved at a higher level
-      (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ (((assumptions: Map[DependentResource, Int])) =>
+      (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ ((assumptions: Map[DependentResource, Int]) =>
         assumptions(child)), previousRestrictions + (child -> child.possibleSizes))
     else {
       val (childSizeFunctions, childRestrictions) = dependencySizes(visiting + current, previousDependencySizeFunctions, previousRestrictions)(child)
@@ -151,7 +151,7 @@ abstract class Application {
           val size = child.sizeForDependencySize(known.size, known.offsetDirection)
           (newDependencySizes, previousFixedSize + size, previousChildSizeFunctions, newRestrictions)
         case unknown: UnknownDependencySize =>
-          val size = ((assumptions: Map[DependentResource, Int])) => assumptions.getOrElse(child,
+          val size = (assumptions: Map[DependentResource, Int]) => assumptions.getOrElse(child,
             child.sizeForDependencySize(unknown.sizeFunction(assumptions), unknown.offsetDirection))
           (newDependencySizes, previousFixedSize, previousChildSizeFunctions :+ size, newRestrictions)
       }

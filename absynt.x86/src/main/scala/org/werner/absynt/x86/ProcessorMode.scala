@@ -80,7 +80,7 @@ object ProcessorMode {
     }
 
     implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement =
-      (((_: Operand with ValueSize))) => false
+      (_: Operand with ValueSize) => false
 
     override def pointer(location: Long): ImmediateValue[Short] with WordDoubleQuadSize = location.toShort
   }

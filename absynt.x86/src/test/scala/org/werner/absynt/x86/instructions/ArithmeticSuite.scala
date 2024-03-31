@@ -316,16 +316,16 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode xor QWORD PTR [0x11111111], 0x44332211" in {
-        Xor(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
+        Xor(0x44332211, MemoryAddress[QuadWordSize](doubleWordImm(0x11111111))).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent xor QWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Xor(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).toString shouldBe "xor QWORD PTR [286331153], 1144201745"
+        Xor(0x44332211, MemoryAddress[QuadWordSize](doubleWordImm(0x11111111))).toString shouldBe "xor QWORD PTR [286331153], 1144201745"
       }
 
       "throw an AssertionError for xor WORD PTR [0x11111111], 0x44332211" in {
         an[AssertionError] should be thrownBy {
-          Xor(0x44332211, MemoryAddress[WordSize](0x11111111))
+          Xor(0x44332211, MemoryAddress[WordSize](doubleWordImm(0x11111111)))
         }
       }
 

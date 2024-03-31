@@ -17,7 +17,6 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
-import scala.reflect.runtime.universe._
 
 
 object Test {
@@ -62,13 +61,13 @@ object Test {
         override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with DoubleWordSize] = immediateValue
       }
 
-    protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue[_] with ByteSize): X86Operation =
+    protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue[_] with ByteSize) =
       new ModRM(operand, 0xF6.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
         override val immediateOrder: OperandOrder = source
         override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
       }
 
-    protected def Imm16ToRM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, immediateValue: ImmediateValue[_] with Size): X86Operation =
+    protected def Imm16ToRM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size, immediateValue: ImmediateValue[_] with Size) =
       new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size] {
         override val immediateOrder: OperandOrder = source
         override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size] = immediateValue
@@ -101,12 +100,11 @@ object Test {
 
     object Test extends TestBase  {
 
-      def apply[Size <: ByteWordSize : TypeTag](immediate: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size): X86Operation = {
-        println(s"TPE ${typeOf[Size]}")
-        typeOf[Size] match {
-          case t if t <:< typeOf[ByteSize] =>
+      def apply[Size <: ByteWordSize](immediate: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size) = {
+        immediate match {
+          case i: ImmediateValue[_] with ByteSize =>
             Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand with ByteSize], immediate.asInstanceOf[ImmediateValue[_] with ByteSize])
-          case t if t <:< typeOf[WordSize] =>
+          case i: ImmediateValue[_] with WordSize =>
             Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand with WordSize], immediate.asInstanceOf[ImmediateValue[_] with WordSize])
         }
       }
@@ -126,11 +124,11 @@ object Test {
       def apply(immediate: ImmediateValue[_] with DoubleWordSize, destination: Accumulator.DoubleWord.type): X86Operation =
         Imm32ToEAX(immediate)
 
-      def apply[Size <: ByteWordDoubleSize : TypeTag](immediate: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size): X86Operation =
-        typeOf[Size] match {
-          case t if t <:< typeOf[ByteSize] =>
+      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size) =
+        immediate match {
+          case i: ImmediateValue[_] with ByteSize =>
             Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand with ByteSize], immediate.asInstanceOf[ImmediateValue[_] with ByteSize])
-          case t if t <:< typeOf[WordDoubleSize] =>
+          case i: ImmediateValue[_] with WordDoubleSize =>
             Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand with WordDoubleSize], immediate.asInstanceOf[ImmediateValue[_] with WordDoubleSize])
         }
     }
@@ -152,7 +150,7 @@ object Test {
       def apply(immediate: ImmediateValue[_] with DoubleWordSize, destination: Accumulator.QuadWord.type): X86Operation =
         Imm32ToRAX(immediate)
 
-      def apply[ImmediateSize <: ByteWordDoubleSize, DestinationSize <: ValueSize](immediate: ImmediateValue[_] with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize): X86Operation =
+      def apply[ImmediateSize <: ByteWordDoubleSize, DestinationSize <: ValueSize](immediate: ImmediateValue[_] with ImmediateSize, destination: ModRMEncodableOperand with DestinationSize) =
         (immediate, destination) match {
           case (imm: ImmediateValue[_] with ByteSize, d: ModRMEncodableOperand with ByteSize) =>
             Imm8ToRM8(d, imm)

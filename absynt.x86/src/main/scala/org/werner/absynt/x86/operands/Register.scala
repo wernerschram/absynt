@@ -215,21 +215,21 @@ sealed abstract class SourceIndex extends GeneralPurposeRegister(0x06, "si") {
 
 object SourceIndex {
 
-  final case object Real extends SourceIndex with WordRegister with CombinableRealModeIndexRegister {
+  case object Real extends SourceIndex with WordRegister with CombinableRealModeIndexRegister {
     override val indexCode: Byte = 0x04.toByte
   }
 
-  final case object Protected extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
+  case object Protected extends SourceIndex with DoubleWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
   }
 
-  final case object Long extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
+  case object Long extends SourceIndex with QuadWordRegister with ProtectedModeIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
   }
 
-  final case object X64Real extends SourceIndex with WordRegister
+  case object X64Real extends SourceIndex with WordRegister
 
-  final case object LongLowByte extends SourceIndex with LowByteRegister
+  case object LongLowByte extends SourceIndex with LowByteRegister
 }
 
 sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di") {
@@ -237,18 +237,18 @@ sealed abstract class DestinationIndex extends GeneralPurposeRegister(0x07, "di"
 }
 
 object DestinationIndex {
-  final case object Real extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
+  case object Real extends DestinationIndex with WordRegister with CombinableRealModeIndexRegister {
     override val defaultSegment: SegmentRegister = Segment.Extra
     override val indexCode: Byte = 0x05.toByte
   }
 
-  final case object Protected extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
+  case object Protected extends DestinationIndex with DoubleWordRegister with ProtectedModeIndexRegister
 
-  final case object Long extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
+  case object Long extends DestinationIndex with QuadWordRegister with ProtectedModeIndexRegister
 
-  final case object X64Real extends DestinationIndex with WordRegister
+  case object X64Real extends DestinationIndex with WordRegister
 
-  final case object LongLowByte extends DestinationIndex with LowByteRegister
+  case object LongLowByte extends DestinationIndex with LowByteRegister
 }
 
 sealed abstract class Rex8 extends GeneralPurposeRexRegister(0x00, "r8") {

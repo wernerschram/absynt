@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "3.3.1"
 ThisBuild / organization := "org.werner"
 ThisBuild / licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
 
@@ -11,6 +11,7 @@ val spec2Version = "4.7.0"
 
 ThisBuild / scalacOptions ++= Seq(
 	"-feature",
+//  "-explain",
   "-unchecked",
   "-deprecation",
 	"-Wunused:imports" // required by `RemoveUnused` rule
@@ -58,7 +59,7 @@ lazy val absyntX86 = (project in file("absynt.x86"))
 .settings(
   name := "absynt.x86",
   publishMavenStyle := false,
-  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+//  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
   libraryDependencies += "org.scalatest" %% "scalatest" % testVersion % Test,
 ).dependsOn(absynt)
 

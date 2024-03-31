@@ -27,15 +27,15 @@ trait NoModRM extends ModRMBytes {
 }
 
 // TODO: There should also be an option to create a disp32 ModRM: a displacement without operand (the value at an absolute address)
-class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
+class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand & Size,
                      override val code: Seq[Byte],
                      val rValue: Byte,
                      override val mnemonic: String,
                      val operandRMOrder: OperandOrder,
                      includeRexW: Boolean = true)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
-  extends X86Operation(code) with ModRMBytes {
+  extends X86Operation(code), ModRMBytes {
 
-  self: X86Operation with DisplacementBytes with ImmediateBytes =>
+  self: X86Operation & DisplacementBytes & ImmediateBytes =>
 
   override def modRMBytes: Seq[Byte] = operandRM.getExtendedBytes(rValue)
 
@@ -43,13 +43,13 @@ class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand with Size,
     super.allOperands + OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW)
 }
 
-class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister with Size,
-                                operandRM: ModRMEncodableOperand with Size,
+class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister & Size,
+                                operandRM: ModRMEncodableOperand & Size,
                                 override val code: Seq[Byte],
                                 override val mnemonic: String,
                                 override val operandRMOrder: OperandOrder)
                                (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
-  extends ModRM(operandRM, code, register.registerOrMemoryModeCode, mnemonic, operandRMOrder) with NoDisplacement with NoImmediate {
+  extends ModRM(operandRM, code, register.registerOrMemoryModeCode, mnemonic, operandRMOrder), NoDisplacement, NoImmediate {
 
   def operandROrder: OperandOrder =
     if (operandRMOrder == destination) source else destination
@@ -59,13 +59,13 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister with Size,
 }
 
 class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
-                                             operandRM: ModRMEncodableOperand with Size,
+                                             operandRM: ModRMEncodableOperand & Size,
                                              override val code: Seq[Byte],
                                              override val mnemonic: String,
                                              override val operandRMOrder: OperandOrder)
                                             (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerCode, mnemonic, operandRMOrder) {
-  self: X86Operation with DisplacementBytes with ImmediateBytes =>
+  self: X86Operation & DisplacementBytes & ImmediateBytes =>
 
   def operandSegmentOrder: OperandOrder =
     if (operandRMOrder == destination) source else destination

@@ -18,7 +18,6 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
-import scala.reflect.runtime.universe._
 
 object Stack {
 
@@ -93,7 +92,7 @@ object Stack {
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize): ModRM[ModRMEncodableOperand with RMMaxSize] with NoDisplacement with NoImmediate =
+      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
         new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
 
@@ -106,13 +105,15 @@ object Stack {
       def apply[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
         R16(register)
 
-      def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand with Size) =
         RM16(operand)
 
-      def apply[Size <: ImmMaxSize: TypeTag](immediate: ImmediateValue[_] with Size): X86Operation = {
-        typeOf[Size] match {
-          case t if t <:< typeOf[ImmediateValue[_] with ByteSize] => Imm8(immediate.asInstanceOf[ImmediateValue[_] with ByteSize])
-          case t if t <:< typeOf[WordDoubleQuadSize] => Imm16(immediate.asInstanceOf[ImmediateValue[_] with ImmExtendedMaxSize])
+      def apply[Size <: ImmMaxSize](immediate: ImmediateValue[_] with Size): X86Operation = {
+        immediate match {
+          case i: ImmediateValue[_] with ByteSize => 
+            Imm8(immediate.asInstanceOf[ImmediateValue[_] with ByteSize])
+          case i: ImmediateValue[_] with WordDoubleQuadSize =>
+            Imm16(immediate.asInstanceOf[ImmediateValue[_] with ImmExtendedMaxSize])
         }
       }
     }
@@ -139,7 +140,7 @@ object Stack {
     type RMMaxSize <: MaxWideSize
 
     sealed class PopOperations {
-      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize): ModRM[ModRMEncodableOperand with RMMaxSize] with NoDisplacement with NoImmediate =
+      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
         new ModRM(operand, 0x8F.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
       protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
@@ -197,7 +198,7 @@ object Stack {
           super.allOperands + OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
-      def apply(operand: ModRMEncodableOperand with RMMaxSize): X86Operation =
+      def apply(operand: ModRMEncodableOperand with RMMaxSize) =
         RM16(operand)
 
       def apply[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =

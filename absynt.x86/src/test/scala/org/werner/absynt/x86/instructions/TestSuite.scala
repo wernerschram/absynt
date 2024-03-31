@@ -127,16 +127,16 @@ class TestSuite extends AnyWordSpec with Matchers {
       import ProcessorMode.Long._
 
       "correctly encode test QWORD PTR [0x11111111], 0x44332211" in {
-        Test(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).encodeByte should be(Hex.lsb("67 48 F7 05 11 11 11 11 11 22 33 44"))
+        Test(0x44332211, MemoryAddress[QuadWordSize](doubleWordImm(0x11111111))).encodeByte should be(Hex.lsb("67 48 F7 05 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Test(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).toString shouldBe "test QWORD PTR [286331153], 1144201745"
+        Test(0x44332211, MemoryAddress[QuadWordSize](doubleWordImm(0x11111111))).toString shouldBe "test QWORD PTR [286331153], 1144201745"
       }
 
       "throw an AssertionError for test WORD PTR [0x11111111], 0x44332211" in {
         an[AssertionError] should be thrownBy {
-          Test(0x44332211, MemoryAddress[WordSize](0x11111111))
+          Test(0x44332211, MemoryAddress[WordSize](quadWordImm(0x11111111)))
         }
       }
 
