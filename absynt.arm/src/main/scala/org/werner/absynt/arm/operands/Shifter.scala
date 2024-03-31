@@ -150,7 +150,7 @@ object Shifter {
       RightRotateImmediate(immediate, 0)
 
     implicit def shifterForImmediate(immediate: Int): RightRotateImmediate = {
-      val rotateValue = (0 to 30 by 2).find { x => (Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x) }
+      val rotateValue = Range.inclusive(0, 30, 2).find { x => (Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x) }
       assume(rotateValue.isDefined)
 
       val rotate = rotateValue.get.toByte
@@ -161,7 +161,7 @@ object Shifter {
       if (value == 0)
         return Nil
 
-      val shift = (minRotate to 30 by 2).find { x => ((value >>> x) & 0x03) != 0 }.get.toByte
+      val shift = Range.inclusive(minRotate, 30, 2).find { x => ((value >>> x) & 0x03) != 0 }.get.toByte
       val intermediateValue = value >>> shift
       val rotate: Byte = if (shift == 0) 0 else (32 - shift).toByte
 

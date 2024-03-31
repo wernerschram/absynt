@@ -19,7 +19,7 @@ import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations._
 import org.werner.absynt.resource.{AbsoluteReference, RelativeReference, UnlabeledEncodable}
 
-class DataProcessing(val code: Byte, val opcode: String) {
+class DataProcessing private (val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Condition.Always): DataProcessingOperation =
     RegAndShifterToReg(source1, source2, destination, condition)
 
@@ -70,7 +70,7 @@ object DataProcessing {
           AddCarry(source1, 0, destination, condition)
         else {
           val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
-          EncodableCollection(apply(source1, shifters.head, destination, condition) +:
+          EncodableCollection(AddCarry(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Add(destination, value, destination, condition)))
         }
     }
@@ -82,7 +82,7 @@ object DataProcessing {
           EncodableCollection(Nil)
         else {
           val shifters = immediateShifter(source2)
-          EncodableCollection(apply(source1, shifters.head, destination, condition) +:
+          EncodableCollection(Add(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Add(destination, value, destination, condition)))
         }
 
@@ -149,7 +149,7 @@ object DataProcessing {
           Move(0, destination, condition)
         else {
           val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
-          EncodableCollection(apply(shifters.head, destination, condition) +:
+          EncodableCollection(Move(shifters.head, destination, condition) +:
             shifters.tail.map(value => Or(destination, value, destination, condition)))
         }
 
@@ -177,7 +177,7 @@ object DataProcessing {
           EncodableCollection(Nil)
         else {
           val shifters: Seq[RightRotateImmediate] = immediateShifter(source2)
-          EncodableCollection(apply(source1, shifters.head, destination, condition) +:
+          EncodableCollection(Or(source1, shifters.head, destination, condition) +:
             shifters.tail.map(value => Or(destination, value, destination, condition)))
         }
     }

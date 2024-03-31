@@ -26,7 +26,7 @@ trait RelativeOffset {
   self: ArmOffset =>
 }
 
-sealed case class ArmRelativeOffset private(override val offset: Int) extends ArmOffset(offset) with RelativeOffset
+sealed case class ArmRelativeOffset(override val offset: Int) extends ArmOffset(offset) with RelativeOffset
 
 object ArmRelativeOffset {
   implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection): ArmOffset with RelativeOffset =
