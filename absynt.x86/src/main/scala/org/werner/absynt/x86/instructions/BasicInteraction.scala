@@ -22,7 +22,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 object BasicInteraction {
 
   sealed trait Common {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
     protected def Imm8ToAL(immediateValue: ImmediateValue[_] with ByteSize, opcodeBase: Byte, mnemonic: String): X86Operation =
       new Static((opcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
         protected override def allOperands: Set[OperandInfo[_]] =
@@ -129,7 +129,7 @@ object BasicInteraction {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed class I8086BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends BasicInteraction[MaxValueSize](opcodeBase, mnemonic) {
       def apply(immediate: ImmediateValue[_] with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
@@ -162,7 +162,7 @@ object BasicInteraction {
   }
 
   trait I386Operations extends Common {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
 
     sealed class I386BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends BasicInteraction[MaxValueSize](opcodeBase, mnemonic) {
       def apply(immediate: ImmediateValue[_] with ByteSize, destination: Accumulator.LowByte.type): X86Operation =
@@ -199,7 +199,7 @@ object BasicInteraction {
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with OperandSizeInfo =>
+    self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed class X64BasicInteraction(opcodeBase: Byte, extensionCode: Byte, mnemonic: String) extends BasicInteraction[MaxValueSize](opcodeBase, mnemonic) {
       def apply(immediate: ImmediateValue[_] with DoubleWordSize, destination: Accumulator.DoubleWord.type): X86Operation =

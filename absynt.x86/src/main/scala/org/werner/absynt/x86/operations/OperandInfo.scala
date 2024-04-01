@@ -13,8 +13,9 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.{ArchitectureBounds, RexRequirement}
-import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode, RexRequirement}
+import org.werner.absynt.x86.operands.*
+
 import scala.language.implicitConversions
 
 case class OperandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement)
@@ -22,7 +23,7 @@ case class OperandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit va
 case class OperandWithSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement, val addressSizePrefixRequirement: AddressSizePrefixRequirement)
 
 trait OperandSizeInfo {
-  self: ArchitectureBounds =>
+  self: ArchitectureBounds & ProcessorMode =>
   implicit def operandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
     OperandWithOperandSizePrefixInfo(operand)
 

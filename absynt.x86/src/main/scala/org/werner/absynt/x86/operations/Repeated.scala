@@ -14,19 +14,19 @@
 package org.werner.absynt.x86.operations
 
 trait Repeated {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & DisplacementBytes & ImmediateBytes =>
   override val optionalRepeatPrefix: List[Byte] = 0xF3.toByte :: Nil
   override val optionalRepeatPrefixString = "rep "
 }
 
 trait RepeatEqual {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & DisplacementBytes & ImmediateBytes =>
   override val optionalRepeatPrefix: List[Byte] = 0xF3.toByte :: Nil
   override val optionalRepeatPrefixString = "repe "
 }
 
 trait RepeatNotEqual {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & DisplacementBytes & ImmediateBytes =>
   override val optionalRepeatPrefix: List[Byte] = 0xF2.toByte :: Nil
   override val optionalRepeatPrefixString = "repne "
 }

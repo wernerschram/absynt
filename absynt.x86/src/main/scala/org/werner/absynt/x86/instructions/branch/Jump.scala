@@ -24,7 +24,7 @@ import org.werner.absynt.x86.operations.{ModRM, NoDisplacement, NoImmediate, Ope
 
 object Jump {
   trait Common {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
@@ -86,7 +86,7 @@ object Jump {
   }
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo  =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) {
@@ -171,7 +171,7 @@ object Jump {
   }
 
   trait RealOperations extends Common {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
 
     sealed abstract class ShortOrLongRelativeJumpReal(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
@@ -255,7 +255,7 @@ object Jump {
   }
 
   trait ProtectedOperations extends Common {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
 
     sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
@@ -340,7 +340,7 @@ object Jump {
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with OperandSizeInfo  =>
+    self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo =>
 
     abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) {

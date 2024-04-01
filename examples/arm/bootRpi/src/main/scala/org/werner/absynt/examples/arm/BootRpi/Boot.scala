@@ -68,7 +68,7 @@ object Boot extends App {
   }
 
   private def halt() = {
-    val label: UniqueLabel = Label.unique
+    val label = Label.unique
     Branch(label).label(label)
   }
 

@@ -18,7 +18,7 @@ import org.werner.absynt.x86.operands.{FarPointerSize, ModRMEncodableOperand, Va
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 
 sealed trait DisplacementBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   def displacementBytes: Seq[Byte]
 
@@ -26,19 +26,19 @@ sealed trait DisplacementBytes {
 }
 
 trait NoDisplacement extends DisplacementBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & ImmediateBytes =>
   override def displacementBytes: Seq[Byte] = Nil
 }
 
 trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
-  self: ModRM[Size] =>
+  self: X86Operation & ModRM[Size] & ImmediateBytes =>
   val operandRM: ModRMEncodableOperand with Size
 
   override def displacementBytes: Seq[Byte] = Nil
 }
 
 trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   def pointer: OperandWithOperandSizePrefixInfo[FarPointerType[OffsetSize] with FarPointerSize[OffsetSize]]
 
@@ -49,7 +49,7 @@ trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
 }
 
 trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   def pointer: OperandWithOperandSizePrefixInfo[NearPointerType with Size]
   def pointerOrder: OperandOrder
@@ -61,7 +61,7 @@ trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
 }
 
 trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   def location: OperandWithSizePrefixInfo[MemoryLocationType with Size]
   def offsetOrder: OperandOrder

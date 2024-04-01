@@ -20,7 +20,7 @@ sealed abstract class Register extends Operand {
 }
 
 sealed abstract class GeneralPurposeRegister(val registerCode: Byte, val mnemonic: String)
-  extends Register with ModRMEncodableOperand {
+  extends Register, ModRMEncodableOperand {
   self: ValueSize =>
   val modValue: Byte = 0x03.toByte
   val registerOrMemoryModeCode: Byte = registerCode
@@ -40,22 +40,22 @@ sealed trait RegisterReference {
 }
 
 sealed trait IndexRegister extends RegisterReference {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister & ValueSize =>
 }
 
 sealed trait RealModeIndexRegister extends IndexRegister {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister & ValueSize =>
 }
 
 sealed trait CombinableRealModeIndexRegister extends RealModeIndexRegister {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister & ValueSize =>
 
   def +(base: BaseRegisterReference): BaseIndexReference =
     base.combinedIndex(this)
 }
 
 sealed trait BaseRegisterReference extends ModRMEncodableOperand {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister & ValueSize =>
 
   def combinedIndex(index: CombinableRealModeIndexRegister): BaseIndexReference
 
@@ -64,7 +64,7 @@ sealed trait BaseRegisterReference extends ModRMEncodableOperand {
 }
 
 sealed trait ProtectedModeIndexRegister extends IndexRegister {
-  self: GeneralPurposeRegister =>
+  self: GeneralPurposeRegister & ValueSize =>
   override val indexCode: Byte = self.registerOrMemoryModeCode
 }
 

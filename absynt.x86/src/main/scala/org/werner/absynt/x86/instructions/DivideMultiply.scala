@@ -13,16 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.ArchitectureBounds
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 import org.werner.absynt.x86.operands.{ByteSize, ModRMEncodableOperand}
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
-import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
+import org.werner.absynt.x86.operations.*
 
 object DivideMultiply {
 
 
   trait Operations {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds & ProcessorMode =>
 
 
     private def RM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =

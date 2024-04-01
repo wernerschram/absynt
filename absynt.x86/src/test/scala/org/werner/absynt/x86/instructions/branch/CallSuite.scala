@@ -22,6 +22,7 @@ import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
+import scala.language.implicitConversions
 
 class CallSuite extends AnyWordSpec with Matchers {
   "a Call instruction" when {

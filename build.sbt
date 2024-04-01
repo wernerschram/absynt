@@ -14,7 +14,6 @@ ThisBuild / scalacOptions ++= Seq(
 //  "-explain",
   "-unchecked",
   "-deprecation",
-	"-Wunused:imports" // required by `RemoveUnused` rule
 )
 
 git.useGitDescribe := true

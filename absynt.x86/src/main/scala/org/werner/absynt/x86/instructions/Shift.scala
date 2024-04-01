@@ -13,21 +13,22 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.ArchitectureBounds
-import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
+import org.werner.absynt.x86.operands.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.OperandOrder
-import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.operations.*
+import scala.language.implicitConversions
 
 object Shift {
 
   trait Operations {
-    self: ArchitectureBounds with OperandSizeInfo with ImmediateValue.I8086Implicits =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo & ImmediateValue.I8086Implicits =>
 
     protected def OneToRM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM[ByteSize](operand, 0xD0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
-          super.allOperands + OperandInfo.implicitOperand(byteImm(1), OperandOrder.source)(noOperandSizePrefixRequirement)
+          super.allOperands + OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
     protected def CLToRM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
@@ -45,7 +46,7 @@ object Shift {
     protected def OneToRM16(operand: ModRMEncodableOperand with WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM[WordDoubleQuadSize](operand, 0xD1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
-          super.allOperands + OperandInfo.implicitOperand(byteImm(1), OperandOrder.source)(noOperandSizePrefixRequirement)
+          super.allOperands + OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
     protected def CLToRM16[Size <: MaxWideSize](operand: ModRMEncodableOperand with Size, extensionCode: Byte, mnemonic: String): X86Operation =

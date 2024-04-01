@@ -20,7 +20,7 @@ import org.werner.absynt.x86.operations._
 
 object System {
   sealed trait Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds & ProcessorMode =>
 
 
     def staticEnter(): Static =
@@ -43,12 +43,12 @@ object System {
   }
 
   trait ProtectedOperations extends Common {
-    self: ProcessorMode.I386Bounds =>
+    self: ProcessorMode.I386Bounds & ProcessorMode =>
 
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds =>
+    self: ProcessorMode.LongBounds & ProcessorMode =>
 
     def staticCall(): Static =
       new Static(0x0F.toByte :: 0x05.toByte :: Nil, "syscall") with NoDisplacement with NoImmediate

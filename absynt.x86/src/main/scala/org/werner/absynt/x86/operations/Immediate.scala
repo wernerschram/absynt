@@ -17,18 +17,18 @@ import org.werner.absynt.x86.operands.{ImmediateValue, ValueSize}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 
 sealed trait ImmediateBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & DisplacementBytes =>
   def immediateBytes: Seq[Byte]
   protected override def allOperands: Set[OperandInfo[_]]
 }
 
 trait NoImmediate extends ImmediateBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & DisplacementBytes =>
   override def immediateBytes: Seq[Byte] = Nil
 }
 
 trait Immediate[Size<:ValueSize] extends ImmediateBytes {
-  self: X86Operation =>
+  self: X86Operation & ModRMBytes & DisplacementBytes =>
 
   def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size]
   def immediateOrder: OperandOrder

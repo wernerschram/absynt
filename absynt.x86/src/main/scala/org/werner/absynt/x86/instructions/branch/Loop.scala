@@ -25,7 +25,7 @@ import org.werner.absynt.x86.operations.{NoImmediate, OperandSizeInfo, OperandWi
 object Loop {
 
   trait Operations {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed abstract class LoopOperations(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 

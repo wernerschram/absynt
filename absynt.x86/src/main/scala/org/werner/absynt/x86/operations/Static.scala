@@ -16,5 +16,5 @@ package org.werner.absynt.x86.operations
 abstract class Static(override val code: Seq[Byte], override val mnemonic: String)
   extends X86Operation(code), NoModRM {
 
-  self: X86Operation with DisplacementBytes with ImmediateBytes =>
+  self: DisplacementBytes & ImmediateBytes =>
 }

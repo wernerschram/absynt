@@ -27,7 +27,7 @@ object Move extends I8086GenericRegisters {
   implicit val mnemonic: String = "mov"
 
   sealed trait Common {
-    self: ArchitectureBounds with OperandSizeInfo  =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo  =>
 
     trait BasicMove {
 
@@ -181,17 +181,17 @@ object Move extends I8086GenericRegisters {
   }
 
   sealed trait I8086 extends Common {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo  =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo  =>
     sealed trait I8086Move extends BasicMove
   }
 
   sealed trait I386 extends Common {
-    self: ProcessorMode.I386Bounds  with OperandSizeInfo =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
     sealed trait I386Move extends BasicMove
   }
 
   trait LegacyOperations extends I8086 {
-    self: ProcessorMode.LegacyBounds with ImmediateValue.I8086Implicits  with OperandSizeInfo =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo =>
     object Move extends I8086Move {
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize): AbsoluteReference =
         new MoveForLabel(targetLabel) {
@@ -204,7 +204,7 @@ object Move extends I8086GenericRegisters {
   }
 
   trait RealOperations extends I386 {
-    self: ProcessorMode.I386Bounds with ImmediateValue.I8086Implicits with OperandSizeInfo  =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo  =>
     object Move extends I386Move {
 
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize): AbsoluteReference =
@@ -218,7 +218,7 @@ object Move extends I8086GenericRegisters {
   }
 
   trait ProtectedOperations extends I386 {
-    self: ProcessorMode.I386Bounds with ImmediateValue.I386Implicits  with OperandSizeInfo =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & ImmediateValue.I386Implicits & OperandSizeInfo  =>
     object Move extends I386Move {
 
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with DoubleWordSize): AbsoluteReference =
@@ -232,7 +232,7 @@ object Move extends I8086GenericRegisters {
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with ImmediateValue.X64Implicits with OperandSizeInfo  =>
+    self: ProcessorMode.LongBounds & ProcessorMode & ImmediateValue.X64Implicits & OperandSizeInfo  =>
     object Move extends BasicMove {
       def forLabel(targetLabel: Label, register: GeneralPurposeRegister with QuadWordSize): AbsoluteReference =
         new MoveForLabel(targetLabel) {

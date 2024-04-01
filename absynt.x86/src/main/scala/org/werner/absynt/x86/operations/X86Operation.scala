@@ -18,7 +18,7 @@ import org.werner.absynt.x86.RexRequirement
 import org.werner.absynt.x86.operands._
 
 abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
-  self: ModRMBytes with DisplacementBytes with ImmediateBytes =>
+  self: ModRMBytes & DisplacementBytes & ImmediateBytes =>
   final def prefixes: Seq[Byte] =
     optionalRepeatPrefix ++
       optionalSegmentOverridePrefix ++

@@ -18,10 +18,10 @@ import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 
-object IO extends {
+object IO {
 
   trait Common {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed trait I8086Input {
       val mnemonic: String = "in"
@@ -122,14 +122,14 @@ object IO extends {
 
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo =>
 
     object Input extends I8086Input
     object Output extends I8086Output
   }
 
   trait I386Operations extends Common {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed trait I386Input extends I8086Input {
       private def Imm8ToEAX(immediateValue: ImmediateValue[_] with ByteSize) =
@@ -185,7 +185,7 @@ object IO extends {
   }
 
   trait LongOperations extends I386Operations {
-    self: ProcessorMode.LongBounds with OperandSizeInfo =>
+    self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo =>
   }
 
 }

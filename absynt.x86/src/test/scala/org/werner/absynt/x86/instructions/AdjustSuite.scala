@@ -17,6 +17,7 @@ import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class AdjustSuite extends AnyWordSpec with Matchers {
 

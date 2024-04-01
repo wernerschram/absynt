@@ -25,7 +25,7 @@ import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImm
 object Call {
 
   sealed trait CallOperations {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     sealed trait BaseCall {
 
@@ -63,7 +63,7 @@ object Call {
   }
 
   sealed trait ReturnOperations {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     object Return {
 
@@ -107,7 +107,7 @@ object Call {
   }
 
   trait LegacyOperations extends ReturnOperations with CallOperations {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo =>
 
     object Call extends BaseCall {
 
@@ -139,7 +139,7 @@ object Call {
   }
 
   trait RealOperations extends ReturnOperations with CallOperations {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
 
     object Call extends BaseCall {
 
@@ -182,7 +182,7 @@ object Call {
   }
 
   trait ProtectedOperations extends ReturnOperations with CallOperations {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
 
     object Call extends BaseCall {
 
@@ -225,7 +225,7 @@ object Call {
   }
 
   trait LongOperations extends ReturnOperations with CallOperations {
-    self: ProcessorMode.LongBounds with OperandSizeInfo =>
+    self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo =>
 
     object Call extends BaseCall {
 

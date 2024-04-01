@@ -22,6 +22,7 @@ import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, W
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class MoveSuite extends AnyWordSpec with Matchers {
 
@@ -66,7 +67,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
         Move(BH, RegisterMemoryLocation[ByteSize](SI+BP, 0x7D.toByte)).toString should be("mov BYTE PTR [bp+si+125], bh")
       }
 
-     "correctly encode mov WORD PTR [bp], bp" in {
+      "correctly encode mov WORD PTR [bp], bp" in {
         Move(BP, RegisterMemoryLocation[WordSize](BP)).encodeByte should be(Hex.lsb("89 6E 00"))
       }
 
@@ -390,7 +391,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
         Move(EBP, RegisterMemoryLocation[DoubleWordSize](EDX)).toString should be("mov DWORD PTR [edx], ebp")
       }
 
-     "correctly encode mov DWORD PTR [ebp], ebp" in {
+      "correctly encode mov DWORD PTR [ebp], ebp" in {
         Move(EBP, RegisterMemoryLocation[DoubleWordSize](EBP)).encodeByte should be(Hex.lsb("89 6D 00"))
       }
 
@@ -592,7 +593,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
         withClue("Move") { encodables(move).encodeByte should be(Hex.lsb("48 BB 02 00 00 03 00 00 00 00")) }
       }
 
-     "correctly represent mov r14d, 2018915346 as a string" in {
+      "correctly represent mov r14d, 2018915346 as a string" in {
         Move[DoubleWordSize](0x78563412, R14D).toString should be("mov r14d, 2018915346")
       }
 

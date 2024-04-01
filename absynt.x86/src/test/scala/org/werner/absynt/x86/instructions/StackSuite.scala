@@ -19,6 +19,7 @@ import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operands.{DoubleWordSize, QuadWordSize, WordSize}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class StackSuite extends AnyWordSpec with Matchers {
 

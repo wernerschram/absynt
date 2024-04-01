@@ -13,21 +13,21 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, _}
+import org.werner.absynt.x86.ProcessorMode
+import org.werner.absynt.x86.operands.*
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, *}
 
 sealed trait ModRMBytes {
-  self: X86Operation =>
   def modRMBytes: Seq[Byte]
 }
 
 trait NoModRM extends ModRMBytes {
-  self: X86Operation =>
+  self: X86Operation & DisplacementBytes & ImmediateBytes =>
   override def modRMBytes: Seq[Byte] = Nil
 }
 
 // TODO: There should also be an option to create a disp32 ModRM: a displacement without operand (the value at an absolute address)
-class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand & Size,
+abstract class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand & Size,
                      override val code: Seq[Byte],
                      val rValue: Byte,
                      override val mnemonic: String,
@@ -35,7 +35,7 @@ class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand & Size,
                      includeRexW: Boolean = true)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends X86Operation(code), ModRMBytes {
 
-  self: X86Operation & DisplacementBytes & ImmediateBytes =>
+  self: DisplacementBytes & ImmediateBytes =>
 
   override def modRMBytes: Seq[Byte] = operandRM.getExtendedBytes(rValue)
 

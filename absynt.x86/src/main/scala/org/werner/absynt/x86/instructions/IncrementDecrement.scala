@@ -21,7 +21,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 object IncrementDecrement {
 
   sealed trait Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds & ProcessorMode =>
 
     private def RM8(operand: ModRMEncodableOperand with ByteSize, rValue: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xFE.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
@@ -41,7 +41,7 @@ object IncrementDecrement {
   }
 
   sealed trait Shorter extends Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds & ProcessorMode =>
 
     private def R16[Size <: MaxWideSize](register: GeneralPurposeRegister with Size, opcodeBase: Byte, mnemonic: String) =
       new RegisterEncoded[Size](register, Seq(opcodeBase), mnemonic) with NoDisplacement with NoImmediate {
@@ -66,21 +66,21 @@ object IncrementDecrement {
   }
 
   sealed trait NoShorter extends Common {
-    self: ArchitectureBounds =>
+    self: ArchitectureBounds & ProcessorMode =>
 
     object Increment extends BaseOperation(0, "inc")
     object Decrement extends BaseOperation(1, "dec")
   }
 
   trait LegacyOperations extends Shorter {
-    self: ProcessorMode.LegacyBounds =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode =>
   }
 
   trait I386Operations extends Shorter {
-    self: ProcessorMode.I386Bounds =>
+    self: ProcessorMode.I386Bounds & ProcessorMode =>
   }
 
   trait LongOperations extends NoShorter {
-    self: ProcessorMode.LongBounds =>
+    self: ProcessorMode.LongBounds & ProcessorMode =>
   }
 }

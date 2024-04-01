@@ -22,7 +22,7 @@ import org.werner.absynt.x86.operations._
 object Stack {
 
   sealed trait PushCommon {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     type RMMaxSize <: MaxWideSize
     type ImmMaxSize <: MaxValueSize
@@ -133,7 +133,7 @@ object Stack {
   }
 
   sealed trait PopCommon {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     private val mnemonic: String = "pop"
 
@@ -221,7 +221,7 @@ object Stack {
   }
 
   trait LegacyOperations extends PushCommon with PopCommon {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo  =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo  =>
 
     override type RMMaxSize = WordSize
     override type ImmMaxSize = ByteWordSize
@@ -252,7 +252,7 @@ object Stack {
   }
 
   trait I386Operations extends PushCommon with PopCommon {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo  =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo  =>
 
     override type RMMaxSize = WordDoubleSize
     override type ImmMaxSize = ByteWordDoubleSize
@@ -307,7 +307,7 @@ object Stack {
   }
 
   trait LongOperations extends PushCommon with PopCommon {
-    self: ProcessorMode.LongBounds with OperandSizeInfo =>
+    self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo  =>
 
     type RMMaxSize = WordQuadSize
     override type ImmMaxSize = ByteWordDoubleSize

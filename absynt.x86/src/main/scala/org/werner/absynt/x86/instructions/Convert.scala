@@ -21,7 +21,7 @@ import org.werner.absynt.x86.operations._
 object Convert {
 
   sealed trait Common {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     protected def ALToAX(): X86Operation =
       new Static(0x98.toByte :: Nil, "cbw") with NoDisplacement with NoImmediate {
@@ -61,7 +61,7 @@ object Convert {
   }
 
   trait LegacyOperations extends Common {
-    self: ProcessorMode.LegacyBounds with OperandSizeInfo =>
+    self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo =>
 
     object Convert {
       object ScaleUp {
@@ -75,7 +75,7 @@ object Convert {
   }
 
   trait I386Operations extends Common {
-    self: ProcessorMode.I386Bounds with OperandSizeInfo =>
+    self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo =>
 
     object Convert {
       object ScaleUp {
@@ -91,7 +91,7 @@ object Convert {
   }
 
   trait LongOperations extends Common {
-    self: ProcessorMode.LongBounds with OperandSizeInfo =>
+    self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo =>
 
     object Convert {
       object ScaleUp {

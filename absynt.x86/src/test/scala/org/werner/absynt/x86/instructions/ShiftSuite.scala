@@ -19,6 +19,7 @@ import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
 import org.werner.absynt.x86.operands.memoryaccess._
+import scala.language.implicitConversions
 
 class ShiftSuite extends AnyWordSpec with Matchers {
 

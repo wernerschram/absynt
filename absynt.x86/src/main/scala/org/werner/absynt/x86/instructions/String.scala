@@ -13,16 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.ArchitectureBounds
-import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
+import org.werner.absynt.x86.operands.*
 import org.werner.absynt.x86.operands.memoryaccess.{DestinationReference, SourceReference}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
-import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.operations.*
 
 object String {
 
   trait Operations {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
     protected def Static8(operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {

@@ -24,6 +24,7 @@ import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.X86Operation
+import scala.language.implicitConversions
 
 class JumpSuite extends AnyWordSpec with Matchers {
 

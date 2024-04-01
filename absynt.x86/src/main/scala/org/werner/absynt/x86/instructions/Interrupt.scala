@@ -17,15 +17,16 @@ import org.werner.absynt.x86.operands.{ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
+import scala.language.implicitConversions
 
 object Interrupt {
   sealed trait BaseOperations {
-    self: ArchitectureBounds with ImmediateValue.I8086Implicits with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo =>
 
     protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[_]] =
-          super.allOperands + OperandInfo.implicitOperand(byteImm(interrupt), destination)(noOperandSizePrefixRequirement)
+          super.allOperands + OperandInfo.implicitOperand(interrupt, destination)(noOperandSizePrefixRequirement)
       }
 
     protected def Imm8(immediateValue: ImmediateValue[_] with ByteSize, mnemonic: String): X86Operation =
@@ -41,7 +42,7 @@ object Interrupt {
   }
 
   trait LegacyRealProtectedOperations extends BaseOperations {
-    self: ArchitectureBounds with ImmediateValue.I8086Implicits with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo =>
     object Interrupt {
       val mnemonic: String = "int"
 
@@ -55,7 +56,7 @@ object Interrupt {
   }
 
   trait LongOperations extends BaseOperations {
-    self: ProcessorMode.LongBounds with ImmediateValue.I8086Implicits with OperandSizeInfo =>
+    self: ProcessorMode.LongBounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo =>
     object Interrupt {
       val mnemonic: String = "int"
 

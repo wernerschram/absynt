@@ -33,10 +33,10 @@ object ImmediateValue {
 
   def unapply[S:Integral](immediateValue: ImmediateValue[S]): Option[S] = Some(immediateValue.value)
 
-  type ValueToByteImmediate = Byte => ImmediateValue[Byte] with ByteSize
-  type ValueToWordImmediate = Short => ImmediateValue[Short] with WordSize
-  type ValueToDoubleWordImmediate = Int => ImmediateValue[Int] with DoubleWordSize
-  type ValueToQuadWordImmediate = Long => ImmediateValue[Long] with QuadWordSize
+  type ValueToByteImmediate = Conversion[Byte, ImmediateValue[Byte] with ByteSize]
+  type ValueToWordImmediate = Conversion[Short, ImmediateValue[Short] with WordSize]
+  type ValueToDoubleWordImmediate = Conversion[Int, ImmediateValue[Int] with DoubleWordSize]
+  type ValueToQuadWordImmediate = Conversion[Long, ImmediateValue[Long] with QuadWordSize]
 
   val byteImmediate: ValueToByteImmediate = value => new ImmediateValue(value) with ByteSize {}
   val wordImmediate: ValueToWordImmediate = value => new ImmediateValue(value) with WordSize {}

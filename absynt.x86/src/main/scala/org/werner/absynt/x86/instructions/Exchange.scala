@@ -13,16 +13,16 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt.x86.ArchitectureBounds
-import org.werner.absynt.x86.operands._
+import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
+import org.werner.absynt.x86.operands.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.OperandOrder
-import org.werner.absynt.x86.operations._
+import org.werner.absynt.x86.operations.*
 
 object Exchange {
 
   trait Operations {
-    self: ArchitectureBounds with OperandSizeInfo =>
+    self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
     private val mnemonic = "xchg"
 
     private def AxToR16[Size <: MaxWideSize](source: AccumulatorRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
