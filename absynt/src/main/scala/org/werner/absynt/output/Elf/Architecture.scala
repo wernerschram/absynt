@@ -103,12 +103,12 @@ abstract case class Endianness private(id: Byte) {
 case object Endianness {
 
   import org.werner.absynt.ListExtensions._
- object LittleEndian extends Endianness(0x01.toByte) {
+  object LittleEndian extends Endianness(0x01.toByte) {
     override def encode(value: Short): Seq[Byte] = value.encodeLittleEndian
     override def encode(value: Int): Seq[Byte] = value.encodeLittleEndian
     override def encode(value: Long): Seq[Byte] = value.encodeLittleEndian
 
-   override def toString: String = "LittleEndian"
+    override def toString: String = "LittleEndian"
   }
 
   object BigEndian extends Endianness(0x02.toByte) {

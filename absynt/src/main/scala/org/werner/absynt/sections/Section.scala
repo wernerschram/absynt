@@ -24,28 +24,22 @@ abstract class Section protected(val name: String, val alignment: Int) {
   def precedingResources(target: Label): Seq[Resource] = content.takeWhile(!matchLabel(_, target))
 
   private def matchResourceOrLabel(resource: Resource, target: Resource, label: Label): Boolean =
-    (resource == target) || (resource match {
-      case l: Labeled => l.label.matches(label) || l.resource == target
-      case _ => false
-    })
+    resource == target || resource.isInstanceOf[Labeled] && {
+      val l = resource.asInstanceOf[Labeled]
+      l.label.matches(label) || l.resource == target
+    }
 
   private def matchResourceAndLabel(resource: Resource, target: Resource, label: Label): Boolean =
-    resource match {
-      case l: Labeled => l.label.matches(label) && l.resource == target
-      case _ => false
+    resource.isInstanceOf[Labeled] && {
+      val l = resource.asInstanceOf[Labeled]
+      l.label.matches(label) && l.resource == target
     }
 
   private def matchLabel(resource: Resource, label: Label): Boolean =
-    resource match {
-      case l: Labeled => l.label.matches(label)
-      case _ => false
-    }
+    resource.isInstanceOf[Labeled] && resource.asInstanceOf[Labeled].label.matches(label)
 
   private def matchResource(resource: Resource, target: Resource): Boolean =
-    (resource == target) || (resource match {
-      case l: Labeled => l.resource == target
-      case _ => false
-    })
+    (resource == target) || resource.isInstanceOf[Labeled] && resource.asInstanceOf[Labeled].resource == target
 
   /** returns all resources between a relative reference and it's target. If it is a back reference, it will include the target
     *

@@ -30,10 +30,8 @@ abstract class RelativeReference() extends UnlabeledDependentResource {
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
     val section = context.sections.filter(s => s.content.exists(r =>
-        (r == this) || (r match {
-          case l: Labeled => l.resource == this
-          case _ => false
-        }))).head
+      (r == this) || (r.isInstanceOf[Labeled] && r.asInstanceOf[Labeled].resource == this)
+    )).head
 
     (section.intermediateResources(this), section.offsetDirection(this))
   }
