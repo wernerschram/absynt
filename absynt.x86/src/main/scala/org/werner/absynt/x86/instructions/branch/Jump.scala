@@ -29,21 +29,24 @@ object Jump {
     sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
       protected def Rel8(nearPointer: NearPointer & ByteSize): Static & NearPointerOperation[ByteSize] & NoImmediate =
-        new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & ByteSize] = nearPointer
-          override def pointerOrder: OperandOrder = destination
-        }
+        new Static(shortOpcode, mnemonic) 
+          with NearPointerOperation[ByteSize](nearPointer, destination) 
+          with NoImmediate
 
       protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
-        new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
+        new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) 
+          with NoDisplacement 
+          with NoImmediate
 
       protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
-        new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate {
-          override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] & FarPointerSize[Size]] = operandWithOperandSizePrefixInfo(farPointer)
-        }
+        new Static(0xEA.toByte :: Nil, mnemonic) 
+          with FarPointerOperation[Size](operandWithOperandSizePrefixInfo(farPointer))
+          with NoImmediate
 
       protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =
-        new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
+        new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) 
+          with NoDisplacement 
+          with NoImmediate
     }
 
     sealed abstract class ShortRelativeJump(shortOpcode: Seq[Byte], mnemonic: String)

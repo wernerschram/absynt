@@ -37,10 +37,8 @@ trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
   override def displacementBytes: Seq[Byte] = Nil
 }
 
-trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
+trait FarPointer[OffsetSize<:WordDoubleSize](pointer: OperandWithOperandSizePrefixInfo[FarPointerType[OffsetSize] & FarPointerSize[OffsetSize]]) extends DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
-
-  def pointer: OperandWithOperandSizePrefixInfo[FarPointerType[OffsetSize] & FarPointerSize[OffsetSize]]
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =
     super.allOperands + OperandInfo.pointer(pointer.operand, destination)(pointer.operandSizePrefixRequirement)
@@ -48,11 +46,8 @@ trait FarPointer[OffsetSize<:WordDoubleSize] extends DisplacementBytes {
   override def displacementBytes: Seq[Byte] = pointer.operand.encodeByte
 }
 
-trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
+trait NearPointer[Size<:ValueSize](pointer: OperandWithOperandSizePrefixInfo[NearPointerType & Size], pointerOrder: OperandOrder) extends DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
-
-  def pointer: OperandWithOperandSizePrefixInfo[NearPointerType & Size]
-  def pointerOrder: OperandOrder
 
   override def displacementBytes: Seq[Byte] = pointer.operand.encodeBytes
 

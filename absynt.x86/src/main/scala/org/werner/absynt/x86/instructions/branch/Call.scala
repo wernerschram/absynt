@@ -32,32 +32,30 @@ object Call {
       val mnemonic = "call"
       val opcode: Seq[Byte] = Seq(0xe8.toByte)
 
-      protected def Rel16(nearPointer: NearPointer & WordSize): Static & NearPointerOperation[WordSize] & NoImmediate = {
-        new Static(opcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & WordSize] = nearPointer
+      protected def Rel16(nearPointer: NearPointer & WordSize): Static & NearPointerOperation[WordSize] & NoImmediate = 
+        new Static(opcode, mnemonic) 
+          with NearPointerOperation[WordSize](nearPointer, destination) 
+          with NoImmediate 
 
-          override def pointerOrder: OperandOrder = destination
-        }
-      }
-
-      protected def Rel32(nearPointer: NearPointer & DoubleWordSize): Static & NearPointerOperation[DoubleWordSize] & NoImmediate = {
-        new Static(opcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & DoubleWordSize] = nearPointer
-
-          override def pointerOrder: OperandOrder = destination
-        }
-      }
+      protected def Rel32(nearPointer: NearPointer & DoubleWordSize): Static & NearPointerOperation[DoubleWordSize] & NoImmediate =
+        new Static(opcode, mnemonic) 
+          with NearPointerOperation[DoubleWordSize](nearPointer, destination) 
+          with NoImmediate
 
       protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
-        new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) with NoDisplacement with NoImmediate
+        new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) 
+          with NoDisplacement 
+          with NoImmediate
 
       protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
-        new Static(0x9A.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate {
-          override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] & FarPointerSize[Size]] = farPointer
-        }
+        new Static(0x9A.toByte :: Nil, mnemonic) 
+          with FarPointerOperation[Size](farPointer)
+          with NoImmediate
 
       protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =
-        new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
+        new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) 
+          with NoDisplacement 
+          with NoImmediate
     }
 
   }
