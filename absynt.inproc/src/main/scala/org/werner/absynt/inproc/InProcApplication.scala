@@ -13,10 +13,10 @@
 
 package org.werner.absynt.inproc
 
-import com.sun.jna._
+import com.sun.jna.*
 import org.werner.absynt.inproc.InProcApplication.ReturnType
-import org.werner.absynt.resource.EncodableConversion._
-import org.werner.absynt.resource.{AlignmentFiller, Encodable, Labeled, Resource}
+import org.werner.absynt.resource.EncodableConversion.*
+import org.werner.absynt.resource.{AlignmentFiller, Encodable, Labeled, LabeledEncodable, Resource}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.{Application, Label}
 import sun.misc.Unsafe
@@ -55,7 +55,7 @@ class InProcApplication(val sections: Seq[Section]) extends Application with Aut
   Libc.mprotect(new Pointer(startAddress), contentLength + pageSize - contentLength % pageSize, Libc.Protection.Read | Libc.Protection.Exec)
 
   val labelPointers: Map[Label, Pointer] = encodableContent.foldLeft((startAddress, Map.empty[Label, Pointer])){
-    case ((lastOffset, labels), encodable: Encodable with Labeled) => (lastOffset + encodable.size, labels + (encodable.label -> new Pointer(lastOffset)))
+    case ((lastOffset, labels), encodable: LabeledEncodable) => (lastOffset + encodable.size, labels + (encodable.label -> new Pointer(lastOffset)))
     case ((lastOffset, labels), encodable: Encodable) => (lastOffset + encodable.size, labels)
   }._2
 
@@ -86,7 +86,7 @@ class InProcApplication(val sections: Seq[Section]) extends Application with Aut
 }
 
 object InProcApplication {
-   sealed abstract class ReturnType[Out] {
+  sealed abstract class ReturnType[Out] {
     def invoke(function: Function, params: Array[AnyRef]): Out
   }
 
