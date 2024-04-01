@@ -26,15 +26,13 @@ object Exchange {
     private val mnemonic = "xchg"
 
     private def AxToR16[Size <: MaxWideSize](source: AccumulatorRegister & Size, destination: GeneralPurposeRegister & Size): X86Operation =
-      new RegisterEncoded(destination, 0x90.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        override def registerOrder: OperandOrder = OperandOrder.destination
+      new RegisterEncoded(destination, 0x90.toByte :: Nil, OperandOrder.destination, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(source, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
     private def R16ToAX[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: AccumulatorRegister & Size): X86Operation =
-      new RegisterEncoded(source, 0x90.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        override def registerOrder: OperandOrder = OperandOrder.source
+      new RegisterEncoded(source, 0x90.toByte :: Nil, OperandOrder.source, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(destination, OperandOrder.destination)(noOperandSizePrefixRequirement)
       }

@@ -85,9 +85,7 @@ object Stack {
         new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size](immediateValue, destination)
 
       protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
-        new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), mnemonic) with NoDisplacement with NoImmediate {
-          override def registerOrder: OperandOrder = destination
-        }
+        new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), destination, mnemonic) with NoDisplacement with NoImmediate
 
       protected def RM16(operand: ModRMEncodableOperand & RMMaxSize) =
         new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
@@ -138,9 +136,7 @@ object Stack {
         new ModRM(operand, 0x8F.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
       protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
-        new RegisterEncoded[RMMaxSize](register, Seq(0x58.toByte), mnemonic) with NoDisplacement with NoImmediate {
-          override def registerOrder: OperandOrder = destination
-        }
+        new RegisterEncoded[RMMaxSize](register, Seq(0x58.toByte), destination, mnemonic) with NoDisplacement with NoImmediate
 
       protected def StaticSS(): X86Operation = new Static(0x17.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         protected override def allOperands: Set[OperandInfo[?]] =

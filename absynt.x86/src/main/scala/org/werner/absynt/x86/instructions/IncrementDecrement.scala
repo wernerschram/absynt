@@ -44,9 +44,7 @@ object IncrementDecrement {
     self: ArchitectureBounds & ProcessorMode =>
 
     private def R16[Size <: MaxWideSize](register: GeneralPurposeRegister & Size, opcodeBase: Byte, mnemonic: String) =
-      new RegisterEncoded[Size](register, Seq(opcodeBase), mnemonic) with NoDisplacement with NoImmediate {
-      override def registerOrder: OperandOrder = destination
-    }
+      new RegisterEncoded[Size](register, Seq(opcodeBase), destination, mnemonic) with NoDisplacement with NoImmediate
 
     trait ShorterOperation {
       self: BaseOperation =>
