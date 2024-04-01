@@ -3,13 +3,11 @@ inThisBuild(
     scalaVersion := "3.4.1",
     organization := "org.werner",
     licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0")),
-    semanticdbEnabled := true, // enable SemanticDB
+    semanticdbEnabled := true,
     scalacOptions ++= Seq(
       "-feature",
       "-new-syntax",
-      "-rewrite",
-      "-source", "3.4-migration",
-      //  "-explain",
+      "-source", "3.4",
       "-unchecked",
       "-deprecation",
     )
