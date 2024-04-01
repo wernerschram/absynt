@@ -26,34 +26,39 @@ object Shift {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo & ImmediateValue.I8086Implicits =>
 
     protected def OneToRM8(operand: ModRMEncodableOperand & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[ByteSize](operand, 0xD0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(noOperandSizePrefixRequirement)
-      }
+      new ModRM[ByteSize](operand, 0xD0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+        with NoDisplacement
+        with NoImmediate
+        with ExtraOperands(OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(noOperandSizePrefixRequirement))
 
     protected def CLToRM8(operand: ModRMEncodableOperand & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[ByteSize](operand, 0xD2.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(Count.LowByte, OperandOrder.source)(noOperandSizePrefixRequirement)
-      }
+      new ModRM[ByteSize](operand, 0xD2.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+        with NoDisplacement
+        with NoImmediate
+        with ExtraOperands(OperandInfo.implicitOperand(Count.LowByte, OperandOrder.source)(noOperandSizePrefixRequirement))
 
     protected def Imm8ToRM8(immediateValue: ImmediateValue[Byte] & ByteSize, operand: ModRMEncodableOperand & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[ByteSize](operand, 0xC0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with Immediate[ByteSize](immediateValue, OperandOrder.source)
+      new ModRM[ByteSize](operand, 0xC0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+        with NoDisplacement
+        with Immediate[ByteSize](immediateValue, OperandOrder.source)
 
     protected def OneToRM16(operand: ModRMEncodableOperand & WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[WordDoubleQuadSize](operand, 0xD1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(noOperandSizePrefixRequirement)
-      }
+      new ModRM[WordDoubleQuadSize](operand, 0xD1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+        with NoDisplacement
+        with NoImmediate
+        with ExtraOperands(OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(noOperandSizePrefixRequirement))
+      
 
     protected def CLToRM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[Size](operand, 0xD3.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(Count.LowByte, OperandOrder.source)(noOperandSizePrefixRequirement)
-      }
+      new ModRM[Size](operand, 0xD3.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+        with NoDisplacement
+        with NoImmediate
+        with ExtraOperands(OperandInfo.implicitOperand(Count.LowByte, OperandOrder.source)(noOperandSizePrefixRequirement))
 
     protected def Imm8ToRM16(immediateValue: ImmediateValue[Byte] & ByteSize, operand: ModRMEncodableOperand & WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[WordDoubleQuadSize](operand, 0xC1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with Immediate[ByteSize](immediateValue, OperandOrder.source)
+      new ModRM[WordDoubleQuadSize](operand, 0xC1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+        with NoDisplacement
+        with Immediate[ByteSize](immediateValue, OperandOrder.source)
 
     sealed abstract class ShiftInstruction(extensionCode: Byte, mnemonic: String) {
       def apply[Size <: MaxValueSize](immediateValue: ImmediateValue[Byte] & ByteSize, destination: ModRMEncodableOperand & Size): X86Operation = {

@@ -24,60 +24,69 @@ object String {
   trait Operations {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
-    protected def Static8(operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
+    protected def Static8(operand: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(operand :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with ExtraOperands(staticOperands*)
 
-    protected def Static16[Size <: MaxWideSize](operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
+    protected def Static16[Size <: MaxWideSize](operand: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(operand :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with ExtraOperands(staticOperands*)
 
-    protected def RepStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
 
-    protected def RepStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
+    protected def RepStatic8(opcode: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(opcode :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with Repeated
+        with ExtraOperands(staticOperands*)
 
-    protected def RepEStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
 
-    protected def RepEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
+    protected def RepStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(opcode :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with Repeated
+        with ExtraOperands(staticOperands*)
 
-    protected def RepNEStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
 
-    protected def RepNEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands ++ staticOperands
-      }
+    protected def RepEStatic8(opcode: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(opcode :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with RepeatEqual
+        with ExtraOperands(staticOperands*)
+
+    protected def RepEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(opcode :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with RepeatEqual
+        with ExtraOperands(staticOperands*)
+
+    protected def RepNEStatic8(opcode: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(opcode :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with RepeatNotEqual
+        with ExtraOperands(staticOperands*)
+
+    protected def RepNEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Seq[OperandInfo[?]]): X86Operation =
+      new Static(opcode :: Nil, mnemonic)
+        with NoDisplacement
+        with NoImmediate
+        with RepeatNotEqual
+        with ExtraOperands(staticOperands*)
 
     object InString {
       private val byteOpcode = 0x6C.toByte
       private val wideOpcode = 0x6D.toByte
       private val mnemonic = "ins"
 
-      private def operands[Size <: MaxValueSize](destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
+      private def operands[Size <: MaxValueSize](destination: DestinationReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(Data.Word, OperandOrder.source)(noOperandSizePrefixRequirement)
       )
@@ -105,7 +114,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](
         source: SourceReference & Size,
-        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
+        destination: DestinationReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitAddress(source, OperandOrder.source),
       )
@@ -136,7 +145,7 @@ object String {
       private val wideOpcode = 0x6F.toByte
       private val mnemonic = "outs"
 
-      private def operands[Size <: MaxValueSize](source: SourceReference & Size): Set[OperandInfo[?]] = Set(
+      private def operands[Size <: MaxValueSize](source: SourceReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitOperand(Data.Word, OperandOrder.destination)(noOperandSizePrefixRequirement),
         OperandInfo.implicitAddress(source, OperandOrder.source),
       )
@@ -164,7 +173,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](
         source: SourceReference & Size,
-        destination: AccumulatorRegister & Size): Set[OperandInfo[?]] = Set(
+        destination: AccumulatorRegister & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(source, OperandOrder.source),
         OperandInfo.implicitOperand(destination, OperandOrder.destination)
       )
@@ -194,7 +203,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](
         source: AccumulatorRegister & Size,
-        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
+        destination: DestinationReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(source, OperandOrder.source)
       )
@@ -227,7 +236,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](
         source: SourceReference & Size,
-        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
+        destination: DestinationReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(source, OperandOrder.source)
       )
@@ -273,7 +282,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](
         source: AccumulatorRegister & Size,
-        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
+        destination: DestinationReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(source, OperandOrder.source)
       )

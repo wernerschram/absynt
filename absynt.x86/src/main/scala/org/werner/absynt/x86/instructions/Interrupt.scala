@@ -24,13 +24,15 @@ object Interrupt {
     self: ArchitectureBounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo =>
 
     protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String): X86Operation =
-      new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(interrupt, destination)(noOperandSizePrefixRequirement)
-      }
+      new Static(opcode :: Nil, mnemonic) 
+        with NoDisplacement 
+        with NoImmediate 
+        with ExtraOperands(OperandInfo.implicitOperand(interrupt, destination)(noOperandSizePrefixRequirement))
 
     protected def Imm8(immediateValue: ImmediateValue[?] & ByteSize, mnemonic: String): X86Operation =
-      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), destination)
+      new Static(0xCD.toByte :: Nil, mnemonic) 
+        with NoDisplacement 
+        with Immediate[ByteSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), destination)
 
     object InterruptReturn {
       def apply(): X86Operation =

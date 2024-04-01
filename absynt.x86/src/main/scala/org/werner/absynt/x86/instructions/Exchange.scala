@@ -26,16 +26,16 @@ object Exchange {
     private val mnemonic = "xchg"
 
     private def AxToR16[Size <: MaxWideSize](source: AccumulatorRegister & Size, destination: GeneralPurposeRegister & Size): X86Operation =
-      new RegisterEncoded(destination, 0x90.toByte :: Nil, OperandOrder.destination, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(source, OperandOrder.source)(noOperandSizePrefixRequirement)
-      }
+      new RegisterEncoded(destination, 0x90.toByte :: Nil, OperandOrder.destination, mnemonic)
+        with NoDisplacement 
+        with NoImmediate 
+        with ExtraOperands(OperandInfo.implicitOperand(source, OperandOrder.source)(noOperandSizePrefixRequirement))
 
     private def R16ToAX[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: AccumulatorRegister & Size): X86Operation =
-      new RegisterEncoded(source, 0x90.toByte :: Nil, OperandOrder.source, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(destination, OperandOrder.destination)(noOperandSizePrefixRequirement)
-      }
+      new RegisterEncoded(source, 0x90.toByte :: Nil, OperandOrder.source, mnemonic) 
+        with NoDisplacement 
+        with NoImmediate 
+        with ExtraOperands(OperandInfo.implicitOperand(destination, OperandOrder.destination)(noOperandSizePrefixRequirement))
 
     private def R16ToRM16[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size) =
       new ModRRM(source, destination, 0x86.toByte :: Nil, mnemonic, OperandOrder.destination)

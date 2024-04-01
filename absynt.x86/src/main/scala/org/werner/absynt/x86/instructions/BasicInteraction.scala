@@ -24,38 +24,44 @@ object BasicInteraction {
   sealed trait Common {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
     protected def Imm8ToAL(immediateValue: ImmediateValue[?] & ByteSize, opcodeBase: Byte, mnemonic: String): X86Operation =
-      new Static((opcodeBase + 0x04).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize](immediateValue, source) {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, destination)
-      }
+      new Static((opcodeBase + 0x04).toByte :: Nil, mnemonic) 
+        with NoDisplacement 
+        with Immediate[ByteSize](immediateValue, source) 
+        with ExtraOperands(OperandInfo.implicitOperand(Accumulator.LowByte, destination))
 
     protected def Imm16ToAX(immediateValue: ImmediateValue[?] & WordSize, opcodeBase: Byte, mnemonic: String): X86Operation =
-      new Static((opcodeBase + 0x05).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize](immediateValue, source) {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, destination)
-      }
+      new Static((opcodeBase + 0x05).toByte :: Nil, mnemonic) 
+        with NoDisplacement 
+        with Immediate[WordSize](immediateValue, source) 
+        with ExtraOperands(OperandInfo.implicitOperand(Accumulator.Word, destination))
 
     protected def Imm32ToEAX(immediateValue: ImmediateValue[?] & DoubleWordSize, opcodeBase: Byte, mnemonic: String): X86Operation =
-      new Static((opcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize](immediateValue, source) {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
-      }
+      new Static((opcodeBase + 0x5).toByte :: Nil, mnemonic) 
+        with NoDisplacement 
+        with Immediate[DoubleWordSize](immediateValue, source) 
+        with ExtraOperands(OperandInfo.implicitOperand(Accumulator.DoubleWord, destination))
 
     protected def Imm32ToRAX(immediateValue: ImmediateValue[?] & DoubleWordSize, opcodeBase: Byte, mnemonic: String): X86Operation =
-      new Static((opcodeBase + 0x5).toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize](immediateValue, source) {
-        protected override def allOperands: Set[OperandInfo[?]] =
-          super.allOperands + OperandInfo.implicitOperand(Accumulator.QuadWord, destination)
-      }
+      new Static((opcodeBase + 0x5).toByte :: Nil, mnemonic) 
+        with NoDisplacement 
+        with Immediate[DoubleWordSize](immediateValue, source) 
+        with ExtraOperands(OperandInfo.implicitOperand(Accumulator.QuadWord, destination))
 
     protected def Imm8ToRM8(operand: ModRMEncodableOperand & ByteSize, immediateValue: ImmediateValue[?] & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM(operand, 0x80.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[ByteSize](immediateValue, source)
+      new ModRM(operand, 0x80.toByte :: Nil, extensionCode, mnemonic, destination) 
+        with NoDisplacement 
+        with Immediate[ByteSize](immediateValue, source)
       
 
     protected def Imm16ToRM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, immediateValue: ImmediateValue[?] & Size, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM(operand, 0x81.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[Size](immediateValue, source)
+      new ModRM(operand, 0x81.toByte :: Nil, extensionCode, mnemonic, destination)
+        with NoDisplacement 
+        with Immediate[Size](immediateValue, source)
 
     protected def Imm8ToRM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, immediateValue: ImmediateValue[?] & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM(operand, 0x83.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with Immediate[ByteSize](immediateValue, source)
+      new ModRM(operand, 0x83.toByte :: Nil, extensionCode, mnemonic, destination) 
+        with NoDisplacement 
+        with Immediate[ByteSize](immediateValue, source)
 
     protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand & ByteSize, opcodeBase: Byte, mnemonic: String): X86Operation =
       new ModRRM(operand1, operand2, (opcodeBase + 0x00).toByte :: Nil, mnemonic, destination)
@@ -70,10 +76,14 @@ object BasicInteraction {
       new ModRRM(operand1, operand2, (opcodeBase + 0x03).toByte :: Nil, mnemonic, source)
 
     protected def RM8(operand: ModRMEncodableOperand & ByteSize, mnemonic: String): X86Operation =
-      new ModRM(operand, 0xF6.toByte :: Nil, 2, mnemonic, destination) with NoDisplacement with NoImmediate
+      new ModRM(operand, 0xF6.toByte :: Nil, 2, mnemonic, destination) 
+        with NoDisplacement 
+        with NoImmediate
 
     protected def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, mnemonic: String): X86Operation =
-      new ModRM(operand, 0xF7.toByte :: Nil, 2, mnemonic, destination) with NoDisplacement with NoImmediate
+      new ModRM(operand, 0xF7.toByte :: Nil, 2, mnemonic, destination) 
+        with NoDisplacement 
+        with NoImmediate
 
     sealed abstract class BasicInteraction[MaxValSize](opcodeBase: Byte, mnemonic: String) {
 

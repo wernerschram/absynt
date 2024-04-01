@@ -13,14 +13,14 @@
 
 package org.werner.absynt.x86.instructions
 
-import org.werner.absynt._
+import org.werner.absynt.*
 import org.werner.absynt.resource.{AbsoluteReference, UnlabeledEncodable}
 import org.werner.absynt.x86.operands.Register.I8086GenericRegisters
-import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
-import org.werner.absynt.x86.operations.{Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo, RegisterEncoded, Static, X86Operation, MemoryLocation => MemoryLocationOperation}
-import org.werner.absynt.x86._
+import org.werner.absynt.x86.operands.*
+import org.werner.absynt.x86.operands.memoryaccess.*
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
+import org.werner.absynt.x86.operations.{ExtraOperands, Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo, RegisterEncoded, Static, X86Operation, MemoryLocation as MemoryLocationOperation}
+import org.werner.absynt.x86.*
 
 object Move extends I8086GenericRegisters {
 
@@ -32,18 +32,23 @@ object Move extends I8086GenericRegisters {
     trait BasicMove {
 
       protected def RM16ToSReg[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand & Size) =
-        new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
+        new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source)
+          with NoDisplacement
+          with NoImmediate
 
       protected def SRegToRM16[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand & Size) =
-        new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
+        new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic, destination)
+          with NoDisplacement
+          with NoImmediate
 
       protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand & ByteSize) =
         new ModRRM(operand1, operand2, 0x88.toByte :: Nil, mnemonic, destination)
 
       protected def ALToMOffs8(memoryLocation: MemoryLocation & ByteSize): X86Operation =
-        new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[?]] =
-            super.allOperands + OperandInfo.implicitOperand(AL, source)
+        new Static(0xA2.toByte :: Nil, mnemonic)
+          with MemoryLocationOperation[ByteSize]
+          with NoImmediate
+          with ExtraOperands(OperandInfo.implicitOperand(AL, source)) {
 
           override val location: OperandWithSizePrefixInfo[MemoryLocation & ByteSize] = memoryLocation
 
@@ -55,10 +60,10 @@ object Move extends I8086GenericRegisters {
         new ModRRM(operand1, operand2, 0x89.toByte :: Nil, mnemonic, destination)
 
       protected def AXToMOffs16[Size <: MaxWideSize](accumulatorRegister: AccumulatorRegister & Size, memoryLocation: MemoryLocation & Size): X86Operation =
-        new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[?]] =
-            super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, source)
-
+        new Static(0xA3.toByte :: Nil, mnemonic)
+          with MemoryLocationOperation[Size]
+          with NoImmediate
+          with ExtraOperands(OperandInfo.implicitOperand(accumulatorRegister, source)) {
           override val location: OperandWithSizePrefixInfo[MemoryLocation & Size] = memoryLocation
 
           override def offsetOrder: OperandOrder = destination
@@ -68,9 +73,10 @@ object Move extends I8086GenericRegisters {
         new ModRRM(operand1, operand2, 0x8A.toByte :: Nil, mnemonic, source)
 
       protected def MOffs8ToAL(memoryLocation: MemoryLocation & ByteSize): X86Operation =
-        new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[?]] =
-            super.allOperands + OperandInfo.implicitOperand(AL, destination)
+        new Static(0xA0.toByte :: Nil, mnemonic)
+          with MemoryLocationOperation[ByteSize]
+          with NoImmediate
+          with ExtraOperands(OperandInfo.implicitOperand(AL, destination)) {
 
           override val location: OperandWithSizePrefixInfo[MemoryLocation & ByteSize] = memoryLocation
 
@@ -81,9 +87,10 @@ object Move extends I8086GenericRegisters {
         new ModRRM(operand1, operand2, 0x8B.toByte :: Nil, mnemonic, source)
 
       protected def MOffs16ToAX[Size <: MaxWideSize](memoryLocation: MemoryLocation & Size, accumulatorRegister: AccumulatorRegister & Size): X86Operation =
-        new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[?]] =
-            super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, destination)
+        new Static(0xA1.toByte :: Nil, mnemonic)
+          with MemoryLocationOperation[Size]
+          with NoImmediate
+          with ExtraOperands(OperandInfo.implicitOperand(accumulatorRegister, destination)) {
 
           override val location: OperandWithSizePrefixInfo[MemoryLocation & Size] = memoryLocation
 
@@ -91,16 +98,24 @@ object Move extends I8086GenericRegisters {
         }
 
       protected def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue[?] & ByteSize): X86Operation =
-        new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), destination, mnemonic) with NoDisplacement with Immediate[ByteSize](immediateValue, source)
+        new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), destination, mnemonic)
+          with NoDisplacement
+          with Immediate[ByteSize](immediateValue, source)
 
       protected def Imm16ToR16[Size <: MaxWideSize](register: GeneralPurposeRegister & Size, immediateValue: ImmediateValue[?] & Size): X86Operation =
-        new RegisterEncoded[Size](register, Seq(0xB8.toByte), destination, mnemonic) with NoDisplacement with Immediate[Size](immediateValue, source)
+        new RegisterEncoded[Size](register, Seq(0xB8.toByte), destination, mnemonic)
+          with NoDisplacement
+          with Immediate[Size](immediateValue, source)
 
       protected def Imm8ToRM8(operand: ModRMEncodableOperand & ByteSize, immediateValue: ImmediateValue[?] & ByteSize) =
-        new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[ByteSize](immediateValue, source)
+        new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination)
+          with NoDisplacement
+          with Immediate[ByteSize](immediateValue, source)
 
       protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand & OperandSize, immediateValue: ImmediateValue[?] & OperandSize) =
-        new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[OperandSize](immediateValue, source)
+        new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination)
+          with NoDisplacement
+          with Immediate[OperandSize](immediateValue, source)
 
       sealed abstract class MoveForLabel(targetLabel: Label) extends AbsoluteReference(targetLabel) {
         def size: Int
