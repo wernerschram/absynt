@@ -23,18 +23,18 @@ object IncrementDecrement {
   sealed trait Common {
     self: ArchitectureBounds & ProcessorMode =>
 
-    private def RM8(operand: ModRMEncodableOperand with ByteSize, rValue: Byte, mnemonic: String): X86Operation =
+    private def RM8(operand: ModRMEncodableOperand & ByteSize, rValue: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xFE.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
 
-    private def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand with Size, rValue: Byte, mnemonic: String): X86Operation =
+    private def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, rValue: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xFF.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
 
     abstract class BaseOperation(extension: Byte, val mnemonic: String) {
 
-      def apply[Size <: MaxValueSize](destination: ModRMEncodableOperand with Size): X86Operation = destination match {
-        case d: ModRMEncodableOperand with ByteSize =>
+      def apply[Size <: MaxValueSize](destination: ModRMEncodableOperand & Size): X86Operation = destination match {
+        case d: ByteSize =>
           RM8(d, extension, mnemonic)
-        case d: ModRMEncodableOperand with MaxWideSize @unchecked =>
+        case d: MaxWideSize @unchecked =>
           RM16(d, extension, mnemonic)
       }
     }
@@ -43,7 +43,7 @@ object IncrementDecrement {
   sealed trait Shorter extends Common {
     self: ArchitectureBounds & ProcessorMode =>
 
-    private def R16[Size <: MaxWideSize](register: GeneralPurposeRegister with Size, opcodeBase: Byte, mnemonic: String) =
+    private def R16[Size <: MaxWideSize](register: GeneralPurposeRegister & Size, opcodeBase: Byte, mnemonic: String) =
       new RegisterEncoded[Size](register, Seq(opcodeBase), mnemonic) with NoDisplacement with NoImmediate {
       override def registerOrder: OperandOrder = destination
     }
@@ -52,7 +52,7 @@ object IncrementDecrement {
       self: BaseOperation =>
       val shortOpcodeBase: Byte
 
-      def apply[Size <: MaxWideSize](destination: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](destination: GeneralPurposeRegister & Size): X86Operation =
         R16(destination, shortOpcodeBase, mnemonic)
     }
 

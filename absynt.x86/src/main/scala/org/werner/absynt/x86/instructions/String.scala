@@ -24,51 +24,51 @@ object String {
   trait Operations {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
-    protected def Static8(operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def Static8(operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def Static16[Size <: MaxWideSize](operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def Static16[Size <: MaxWideSize](operand: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(operand :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def RepStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def RepStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def RepStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def RepStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with Repeated {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def RepEStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def RepEStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def RepEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def RepEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatEqual {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def RepNEStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def RepNEStatic8(opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
-    protected def RepNEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[_]]): X86Operation =
+    protected def RepNEStatic16[Size <: MaxWideSize](opcode: Byte, mnemonic: String, staticOperands: Set[OperandInfo[?]]): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate with RepeatNotEqual {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands ++ staticOperands
       }
 
@@ -77,23 +77,23 @@ object String {
       private val wideOpcode = 0x6D.toByte
       private val mnemonic = "ins"
 
-      private def operands[Size <: MaxValueSize](destination: DestinationReference with Size): Set[OperandInfo[_]] = Set(
+      private def operands[Size <: MaxValueSize](destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(Data.Word, OperandOrder.source)(noOperandSizePrefixRequirement)
       )
 
-      def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference with Size): X86Operation =
+      def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference & Size): X86Operation =
         destination match {
-          case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(destination))
-          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(destination))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(destination))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(destination))
         }
 
       object Repeat {
 
-        def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference with Size): X86Operation =
+        def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize => RepStatic8(byteOpcode, mnemonic, operands(destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(destination))
+            case _: ByteSize => RepStatic8(byteOpcode, mnemonic, operands(destination))
+            case _: MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(destination))
           }
       }
     }
@@ -104,29 +104,29 @@ object String {
       private val mnemonic = "movs"
 
       private def operands[Size <: MaxValueSize](
-        source: SourceReference with Size,
-        destination: DestinationReference with Size): Set[OperandInfo[_]] = Set(
+        source: SourceReference & Size,
+        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitAddress(source, OperandOrder.source),
       )
 
       def apply[Size <: MaxValueSize](
-        register: SourceReference with Size,
-        destination: DestinationReference with Size): X86Operation =
+        register: SourceReference & Size,
+        destination: DestinationReference & Size): X86Operation =
         destination match {
-          case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(register, destination))
-          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(register, destination))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(register, destination))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(register, destination))
         }
 
       object Repeat {
 
         def apply[Size <: MaxValueSize](
-          register: SourceReference with Size,
-          destination: DestinationReference with Size): X86Operation =
+          register: SourceReference & Size,
+          destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize =>
+            case _: ByteSize =>
               RepStatic8(byteOpcode, mnemonic, operands(register, destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
+            case _: MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
           }
       }
     }
@@ -136,23 +136,23 @@ object String {
       private val wideOpcode = 0x6F.toByte
       private val mnemonic = "outs"
 
-      private def operands[Size <: MaxValueSize](source: SourceReference with Size): Set[OperandInfo[_]] = Set(
+      private def operands[Size <: MaxValueSize](source: SourceReference & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitOperand(Data.Word, OperandOrder.destination)(noOperandSizePrefixRequirement),
         OperandInfo.implicitAddress(source, OperandOrder.source),
       )
 
-      def apply[Size <: MaxValueSize](source: SourceReference with Size, register: Data.Word.type): X86Operation =
+      def apply[Size <: MaxValueSize](source: SourceReference & Size, register: Data.Word.type): X86Operation =
         source match {
-          case _: SourceReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source))
-          case _: SourceReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(source))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source))
         }
 
       object Repeat {
 
-        def apply[Size <: MaxValueSize](source: SourceReference with Size, register: Data.Word.type): X86Operation =
+        def apply[Size <: MaxValueSize](source: SourceReference & Size, register: Data.Word.type): X86Operation =
           source match {
-            case _: SourceReference with ByteSize => RepStatic8(byteOpcode, mnemonic, operands(source))
-            case _: SourceReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(source))
+            case _: ByteSize => RepStatic8(byteOpcode, mnemonic, operands(source))
+            case _: MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(source))
           }
       }
     }
@@ -163,26 +163,26 @@ object String {
       private val mnemonic = "lods"
 
       private def operands[Size <: MaxValueSize](
-        source: SourceReference with Size,
-        destination: AccumulatorRegister with Size): Set[OperandInfo[_]] = Set(
+        source: SourceReference & Size,
+        destination: AccumulatorRegister & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitAddress(source, OperandOrder.source),
         OperandInfo.implicitOperand(destination, OperandOrder.destination)
       )
 
-      def apply[Size <: MaxValueSize](source: SourceReference with Size, register: AccumulatorRegister with Size): X86Operation =
+      def apply[Size <: MaxValueSize](source: SourceReference & Size, register: AccumulatorRegister & Size): X86Operation =
         source match {
-          case _: SourceReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source, register))
-          case _: SourceReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, register))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(source, register))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, register))
         }
 
       object Repeat {
 
         def apply[Size <: MaxValueSize](
-          source: SourceReference with Size,
-          register: AccumulatorRegister with Size): X86Operation =
+          source: SourceReference & Size,
+          register: AccumulatorRegister & Size): X86Operation =
           source match {
-            case _: SourceReference with ByteSize => RepStatic8(byteOpcode, mnemonic, operands(source, register))
-            case _: SourceReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(source, register))
+            case _: ByteSize => RepStatic8(byteOpcode, mnemonic, operands(source, register))
+            case _: MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(source, register))
           }
       }
     }
@@ -193,29 +193,29 @@ object String {
       private val mnemonic = "stos"
 
       private def operands[Size <: MaxValueSize](
-        source: AccumulatorRegister with Size,
-        destination: DestinationReference with Size): Set[OperandInfo[_]] = Set(
+        source: AccumulatorRegister & Size,
+        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(source, OperandOrder.source)
       )
 
       def apply[Size <: MaxValueSize](
-        register: AccumulatorRegister with Size,
-        destination: DestinationReference with Size): X86Operation =
+        register: AccumulatorRegister & Size,
+        destination: DestinationReference & Size): X86Operation =
         destination match {
-          case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(register, destination))
-          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(register, destination))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(register, destination))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(register, destination))
         }
 
       object Repeat {
 
         def apply[Size <: MaxValueSize](
-          register: AccumulatorRegister with Size,
-          destination: DestinationReference with Size): X86Operation =
+          register: AccumulatorRegister & Size,
+          destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize =>
+            case _: ByteSize =>
               RepStatic8(byteOpcode, mnemonic, operands(register, destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
+            case _: MaxWideSize @unchecked => RepStatic16(wideOpcode, mnemonic, operands(register, destination))
           }
       }
     }
@@ -226,41 +226,41 @@ object String {
       private val mnemonic = "cmps"
 
       private def operands[Size <: MaxValueSize](
-        source: SourceReference with Size,
-        destination: DestinationReference with Size): Set[OperandInfo[_]] = Set(
+        source: SourceReference & Size,
+        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(source, OperandOrder.source)
       )
 
       def apply[Size <: MaxValueSize](
-        source: SourceReference with Size,
-        destination: DestinationReference with Size): X86Operation =
+        source: SourceReference & Size,
+        destination: DestinationReference & Size): X86Operation =
         destination match {
-          case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source, destination))
-          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, destination))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(source, destination))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, destination))
         }
 
       object RepeatEqual {
 
         def apply[Size <: MaxValueSize](
-          source: SourceReference with Size,
-          destination: DestinationReference with Size): X86Operation =
+          source: SourceReference & Size,
+          destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize =>
+            case _: ByteSize =>
               RepEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: MaxWideSize @unchecked => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
 
       object RepeatNotEqual {
 
         def apply[Size <: MaxValueSize](
-          source: SourceReference with Size,
-          destination: DestinationReference with Size): X86Operation =
+          source: SourceReference & Size,
+          destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize =>
+            case _: ByteSize =>
               RepNEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: MaxWideSize @unchecked => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
     }
@@ -272,41 +272,41 @@ object String {
         "s"
 
       private def operands[Size <: MaxValueSize](
-        source: AccumulatorRegister with Size,
-        destination: DestinationReference with Size): Set[OperandInfo[_]] = Set(
+        source: AccumulatorRegister & Size,
+        destination: DestinationReference & Size): Set[OperandInfo[?]] = Set(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
         OperandInfo.implicitOperand(source, OperandOrder.source)
       )
 
       def apply[Size <: MaxValueSize](
-        source: AccumulatorRegister with Size,
-        destination: DestinationReference with Size): X86Operation =
+        source: AccumulatorRegister & Size,
+        destination: DestinationReference & Size): X86Operation =
         destination match {
-          case _: DestinationReference with ByteSize => Static8(byteOpcode, mnemonic, operands(source, destination))
-          case _: DestinationReference with MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, destination))
+          case _: ByteSize => Static8(byteOpcode, mnemonic, operands(source, destination))
+          case _: MaxWideSize @unchecked => Static16(wideOpcode, mnemonic, operands(source, destination))
         }
 
       object RepeatEqual {
 
         def apply[Size <: MaxValueSize](
-          source: AccumulatorRegister with Size,
-          destination: DestinationReference with Size): X86Operation =
+          source: AccumulatorRegister & Size,
+          destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize =>
+            case _: ByteSize =>
               RepEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: MaxWideSize @unchecked => RepEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
 
       object RepeatNotEqual {
 
         def apply[Size <: MaxValueSize](
-          source: AccumulatorRegister with Size,
-          destination: DestinationReference with Size): X86Operation =
+          source: AccumulatorRegister & Size,
+          destination: DestinationReference & Size): X86Operation =
           destination match {
-            case _: DestinationReference with ByteSize =>
+            case _: ByteSize =>
               RepNEStatic8(byteOpcode, mnemonic, operands(source, destination))
-            case _: DestinationReference with MaxWideSize @unchecked => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
+            case _: MaxWideSize @unchecked => RepNEStatic16(wideOpcode, mnemonic, operands(source, destination))
           }
       }
     }

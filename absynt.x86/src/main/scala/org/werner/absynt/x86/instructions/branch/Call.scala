@@ -32,31 +32,31 @@ object Call {
       val mnemonic = "call"
       val opcode: Seq[Byte] = Seq(0xe8.toByte)
 
-      protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
+      protected def Rel16(nearPointer: NearPointer & WordSize): Static & NearPointerOperation[WordSize] & NoImmediate = {
         new Static(opcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with WordSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & WordSize] = nearPointer
 
           override def pointerOrder: OperandOrder = destination
         }
       }
 
-      protected def Rel32(nearPointer: NearPointer with DoubleWordSize): Static with NearPointerOperation[DoubleWordSize] with NoImmediate = {
+      protected def Rel32(nearPointer: NearPointer & DoubleWordSize): Static & NearPointerOperation[DoubleWordSize] & NoImmediate = {
         new Static(opcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with DoubleWordSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & DoubleWordSize] = nearPointer
 
           override def pointerOrder: OperandOrder = destination
         }
       }
 
-      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size): ModRM[ModRMEncodableOperand with Size] with NoDisplacement with NoImmediate =
+      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
         new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
-      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate =
+      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
         new Static(0x9A.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate {
-          override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] with FarPointerSize[Size]] = farPointer
+          override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] & FarPointerSize[Size]] = farPointer
         }
 
-      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize): ModRM[MemoryLocation with WordDoubleQuadSize] with NoDisplacement with NoImmediate =
+      protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =
         new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
     }
 
@@ -72,9 +72,9 @@ object Call {
       private def Static =
         new Static(0xC3.toByte :: Nil, "ret") with NoDisplacement with NoImmediate
 
-      protected def Imm16(immediateValue: ImmediateValue[_] with WordSize): X86Operation =
+      protected def Imm16(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
         new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with WordSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & WordSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
 
           override def immediateOrder: OperandOrder = source
         }
@@ -82,24 +82,24 @@ object Call {
 
       def apply(): X86Operation = Static
 
-      def apply(immediateValue: ImmediateValue[_] with WordSize): X86Operation = Imm16(immediateValue)
+      def apply(immediateValue: ImmediateValue[?] & WordSize): X86Operation = Imm16(immediateValue)
 
       object Far {
         private def Static =
           new Static(0xCB.toByte :: Nil, "retf") with NoDisplacement with NoImmediate
 
-        protected def Imm16(immediateValue: ImmediateValue[_] with WordSize): X86Operation =
+        protected def Imm16(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
           new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize] {
             implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = noOperandSizePrefixRequirement
 
-            override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with WordSize] = immediateValue
+            override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & WordSize] = immediateValue
 
             override def immediateOrder: OperandOrder = source
           }
 
         def apply(): X86Operation = Static
 
-        def apply(immediateValue: ImmediateValue[_] with WordSize): X86Operation = Imm16(immediateValue)
+        def apply(immediateValue: ImmediateValue[?] & WordSize): X86Operation = Imm16(immediateValue)
       }
 
     }
@@ -111,24 +111,24 @@ object Call {
 
     object Call extends BaseCall {
 
-      def apply(nearPointer: NearPointer with WordSize): X86Operation =
+      def apply(nearPointer: NearPointer & WordSize): X86Operation =
         Rel16(nearPointer)
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply(farPointer: FarPointer[WordSize] with FarPointerSize[WordSize]): Static with FarPointerOperation[WordSize] =
+        def apply(farPointer: FarPointer[WordSize] & FarPointerSize[WordSize]): Static & FarPointerOperation[WordSize] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WordSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordSize): X86Operation =
           M1616(pointer)
       }
 
       def apply(targetLabel: Label): RelativeReference = {
         LabelJumpOperation(
           Seq(new JumpOption(3, Short.MinValue, Short.MaxValue) {
-            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+            override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
               Rel16(LongPointer.realMode(offset))
           }),
           mnemonic,
@@ -143,22 +143,22 @@ object Call {
 
     object Call extends BaseCall {
 
-      def apply(nearPointer: NearPointer with WordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & WordDoubleSize): X86Operation =
         nearPointer match {
-          case p: NearPointer with WordSize =>
+          case p: WordSize =>
             Rel16(p)
-          case p: NearPointer with DoubleWordSize =>
+          case p: DoubleWordSize =>
             Rel32(p)
         }
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
           M1616(pointer)
       }
 
@@ -166,11 +166,11 @@ object Call {
         LabelJumpOperation(
           Seq(
             new JumpOption(3, Short.MinValue, Short.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel16(LongPointer.realMode(offset))
             },
             new JumpOption(6, Int.MinValue, Int.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
             }
           ),
@@ -186,22 +186,22 @@ object Call {
 
     object Call extends BaseCall {
 
-      def apply(nearPointer: NearPointer with WordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & WordDoubleSize): X86Operation =
         nearPointer match {
-          case p: NearPointer with WordSize =>
+          case p: WordSize =>
             Rel16(p)
-          case p: NearPointer with DoubleWordSize =>
+          case p: DoubleWordSize =>
             Rel32(p)
         }
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
           M1616(pointer)
       }
 
@@ -209,11 +209,11 @@ object Call {
         LabelJumpOperation(
           Seq(
             new JumpOption(4, Short.MinValue, Short.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel16(LongPointer.realMode(offset))
             },
             new JumpOption(5, Int.MinValue, Int.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
             }
           ),
@@ -229,14 +229,14 @@ object Call {
 
     object Call extends BaseCall {
 
-      def apply(nearPointer: NearPointer with DoubleWordSize): X86Operation =
+      def apply(nearPointer: NearPointer & DoubleWordSize): X86Operation =
         Rel32(nearPointer)
 
-      def apply(operand: ModRMEncodableOperand with QuadWordSize): X86Operation =
+      def apply(operand: ModRMEncodableOperand & QuadWordSize): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size <: MaxWideSize](pointer: MemoryLocation with Size): X86Operation =
+        def apply[Size <: MaxWideSize](pointer: MemoryLocation & Size): X86Operation =
           M1616(pointer)
       }
 
@@ -244,7 +244,7 @@ object Call {
         LabelJumpOperation(
           Seq(
             new JumpOption(5, Int.MinValue, Int.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
             }
           ),

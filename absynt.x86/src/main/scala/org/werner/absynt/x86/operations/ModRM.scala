@@ -39,7 +39,7 @@ abstract class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand & Siz
 
   override def modRMBytes: Seq[Byte] = operandRM.getExtendedBytes(rValue)
 
-  protected override def allOperands: Set[OperandInfo[_]] =
+  protected override def allOperands: Set[OperandInfo[?]] =
     super.allOperands + OperandInfo.rmRegisterOrMemory(operandRM, operandRMOrder, includeRexW)
 }
 
@@ -52,9 +52,9 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister & Size,
   extends ModRM(operandRM, code, register.registerOrMemoryModeCode, mnemonic, operandRMOrder), NoDisplacement, NoImmediate {
 
   def operandROrder: OperandOrder =
-    if (operandRMOrder == destination) source else destination
+    if operandRMOrder == destination then source else destination
 
-  protected override def allOperands: Set[OperandInfo[_]] =
+  protected override def allOperands: Set[OperandInfo[?]] =
     super.allOperands + OperandInfo.rmRegister(register, operandROrder)
 }
 
@@ -68,8 +68,8 @@ class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
   self: X86Operation & DisplacementBytes & ImmediateBytes =>
 
   def operandSegmentOrder: OperandOrder =
-    if (operandRMOrder == destination) source else destination
+    if operandRMOrder == destination then source else destination
 
-  protected override def allOperands: Set[OperandInfo[_]] =
+  protected override def allOperands: Set[OperandInfo[?]] =
     super.allOperands + OperandInfo.rmSegment(register, operandSegmentOrder)
 }

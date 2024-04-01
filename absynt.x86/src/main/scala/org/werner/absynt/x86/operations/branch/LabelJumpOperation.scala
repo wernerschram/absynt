@@ -17,7 +17,7 @@ import org.werner.absynt.{Label, OffsetDirection, RelativeOffsetDirection}
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
 
 abstract class JumpOption(val encodedLength: Int, val minValue: Int, val maxValue: Int) {
-  def encodableForPointer(offset: Int): Resource with UnlabeledEncodable
+  def encodableForPointer(offset: Int): Resource & UnlabeledEncodable
 }
 
 case class LabelJumpOperation(ascendingSizeOptions: Seq[JumpOption], mnemonic: String, target: Label)
@@ -33,10 +33,10 @@ case class LabelJumpOperation(ascendingSizeOptions: Seq[JumpOption], mnemonic: S
     case OffsetDirection.Backward => -distance - jumpSize
   }
 
-  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource with UnlabeledEncodable = {
+  override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): Resource & UnlabeledEncodable = {
     ascendingSizeOptions.map{option =>
       val thisOffset = offset(option.encodedLength, distance, offsetDirection)
-      if (thisOffset >= option.minValue && thisOffset <= option.maxValue) {
+      if thisOffset >= option.minValue && thisOffset <= option.maxValue then {
         Some(option.encodableForPointer(thisOffset))
       } else None
     }.collectFirst{case Some(v) => v}.getOrElse(throw new AssertionError())

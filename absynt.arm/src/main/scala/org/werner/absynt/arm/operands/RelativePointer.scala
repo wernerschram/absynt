@@ -29,7 +29,7 @@ trait RelativeOffset {
 sealed case class ArmRelativeOffset(override val offset: Int) extends ArmOffset(offset) with RelativeOffset
 
 object ArmRelativeOffset {
-  implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection): ArmOffset with RelativeOffset =
+  implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection): ArmOffset & RelativeOffset =
     offsetDirection match {
       case OffsetDirection.Self => ArmRelativeOffset(-8)
       case OffsetDirection.Forward => ArmRelativeOffset((offsetValue - 4).toInt)
@@ -38,7 +38,7 @@ object ArmRelativeOffset {
 
 }
 
-sealed abstract class RelativePointer(val offset: ArmOffset with RelativeOffset) extends Operand {
+sealed abstract class RelativePointer(val offset: ArmOffset & RelativeOffset) extends Operand {
   //offset should be between 3221225472 and -3221225473
   assume(((offset.offset & 0xC0000000) == 0) || ((offset.offset & 0xC0000000) == 0xC0000000))
 
@@ -47,12 +47,12 @@ sealed abstract class RelativePointer(val offset: ArmOffset with RelativeOffset)
   override def toString: String = offset.toString
 }
 
-case class RelativeA32Pointer(override val offset: ArmOffset with RelativeOffset) extends RelativePointer(offset) {
+case class RelativeA32Pointer(override val offset: ArmOffset & RelativeOffset) extends RelativePointer(offset) {
   //offset should be divisible by 4
   assume((offset.offset & 0x00000003) == 0)
 }
 
-case class RelativeThumbPointer(override val offset: ArmOffset with RelativeOffset) extends RelativePointer(offset) {
+case class RelativeThumbPointer(override val offset: ArmOffset & RelativeOffset) extends RelativePointer(offset) {
   //offset should be divisible by 2
   assume((offset.offset & 0x00000001) == 0)
 

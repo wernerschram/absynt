@@ -32,88 +32,88 @@ object Stack {
       private val mnemonic: String = "push"
 
       protected def StaticCS(): X86Operation = new Static(0x0E.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Code, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
       protected def StaticSS(): X86Operation = new Static(0x16.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
       protected def StaticDS(): X86Operation = new Static(0x1E.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
       protected def StaticES(): X86Operation = new Static(0x06.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
       protected def StaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
       protected def StaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
       protected def PrefStaticCS(): X86Operation = new Static(0x0E.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Code, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
       protected def PrefStaticSS(): X86Operation = new Static(0x16.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
       protected def PrefStaticDS(): X86Operation = new Static(0x1E.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
       protected def PrefStaticES(): X86Operation = new Static(0x06.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
       protected def PrefStaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
       protected def PrefStaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
-      protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue[_] with Size): X86Operation =
+      protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue[?] & Size): X86Operation =
         new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & Size] = immediateValue
           override def immediateOrder: OperandOrder = destination
         }
 
-      protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+      protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
         new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), mnemonic) with NoDisplacement with NoImmediate {
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
+      protected def RM16(operand: ModRMEncodableOperand & RMMaxSize) =
         new ModRM(operand, 0xFF.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
 
-      protected def Imm8(immediateValue: ImmediateValue[_] with ByteSize): X86Operation =
+      protected def Imm8(immediateValue: ImmediateValue[?] & ByteSize): X86Operation =
         new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = destination
         }
 
-      def apply[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
         R16(register)
 
-      def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand with Size) =
+      def apply[Size <: RMMaxSize](operand: ModRMEncodableOperand & Size) =
         RM16(operand)
 
-      def apply[Size <: ImmMaxSize](immediate: ImmediateValue[_] with Size): X86Operation = {
+      def apply[Size <: ImmMaxSize](immediate: ImmediateValue[?] & Size): X86Operation = {
         immediate match {
-          case i: ImmediateValue[_] with ByteSize => 
-            Imm8(immediate.asInstanceOf[ImmediateValue[_] with ByteSize])
-          case i: ImmediateValue[_] with WordDoubleQuadSize =>
-            Imm16(immediate.asInstanceOf[ImmediateValue[_] with ImmExtendedMaxSize])
+          case i: ByteSize => 
+            Imm8(immediate.asInstanceOf[ImmediateValue[?] & ByteSize])
+          case i: WordDoubleQuadSize =>
+            Imm16(immediate.asInstanceOf[ImmediateValue[?] & ImmExtendedMaxSize])
         }
       }
     }
@@ -140,68 +140,68 @@ object Stack {
     type RMMaxSize <: MaxWideSize
 
     sealed class PopOperations {
-      protected def RM16(operand: ModRMEncodableOperand with RMMaxSize) =
+      protected def RM16(operand: ModRMEncodableOperand & RMMaxSize) =
         new ModRM(operand, 0x8F.toByte :: Nil, 0x06.toByte, mnemonic, destination) with NoDisplacement with NoImmediate
 
-      protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+      protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
         new RegisterEncoded[RMMaxSize](register, Seq(0x58.toByte), mnemonic) with NoDisplacement with NoImmediate {
           override def registerOrder: OperandOrder = destination
         }
 
       protected def StaticSS(): X86Operation = new Static(0x17.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
       protected def StaticDS(): X86Operation = new Static(0x1F.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
       protected def StaticES(): X86Operation = new Static(0x07.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
       protected def StaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA1.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
       protected def StaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA9.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
       protected def PrefStaticSS(): X86Operation = new Static(0x17.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
       protected def PrefStaticDS(): X86Operation = new Static(0x1F.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
       protected def PrefStaticES(): X86Operation = new Static(0x07.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
       protected def PrefStaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA1.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
       protected def PrefStaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA9.toByte :: Nil, s"${mnemonic}w") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement)
       }
 
-      def apply(operand: ModRMEncodableOperand with RMMaxSize) =
+      def apply(operand: ModRMEncodableOperand & RMMaxSize) =
         RM16(operand)
 
-      def apply[Size <: RMMaxSize](register: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
         R16(register)
     }
 

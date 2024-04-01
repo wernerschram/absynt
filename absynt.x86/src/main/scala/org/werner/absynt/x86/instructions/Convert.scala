@@ -25,37 +25,37 @@ object Convert {
 
     protected def ALToAX(): X86Operation =
       new Static(0x98.toByte :: Nil, "cbw") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, OperandOrder.source)
       }
 
     protected def AXToDXAX(): X86Operation =
       new Static(0x99.toByte :: Nil, "cwd") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, OperandOrder.source)
       }
 
     protected def AXToEAX(): X86Operation =
       new Static(0x98.toByte :: Nil, "cwde") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, OperandOrder.source)
       }
 
     protected def EAXToEDXEAX(): X86Operation =
       new Static(0x99.toByte :: Nil, "cdq") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, OperandOrder.source)
       }
 
     protected def EAXToRAX(): X86Operation =
       new Static(0x98.toByte :: Nil, "cdqe") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.QuadWord, OperandOrder.source)
       }
 
     protected def RAXToRDXRAX(): X86Operation =
       new Static(0x99.toByte :: Nil, "cqo") with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.QuadWord, OperandOrder.source)
       }
   }

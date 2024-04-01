@@ -25,41 +25,41 @@ object Exchange {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
     private val mnemonic = "xchg"
 
-    private def AxToR16[Size <: MaxWideSize](source: AccumulatorRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+    private def AxToR16[Size <: MaxWideSize](source: AccumulatorRegister & Size, destination: GeneralPurposeRegister & Size): X86Operation =
       new RegisterEncoded(destination, 0x90.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         override def registerOrder: OperandOrder = OperandOrder.destination
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(source, OperandOrder.source)(noOperandSizePrefixRequirement)
       }
 
-    private def R16ToAX[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: AccumulatorRegister with Size): X86Operation =
+    private def R16ToAX[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: AccumulatorRegister & Size): X86Operation =
       new RegisterEncoded(source, 0x90.toByte :: Nil, mnemonic) with NoDisplacement with NoImmediate {
         override def registerOrder: OperandOrder = OperandOrder.source
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(destination, OperandOrder.destination)(noOperandSizePrefixRequirement)
       }
 
-    private def R16ToRM16[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size) =
+    private def R16ToRM16[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size) =
       new ModRRM(source, destination, 0x86.toByte :: Nil, mnemonic, OperandOrder.destination)
 
-    private def RM16ToR16[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size) =
+    private def RM16ToR16[Size <: MaxWideSize](source: ModRMEncodableOperand & Size, destination: GeneralPurposeRegister & Size) =
       new ModRRM(destination, source, 0x86.toByte :: Nil, mnemonic, OperandOrder.source)
 
 
 
     object Exchange {
-      def apply[Size <: MaxWideSize](source: AccumulatorRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: AccumulatorRegister & Size, destination: GeneralPurposeRegister & Size): X86Operation =
         AxToR16(source, destination)
 
 
-      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: AccumulatorRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: AccumulatorRegister & Size): X86Operation =
         R16ToAX(source, destination)
 
-      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size): X86Operation =
         R16ToRM16(source, destination)
 
 
-      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand & Size, destination: GeneralPurposeRegister & Size): X86Operation =
         RM16ToR16(source, destination)
     }
   }

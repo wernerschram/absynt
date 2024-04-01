@@ -28,21 +28,21 @@ object Jump {
 
     sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
-      protected def Rel8(nearPointer: NearPointer with ByteSize): Static with NearPointerOperation[ByteSize] with NoImmediate =
+      protected def Rel8(nearPointer: NearPointer & ByteSize): Static & NearPointerOperation[ByteSize] & NoImmediate =
         new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with ByteSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & ByteSize] = nearPointer
           override def pointerOrder: OperandOrder = destination
         }
 
-      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand with Size): ModRM[ModRMEncodableOperand with Size] with NoDisplacement with NoImmediate =
+      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
         new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) with NoDisplacement with NoImmediate
 
-      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] with NoImmediate =
+      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
         new Static(0xEA.toByte :: Nil, mnemonic) with FarPointerOperation[Size] with NoImmediate {
-          override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] with FarPointerSize[Size]] = operandWithOperandSizePrefixInfo(farPointer)
+          override def pointer: OperandWithOperandSizePrefixInfo[FarPointer[Size] & FarPointerSize[Size]] = operandWithOperandSizePrefixInfo(farPointer)
         }
 
-      protected def M1616(operand: MemoryLocation with WordDoubleQuadSize): ModRM[MemoryLocation with WordDoubleQuadSize] with NoDisplacement with NoImmediate =
+      protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =
         new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) with NoDisplacement with NoImmediate
     }
 
@@ -52,7 +52,7 @@ object Jump {
       def apply(targetLabel: Label): RelativeReference = {
         LabelJumpOperation(
           Seq(new JumpOption(2, Byte.MinValue, Byte.MaxValue) {
-            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+            override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
               Rel8(ShortPointer(offset.toByte))
           }),
           mnemonic,
@@ -60,7 +60,7 @@ object Jump {
         )
       }
 
-      def apply(nearPointer: NearPointer with ByteSize): X86Operation =
+      def apply(nearPointer: NearPointer & ByteSize): X86Operation =
         Rel8(nearPointer)
     }
 
@@ -68,17 +68,17 @@ object Jump {
     sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) {
 
-      protected def Rel16(nearPointer: NearPointer with WordSize): Static with NearPointerOperation[WordSize] with NoImmediate = {
+      protected def Rel16(nearPointer: NearPointer & WordSize): Static & NearPointerOperation[WordSize] & NoImmediate = {
         new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with WordSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & WordSize] = nearPointer
 
           override def pointerOrder: OperandOrder = destination
         }
       }
 
-      protected def Rel32(nearPointer: NearPointer with DoubleWordSize): Static with NearPointerOperation[DoubleWordSize] with NoImmediate = {
+      protected def Rel32(nearPointer: NearPointer & DoubleWordSize): Static & NearPointerOperation[DoubleWordSize] & NoImmediate = {
         new Static(longOpcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with DoubleWordSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & DoubleWordSize] = nearPointer
           override def pointerOrder: OperandOrder = destination
         }
       }
@@ -90,17 +90,17 @@ object Jump {
 
     sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) {
-      def apply(nearPointer: NearPointer with ByteWordSize): X86Operation =
+      def apply(nearPointer: NearPointer & ByteWordSize): X86Operation =
         nearPointer match {
-          case p: NearPointer with ByteSize =>
+          case p: ByteSize =>
             Rel8(p)
-          case p: NearPointer with WordSize =>
+          case p: WordSize =>
             Rel16(p)
         }
 
-      private def Rel16(nearPointer: NearPointer with WordSize) = {
+      private def Rel16(nearPointer: NearPointer & WordSize) = {
         new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with WordSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & WordSize] = nearPointer
           override def pointerOrder: OperandOrder = destination
         }
       }
@@ -109,11 +109,11 @@ object Jump {
         LabelJumpOperation(
           Seq(
             new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel8(ShortPointer(offset.toByte))
             },
             new JumpOption(longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel16(LongPointer.realMode(offset))
             },
           ),
@@ -125,14 +125,14 @@ object Jump {
 
     object Jump extends ShortOrLongRelativeJumpLegacy(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply(operand: ModRMEncodableOperand with WordSize): X86Operation =
+      def apply(operand: ModRMEncodableOperand & WordSize): X86Operation =
             RM16(operand)
 
       object Far {
-        def apply(farPointer: FarPointer[WordSize] with FarPointerSize[WordSize]): Static with FarPointerOperation[WordSize] =
+        def apply(farPointer: FarPointer[WordSize] & FarPointerSize[WordSize]): Static & FarPointerOperation[WordSize] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WordSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordSize): X86Operation =
           M1616(pointer)
       }
 
@@ -175,13 +175,13 @@ object Jump {
 
     sealed abstract class ShortOrLongRelativeJumpReal(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
-      def apply(nearPointer: NearPointer with ByteWordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & ByteWordDoubleSize): X86Operation =
         nearPointer match {
-          case p: NearPointer with ByteSize =>
+          case p: ByteSize =>
             Rel8(p)
-          case p: NearPointer with WordSize =>
+          case p: WordSize =>
             Rel16(p)
-          case p: NearPointer with DoubleWordSize =>
+          case p: DoubleWordSize =>
             Rel32(p)
         }
 
@@ -189,15 +189,15 @@ object Jump {
         LabelJumpOperation(
           Seq(
             new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel8(ShortPointer(offset.toByte))
             },
             new JumpOption(longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel16(LongPointer.realMode(offset))
             },
             new JumpOption(1 + longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
             },
           ),
@@ -209,14 +209,14 @@ object Jump {
 
     object Jump extends ShortOrLongRelativeJumpReal(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
           M1616(pointer)
       }
 
@@ -260,13 +260,13 @@ object Jump {
     sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
 
-      def apply(nearPointer: NearPointer with ByteWordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & ByteWordDoubleSize): X86Operation =
         nearPointer match {
-          case p: NearPointer with ByteSize =>
+          case p: ByteSize =>
             Rel8(p)
-          case p: NearPointer with WordSize =>
+          case p: WordSize =>
             Rel16(p)
-          case p: NearPointer with DoubleWordSize =>
+          case p: DoubleWordSize =>
             Rel32(p)
         }
 
@@ -274,15 +274,15 @@ object Jump {
         LabelJumpOperation(
           Seq(
             new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel8(ShortPointer(offset.toByte))
             },
             new JumpOption(1 + longOpcode.length + 2, Short.MinValue, Short.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel16(LongPointer.realMode(offset))
             },
             new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
             },
           ),
@@ -294,14 +294,14 @@ object Jump {
 
     object Jump extends ShortOrLongRelativeJumpProtected(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] with FarPointerSize[Size]): Static with FarPointerOperation[Size] =
+        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation with WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
           M1616(pointer)
       }
 
@@ -344,11 +344,11 @@ object Jump {
 
     abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) {
-      def apply(nearPointer: NearPointer with ByteDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & ByteDoubleSize): X86Operation =
         nearPointer match {
-          case p: NearPointer with ByteSize =>
+          case p: ByteSize =>
             Rel8(p)
-          case p: NearPointer with DoubleWordSize =>
+          case p: DoubleWordSize =>
             Rel32(p)
         }
 
@@ -356,11 +356,11 @@ object Jump {
         LabelJumpOperation(
           Seq(
             new JumpOption(shortOpcode.length + 1, Byte.MinValue, Byte.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel8(ShortPointer(offset.toByte))
             },
             new JumpOption(longOpcode.length + 4, Int.MinValue, Int.MaxValue) {
-              override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+              override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
                 Rel32(LongPointer.protectedMode(offset))
             }
           ),
@@ -372,14 +372,14 @@ object Jump {
 
     object Jump extends ShortOrLongRelativeJumpLong(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply(operand: ModRMEncodableOperand with QuadWordSize): X86Operation =
+      def apply(operand: ModRMEncodableOperand & QuadWordSize): X86Operation =
         RM16(operand)
 
-      def rm(operand: ModRMEncodableOperand with QuadWordSize): X86Operation =
+      def rm(operand: ModRMEncodableOperand & QuadWordSize): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply(pointer: MemoryLocation with WordDoubleQuadSize): X86Operation =
+        def apply(pointer: MemoryLocation & WordDoubleQuadSize): X86Operation =
           M1616(pointer)
       }
     }

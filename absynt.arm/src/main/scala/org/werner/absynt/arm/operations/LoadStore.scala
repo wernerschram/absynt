@@ -20,7 +20,7 @@ import org.werner.absynt.arm.operands.{ImmediateShiftValue, ShiftRegisterWithShi
 import scala.language.implicitConversions
 
 abstract sealed class LoadStoreAddressingType(pBit: Boolean, wBit: Boolean, val opcodeExtension: String) {
-  val bitMask: Int = (if (pBit) 0x01000000 else 0) | (if (wBit) 0x00200000 else 0)
+  val bitMask: Int = (if pBit then 0x01000000 else 0) | (if wBit then 0x00200000 else 0)
 
   final def formatParameters(baseRegister: GeneralRegister, offset: LoadStoreOffset): String =
     formatParameters(baseRegister, offset.toString)
@@ -77,7 +77,7 @@ object LoadStoreOffset {
 
   val noOffset: LoadStoreOffset = apply(0.toShort)
 
-  implicit def apply(offset: Short): LoadStoreOffset = if (offset >= 0)
+  implicit def apply(offset: Short): LoadStoreOffset = if offset >= 0 then
     apply(offset, UpdateDirection.Increment)
   else
     apply((-offset).toShort, UpdateDirection.Decrement)
@@ -113,7 +113,7 @@ object LoadStoreMiscellaneousOffset {
       override def toString: String = s"#${this.updateDirection.sign}$offset"
     }
 
-  implicit def apply(offset: Byte): LoadStoreMiscellaneousOffset = if (offset >= 0)
+  implicit def apply(offset: Byte): LoadStoreMiscellaneousOffset = if offset >= 0 then
     apply(offset, UpdateDirection.Increment)
   else
     apply((-offset).toByte, UpdateDirection.Decrement)
@@ -131,7 +131,7 @@ object LoadStoreMiscellaneousOffset {
 object UpdateDirection {
 
   sealed abstract class UpdateDirection(uBit: Boolean, val sign: String) {
-    val bitMask: Int = if (uBit) 0x00800000 else 0
+    val bitMask: Int = if uBit then 0x00800000 else 0
   }
 
   object Increment extends UpdateDirection(true, "")

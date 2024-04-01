@@ -26,10 +26,10 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
       optionalOperandSizePrefix ++
       optionalRexPrefix
 
-  protected def allOperands: Set[OperandInfo[_]] =
+  protected def allOperands: Set[OperandInfo[?]] =
     Set.empty
 
-  final lazy val operands: Set[OperandInfo[_]] = allOperands
+  final lazy val operands: Set[OperandInfo[?]] = allOperands
 
   override def size: Int = encodeByte.length
 
@@ -48,13 +48,13 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
       operands.flatMap(_.addressOperands).flatMap(_.segmentOverride).flatMap(X86Operation.SegmentOverrideMap.get).toList
 
   private def optionalAddressSizePrefix: List[Byte] =
-    if (operands.flatMap(_.addressOperands).exists(_.requiresAddressSize)) X86Operation.AddressSizeCode :: Nil else Nil
+    if operands.flatMap(_.addressOperands).exists(_.requiresAddressSize) then X86Operation.AddressSizeCode :: Nil else Nil
 
   private def optionalOperandSizePrefix: List[Byte] =
-    if (operands.exists(_.requiresOperandSize)) X86Operation.OperandSizeCode :: Nil else Nil
+    if operands.exists(_.requiresOperandSize) then X86Operation.OperandSizeCode :: Nil else Nil
 
   private def optionalRexPrefix: List[Byte] = {
-    if (rexRequirements.isEmpty)
+    if rexRequirements.isEmpty then
       Nil
     else
       rexRequirements.foldLeft[Byte](X86Operation.RexCode)((value, req) => (value | req.rexBitMask).toByte) :: Nil
@@ -69,7 +69,7 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
 
   override def toString: String = {
     val operandString = operands.toSeq.sorted.map(_.toString).mkString(", ")
-    s"${optionalRepeatPrefixString}$mnemonic${if (operandString.nonEmpty) s" $operandString" else ""}"
+    s"${optionalRepeatPrefixString}$mnemonic${if operandString.nonEmpty then s" $operandString" else ""}"
   }
 }
 

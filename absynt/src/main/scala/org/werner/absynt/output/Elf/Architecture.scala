@@ -61,7 +61,7 @@ abstract sealed case class ProcessorClass private(id: Byte) {
   def sectionHeaderSize: Short
   def numberSize: Byte
 
-  def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): Seq[Byte]
+  def flagBytes(flags: Flags[?])(implicit  endianness: Endianness): Seq[Byte]
   def numberBytes(number: Long)(implicit  endianness: Endianness): Seq[Byte]
   def programHeaderOffsetBytes(implicit endianness: Endianness): Seq[Byte]
   def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): Seq[Byte]
@@ -74,7 +74,7 @@ case object ProcessorClass {
     override val sectionHeaderSize: Short = 0x28
     override val numberSize: Byte = 4
 
-    override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(flags.encode.toInt)
+    override def flagBytes(flags: Flags[?])(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(flags.encode.toInt)
     override def numberBytes(number: Long)(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(number.toInt)
     override def programHeaderOffsetBytes(implicit endianness: Endianness): Seq[Byte] = endianness.encode(headerSize.toInt)
     override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): Seq[Byte] =
@@ -86,7 +86,7 @@ case object ProcessorClass {
     override val sectionHeaderSize: Short = 0x40
     override val numberSize: Byte = 8
 
-    override def flagBytes(flags: Flags[_])(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(flags.encode)
+    override def flagBytes(flags: Flags[?])(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(flags.encode)
     override def numberBytes(number: Long)(implicit  endianness: Endianness): Seq[Byte] = endianness.encode(number)
     override def programHeaderOffsetBytes(implicit endianness: Endianness): Seq[Byte] = endianness.encode(headerSize.toLong)
     override def sectionHeaderOffsetBytes(headerCount: Int)(implicit endianness: Endianness): Seq[Byte] =

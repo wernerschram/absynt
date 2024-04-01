@@ -39,10 +39,10 @@ extends ImmediateValue.I8086Implicits
   with FarPointer.I8086Implicits
 {
 
-  def pointer(location: Long): ImmediateValue[_] with WordDoubleQuadSize
-  def shortPointer(location: Byte): NearPointer with ByteSize = ShortPointer(location)
-  def wordPointer(location: Int): NearPointer with WordSize = LongPointer.realMode(location)
-  def doubleWordPointer(location: Int): NearPointer with DoubleWordSize = LongPointer.protectedMode(location)
+  def pointer(location: Long): ImmediateValue[?] & WordDoubleQuadSize
+  def shortPointer(location: Byte): NearPointer & ByteSize = ShortPointer(location)
+  def wordPointer(location: Int): NearPointer & WordSize = LongPointer.realMode(location)
+  def doubleWordPointer(location: Int): NearPointer & DoubleWordSize = LongPointer.protectedMode(location)
 }
 
 object ProcessorMode {
@@ -76,14 +76,14 @@ object ProcessorMode {
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-      override def normalOperand(size: Operand with ValueSize): Boolean = false
-      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = false
+      override def normalOperand(size: Operand & ValueSize): Boolean = false
+      override def pointerOperand(size: Operand & FarPointerSize[?]): Boolean = false
     }
 
     implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement =
-      (_: Operand with ValueSize) => false
+      (_: Operand & ValueSize) => false
 
-    override def pointer(location: Long): ImmediateValue[Short] with WordDoubleQuadSize = location.toShort
+    override def pointer(location: Long): ImmediateValue[Short] & WordDoubleQuadSize = location.toShort
   }
 
   sealed trait I386Bounds extends ArchitectureBounds {
@@ -123,11 +123,11 @@ object ProcessorMode {
   {
 
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-      override def normalOperand(size: Operand with ValueSize): Boolean = size match {
+      override def normalOperand(size: Operand & ValueSize): Boolean = size match {
         case _: DoubleWordSize => true
         case _ => false
       }
-      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
+      override def pointerOperand(size: Operand & FarPointerSize[?]): Boolean = size match {
         case _: FarDoubleWordSize => true
         case _ => false
       }
@@ -138,7 +138,7 @@ object ProcessorMode {
         case _ => false
       }
 
-    override def pointer(location: Long): ImmediateValue[Short] with WordDoubleQuadSize = location.toShort
+    override def pointer(location: Long): ImmediateValue[Short] & WordDoubleQuadSize = location.toShort
   }
 
   object Protected extends ProcessorMode
@@ -172,11 +172,11 @@ object ProcessorMode {
     with Loop.Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-      override def normalOperand(size: Operand with ValueSize): Boolean = size match {
+      override def normalOperand(size: Operand & ValueSize): Boolean = size match {
         case _: WordSize => true
         case _ => false
       }
-      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
+      override def pointerOperand(size: Operand & FarPointerSize[?]): Boolean = size match {
         case _: FarWordSize => true
         case _ => false
       }
@@ -187,7 +187,7 @@ object ProcessorMode {
       case _ => false
     }
 
-    override def pointer(location: Long): ImmediateValue[Int] with WordDoubleQuadSize = location.toInt
+    override def pointer(location: Long): ImmediateValue[Int] & WordDoubleQuadSize = location.toInt
   }
   sealed trait LongBounds extends ArchitectureBounds {
     self: ProcessorMode =>
@@ -230,11 +230,11 @@ object ProcessorMode {
     with Loop.Operations
   {
     implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
-      override def normalOperand(size: Operand with ValueSize): Boolean = size match {
+      override def normalOperand(size: Operand & ValueSize): Boolean = size match {
         case _: WordSize => true
         case _ => false
       }
-      override def pointerOperand(size: Operand with FarPointerSize[_]): Boolean = size match {
+      override def pointerOperand(size: Operand & FarPointerSize[?]): Boolean = size match {
         case _: FarWordSize => true
         case _ => false
       }
@@ -245,6 +245,6 @@ object ProcessorMode {
       case _ => false
     }
 
-    override def pointer(location: Long): ImmediateValue[Long] with WordDoubleQuadSize = location
+    override def pointer(location: Long): ImmediateValue[Long] & WordDoubleQuadSize = location
   }
 }

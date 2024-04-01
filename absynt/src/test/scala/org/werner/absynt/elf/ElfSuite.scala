@@ -73,7 +73,7 @@ class ElfSuite extends AnyWordSpec with Matchers {
 
       val sectionAlignment = sections
         .foldLeft((applicationHeaderSize + programHeaderSize * programHeaderCount, Seq.empty[Int]))((total, current) => {
-          val alignment = if (total._1 % 16 == 0) 0 else 16 - total._1 % 16
+          val alignment = if total._1 % 16 == 0 then 0 else 16 - total._1 % 16
           (total._1 + alignment + current.content.length, total._2 :+ alignment)
         })._2
 

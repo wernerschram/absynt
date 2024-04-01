@@ -157,7 +157,7 @@ case class ElfSectionFileReference(target: Section, elf: Elf) extends UnlabeledD
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
-    if (elf.sections.head != target)
+    if elf.sections.head != target then
       (((elf.applicationHeader ++ elf.programHeaders.flatMap(_.resources)) :+ context.alignmentFillers(target)) ++
         context.sections.takeWhile(_ != target).flatMap(s => context.alignmentFillers(s) +: s.content)
       , OffsetDirection.Absolute)
@@ -179,7 +179,7 @@ case class ElfSectionReference(target: Section, elf: Elf) extends UnlabeledDepen
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) =
-    if (elf.sections.head == target) // First section includes the application header and the program headers
+    if elf.sections.head == target then // First section includes the application header and the program headers
       (Seq(context.startFiller), OffsetDirection.Absolute)
     else
       (context.startFiller +: context.alignedSectionDependencies(target), OffsetDirection.Absolute)
@@ -199,7 +199,7 @@ case class ElfSectionSize(target: Section, elf: Elf) extends UnlabeledDependentR
   override def possibleSizes: Set[Int] = Set(elf.architecture.processorClass.numberSize)
 
   override def dependencies(context: Application): (Seq[Resource], OffsetDirection) = {
-    if (elf.sections.head == target) // First section includes the application header and the program headers
+    if elf.sections.head == target then // First section includes the application header and the program headers
       (elf.applicationHeader ++ elf.programHeaders.flatMap(_.resources) ++ target.content :+ elf.alignmentFillers(target), OffsetDirection.Absolute)
     else
       (target.content, OffsetDirection.Absolute)

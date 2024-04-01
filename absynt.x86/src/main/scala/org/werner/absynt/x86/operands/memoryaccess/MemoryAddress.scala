@@ -17,14 +17,14 @@ import org.werner.absynt.ListExtensions.ListToImmediate
 import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRequirement}
 
-sealed class MemoryAddress private(address: ImmediateValue[_] with ValueSize, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
+sealed class MemoryAddress private(address: ImmediateValue[?] & ValueSize, segment: SegmentRegister = Segment.Data)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement)
   extends MemoryLocation(Some(address), segment) with ModRMEncodableOperand {
   self: ValueSize =>
 
   override val modValue: Byte = 0x00.toByte
 
   // TODO: WordSize is not valid in Long mode
-  override val registerOrMemoryModeCode: Byte = if (address.isInstanceOf[WordSize]) 0x06.toByte else 0x05.toByte
+  override val registerOrMemoryModeCode: Byte = if address.isInstanceOf[WordSize] then 0x06.toByte else 0x05.toByte
   final override val defaultSegment: SegmentRegister = Segment.Data
 
   override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
@@ -37,26 +37,26 @@ sealed class MemoryAddress private(address: ImmediateValue[_] with ValueSize, se
 
 object MemoryAddress {
   abstract class MemoryAddressForSize[Size<:ValueSize] {
-    def instance(address: ImmediateValue[_] with ValueSize, segment: SegmentRegister = Segment.Data): MemoryAddress with Size
+    def instance(address: ImmediateValue[?] & ValueSize, segment: SegmentRegister = Segment.Data): MemoryAddress & Size
   }
 
-  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue[_] with ValueSize, segment: SegmentRegister = Segment.Data): MemoryAddress with Size =
+  def apply[Size<:ValueSize:MemoryAddressForSize](address: ImmediateValue[?] & ValueSize, segment: SegmentRegister = Segment.Data): MemoryAddress & Size =
     implicitly[MemoryAddressForSize[Size]].instance(address, segment)
 
   trait I8086Implicits {
     implicit def ByteMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[ByteSize] =
-      (address: ImmediateValue[_] with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
+      (address: ImmediateValue[?] & ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with ByteSize
     implicit def WordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[WordSize] =
-      (address: ImmediateValue[_] with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
+      (address: ImmediateValue[?] & ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with WordSize
   }
 
   trait I386Implicits {
     implicit def DoubleWordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[DoubleWordSize] =
-      (address: ImmediateValue[_] with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
+      (address: ImmediateValue[?] & ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with DoubleWordSize
   }
 
   trait X64Implicits {
     implicit def QuadWordMemoryAddress(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): MemoryAddressForSize[QuadWordSize] =
-      (address: ImmediateValue[_] with ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
+      (address: ImmediateValue[?] & ValueSize, segment: SegmentRegister) => new MemoryAddress(address, segment) with QuadWordSize
   }
 }

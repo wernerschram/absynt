@@ -26,7 +26,7 @@ final case class AlignmentFiller(section: Section) extends UnlabeledDependentRes
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int = {
     val alignment = dependencySize % section.alignment
-    if (alignment != 0)
+    if alignment != 0 then
       section.alignment - alignment
     else 0
   }

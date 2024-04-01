@@ -15,14 +15,14 @@ package org.werner.absynt.x86.operands.memoryaccess
 
 import org.werner.absynt.x86.operands._
 
-abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue[_] with ByteWordDoubleSize] = None,
+abstract class IndirectMemoryLocation(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize] = None,
                                       segment: SegmentRegister)
   extends MemoryLocation(displacement, segment) {
 
   val modValue: Byte = {
     displacement match {
       case None => 0x00
-      case Some(d) => if (d.isInstanceOf[ByteSize]) 0x01 else 0x02
+      case Some(d) => if d.isInstanceOf[ByteSize] then 0x01 else 0x02
     }
   }
 }

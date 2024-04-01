@@ -51,13 +51,13 @@ abstract class Section protected(val name: String, val alignment: Int) {
     val trimLeft = content
       .dropWhile(x => !matchResourceOrLabel(x, from, from.target))
 
-    if (matchResourceAndLabel(trimLeft.head, from, from.target))  // reference to self
+    if matchResourceAndLabel(trimLeft.head, from, from.target) then  // reference to self
       return Nil
 
     val trimRight = trimLeft.tail
       .takeWhile(x => !matchResourceOrLabel(x, from, from.target))
 
-    if (matchResource(trimLeft.head, from))
+    if matchResource(trimLeft.head, from) then
       trimRight
     else
       trimLeft.head +: trimRight
@@ -65,8 +65,8 @@ abstract class Section protected(val name: String, val alignment: Int) {
 
   def offsetDirection(from: RelativeReference): OffsetDirection = {
     val firstInstruction = content.find(x => matchResourceOrLabel(x, from, from.target)).get
-    if (matchLabel(firstInstruction, from.target))
-      if (matchResource(firstInstruction, from))
+    if matchLabel(firstInstruction, from.target) then
+      if matchResource(firstInstruction, from) then
         OffsetDirection.Self
       else
         OffsetDirection.Backward

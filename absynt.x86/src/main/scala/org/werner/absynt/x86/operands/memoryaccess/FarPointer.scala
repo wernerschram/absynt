@@ -16,7 +16,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 import org.werner.absynt.ListExtensions._
 import org.werner.absynt.x86.operands._
 
-sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateValue[Short] with WordSize, offset: ImmediateValue[_] with Size)
+sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size)
   extends Operand {
   self: FarPointerSize[Size] =>
 
@@ -28,22 +28,22 @@ sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateVa
 
 object FarPointer {
   abstract class FarPointerForSize[OffsetSize<:WordDoubleSize] {
-    def instance(segment: ImmediateValue[Short] with WordSize, offset: ImmediateValue[_] with OffsetSize): FarPointer[OffsetSize] with FarPointerSize[OffsetSize]
+    def instance(segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & OffsetSize): FarPointer[OffsetSize] & FarPointerSize[OffsetSize]
   }
 
   trait I8086Implicits {
     implicit def FarPointerForWord: FarPointerForSize[WordSize] =
-      (segment: ImmediateValue[Short] with WordSize, offset: ImmediateValue[_] with WordSize) =>
+      (segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & WordSize) =>
         new FarPointer[WordSize](segment, offset) with FarWordSize
   }
 
 
   trait I386Implicits {
     implicit def FarPointerForDoubleWord: FarPointerForSize[DoubleWordSize] =
-      (segment: ImmediateValue[Short] with WordSize, offset: ImmediateValue[_] with DoubleWordSize) =>
+      (segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & DoubleWordSize) =>
         new FarPointer[DoubleWordSize](segment, offset) with FarDoubleWordSize
   }
 
-  def apply[Size<:WordDoubleSize: FarPointerForSize](segment: ImmediateValue[Short] with WordSize, offset: ImmediateValue[_] with Size): FarPointer[Size] with FarPointerSize[Size] =
+  def apply[Size<:WordDoubleSize: FarPointerForSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size): FarPointer[Size] & FarPointerSize[Size] =
     implicitly[FarPointerForSize[Size]].instance(segment, offset)
 }

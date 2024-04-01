@@ -80,7 +80,7 @@ sealed trait SIBBaseRegister extends ModRMEncodableOperand {
 sealed trait ByteRegister extends GeneralPurposeRegister with ByteSize
 
 sealed trait LowByteRegister extends ByteRegister {
-  override def toString: String = if ( mnemonic.startsWith("r")) s"${mnemonic}l" else mnemonic.replace('x', 'l')
+  override def toString: String = if  mnemonic.startsWith("r") then s"${mnemonic}l" else mnemonic.replace('x', 'l')
 }
 
 sealed trait HighByteRegister extends ByteRegister {
@@ -90,15 +90,15 @@ sealed trait HighByteRegister extends ByteRegister {
 }
 
 sealed trait WordRegister extends GeneralPurposeRegister with WordSize {
-  override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}w" else mnemonic
+  override def toString: String = if mnemonic.startsWith("r") then s"${mnemonic}w" else mnemonic
 }
 
 sealed trait DoubleWordRegister extends GeneralPurposeRegister with SIBIndexRegister with SIBBaseRegister with DoubleWordSize {
-  override def toString: String = if (mnemonic.startsWith("r")) s"${mnemonic}d" else s"e$mnemonic"
+  override def toString: String = if mnemonic.startsWith("r") then s"${mnemonic}d" else s"e$mnemonic"
 }
 
 sealed trait QuadWordRegister extends GeneralPurposeRegister with SIBIndexRegister with SIBBaseRegister with QuadWordSize {
-  override def toString: String = if (mnemonic.startsWith("r")) mnemonic else s"r$mnemonic"
+  override def toString: String = if mnemonic.startsWith("r") then mnemonic else s"r$mnemonic"
 }
 
 sealed abstract class AccumulatorRegister extends GeneralPurposeRegister(0x00, "ax") {
@@ -340,8 +340,8 @@ object Register15 {
 }
 
 sealed abstract class BaseIndexReference(
-  val base: GeneralPurposeRegister with BaseRegisterReference with WordSize,
-  val index: GeneralPurposeRegister with CombinableRealModeIndexRegister with WordSize,
+  val base: GeneralPurposeRegister & BaseRegisterReference & WordSize,
+  val index: GeneralPurposeRegister & CombinableRealModeIndexRegister & WordSize,
   override val indexCode: Byte)
   extends RegisterReference {
 

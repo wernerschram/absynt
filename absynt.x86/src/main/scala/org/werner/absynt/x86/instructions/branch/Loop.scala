@@ -29,9 +29,9 @@ object Loop {
 
     sealed abstract class LoopOperations(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
-      protected def Rel8(nearPointer: NearPointer with ByteSize): Static with NearPointerOperation[ByteSize] with NoImmediate =
+      protected def Rel8(nearPointer: NearPointer & ByteSize): Static & NearPointerOperation[ByteSize] & NoImmediate =
         new Static(shortOpcode, mnemonic) with NearPointerOperation[ByteSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer with ByteSize] = nearPointer
+          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & ByteSize] = nearPointer
 
           override def pointerOrder: OperandOrder = destination
         }
@@ -39,7 +39,7 @@ object Loop {
       def apply(targetLabel: Label): RelativeReference = {
         LabelJumpOperation(
           Seq(new JumpOption(2, Byte.MinValue, Byte.MaxValue) {
-            override def encodableForPointer(offset: Int): Resource with UnlabeledEncodable =
+            override def encodableForPointer(offset: Int): Resource & UnlabeledEncodable =
               Rel8(ShortPointer(offset.toByte))
           }),
           mnemonic,
@@ -47,7 +47,7 @@ object Loop {
         )
       }
 
-      def apply(nearPointer: NearPointer with ByteSize): X86Operation =
+      def apply(nearPointer: NearPointer & ByteSize): X86Operation =
         Rel8(nearPointer)
     }
 

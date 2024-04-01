@@ -158,12 +158,12 @@ object Shifter {
     }
 
     private def immediateShifters(value: Int, minRotate: Int): Seq[RightRotateImmediate] = {
-      if (value == 0)
+      if value == 0 then
         return Nil
 
       val shift = Range.inclusive(minRotate, 30, 2).find { x => ((value >>> x) & 0x03) != 0 }.get.toByte
       val intermediateValue = value >>> shift
-      val rotate: Byte = if (shift == 0) 0 else (32 - shift).toByte
+      val rotate: Byte = if shift == 0 then 0 else (32 - shift).toByte
 
       RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) +:  immediateShifters(value & (0xFFFFFF00 << shift), shift)
     }

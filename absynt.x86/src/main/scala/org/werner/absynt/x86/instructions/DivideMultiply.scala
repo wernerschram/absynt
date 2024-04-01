@@ -25,18 +25,18 @@ object DivideMultiply {
     self: ArchitectureBounds & ProcessorMode =>
 
 
-    private def RM8(operand: ModRMEncodableOperand with ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
+    private def RM8(operand: ModRMEncodableOperand & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xF6.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
-    private def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand with Size, extensionCode: Byte, mnemonic: String): X86Operation =
+    private def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM(operand, 0xF7.toByte :: Nil, extensionCode, mnemonic, destination) with NoDisplacement with NoImmediate
 
     sealed class BasicDivideMultiply(extensionCode: Byte, val mnemonic: String){
 
-      def apply[Size <: MaxValueSize](operand: ModRMEncodableOperand with Size): X86Operation =
+      def apply[Size <: MaxValueSize](operand: ModRMEncodableOperand & Size): X86Operation =
         operand match {
           case o: ByteSize => RM8(o, extensionCode, mnemonic)
-          case o: ModRMEncodableOperand with MaxWideSize @unchecked => RM16(o, extensionCode, mnemonic)
+          case o: MaxWideSize @unchecked => RM16(o, extensionCode, mnemonic)
         }
     }
 

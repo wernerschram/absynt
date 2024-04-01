@@ -24,21 +24,21 @@ sealed abstract class NearPointer(val offset: Seq[Byte])
 }
 
 object ShortPointer {
-  def apply(offset: Byte): NearPointer with ByteSize =
+  def apply(offset: Byte): NearPointer & ByteSize =
     new NearPointer(offset.encodeLittleEndian) with ByteSize {
       override def toString: String = s"0x${this.offset.bigEndianHexString}"
     }
 }
 
 object LongPointer {
-  def realMode(offset: Int): NearPointer with WordSize = {
+  def realMode(offset: Int): NearPointer & WordSize = {
     assume(offset.toShort == offset)
     new NearPointer(offset.toShort.encodeLittleEndian) with WordSize {
       override def toString: String = s"0x${this.offset.bigEndianHexString}"
     }
   }
 
-  def protectedMode(offset: Int): NearPointer with DoubleWordSize =
+  def protectedMode(offset: Int): NearPointer & DoubleWordSize =
      new NearPointer(offset.encodeLittleEndian) with DoubleWordSize {
        override def toString: String = s"0x${this.offset.bigEndianHexString}"
     }

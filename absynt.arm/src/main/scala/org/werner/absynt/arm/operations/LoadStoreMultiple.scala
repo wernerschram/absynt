@@ -70,9 +70,9 @@ class ReturnFromException(baseRegister: GeneralRegister, addressingMode: UpdateM
   extends ARMOperation {
   override def encodeWord: Int =
     0xf8100a00 |
-      (if (updateBase) 0x00200000 else 0) |
+      (if updateBase then 0x00200000 else 0) |
       addressingMode.bitMask |
       (baseRegister.registerCode << 16)
 
-  override def toString: String = s"$mnemonicString${addressingMode.mnemonicExtension} $baseRegister${if (updateBase) "!" else ""}"
+  override def toString: String = s"$mnemonicString${addressingMode.mnemonicExtension} $baseRegister${if updateBase then "!" else ""}"
 }

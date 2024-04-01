@@ -32,7 +32,7 @@ sealed abstract class Encodable extends Resource {
 sealed abstract class LabeledEncodable extends Encodable with Labeled {}
 
 abstract class UnlabeledEncodable extends Encodable {
-  final def label(newLabel: Label): Encodable with Labeled = new LabeledEncodable {
+  final def label(newLabel: Label): Encodable & Labeled = new LabeledEncodable {
     override def encodeByte: Seq[Byte] = UnlabeledEncodable.this.encodeByte
 
     override def size: Int = UnlabeledEncodable.this.size
@@ -69,7 +69,7 @@ sealed abstract class DependentResource extends Resource {
 sealed abstract class LabeledDependentResource extends DependentResource with Labeled {}
 abstract class UnlabeledDependentResource extends DependentResource {
 
-  final def label(newLabel: Label): DependentResource with Labeled = new LabeledDependentResource {
+  final def label(newLabel: Label): DependentResource & Labeled = new LabeledDependentResource {
     override def label: Label = newLabel
 
     override val resource: Resource = UnlabeledDependentResource.this

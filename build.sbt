@@ -1,23 +1,27 @@
-ThisBuild / scalaVersion := "3.2.0"
-ThisBuild / organization := "org.werner"
-ThisBuild / licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
+inThisBuild(
+  List(
+    scalaVersion := "3.4.1",
+    organization := "org.werner",
+    licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0")),
+    semanticdbEnabled := true, // enable SemanticDB
+    scalacOptions ++= Seq(
+      "-feature",
+      "-new-syntax",
+      "-rewrite",
+      "-source", "3.4-migration",
+      //  "-explain",
+      "-unchecked",
+      "-deprecation",
+    )
+  )
+)
 
 autoCompilerPlugins := true
-//ThisBuild / libraryDependencies += compilerPlugin(scalafixSemanticdb) // enable SemanticDB
-//ThisBuild / scalafixDependencies += "org.scalatest" %% "autofix" % "3.1.0.0"
 
 val testVersion = "3.2.9"
 val spec2Version = "4.7.0"
 
-ThisBuild / scalacOptions ++= Seq(
-	"-feature",
-//  "-explain",
-  "-unchecked",
-  "-deprecation",
-)
-
 git.useGitDescribe := true
-
 
 lazy val root = (project in file("."))
 .settings(

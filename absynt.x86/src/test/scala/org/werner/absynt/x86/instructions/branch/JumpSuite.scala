@@ -34,7 +34,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
 
       import ProcessorMode.Real._
 
-      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String, String](
+      val combinations = Table[String, (NearPointer & ByteWordDoubleSize) => X86Operation, String, String, String](
         ("Mnemonic", "Instruction", "Short (0x10)", "Word (0x2030)", "Double (0x20304050)"),
         ("jmp", Jump(_), "EB 10", "E9 30 20", "66 E9 50 40 30 20"),
         ("ja", JumpIfAbove(_), "77 10", "0F 87 30 20", "66 0F 87 50 40 30 20"),
@@ -60,7 +60,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, word: String, doubleWord: String) => {
+        (mnemonic: String, operation: (NearPointer & ByteWordDoubleSize) => X86Operation, short: String, word: String, doubleWord: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val wordName = s"$mnemonic 0x2030"
@@ -531,7 +531,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
 
       import ProcessorMode.Protected._
 
-      val combinations = Table[String, (NearPointer with ByteWordDoubleSize) => X86Operation, String, String, String](
+      val combinations = Table[String, (NearPointer & ByteWordDoubleSize) => X86Operation, String, String, String](
         ("Mnemonic", "Instruction", "Short (0x10)", "Word (0x2030)", "Double (0x20304050)"),
         ("jmp", Jump(_), "EB 10", "66 E9 30 20", "E9 50 40 30 20"),
         ("ja", JumpIfAbove(_), "77 10", "66 0F 87 30 20", "0F 87 50 40 30 20"),
@@ -557,7 +557,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ByteWordDoubleSize) => X86Operation, short: String, word: String, doubleWord: String) => {
+        (mnemonic: String, operation: (NearPointer & ByteWordDoubleSize) => X86Operation, short: String, word: String, doubleWord: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val wordName = s"$mnemonic 0x2030"
@@ -717,7 +717,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
 
       import ProcessorMode.Long._
 
-      val combinations = Table[String, (NearPointer with ByteDoubleSize) => X86Operation, String, String](
+      val combinations = Table[String, (NearPointer & ByteDoubleSize) => X86Operation, String, String](
         ("Mnemonic", "Instruction", "Short (0x10)", "Long (0x20304050)"),
         ("jmp", Jump(_), "EB 10", "E9 50 40 30 20"),
         ("ja", JumpIfAbove(_), "77 10", "0F 87 50 40 30 20"),
@@ -743,7 +743,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
       )
 
       forAll(combinations) {
-        (mnemonic: String, operation: (NearPointer with ByteDoubleSize) => X86Operation, short: String, long: String) => {
+        (mnemonic: String, operation: (NearPointer & ByteDoubleSize) => X86Operation, short: String, long: String) => {
           val shortName = s"$mnemonic 0x10"
           val shortInstruction = operation(shortPointer(0x10.toByte))
           val longName = s"$mnemonic 0x20304050"

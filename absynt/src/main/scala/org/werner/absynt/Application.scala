@@ -71,14 +71,14 @@ abstract class Application {
   }
 
   private def possibleSizeCombinations(references: Map[DependentResource, Set[Int]]): Set[Map[DependentResource, Int]]  =
-    if (references.isEmpty)
+    if references.isEmpty then
       Set(Map.empty)
     else
-      for (
+      for
         t <- possibleSizeCombinations(references.tail);
         (resource, sizes) = references.head;
         size <- sizes
-      ) yield
+      yield
         t + (resource -> size)
 
   private sealed abstract class DependencySize(val offsetDirection: OffsetDirection) {
@@ -100,7 +100,7 @@ abstract class Application {
     visited: Map[DependentResource, DependencySize], restrictions: Map[DependentResource, Set[Int]])(current: DependentResource):
       (Map[DependentResource, DependencySize], Map[DependentResource, Set[Int]]) = {
 
-    if (visited.contains(current))
+    if visited.contains(current) then
       // this reference has been evaluated in an earlier call (in a prior branch)
       (Map.empty, Map.empty)
     else {
@@ -112,7 +112,7 @@ abstract class Application {
             childDependencies(visiting, current)(previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions, previousRestrictions)(child)
         }
 
-      if (childSizeFunctions.isEmpty)
+      if childSizeFunctions.isEmpty then
         (totalDependencySizes + (current -> KnownDependencySize(fixedSize, offsetDirection)), restrictions ++ totalRestrictions)
       else {
         val dependencySize = (assumptions: Map[DependentResource, Int]) => fixedSize + childSizeFunctions.map(_(assumptions)).sum
@@ -137,7 +137,7 @@ abstract class Application {
       previousRestrictions: Map[DependentResource, Set[Int]])
     (child: DependentResource) = {
 
-    if (visiting.contains(child))
+    if visiting.contains(child) then
     // cyclic dependency: add a dependency which can be resolved at a higher level
       (previousDependencySizeFunctions, previousFixedSize, previousChildSizeFunctions :+ ((assumptions: Map[DependentResource, Int]) =>
         assumptions(child)), previousRestrictions + (child -> child.possibleSizes))

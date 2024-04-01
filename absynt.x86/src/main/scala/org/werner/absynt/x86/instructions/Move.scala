@@ -31,88 +31,88 @@ object Move extends I8086GenericRegisters {
 
     trait BasicMove {
 
-      protected def RM16ToSReg[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size) =
+      protected def RM16ToSReg[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand & Size) =
         new ModSegmentRM(operand1, operand2, 0x8E.toByte :: Nil, mnemonic, source) with NoDisplacement with NoImmediate
 
-      protected def SRegToRM16[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand with Size) =
+      protected def SRegToRM16[Size <: MaxWideSize](operand1: SegmentRegister, operand2: ModRMEncodableOperand & Size) =
         new ModSegmentRM(operand1, operand2, 0x8C.toByte :: Nil, mnemonic, destination) with NoDisplacement with NoImmediate
 
-      protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize) =
+      protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand & ByteSize) =
         new ModRRM(operand1, operand2, 0x88.toByte :: Nil, mnemonic, destination)
 
-      protected def ALToMOffs8(memoryLocation: MemoryLocation with ByteSize): X86Operation =
+      protected def ALToMOffs8(memoryLocation: MemoryLocation & ByteSize): X86Operation =
         new Static(0xA2.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[_]] =
+          protected override def allOperands: Set[OperandInfo[?]] =
             super.allOperands + OperandInfo.implicitOperand(AL, source)
 
-          override val location: OperandWithSizePrefixInfo[MemoryLocation with ByteSize] = memoryLocation
+          override val location: OperandWithSizePrefixInfo[MemoryLocation & ByteSize] = memoryLocation
 
           override def offsetOrder: OperandOrder = destination
 
         }
 
-      protected def R16ToRM16[Size <: MaxWideSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size) =
+      protected def R16ToRM16[Size <: MaxWideSize](operand1: GeneralPurposeRegister & Size, operand2: ModRMEncodableOperand & Size) =
         new ModRRM(operand1, operand2, 0x89.toByte :: Nil, mnemonic, destination)
 
-      protected def AXToMOffs16[Size <: MaxWideSize](accumulatorRegister: AccumulatorRegister with Size, memoryLocation: MemoryLocation with Size): X86Operation =
+      protected def AXToMOffs16[Size <: MaxWideSize](accumulatorRegister: AccumulatorRegister & Size, memoryLocation: MemoryLocation & Size): X86Operation =
         new Static(0xA3.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[_]] =
+          protected override def allOperands: Set[OperandInfo[?]] =
             super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, source)
 
-          override val location: OperandWithSizePrefixInfo[MemoryLocation with Size] = memoryLocation
+          override val location: OperandWithSizePrefixInfo[MemoryLocation & Size] = memoryLocation
 
           override def offsetOrder: OperandOrder = destination
         }
 
-      protected def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand with ByteSize) =
+      protected def RM8ToR8(operand1: ByteRegister, operand2: ModRMEncodableOperand & ByteSize) =
         new ModRRM(operand1, operand2, 0x8A.toByte :: Nil, mnemonic, source)
 
-      protected def MOffs8ToAL(memoryLocation: MemoryLocation with ByteSize): X86Operation =
+      protected def MOffs8ToAL(memoryLocation: MemoryLocation & ByteSize): X86Operation =
         new Static(0xA0.toByte :: Nil, mnemonic) with MemoryLocationOperation[ByteSize] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[_]] =
+          protected override def allOperands: Set[OperandInfo[?]] =
             super.allOperands + OperandInfo.implicitOperand(AL, destination)
 
-          override val location: OperandWithSizePrefixInfo[MemoryLocation with ByteSize] = memoryLocation
+          override val location: OperandWithSizePrefixInfo[MemoryLocation & ByteSize] = memoryLocation
 
           override def offsetOrder: OperandOrder = source
         }
 
-      protected def RM16ToR16[Size <: MaxWideSize](operand1: GeneralPurposeRegister with Size, operand2: ModRMEncodableOperand with Size) =
+      protected def RM16ToR16[Size <: MaxWideSize](operand1: GeneralPurposeRegister & Size, operand2: ModRMEncodableOperand & Size) =
         new ModRRM(operand1, operand2, 0x8B.toByte :: Nil, mnemonic, source)
 
-      protected def MOffs16ToAX[Size <: MaxWideSize](memoryLocation: MemoryLocation with Size, accumulatorRegister: AccumulatorRegister with Size): X86Operation =
+      protected def MOffs16ToAX[Size <: MaxWideSize](memoryLocation: MemoryLocation & Size, accumulatorRegister: AccumulatorRegister & Size): X86Operation =
         new Static(0xA1.toByte :: Nil, mnemonic) with MemoryLocationOperation[Size] with NoImmediate {
-          protected override def allOperands: Set[OperandInfo[_]] =
+          protected override def allOperands: Set[OperandInfo[?]] =
             super.allOperands + OperandInfo.implicitOperand(accumulatorRegister, destination)
 
-          override val location: OperandWithSizePrefixInfo[MemoryLocation with Size] = memoryLocation
+          override val location: OperandWithSizePrefixInfo[MemoryLocation & Size] = memoryLocation
 
           override def offsetOrder: OperandOrder = source
         }
 
-      protected def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue[_] with ByteSize): X86Operation =
+      protected def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue[?] & ByteSize): X86Operation =
         new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = source
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def Imm16ToR16[Size <: MaxWideSize](register: GeneralPurposeRegister with Size, immediateValue: ImmediateValue[_] with Size): X86Operation =
+      protected def Imm16ToR16[Size <: MaxWideSize](register: GeneralPurposeRegister & Size, immediateValue: ImmediateValue[?] & Size): X86Operation =
         new RegisterEncoded[Size](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with Size] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & Size] = immediateValue
           override def immediateOrder: OperandOrder = source
           override def registerOrder: OperandOrder = destination
         }
 
-      protected def Imm8ToRM8(operand: ModRMEncodableOperand with ByteSize, immediateValue: ImmediateValue[_] with ByteSize) =
+      protected def Imm8ToRM8(operand: ModRMEncodableOperand & ByteSize, immediateValue: ImmediateValue[?] & ByteSize) =
         new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
           override def immediateOrder: OperandOrder = source
         }
 
-      protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand with OperandSize, immediateValue: ImmediateValue[_] with OperandSize) =
+      protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand & OperandSize, immediateValue: ImmediateValue[?] & OperandSize) =
         new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[OperandSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with OperandSize] = immediateValue
+          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & OperandSize] = immediateValue
           override def immediateOrder: OperandOrder = source
         }
 
@@ -124,57 +124,57 @@ object Move extends I8086GenericRegisters {
         override def possibleSizes: Set[Int] = Set(size)
       }
 
-      def apply(source: Accumulator.LowByte.type, destination: MemoryAddress with ByteSize): X86Operation =
+      def apply(source: Accumulator.LowByte.type, destination: MemoryAddress & ByteSize): X86Operation =
         ALToMOffs8(destination)
 
-      def apply(source: ByteRegister, destination: ModRMEncodableOperand with ByteSize): X86Operation =
+      def apply(source: ByteRegister, destination: ModRMEncodableOperand & ByteSize): X86Operation =
         R8ToRM8(source, destination)
 
-      def apply(source: MemoryAddress with ByteSize, accumulator: Accumulator.LowByte.type): X86Operation =
+      def apply(source: MemoryAddress & ByteSize, accumulator: Accumulator.LowByte.type): X86Operation =
         MOffs8ToAL(source)
 
-      def apply(source: ModRMEncodableOperand with ByteSize, destination: ByteRegister): X86Operation =
+      def apply(source: ModRMEncodableOperand & ByteSize, destination: ByteRegister): X86Operation =
         RM8ToR8(destination, source)
 
       def apply(source: ByteRegister, destination: ByteRegister): X86Operation = {
         assume(!(source.isInstanceOf[GeneralPurposeRexRegister] && destination.isInstanceOf[HighByteRegister]))
         assume(!(source.isInstanceOf[HighByteRegister] && destination.isInstanceOf[GeneralPurposeRexRegister]))
-        apply(source, destination.asInstanceOf[ModRMEncodableOperand with ByteSize])
+        apply(source, destination.asInstanceOf[ModRMEncodableOperand & ByteSize])
       }
 
-      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, destination: SegmentRegister) =
+      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand & Size, destination: SegmentRegister) =
         RM16ToSReg(destination, source)
 
-      def apply[Size <: MaxWideSize](source: SegmentRegister, destination: ModRMEncodableOperand with Size) =
+      def apply[Size <: MaxWideSize](source: SegmentRegister, destination: ModRMEncodableOperand & Size) =
         SRegToRM16(source, destination)
 
-      def apply[Size <: MaxWideSize](accumulator: AccumulatorRegister with Size, destination: MemoryAddress with Size): X86Operation =
+      def apply[Size <: MaxWideSize](accumulator: AccumulatorRegister & Size, destination: MemoryAddress & Size): X86Operation =
         AXToMOffs16(accumulator, destination)
 
-      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: ModRMEncodableOperand with Size) =
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size) =
         R16ToRM16(source, destination)
 
-      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister with Size, destination: GeneralPurposeRegister with Size): X86Operation =
-        R16ToRM16(source, destination.asInstanceOf[ModRMEncodableOperand with Size])
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: GeneralPurposeRegister & Size): X86Operation =
+        R16ToRM16(source, destination.asInstanceOf[ModRMEncodableOperand & Size])
 
-      def apply[Size <: MaxWideSize](source: MemoryAddress with Size, accumulator: AccumulatorRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: MemoryAddress & Size, accumulator: AccumulatorRegister & Size): X86Operation =
         MOffs16ToAX(source, accumulator)
 
-      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand & Size, destination: GeneralPurposeRegister & Size): X86Operation =
         RM16ToR16(destination, source)
 
-      def apply[Size <: MaxWideSize](source: ImmediateValue[_] with Size, destination: GeneralPurposeRegister with Size): X86Operation =
+      def apply[Size <: MaxWideSize](source: ImmediateValue[?] & Size, destination: GeneralPurposeRegister & Size): X86Operation =
         Imm16ToR16(destination, source)
 
-      def apply(source: ImmediateValue[_] with ByteSize, destination: ByteRegister): X86Operation =
+      def apply(source: ImmediateValue[?] & ByteSize, destination: ByteRegister): X86Operation =
         Imm8ToR8(destination, source)
 
-      def apply[Size <: MaxValueSize](source: ImmediateValue[_] with Size, destination: ModRMEncodableOperand with Size) = {
+      def apply[Size <: MaxValueSize](source: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size) = {
         source match {
-          case s: ImmediateValue[_] with ByteSize =>
-            Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand with ByteSize], source.asInstanceOf[ImmediateValue[_] with ByteSize])
-          case s: ImmediateValue[_] with WordDoubleQuadSize =>
-            Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand with MaxWideSize], source.asInstanceOf[ImmediateValue[_] with MaxWideSize])
+          case s: ByteSize =>
+            Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand & ByteSize], source.asInstanceOf[ImmediateValue[?] & ByteSize])
+          case s: WordDoubleQuadSize =>
+            Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand & MaxWideSize], source.asInstanceOf[ImmediateValue[?] & MaxWideSize])
         }
       }
     }
@@ -193,7 +193,7 @@ object Move extends I8086GenericRegisters {
   trait LegacyOperations extends I8086 {
     self: ProcessorMode.LegacyBounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo =>
     object Move extends I8086Move {
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister & WordSize): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 3
 
@@ -207,7 +207,7 @@ object Move extends I8086GenericRegisters {
     self: ProcessorMode.I386Bounds & ProcessorMode & ImmediateValue.I8086Implicits & OperandSizeInfo  =>
     object Move extends I386Move {
 
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with WordSize): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister & WordSize): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 3
 
@@ -221,7 +221,7 @@ object Move extends I8086GenericRegisters {
     self: ProcessorMode.I386Bounds & ProcessorMode & ImmediateValue.I386Implicits & OperandSizeInfo  =>
     object Move extends I386Move {
 
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with DoubleWordSize): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister & DoubleWordSize): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 5
 
@@ -234,7 +234,7 @@ object Move extends I8086GenericRegisters {
   trait LongOperations extends Common {
     self: ProcessorMode.LongBounds & ProcessorMode & ImmediateValue.X64Implicits & OperandSizeInfo  =>
     object Move extends BasicMove {
-      def forLabel(targetLabel: Label, register: GeneralPurposeRegister with QuadWordSize): AbsoluteReference =
+      def forLabel(targetLabel: Label, register: GeneralPurposeRegister & QuadWordSize): AbsoluteReference =
         new MoveForLabel(targetLabel) {
           override val size: Int = 10
 

@@ -28,7 +28,7 @@ class MultiplyWithRegister(val code: Byte, val opcode: String) {
     new MultiplyWithRegisterOperation(code, opcode, destination, source, multiplyValue, addValue, condition)
 
   def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, addValue: GeneralRegister,
-               condition: Condition = Condition.Always): MultiplyWithRegisterOperation with SetFlags =
+               condition: Condition = Condition.Always): MultiplyWithRegisterOperation & SetFlags =
     RegRegAndRegToRegFlags(destination, source, multiplyValue, addValue, condition)
 
   private def RegRegAndRegToRegFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,
@@ -43,7 +43,7 @@ class Multiply(val code: Byte, val opcode: String) {
   private def RegAndRegToReg(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition) =
     new MultiplyOperation(code, opcode, destination, source, multiplyValue, condition)
 
-  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Condition.Always): MultiplyOperation with SetFlags =
+  def setFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister, condition: Condition = Condition.Always): MultiplyOperation & SetFlags =
     RegAndRegToRegFlags(destination, source, multiplyValue, condition)
 
   private def RegAndRegToRegFlags(destination: GeneralRegister, source: GeneralRegister, multiplyValue: GeneralRegister,

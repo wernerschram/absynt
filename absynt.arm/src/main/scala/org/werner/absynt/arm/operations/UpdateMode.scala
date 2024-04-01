@@ -14,7 +14,7 @@
 package org.werner.absynt.arm.operations
 
 abstract class UpdateMode private[operations](val increment: Boolean, val mnemonicExtension: String) {
-  val incrementBitMask: Int = if (increment) 0x00800000 else 0
+  val incrementBitMask: Int = if increment then 0x00800000 else 0
 
   def bitMask: Int
 }

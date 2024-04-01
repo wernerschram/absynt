@@ -32,7 +32,7 @@ object LoadStoreMultiple {
         new LoadStoreMultipleOperation(LoadStoreMultipleDirection.Load, condition, registers, baseRegister, addressingMode, opcode)
 
       def withUpdateBase(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                         condition: Condition = Condition.Always): LoadStoreMultipleOperation with UpdateBase =
+                         condition: Condition = Condition.Always): LoadStoreMultipleOperation & UpdateBase =
         ImmedUpdateBase(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUpdateBase(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -40,7 +40,7 @@ object LoadStoreMultiple {
         new LoadStoreMultipleOperation(LoadStoreMultipleDirection.Load, condition, registers, baseRegister, addressingMode, opcode) with UpdateBase
 
       def withUserModeRegisters(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                                condition: Condition = Condition.Always): LoadStoreMultipleOperation with UserModeRegisters =
+                                condition: Condition = Condition.Always): LoadStoreMultipleOperation & UserModeRegisters =
         ImmedUserModeRegisters(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUserModeRegisters(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -49,7 +49,7 @@ object LoadStoreMultiple {
           with UserModeRegisters
 
       def withUserModeRegistersAndUpdateBase(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                                             condition: Condition = Condition.Always): LoadStoreMultipleOperation with UpdateBase with UserModeRegisters =
+                                             condition: Condition = Condition.Always): LoadStoreMultipleOperation & UpdateBase & UserModeRegisters =
         ImmedUserModeRegistersAndUpdateBase(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUserModeRegistersAndUpdateBase(condition: Condition, registers: Seq[GeneralRegister],
@@ -69,7 +69,7 @@ object LoadStoreMultiple {
         new LoadStoreMultipleOperation(LoadStoreMultipleDirection.Store, condition, registers, baseRegister, addressingMode, opcode)
 
       def withUpdateBase(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                         condition: Condition = Condition.Always): LoadStoreMultipleOperation with UpdateBase =
+                         condition: Condition = Condition.Always): LoadStoreMultipleOperation & UpdateBase =
         ImmedUpdateBase(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUpdateBase(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -78,7 +78,7 @@ object LoadStoreMultiple {
           with UpdateBase
 
       def withUserModeRegisters(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode,
-                                condition: Condition = Condition.Always): LoadStoreMultipleOperation with UserModeRegisters =
+                                condition: Condition = Condition.Always): LoadStoreMultipleOperation & UserModeRegisters =
         ImmedUserModeRegisters(condition, registers, baseRegister, addressingMode)
 
       private def ImmedUserModeRegisters(condition: Condition, registers: Seq[GeneralRegister], baseRegister: GeneralRegister,
@@ -101,12 +101,12 @@ object LoadStoreMultiple {
     }
 
     object Push {
-      def apply(registers: Seq[GeneralRegister]): LoadStoreMultipleOperation with UpdateBase =
+      def apply(registers: Seq[GeneralRegister]): LoadStoreMultipleOperation & UpdateBase =
         LoadMultiple.withUpdateBase(registers, GeneralRegister.R13, UpdateMode.DecrementAfter)
     }
 
     object Pop {
-      def apply(registers: Seq[GeneralRegister]): LoadStoreMultipleOperation with UpdateBase =
+      def apply(registers: Seq[GeneralRegister]): LoadStoreMultipleOperation & UpdateBase =
         StoreMultiple.withUpdateBase(registers, GeneralRegister.R13, UpdateMode.IncrementBefore)
     }
 

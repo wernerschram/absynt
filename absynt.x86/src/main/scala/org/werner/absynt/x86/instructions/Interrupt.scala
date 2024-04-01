@@ -25,13 +25,13 @@ object Interrupt {
 
     protected def Static(opcode: Byte, interrupt: Byte, mnemonic: String): X86Operation =
       new Static(opcode :: Nil, mnemonic) with NoDisplacement with NoImmediate {
-        protected override def allOperands: Set[OperandInfo[_]] =
+        protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(interrupt, destination)(noOperandSizePrefixRequirement)
       }
 
-    protected def Imm8(immediateValue: ImmediateValue[_] with ByteSize, mnemonic: String): X86Operation =
+    protected def Imm8(immediateValue: ImmediateValue[?] & ByteSize, mnemonic: String): X86Operation =
       new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[_] with ByteSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
+        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
         override def immediateOrder: OperandOrder = destination
       }
 
@@ -46,7 +46,7 @@ object Interrupt {
     object Interrupt {
       val mnemonic: String = "int"
 
-      def apply(immediate: ImmediateValue[_] with ByteSize): X86Operation = immediate.encodedValue.head match {
+      def apply(immediate: ImmediateValue[?] & ByteSize): X86Operation = immediate.encodedValue.head match {
         case 0 => Static(0xCE.toByte, 0.toByte, mnemonic)
         case 1 => Static(0xF1.toByte, 1.toByte, mnemonic)
         case 3 => Static(0xCC.toByte, 3.toByte, mnemonic)
@@ -60,7 +60,7 @@ object Interrupt {
     object Interrupt {
       val mnemonic: String = "int"
 
-      def apply(immediate: ImmediateValue[_] with ByteSize): X86Operation = immediate.encodedValue.head match {
+      def apply(immediate: ImmediateValue[?] & ByteSize): X86Operation = immediate.encodedValue.head match {
         case 1 => Static(0xF1.toByte, 1.toByte, mnemonic)
         case 3 => Static(0xCC.toByte, 3.toByte, mnemonic)
         case _ => Imm8(immediate, mnemonic)

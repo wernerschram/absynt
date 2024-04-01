@@ -24,8 +24,8 @@ case class LinearRelativeTestEncodable(distance: Int, offsetDirection: RelativeO
     }
 
   override def size: Int =
-    if (distance < 10) 1
-    else if (distance < 20) 2
+    if distance < 10 then 1
+    else if distance < 20 then 2
     else 3
 }
 
@@ -35,8 +35,8 @@ case class LinearRelativeTestReference(override val target: Label) extends Relat
     LinearRelativeTestEncodable(distance, offsetDirection)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
-    if (dependencySize < 10) 1
-    else if (dependencySize < 20) 2
+    if dependencySize < 10 then 1
+    else if dependencySize < 20 then 2
     else 3
 
   override def possibleSizes: Set[Int] = Set(1, 2, 3)
@@ -52,8 +52,8 @@ case class NonLinearRelativeTestEncodable(distance: Int, offsetDirection: Relati
     }
 
   override def size: Int =
-    if (distance < 10) 1
-    else if (distance < 20) 3
+    if distance < 10 then 1
+    else if distance < 20 then 3
     else 2
 }
 
@@ -62,8 +62,8 @@ case class NonLinearRelativeTestReference(override val target: Label) extends Re
     NonLinearRelativeTestEncodable(distance, offsetDirection)
 
   override def sizeForDependencySize(dependencySize: Int, offsetDirection: OffsetDirection): Int =
-    if (dependencySize < 10) 1
-    else if (dependencySize < 20) 3
+    if dependencySize < 10 then 1
+    else if dependencySize < 20 then 3
     else 2
 
   override def possibleSizes: Set[Int] = Set(1, 2, 3)
@@ -73,8 +73,8 @@ case class AbsoluteTestEncodable(distance: Int) extends UnlabeledEncodable {
   override def encodeByte: Seq[Byte] = Seq.fill(size)(0xaa.toByte)
 
   override def size: Int =
-    if (distance < 10) 1
-    else if (distance < 20) 2
+    if distance < 10 then 1
+    else if distance < 20 then 2
     else 3
 }
 
