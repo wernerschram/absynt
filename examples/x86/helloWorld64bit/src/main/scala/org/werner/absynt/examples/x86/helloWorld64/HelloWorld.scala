@@ -24,6 +24,7 @@ import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.DoubleWordSize
 import org.werner.absynt.{EncodedBytes, EncodedString, Label}
+import scala.language.implicitConversions
 
 object HelloWorld extends App {
   createFile()

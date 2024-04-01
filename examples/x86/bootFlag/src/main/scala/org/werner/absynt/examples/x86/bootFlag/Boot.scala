@@ -24,6 +24,7 @@ import org.werner.absynt.Label
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
+import scala.language.implicitConversions
 
 object Boot extends App {
   createFile()
