@@ -38,10 +38,7 @@ object Shift {
       }
 
     protected def Imm8ToRM8(immediateValue: ImmediateValue[Byte] & ByteSize, operand: ModRMEncodableOperand & ByteSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[ByteSize](operand, 0xC0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with Immediate[ByteSize] {
-        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-        override def immediateOrder: OperandOrder = OperandOrder.source
-      }
+      new ModRM[ByteSize](operand, 0xC0.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with Immediate[ByteSize](immediateValue, OperandOrder.source)
 
     protected def OneToRM16(operand: ModRMEncodableOperand & WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
       new ModRM[WordDoubleQuadSize](operand, 0xD1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with NoImmediate {
@@ -56,10 +53,7 @@ object Shift {
       }
 
     protected def Imm8ToRM16(immediateValue: ImmediateValue[Byte] & ByteSize, operand: ModRMEncodableOperand & WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[WordDoubleQuadSize](operand, 0xC1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with Immediate[ByteSize] {
-        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-        override def immediateOrder: OperandOrder = OperandOrder.source
-      }
+      new ModRM[WordDoubleQuadSize](operand, 0xC1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true) with NoDisplacement with Immediate[ByteSize](immediateValue, OperandOrder.source)
 
     sealed abstract class ShiftInstruction(extensionCode: Byte, mnemonic: String) {
       def apply[Size <: MaxValueSize](immediateValue: ImmediateValue[Byte] & ByteSize, destination: ModRMEncodableOperand & Size): X86Operation = {

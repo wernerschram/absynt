@@ -26,52 +26,35 @@ object Test {
     val mnemonic = "test"
 
     protected def Imm8ToAL(immediateValue: ImmediateValue[?] & ByteSize): X86Operation =
-      new Static(0xA8.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
+      new Static(0xA8.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize](immediateValue, source) {
         protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.LowByte, destination)
-
-        override val immediateOrder: OperandOrder = source
-        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
       }
 
     protected def Imm16ToAX(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
-      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize] {
+      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[WordSize](immediateValue, source) {
         protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.Word, destination)
-
-        override val immediateOrder: OperandOrder = source
-        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & WordSize] = immediateValue
       }
 
     protected def Imm32ToEAX(immediateValue: ImmediateValue[?] & DoubleWordSize): X86Operation =
-      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
+      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize](immediateValue, source) {
         protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.DoubleWord, destination)
-
-        override val immediateOrder: OperandOrder = source
-        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & DoubleWordSize] = immediateValue
       }
 
     protected def Imm32ToRAX(immediateValue: ImmediateValue[?] & DoubleWordSize): X86Operation =
-      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize] {
+      new Static(0xA9.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[DoubleWordSize](immediateValue, source) {
         protected override def allOperands: Set[OperandInfo[?]] =
           super.allOperands + OperandInfo.implicitOperand(Accumulator.QuadWord, destination)
-
-        override val immediateOrder: OperandOrder = source
-        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & DoubleWordSize] = immediateValue
       }
 
     protected def Imm8ToRM8(operand: ModRMEncodableOperand & ByteSize, immediateValue: ImmediateValue[?] & ByteSize) =
-      new ModRM(operand, 0xF6.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
-        override val immediateOrder: OperandOrder = source
-        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-      }
+      new ModRM(operand, 0xF6.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[ByteSize](immediateValue, source)
+      
 
     protected def Imm16ToRM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size, immediateValue: ImmediateValue[?] & Size) =
-      new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size] {
-        override val immediateOrder: OperandOrder = source
-        override val immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & Size] = immediateValue
-      }
+      new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination) with NoDisplacement with Immediate[Size](immediateValue, source)
 
     protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand & ByteSize): X86Operation =
       new ModRRM(operand1, operand2, 0x84.toByte :: Nil, mnemonic, destination)

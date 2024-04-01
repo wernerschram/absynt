@@ -25,10 +25,7 @@ object Adjust {
       new Static(code :: Nil, mnemonic) with NoDisplacement with NoImmediate
 
     private def StaticImm(code: Byte, mnemonic: String, immediateValue: ImmediateValue[?] & ByteSize) =
-      new Static(code :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-        override def immediateOrder: OperandOrder = destination
-      }
+      new Static(code :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize](immediateValue, destination)
 
     object AdjustAfterAddition {
       def ascii(destination: Accumulator.LowByte.type): X86Operation = Static(0x37.toByte, "aaa")

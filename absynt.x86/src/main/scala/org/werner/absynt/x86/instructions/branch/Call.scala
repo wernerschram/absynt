@@ -15,12 +15,12 @@ package org.werner.absynt.x86.instructions.branch
 
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.werner.absynt.x86._
-import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
+import org.werner.absynt.x86.*
+import org.werner.absynt.x86.operands.*
+import org.werner.absynt.x86.operands.memoryaccess.*
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
-import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandSizePrefixRequirement, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer as FarPointerOperation, NearPointer as NearPointerOperation}
 
 object Call {
 
@@ -73,11 +73,7 @@ object Call {
         new Static(0xC3.toByte :: Nil, "ret") with NoDisplacement with NoImmediate
 
       protected def Imm16(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
-        new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & WordSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
-
-          override def immediateOrder: OperandOrder = source
-        }
+        new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), source)
 
 
       def apply(): X86Operation = Static
@@ -89,13 +85,7 @@ object Call {
           new Static(0xCB.toByte :: Nil, "retf") with NoDisplacement with NoImmediate
 
         protected def Imm16(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
-          new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize] {
-            implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = noOperandSizePrefixRequirement
-
-            override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & WordSize] = immediateValue
-
-            override def immediateOrder: OperandOrder = source
-          }
+          new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), source)
 
         def apply(): X86Operation = Static
 

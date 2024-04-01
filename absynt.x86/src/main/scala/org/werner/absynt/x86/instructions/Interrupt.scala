@@ -30,10 +30,7 @@ object Interrupt {
       }
 
     protected def Imm8(immediateValue: ImmediateValue[?] & ByteSize, mnemonic: String): X86Operation =
-      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-        override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement)
-        override def immediateOrder: OperandOrder = destination
-      }
+      new Static(0xCD.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), destination)
 
     object InterruptReturn {
       def apply(): X86Operation =

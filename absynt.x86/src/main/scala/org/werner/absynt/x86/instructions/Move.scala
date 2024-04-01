@@ -91,30 +91,20 @@ object Move extends I8086GenericRegisters {
         }
 
       protected def Imm8ToR8(register: ByteRegister, immediateValue: ImmediateValue[?] & ByteSize): X86Operation =
-        new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-          override def immediateOrder: OperandOrder = source
+        new RegisterEncoded[ByteSize](register, Seq(0xB0.toByte), mnemonic) with NoDisplacement with Immediate[ByteSize](immediateValue, source) {
           override def registerOrder: OperandOrder = destination
         }
 
       protected def Imm16ToR16[Size <: MaxWideSize](register: GeneralPurposeRegister & Size, immediateValue: ImmediateValue[?] & Size): X86Operation =
-        new RegisterEncoded[Size](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & Size] = immediateValue
-          override def immediateOrder: OperandOrder = source
+        new RegisterEncoded[Size](register, Seq(0xB8.toByte), mnemonic) with NoDisplacement with Immediate[Size](immediateValue, source) {
           override def registerOrder: OperandOrder = destination
         }
 
       protected def Imm8ToRM8(operand: ModRMEncodableOperand & ByteSize, immediateValue: ImmediateValue[?] & ByteSize) =
-        new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-          override def immediateOrder: OperandOrder = source
-        }
+        new ModRM(operand, 0xC6.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[ByteSize](immediateValue, source)
 
       protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand & OperandSize, immediateValue: ImmediateValue[?] & OperandSize) =
-        new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[OperandSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & OperandSize] = immediateValue
-          override def immediateOrder: OperandOrder = source
-        }
+        new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) with NoDisplacement with Immediate[OperandSize](immediateValue, source)
 
       sealed abstract class MoveForLabel(targetLabel: Label) extends AbsoluteReference(targetLabel) {
         def size: Int

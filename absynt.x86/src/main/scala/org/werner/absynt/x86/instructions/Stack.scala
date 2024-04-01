@@ -82,10 +82,7 @@ object Stack {
       }
 
       protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue[?] & Size): X86Operation =
-        new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & Size] = immediateValue
-          override def immediateOrder: OperandOrder = destination
-        }
+        new Static(0x68.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[Size](immediateValue, destination)
 
       protected def R16[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
         new RegisterEncoded[RMMaxSize](register, Seq(0x50.toByte), mnemonic) with NoDisplacement with NoImmediate {
@@ -97,10 +94,7 @@ object Stack {
 
 
       protected def Imm8(immediateValue: ImmediateValue[?] & ByteSize): X86Operation =
-        new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize] {
-          override def immediate: OperandWithOperandSizePrefixInfo[ImmediateValue[?] & ByteSize] = immediateValue
-          override def immediateOrder: OperandOrder = destination
-        }
+        new Static(0x6A.toByte :: Nil, mnemonic) with NoDisplacement with Immediate[ByteSize](immediateValue, destination)
 
       def apply[Size <: RMMaxSize](register: GeneralPurposeRegister & Size): X86Operation =
         R16(register)
