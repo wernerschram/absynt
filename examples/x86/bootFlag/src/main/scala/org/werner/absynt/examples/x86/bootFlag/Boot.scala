@@ -20,7 +20,7 @@ import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
-import org.werner.absynt.{Label, UniqueLabel}
+import org.werner.absynt.Label
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
@@ -79,7 +79,7 @@ object Boot extends App {
       Move((320*67).toShort, CX) ::
       StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
 
-      { val label: UniqueLabel = Label.unique; Jump(label).label(label) } ::
+      { val label = Label.unique; Jump(label).label(label) } ::
       Nil
     )
 
