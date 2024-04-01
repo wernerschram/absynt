@@ -24,10 +24,14 @@ object IncrementDecrement {
     self: ArchitectureBounds & ProcessorMode =>
 
     private def RM8(operand: ModRMEncodableOperand & ByteSize, rValue: Byte, mnemonic: String): X86Operation =
-      new ModRM(operand, 0xFE.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
+      new ModRM(operand, 0xFE.toByte :: Nil, rValue, mnemonic, destination) 
+        with NoDisplacement 
+        with NoImmediate
 
     private def RM16[Size <: MaxWideSize](operand: ModRMEncodableOperand & Size, rValue: Byte, mnemonic: String): X86Operation =
-      new ModRM(operand, 0xFF.toByte :: Nil, rValue, mnemonic, destination) with NoDisplacement with NoImmediate
+      new ModRM(operand, 0xFF.toByte :: Nil, rValue, mnemonic, destination) 
+        with NoDisplacement 
+        with NoImmediate
 
     abstract class BaseOperation(extension: Byte, val mnemonic: String) {
 
@@ -44,7 +48,9 @@ object IncrementDecrement {
     self: ArchitectureBounds & ProcessorMode =>
 
     private def R16[Size <: MaxWideSize](register: GeneralPurposeRegister & Size, opcodeBase: Byte, mnemonic: String) =
-      new RegisterEncoded[Size](register, Seq(opcodeBase), destination, mnemonic) with NoDisplacement with NoImmediate
+      new RegisterEncoded[Size](register, Seq(opcodeBase), destination, mnemonic) 
+        with NoDisplacement 
+        with NoImmediate
 
     trait ShorterOperation {
       self: BaseOperation =>

@@ -60,11 +60,8 @@ trait NearPointer[Size<:ValueSize] extends DisplacementBytes {
     super.allOperands + OperandInfo.relative(pointer.operand, pointerOrder)(pointer.operandSizePrefixRequirement)
 }
 
-trait MemoryLocation[Size<:ValueSize] extends DisplacementBytes {
+trait MemoryLocation[Size<:ValueSize](location: OperandWithSizePrefixInfo[MemoryLocationType & Size], offsetOrder: OperandOrder) extends DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
-
-  def location: OperandWithSizePrefixInfo[MemoryLocationType & Size]
-  def offsetOrder: OperandOrder
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =
     super.allOperands + OperandInfo.memoryOffset(location.operand, offsetOrder)(location.operandSizePrefixRequirement, location.addressSizePrefixRequirement)

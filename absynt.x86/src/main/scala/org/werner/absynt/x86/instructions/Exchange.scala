@@ -16,7 +16,6 @@ package org.werner.absynt.x86.instructions
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 import org.werner.absynt.x86.operands.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.OperandOrder
 import org.werner.absynt.x86.operations.*
 
 object Exchange {
