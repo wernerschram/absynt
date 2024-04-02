@@ -30,13 +30,6 @@ trait NoDisplacement extends DisplacementBytes {
   override def displacementBytes: Seq[Byte] = Nil
 }
 
-trait ModRMDisplacement[Size<:ValueSize] extends DisplacementBytes {
-  self: X86Operation & ModRM[Size] & ImmediateBytes =>
-  val operandRM: ModRMEncodableOperand & Size
-
-  override def displacementBytes: Seq[Byte] = Nil
-}
-
 trait FarPointer[OffsetSize<:WordDoubleSize](pointer: OperandWithOperandSizePrefixInfo[FarPointerType[OffsetSize] & FarPointerSize[OffsetSize]]) extends DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
 
