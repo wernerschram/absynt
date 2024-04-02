@@ -32,8 +32,8 @@ object InProc64 extends App {
 
   val inProc = new InProcApplication(text :: Nil)
 
-  val addFunc: (Int, Int) => Int = inProc.functionForLabel[Int, Int, Int](entryLabel)
-  val result: Int = addFunc(2,3)
+  val addFunc: (Long, Long) => Long = inProc.functionForLabel[Long, Long, Long](entryLabel)
+  val result: Long = addFunc(2,3)
   println(s"2 + 3 = $result")
 
   inProc.close()

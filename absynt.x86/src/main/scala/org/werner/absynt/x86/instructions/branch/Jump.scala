@@ -29,23 +29,23 @@ object Jump {
     sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
 
       protected def Rel8(nearPointer: NearPointer & ByteSize): Static & NearPointerOperation[ByteSize] & NoImmediate =
-        new Static(shortOpcode, mnemonic) 
-          with NearPointerOperation[ByteSize](nearPointer, destination) 
+        new Static(shortOpcode, mnemonic)
+          with NearPointerOperation[ByteSize](nearPointer, destination)
           with NoImmediate
 
       protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
-        new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false) 
-          with NoDisplacement 
+        new ModRM(operand, 0xff.toByte :: Nil, 4, mnemonic, destination, false)
+          with NoDisplacement
           with NoImmediate
 
       protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
-        new Static(0xEA.toByte :: Nil, mnemonic) 
+        new Static(0xEA.toByte :: Nil, mnemonic)
           with FarPointerOperation[Size](operandWithOperandSizePrefixInfo(farPointer))
           with NoImmediate
 
       protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =
-        new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination) 
-          with NoDisplacement 
+        new ModRM(operand, 0xFF.toByte :: Nil, 5, s"$mnemonic FAR", destination)
+          with NoDisplacement
           with NoImmediate
     }
 
@@ -71,20 +71,15 @@ object Jump {
     sealed abstract class ShortOrLongRelativeJumpI386(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) {
 
-      protected def Rel16(nearPointer: NearPointer & WordSize): Static & NearPointerOperation[WordSize] & NoImmediate = {
-        new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & WordSize] = nearPointer
+      protected def Rel16(nearPointer: NearPointer & WordSize): Static & NearPointerOperation[WordSize] & NoImmediate =
+        new Static(longOpcode, mnemonic)
+          with NearPointerOperation[WordSize](nearPointer, destination)
+          with NoImmediate
 
-          override def pointerOrder: OperandOrder = destination
-        }
-      }
-
-      protected def Rel32(nearPointer: NearPointer & DoubleWordSize): Static & NearPointerOperation[DoubleWordSize] & NoImmediate = {
-        new Static(longOpcode, mnemonic) with NearPointerOperation[DoubleWordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & DoubleWordSize] = nearPointer
-          override def pointerOrder: OperandOrder = destination
-        }
-      }
+      protected def Rel32(nearPointer: NearPointer & DoubleWordSize): Static & NearPointerOperation[DoubleWordSize] & NoImmediate =
+        new Static(longOpcode, mnemonic)
+          with NearPointerOperation[DoubleWordSize](nearPointer, destination)
+          with NoImmediate
     }
   }
 
@@ -101,12 +96,10 @@ object Jump {
             Rel16(p)
         }
 
-      private def Rel16(nearPointer: NearPointer & WordSize) = {
-        new Static(longOpcode, mnemonic) with NearPointerOperation[WordSize] with NoImmediate {
-          override val pointer: OperandWithOperandSizePrefixInfo[NearPointer & WordSize] = nearPointer
-          override def pointerOrder: OperandOrder = destination
-        }
-      }
+      private def Rel16(nearPointer: NearPointer & WordSize) =
+        new Static(longOpcode, mnemonic)
+          with NearPointerOperation[WordSize](nearPointer, destination)
+          with NoImmediate
 
       def apply(targetLabel: Label): LabelJumpOperation = {
         LabelJumpOperation(

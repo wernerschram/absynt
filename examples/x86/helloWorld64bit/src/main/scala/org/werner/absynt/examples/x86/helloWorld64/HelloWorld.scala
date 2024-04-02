@@ -52,17 +52,6 @@ object HelloWorld extends App {
       Nil
     )
 
-    val text2: Section = Section.text(
-      Move(EBP, SIBMemoryLocation[DoubleWordSize](R9, R8, 0, 2)) ::
-        Pop(ES) ::
-        Pop(FS) ::
-        EncodedBytes(0x66.toByte) ::
-        Pop(FS) ::
-        EncodedBytes(Seq(0x66.toByte, 0x48.toByte)) ::
-        Pop(FS) ::
-      Nil
-    )
-
     val data: Section = Section.data(
       EncodedString(output).label(hello) ::
       Nil, alignment = 4
@@ -74,7 +63,7 @@ object HelloWorld extends App {
     val outputFilePath = outputPath.resolve("helloworld")
     val out = new FileOutputStream(outputFilePath.toFile)
 
-    val exec = Executable(Architecture.X86_64, text :: text2 :: data :: Nil, entry, 0x8048000)
+    val exec = Executable(Architecture.X86_64, text :: data :: Nil, entry, 0x8048000)
     (text.content zip text.content.encodables(exec.encodablesForDependencies(text.content.dependentResources))).foreach {
       case (orig: RelativeReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")
       case (orig: AbsoluteReference, encoded) => Console.println(s"${encoded.encodeByte.hexString} $encoded (${orig.target})")

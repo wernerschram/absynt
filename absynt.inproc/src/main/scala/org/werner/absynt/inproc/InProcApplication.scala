@@ -94,6 +94,10 @@ object InProcApplication {
     override def invoke(function: Function, params: Array[AnyRef]): Int = function.invokeInt(params)
   }
 
+  implicit final def longReturnType: ReturnType[Long] = new ReturnType[Long] {
+    override def invoke(function: Function, params: Array[AnyRef]): Long = function.invokeInt(params)
+  }
+
 }
 
 object Libc {
