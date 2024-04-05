@@ -68,37 +68,38 @@ abstract sealed class LoadStoreOffset private(val updateDirection: UpdateDirecti
 }
 
 object LoadStoreOffset {
-  implicit def apply(offset: Short, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
+  def apply(offset: Short, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
       override val encode: Int = 0x04000000 | offset | this.updateDirection.bitMask
 
       override def toString: String = s"#${this.updateDirection.sign}$offset"
     }
 
-  val noOffset: LoadStoreOffset = apply(0.toShort)
 
-  implicit def apply(offset: Short): LoadStoreOffset = if offset >= 0 then
+  given Conversion[Short, LoadStoreOffset] = offset => if offset >= 0 then
     apply(offset, UpdateDirection.Increment)
   else
     apply((-offset).toShort, UpdateDirection.Decrement)
 
-  implicit def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
+  val noOffset: LoadStoreOffset = 0.toShort
+
+  def apply(offsetRegister: GeneralRegister, updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
       override val encode: Int = 0x06000000 | offsetRegister.registerCode | this.updateDirection.bitMask
 
       override def toString: String = s"${this.updateDirection.sign}$offsetRegister"
     }
 
-  implicit def apply(offsetRegister: GeneralRegister): LoadStoreOffset = apply(offsetRegister, UpdateDirection.Increment)
+  given Conversion[GeneralRegister, LoadStoreOffset] = offsetRegister => apply(offsetRegister, UpdateDirection.Increment)
 
-  implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
+  def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue], updateDirection: UpdateDirection.UpdateDirection): LoadStoreOffset =
     new LoadStoreOffset(updateDirection) {
       override val encode: Int = 0x06000000 | offset.encode | this.updateDirection.bitMask
 
       override def toString: String = s"${this.updateDirection.sign}$offset"
     }
 
-  implicit def apply(offset: ShiftRegisterWithShift[ImmediateShiftValue]): LoadStoreOffset = apply(offset, UpdateDirection.Increment)
+  given Conversion[ShiftRegisterWithShift[ImmediateShiftValue], LoadStoreOffset] = offset => apply(offset, UpdateDirection.Increment)
 }
 
 abstract sealed class LoadStoreMiscellaneousOffset private(val updateDirection: UpdateDirection.UpdateDirection) {
@@ -113,7 +114,7 @@ object LoadStoreMiscellaneousOffset {
       override def toString: String = s"#${this.updateDirection.sign}$offset"
     }
 
-  implicit def apply(offset: Byte): LoadStoreMiscellaneousOffset = if offset >= 0 then
+  given Conversion[Byte, LoadStoreMiscellaneousOffset] = offset => if offset >= 0 then
     apply(offset, UpdateDirection.Increment)
   else
     apply((-offset).toByte, UpdateDirection.Decrement)
@@ -125,7 +126,7 @@ object LoadStoreMiscellaneousOffset {
       override def toString: String = s"${this.updateDirection.sign}$offsetRegister"
     }
 
-  implicit def apply(offsetRegister: GeneralRegister): LoadStoreMiscellaneousOffset = apply(offsetRegister, UpdateDirection.Increment)
+  given Conversion[GeneralRegister, LoadStoreMiscellaneousOffset] = offsetRegister => apply(offsetRegister, UpdateDirection.Increment)
 }
 
 object UpdateDirection {

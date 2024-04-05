@@ -24,7 +24,7 @@ class MultiplySuite extends AnyWordSpec with Matchers {
   "an MultiplyAccumulate instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode mlagt r1, r3, r2, r4" in {
         MultiplyAccumulate(R1, R2, R3, R4, Condition.SignedGreaterThan).encodeByte should be(Hex.msb("c0214293"))
@@ -43,7 +43,7 @@ class MultiplySuite extends AnyWordSpec with Matchers {
   "an Multiply instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode mulgt r1, r3, r2" in {
         Multiply(R1, R2, R3, Condition.SignedGreaterThan).encodeByte should be(Hex.msb("c0010293"))

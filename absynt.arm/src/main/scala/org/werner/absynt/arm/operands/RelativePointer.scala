@@ -29,7 +29,7 @@ trait RelativeOffset {
 sealed case class ArmRelativeOffset(override val offset: Int) extends ArmOffset(offset) with RelativeOffset
 
 object ArmRelativeOffset {
-  implicit def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection): ArmOffset & RelativeOffset =
+  def positionalOffset(offsetValue: Long)(offsetDirection: RelativeOffsetDirection): ArmOffset & RelativeOffset =
     offsetDirection match {
       case OffsetDirection.Self => ArmRelativeOffset(-8)
       case OffsetDirection.Forward => ArmRelativeOffset((offsetValue - 4).toInt)

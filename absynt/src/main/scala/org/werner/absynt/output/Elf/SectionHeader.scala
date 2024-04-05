@@ -31,7 +31,7 @@ abstract class SectionHeader(elf: Elf) {
   def alignBytes: Int
   def entrySize: Int
 
-  implicit def endianness: Endianness = elf.endianness
+  given Endianness = elf.endianness
 
   def resources: Seq[Resource] =
     EncodedBytes(

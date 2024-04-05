@@ -20,7 +20,7 @@ import org.werner.absynt.sections.{DataSection, Section, TextSection}
 class ProgramHeader(val section: Section, val flags: Flags[ProgramFlag], elf: Elf) {
   def `type`: ProgramType = ProgramType.Load
 
-  implicit def endianness: Endianness = elf.endianness
+  given endianness: Endianness = elf.endianness
 
   def resources: Seq[Resource] = elf.architecture.processorClass match {
     case ProcessorClass._32Bit =>

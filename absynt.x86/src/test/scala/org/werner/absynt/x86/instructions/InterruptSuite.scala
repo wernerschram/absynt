@@ -25,7 +25,7 @@ class InterruptSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode int 0x03" in {
         Interrupt(0x03.toByte).encodeByte should be (Hex.lsb("CC"))
@@ -44,7 +44,7 @@ class InterruptSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode int 0x01" in {
         Interrupt(0x01.toByte).encodeByte should be (Hex.lsb("F1"))
@@ -56,7 +56,7 @@ class InterruptSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode int 0x02" in {
         Interrupt(0x02.toByte).encodeByte should be (Hex.lsb("CD 02"))
@@ -71,7 +71,7 @@ class InterruptSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode iret" in {
         InterruptReturn().encodeByte should be (Hex.lsb("CF"))

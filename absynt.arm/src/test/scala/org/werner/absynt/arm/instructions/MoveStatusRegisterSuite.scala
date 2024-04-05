@@ -25,7 +25,7 @@ class MoveStatusRegisterSuite extends AnyWordSpec with Matchers {
   "an MoveFromStatusRegister instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode mrs r1, CPSR" in {
         MoveFromStatusRegister(CPSR, R1).encodeByte should be(Hex.msb("e10f1000"))
@@ -46,7 +46,7 @@ class MoveStatusRegisterSuite extends AnyWordSpec with Matchers {
   "an MoveToStatusRegister instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode msr SPSR_xc, r1" in {
         MoveToStatusRegister(R1, SPSR, Fields.control + Fields.extension).encodeByte should be(Hex.msb("e163f001"))

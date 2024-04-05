@@ -62,17 +62,19 @@ class InProcApplication(val sections: Seq[Section]) extends Application with Aut
 
   def functionForLabel[Out: ReturnType](label: Label): () => Out = {
     val function = Function.getFunction(labelPointers(label))
-    () => implicitly[ReturnType[Out]].invoke(function, Array.empty)
+    () => function.invokeRet(Array.empty)
   }
 
   def functionForLabel[Out: ReturnType, In1](label: Label): In1 => Out = {
     val function = Function.getFunction(labelPointers(label))
-    (arg1: In1) => implicitly[ReturnType[Out]].invoke(function, Array(arg1.asInstanceOf[AnyRef]))
+    (arg1: In1) =>
+      function.invokeRet(Array(arg1.asInstanceOf[AnyRef]))
   }
 
   def functionForLabel[Out: ReturnType, In1, In2](label: Label): (In1, In2) => Out = {
     val function = Function.getFunction(labelPointers(label))
-    (arg1: In1, arg2: In2) => implicitly[ReturnType[Out]].invoke(function, Array(arg1.asInstanceOf[AnyRef], arg2.asInstanceOf[AnyRef]))
+    (arg1: In1, arg2: In2) =>
+     function.invokeRet(Array(arg1.asInstanceOf[AnyRef], arg2.asInstanceOf[AnyRef]))
   }
 
   override lazy val alignmentFillers: Map[Section, AlignmentFiller] = sections.map(s => s -> AlignmentFiller(s)).toMap
@@ -86,18 +88,15 @@ class InProcApplication(val sections: Seq[Section]) extends Application with Aut
 }
 
 object InProcApplication {
-  sealed abstract class ReturnType[Out] {
-    def invoke(function: Function, params: Array[AnyRef]): Out
+  sealed trait ReturnType[Out] {
+    extension(function: Function) def invokeRet(params: Array[AnyRef]): Out
   }
 
-  implicit final def intReturnType: ReturnType[Int] = new ReturnType[Int] {
-    override def invoke(function: Function, params: Array[AnyRef]): Int = function.invokeInt(params)
-  }
+  given ReturnType[Int] with
+    extension(function: Function) override def invokeRet(params: Array[AnyRef]): Int = function.invokeInt(params)
 
-  implicit final def longReturnType: ReturnType[Long] = new ReturnType[Long] {
-    override def invoke(function: Function, params: Array[AnyRef]): Long = function.invokeInt(params)
-  }
-
+  given ReturnType[Long] with
+    extension(function: Function) override def invokeRet(params: Array[AnyRef]): Long = function.invokeInt(params)
 }
 
 object Libc {

@@ -17,6 +17,7 @@ import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 import org.werner.absynt.x86.operands.{Accumulator, ByteSize, ImmediateValue}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, destination}
 import org.werner.absynt.x86.operations.*
+import scala.language.implicitConversions
 
 object Adjust {
   trait Operations {

@@ -27,12 +27,12 @@ object Interrupt {
       new Static(opcode :: Nil, mnemonic) 
         with NoDisplacement 
         with NoImmediate 
-        with ExtraOperands(OperandInfo.implicitOperand(interrupt, destination)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(interrupt, destination)(using noOperandSizePrefixRequirement))
 
     protected def Imm8(immediateValue: ImmediateValue[?] & ByteSize, mnemonic: String): X86Operation =
       new Static(0xCD.toByte :: Nil, mnemonic) 
         with NoDisplacement 
-        with Immediate[ByteSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), destination)
+        with Immediate[ByteSize](immediateValue.withSizePrefixRequirement(noOperandSizePrefixRequirement), destination)
 
     object InterruptReturn {
       def apply(): X86Operation =

@@ -24,7 +24,7 @@ class InterruptFlagSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode cli" in {
         ClearInterruptFlag().encodeByte should be(Hex.lsb("FA"))
@@ -33,7 +33,7 @@ class InterruptFlagSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode cli" in {
         ClearInterruptFlag().encodeByte should be(Hex.lsb("FA"))
@@ -45,7 +45,7 @@ class InterruptFlagSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode sti" in {
         SetInterruptFlag().encodeByte should be(Hex.lsb("FB"))
@@ -53,7 +53,7 @@ class InterruptFlagSuite extends AnyWordSpec with Matchers {
     }
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode sti" in {
         SetInterruptFlag().encodeByte should be(Hex.lsb("FB"))

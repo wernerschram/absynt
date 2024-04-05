@@ -15,23 +15,31 @@ package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode, RexRequirement}
 import org.werner.absynt.x86.operands.*
-
 import scala.language.implicitConversions
 
-case class OperandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement)
-case class OperandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit val addressSizePrefixRequirement: AddressSizePrefixRequirement)
-case class OperandWithSizePrefixInfo[T<: Operand](operand: T)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement, val addressSizePrefixRequirement: AddressSizePrefixRequirement)
+case class OperandWithOperandSizePrefixInfo[T<: Operand](operand: T)(using val operandSizePrefixRequirement: OperandSizePrefixRequirement)
+case class OperandWithAddressSizePrefixInfo[T<: Operand](operand: T)(using val addressSizePrefixRequirement: AddressSizePrefixRequirement)
+case class OperandWithSizePrefixInfo[T<: Operand](operand: T)(using val operandSizePrefixRequirement: OperandSizePrefixRequirement, val addressSizePrefixRequirement: AddressSizePrefixRequirement)
 
 trait OperandSizeInfo {
   self: ArchitectureBounds & ProcessorMode =>
-  implicit def operandWithOperandSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
-    OperandWithOperandSizePrefixInfo(operand)
 
-  implicit def operandWithAddressSizePrefixInfo[T<: Operand](operand: T)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithAddressSizePrefixInfo[T] =
-    OperandWithAddressSizePrefixInfo(operand)
+  extension [T <: Operand](operand: T) {
+    def withSizePrefixRequirement(operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandWithOperandSizePrefixInfo[T] =
+      OperandWithOperandSizePrefixInfo(operand)(using operandSizePrefixRequirement)
+  }
 
-  implicit def operandWithSizePrefixInfo[T<: Operand](operand: T)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandWithSizePrefixInfo[T] =
-    OperandWithSizePrefixInfo(operand)
+  given [T <: Operand]: Conversion[T, OperandWithOperandSizePrefixInfo[T]] with
+    override def apply(operand: T): OperandWithOperandSizePrefixInfo[T] =
+      OperandWithOperandSizePrefixInfo(operand)
+
+  given [T <: Operand]: Conversion[T, OperandWithAddressSizePrefixInfo[T]] with
+    override def apply(operand: T): OperandWithAddressSizePrefixInfo[T] =
+      OperandWithAddressSizePrefixInfo(operand)
+
+  given [T <: Operand]: Conversion[T, OperandWithSizePrefixInfo[T]] with
+    override def apply(operand: T): OperandWithSizePrefixInfo[T] =
+      OperandWithSizePrefixInfo(operand)
 
   val noOperandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
     override def normalOperand(size: Operand & ValueSize): Boolean = false
@@ -44,7 +52,7 @@ trait OperandSizeInfo {
   }
 }
 
-sealed abstract class OperandInfo[Size<:OperandSize](val operand: Operand & Size, val order: OperandInfo.OperandOrder.Value)(implicit val operandSizePrefixRequirement: OperandSizePrefixRequirement) extends Ordered[OperandInfo[?]] {
+sealed abstract class OperandInfo[Size<:OperandSize](val operand: Operand & Size, val order: OperandInfo.OperandOrder.Value)(using val operandSizePrefixRequirement: OperandSizePrefixRequirement) extends Ordered[OperandInfo[?]] {
   override def toString: String = operand.toString
 
   override def compare(that: OperandInfo[?]): Int = order compare that.order
@@ -94,40 +102,40 @@ object OperandInfo {
 
   import OperandOrder._
 
-  def pointer(pointer: memoryaccess.FarPointer[?] & FarPointerSize[?], operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def pointer(pointer: memoryaccess.FarPointer[?] & FarPointerSize[?], operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[FarPointerSize[?]](pointer, operandOrder) with PointerOperandSizePrefix //ptrXX
 
-  def relative(pointer: memoryaccess.NearPointer & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def relative(pointer: memoryaccess.NearPointer & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](pointer, operandOrder) with NormalOperandSizePrefix //relXX
 
-  def immediate(immediate: ImmediateValue[?] & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def immediate(immediate: ImmediateValue[?] & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](immediate, operandOrder) with NormalOperandSizePrefix  //immXX
 
-  def implicitOperand(operand: Operand & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def implicitOperand(operand: Operand & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](operand, operandOrder) with NormalOperandSizePrefix  //XX
 
-  def implicitPort(operand: DataRegister & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def implicitPort(operand: DataRegister & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](operand, operandOrder) with NoOperandSizePrefix //XX
 
-  def implicitAddress(memoryLocation: memoryaccess.MemoryLocation & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement,  addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[?] =
+  def implicitAddress(memoryLocation: memoryaccess.MemoryLocation & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement,  addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](memoryLocation, operandOrder) with NormalOperandSizePrefix {
       override def addressOperands: Set[AddressOperandInfo] =
         memoryLocation.addressOperands
     } //XX
 
-  def encodedRegister(register: GeneralPurposeRegister & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def encodedRegister(register: GeneralPurposeRegister & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](register, operandOrder) with NormalOperandSizePrefix {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOpcodeReg)
     } //rX
 
-  def memoryOffset(offset: memoryaccess.MemoryLocation & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement,  addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[?] =
+  def memoryOffset(offset: memoryaccess.MemoryLocation & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement,  addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](offset, operandOrder) with NoOperandSizePrefix {
 
       override def addressOperands: Set[AddressOperandInfo] =
         offset.addressOperands
     } //moffsXX
 
-  def rmRegisterOrMemory(rm: ModRMEncodableOperand & ValueSize, operandOrder: OperandOrder, includeRexW: Boolean)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[?] =
+  def rmRegisterOrMemory(rm: ModRMEncodableOperand & ValueSize, operandOrder: OperandOrder, includeRexW: Boolean)(using operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](rm, operandOrder) with NormalOperandSizePrefix {
       override def addressOperands: Set[AddressOperandInfo] = rm match {
         case l: memoryaccess.MemoryLocation => l.addressOperands
@@ -143,16 +151,16 @@ object OperandInfo {
       }
     }//r/mXX
 
-  def rmRegister(register: GeneralPurposeRegister & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def rmRegister(register: GeneralPurposeRegister & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](register, operandOrder) with NormalOperandSizePrefix {
       override def rexRequirements: Set[RexRequirement] = super.rexRequirements ++ register.rexRequirements(RexRequirement.instanceOperandR)
     } //rXX
 
-  def rmSegment(register: SegmentRegister & ValueSize, operandOrder: OperandOrder)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
+  def rmSegment(register: SegmentRegister & ValueSize, operandOrder: OperandOrder)(using operandSizePrefixRequirement: OperandSizePrefixRequirement): OperandInfo[?] =
     new OperandInfo[ValueSize](register, operandOrder) with NoOperandSizePrefix //SregXX
 }
 
-sealed class AddressOperandInfo(val operand: Operand & ValueSize, val segmentOverride: Option[SegmentRegister] = None)(implicit val addressSizePrefixRequirement: AddressSizePrefixRequirement) {
+sealed class AddressOperandInfo(val operand: Operand & ValueSize, val segmentOverride: Option[SegmentRegister] = None)(using val addressSizePrefixRequirement: AddressSizePrefixRequirement) {
   override def toString: String = operand.toString
 
   def requiresAddressSize: Boolean =
@@ -162,28 +170,28 @@ sealed class AddressOperandInfo(val operand: Operand & ValueSize, val segmentOve
 }
 
 object AddressOperandInfo {
-  def rmIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & IndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & IndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOperandRM)
     }
 
-  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & BaseRegisterReference & RegisterSize)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & BaseRegisterReference & RegisterSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register)
 
-  def rmDisplacement(displacement: ImmediateValue[?] & ValueSize, segmentOverride: Option[SegmentRegister])(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmDisplacement(displacement: ImmediateValue[?] & ValueSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(displacement, segmentOverride)
 
-  def SIBBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & SIBBaseRegister & RegisterSize)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def SIBBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & SIBBaseRegister & RegisterSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register) {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceBase)
     }
 
-  def SIBIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & SIBIndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def SIBIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & SIBIndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceIndex)
     }
 
-  def memoryOffset(offset: memoryaccess.MemoryLocation & ValueSize)(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def memoryOffset(offset: memoryaccess.MemoryLocation & ValueSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(offset)
 
 }

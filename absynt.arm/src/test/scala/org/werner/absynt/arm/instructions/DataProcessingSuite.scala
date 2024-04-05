@@ -21,13 +21,14 @@ import org.werner.absynt.resource.{Labeled, Resource, UnlabeledEncodable}
 import org.werner.absynt.sections.Section
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class DataProcessingSuite extends AnyWordSpec with Matchers {
 
   "an AddCarry instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode adc r2, r0, r1" in {
         AddCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0a02001"))
@@ -136,7 +137,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "an Add instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode add r2, r0, rr" in {
         Add(R0, R1, R2).encodeByte should be(Hex.msb("e0802001"))
@@ -188,7 +189,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent an add of a register and a labeled relative address as a string" in {
-        val targetLabel = Label("testLabel")
+        val targetLabel: Label = "testLabel"
         val instruction = Add.forRelativeLabel(R0, targetLabel, R1)
         instruction.toString shouldBe "add r1, r0, testLabel"
       }
@@ -229,7 +230,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "an And instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode and r2, r0, r1" in {
         And(R0, R1, R2).encodeByte should be(Hex.msb("e0002001"))
@@ -271,7 +272,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "an BitClear instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode bic r2, r0, r1" in {
         BitClear(R0, R1, R2).encodeByte should be(Hex.msb("e1c02001"))
@@ -296,7 +297,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a CompareNegative instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode cmn r0, r1" in {
         CompareNegative(R0, R1).encodeByte should be(Hex.msb("e1700001"))
@@ -311,7 +312,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a Compare instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode cmp r2, r0, r1" in {
         Compare(R0, R1).encodeByte should be(Hex.msb("e1500001"))
@@ -326,7 +327,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a Move instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode mov r2, r1" in {
         Move(R1, R2).encodeByte should be(Hex.msb("e1a02001"))
@@ -366,7 +367,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly represent an mov of a register and a labeled absolute address as a string" in {
-        val targetLabel = Label("testLabel")
+        val targetLabel: Label = "testLabel"
         val instruction = Move.forLabel(targetLabel, R1)
         instruction.toString shouldBe "mov r1, testLabel"
       }
@@ -407,7 +408,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "an ExclusiveOr instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode eor r4, r5, r9 lsl #2" in {
         ExclusiveOr(R5, Shift.logicalLeftShift(R9, 2.toByte), R4).encodeByte should be(Hex.msb("e0254109"))
@@ -433,7 +434,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a MoveNot instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode mvn r2, r1" in {
         MoveNot(R1, R2).encodeByte should be(Hex.msb("e1e02001"))
@@ -448,7 +449,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "an Or instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode orr r2, r0, r1" in {
         Or(R0, R1, R2).encodeByte should be(Hex.msb("e1802001"))
@@ -475,7 +476,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a ReverseSubtract instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode rsb r2, r0, r1" in {
         ReverseSubtract(R0, R1, R2).encodeByte should be(Hex.msb("e0602001"))
@@ -502,7 +503,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a ReverseSubtractCarry instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode rsc r2, r0, r1" in {
         ReverseSubtractCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0e02001"))
@@ -531,7 +532,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a SubtractCarry instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode sbc r2, r0, r1" in {
         SubtractCarry(R0, R1, R2).encodeByte should be(Hex.msb("e0c02001"))
@@ -559,7 +560,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a Subtract instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode sub r2, r0, r1" in {
         Subtract(R0, R1, R2).encodeByte should be(Hex.msb("e0402001"))
@@ -586,7 +587,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a TestEquivalence instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode teq r0, r1" in {
         TestEquivalence(R0, R1).encodeByte should be(Hex.msb("e1300001"))
@@ -602,7 +603,7 @@ class DataProcessingSuite extends AnyWordSpec with Matchers {
   "a Test instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode tst r2, r0, r1" in {
         Test(R0, R1).encodeByte should be(Hex.msb("e1100001"))

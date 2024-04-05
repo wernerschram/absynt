@@ -18,6 +18,7 @@ import org.werner.absynt.arm.operands._
 import org.werner.absynt.arm.operands.registers.GeneralRegister
 import org.werner.absynt.arm.operations._
 import org.werner.absynt.resource.{AbsoluteReference, RelativeReference, UnlabeledEncodable}
+import scala.language.implicitConversions
 
 class DataProcessing private (val code: Byte, val opcode: String) {
   def apply(source1: GeneralRegister, source2: Shifter, destination: GeneralRegister, condition: Condition = Condition.Always): DataProcessingOperation =

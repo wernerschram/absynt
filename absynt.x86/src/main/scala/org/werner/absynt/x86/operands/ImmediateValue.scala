@@ -13,13 +13,15 @@
 
 package org.werner.absynt.x86.operands
 
-import org.werner.absynt.ListExtensions._
+import org.werner.absynt.ListExtensions.*
+
+import scala.runtime.stdLibPatches.Predef.summon
 
 sealed class ImmediateValue[S : Integral](val value: S)
   extends Operand {
   self: ValueSize =>
 
-  val num: Integral[S] = implicitly[Integral[S]]
+  val num: Integral[S] = summon[Integral[S]]
   import num._
 
   val encodedValue: Seq[Byte] = value.encodeLittleEndian
@@ -44,15 +46,15 @@ object ImmediateValue {
   val quadWordImmediate: ValueToQuadWordImmediate = value => new ImmediateValue(value) with QuadWordSize {}
 
   trait I8086Implicits {
-    implicit val byteImm: ValueToByteImmediate = byteImmediate
-    implicit val wordImm: ValueToWordImmediate = wordImmediate
+    given ValueToByteImmediate = byteImmediate
+    given ValueToWordImmediate = wordImmediate
   }
 
   trait I386Implicits {
-    implicit val doubleWordImm: ValueToDoubleWordImmediate = doubleWordImmediate
+    given ValueToDoubleWordImmediate = doubleWordImmediate
   }
 
   trait X64Implicits {
-    implicit val quadWordImm: ValueToQuadWordImmediate = quadWordImmediate
+    given ValueToQuadWordImmediate = quadWordImmediate
   }
 }

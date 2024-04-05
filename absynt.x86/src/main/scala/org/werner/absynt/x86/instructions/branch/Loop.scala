@@ -21,13 +21,14 @@ import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
 import org.werner.absynt.x86.operations.{NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, NearPointer => NearPointerOperation}
+import scala.language.implicitConversions
 
 object Loop {
 
   trait Operations {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
-    sealed abstract class LoopOperations(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
+    sealed abstract class LoopOperations(val shortOpcode: Seq[Byte], val mnemonic: String) {
 
       protected def Rel8(nearPointer: NearPointer & ByteSize): Static & NearPointerOperation[ByteSize] & NoImmediate =
         new Static(shortOpcode, mnemonic) 

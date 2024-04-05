@@ -23,7 +23,7 @@ class GenericSuite extends AnyWordSpec with Matchers {
   "a lock instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode in lock" in {
         Lock().encodeByte should be(Hex.lsb("F0"))
@@ -37,7 +37,7 @@ class GenericSuite extends AnyWordSpec with Matchers {
   "a hlt instruction" when {
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode in hlt" in {
         Halt().encodeByte should be(Hex.lsb("F4"))
@@ -51,7 +51,7 @@ class GenericSuite extends AnyWordSpec with Matchers {
   "a cmc instruction" when {
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode in cmc" in {
         ComplementCarry().encodeByte should be(Hex.lsb("F5"))

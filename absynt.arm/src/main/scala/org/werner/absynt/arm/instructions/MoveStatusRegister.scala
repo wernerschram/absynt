@@ -22,7 +22,7 @@ object MoveStatusRegister {
   trait A32Operations {
     self: Condition.ARMCondition =>
     object MoveFromStatusRegister {
-      implicit val opcode: String = "mrs"
+      val opcode: String = "mrs"
 
       def apply(source: StatusRegister, destination: GeneralRegister, condition: Condition = Condition.Always): MoveFromStatusRegisterOperation =
         RegToStatus(source, destination, condition)
@@ -32,7 +32,7 @@ object MoveStatusRegister {
     }
 
     object MoveToStatusRegister {
-      implicit val opcode: String = "msr"
+      val opcode: String = "msr"
 
       def apply(source: GeneralRegister, destination: StatusRegister, fields: Fields.ValueSet): MoveToStatusRegisterOpcode =
         RegToReg(source, destination, fields, Condition.Always)

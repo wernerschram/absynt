@@ -20,7 +20,7 @@ abstract class Label {
 }
 
 object Label {
-  implicit def apply(value: String): Label = StringLabel(value)
+  given Conversion[String, Label] = value => StringLabel(value)
 
   def unique: UniqueLabel = synchronized {
     lastId += 1

@@ -13,17 +13,17 @@
 
 package org.werner.absynt.examples.x86.helloWorld64
 
-import java.io.FileOutputStream
-import java.nio.file.{Files, Paths}
-
-import org.werner.absynt.ListExtensions._
+import org.werner.absynt.ListExtensions.*
 import org.werner.absynt.output.Elf.{Architecture, Executable}
-import org.werner.absynt.resource.EncodableConversion._
+import org.werner.absynt.resource.EncodableConversion.*
 import org.werner.absynt.resource.{AbsoluteReference, RelativeReference}
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.DoubleWordSize
-import org.werner.absynt.{EncodedBytes, EncodedString, Label}
+import org.werner.absynt.{EncodedString, Label}
+
+import java.io.FileOutputStream
+import java.nio.file.{Files, Paths}
 import scala.language.implicitConversions
 
 object HelloWorld extends App {
@@ -31,7 +31,7 @@ object HelloWorld extends App {
 
   def createFile(): Unit = {
 
-    import ProcessorMode.Long._
+    import ProcessorMode.Long.{*, given}
 
     val entry: Label = "Entry"
     val hello: Label = "Text"

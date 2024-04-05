@@ -23,7 +23,7 @@ class SoftwareInterruptSuite extends AnyWordSpec with Matchers {
   "a SoftwareInterrupt instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode swi 10" in {
         SoftwareInterrupt(10).encodeByte should be(Hex.msb("ef00000a"))

@@ -24,7 +24,7 @@ class SystemSuite extends AnyWordSpec with Matchers {
   "a SysCall instruction" when {
 
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
 
       "correctly encode sysenter" in {
@@ -39,7 +39,7 @@ class SystemSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode syscall" in {
         SystemCall().encodeByte should be (Hex.lsb("0F 05"))

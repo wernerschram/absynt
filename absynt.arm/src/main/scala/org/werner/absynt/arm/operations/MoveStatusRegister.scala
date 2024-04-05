@@ -35,7 +35,7 @@ object Fields extends Enumeration {
   val status: Value = Value(18, "s")
   val flags: Value = Value(19, "f")
 
-  implicit def fieldsToString(set: ValueSet): String =
+  def fieldsToString(set: ValueSet): String =
     set.foldRight(new StringBuilder)((value, builder) => builder.addAll(value.toString)).result()
 }
 

@@ -26,8 +26,8 @@ sealed trait ArchitectureBounds {
   type MaxValueSize <: ValueSize
   type MaxWideSize <: WordDoubleQuadSize
 
-  implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement
-  implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement
+  given operandSizePrefixRequirement: OperandSizePrefixRequirement
+  given addressSizePrefixRequirement: AddressSizePrefixRequirement
 
 }
 
@@ -74,14 +74,12 @@ object ProcessorMode {
     with Generic.LegacyOperations
     with Loop.Operations
   {
-
-    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    given operandSizePrefixRequirement: OperandSizePrefixRequirement with {
       override def normalOperand(size: Operand & ValueSize): Boolean = false
       override def pointerOperand(size: Operand & FarPointerSize[?]): Boolean = false
     }
 
-    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement =
-      (_: Operand & ValueSize) => false
+    given addressSizePrefixRequirement: AddressSizePrefixRequirement = _ => false
 
     override def pointer(location: Long): ImmediateValue[Short] & WordDoubleQuadSize = location.toShort
   }
@@ -122,7 +120,7 @@ object ProcessorMode {
     with Loop.Operations
   {
 
-    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    given operandSizePrefixRequirement: OperandSizePrefixRequirement with {
       override def normalOperand(size: Operand & ValueSize): Boolean = size match {
         case _: DoubleWordSize => true
         case _ => false
@@ -133,10 +131,7 @@ object ProcessorMode {
       }
     }
 
-    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = {
-        case _: DoubleWordSize => true
-        case _ => false
-      }
+    given addressSizePrefixRequirement: AddressSizePrefixRequirement = _.isInstanceOf[DoubleWordSize]
 
     override def pointer(location: Long): ImmediateValue[Short] & WordDoubleQuadSize = location.toShort
   }
@@ -171,7 +166,7 @@ object ProcessorMode {
     with Generic.I386Operations
     with Loop.Operations
   {
-    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    given operandSizePrefixRequirement: OperandSizePrefixRequirement with {
       override def normalOperand(size: Operand & ValueSize): Boolean = size match {
         case _: WordSize => true
         case _ => false
@@ -182,10 +177,7 @@ object ProcessorMode {
       }
     }
 
-    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = {
-      case _: WordSize => true
-      case _ => false
-    }
+    given addressSizePrefixRequirement: AddressSizePrefixRequirement = _.isInstanceOf[WordSize]
 
     override def pointer(location: Long): ImmediateValue[Int] & WordDoubleQuadSize = location.toInt
   }
@@ -229,7 +221,7 @@ object ProcessorMode {
     with Generic.I386Operations
     with Loop.Operations
   {
-    implicit def operandSizePrefixRequirement: OperandSizePrefixRequirement = new OperandSizePrefixRequirement {
+    given operandSizePrefixRequirement: OperandSizePrefixRequirement with {
       override def normalOperand(size: Operand & ValueSize): Boolean = size match {
         case _: WordSize => true
         case _ => false
@@ -240,10 +232,7 @@ object ProcessorMode {
       }
     }
 
-    implicit def addressSizePrefixRequirement: AddressSizePrefixRequirement = {
-      case _: DoubleWordSize => true
-      case _ => false
-    }
+    given addressSizePrefixRequirement: AddressSizePrefixRequirement = _.isInstanceOf[DoubleWordSize]
 
     override def pointer(location: Long): ImmediateValue[Long] & WordDoubleQuadSize = location
   }

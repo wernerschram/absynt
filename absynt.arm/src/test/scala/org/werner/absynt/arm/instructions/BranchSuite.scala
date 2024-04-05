@@ -21,13 +21,14 @@ import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class BranchSuite extends AnyWordSpec with Matchers {
 
   "an Branch instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
 
       "correctly encode b +0x3e8" in {
@@ -135,7 +136,7 @@ class BranchSuite extends AnyWordSpec with Matchers {
   "an BranchLink instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode bleq 0x1111118" in {
         BranchLink(RelativeA32Pointer(ArmRelativeOffset(0x1111110)), Equal).encodeByte should be(Hex.msb("0b444444"))
@@ -164,7 +165,7 @@ class BranchSuite extends AnyWordSpec with Matchers {
   "an BranchLinkExchange instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode blx 0x123C" in {
         BranchLinkExchange(RelativeThumbPointer(ArmRelativeOffset(0x1234))).encodeByte should be(Hex.msb("fa00048d"))
@@ -205,7 +206,7 @@ class BranchSuite extends AnyWordSpec with Matchers {
   "a BranchExchange instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode bx r1" in {
         BranchExchange(R1).encodeByte should be(Hex.msb("e12fff11"))
@@ -221,7 +222,7 @@ class BranchSuite extends AnyWordSpec with Matchers {
   "a BranchExchangeJazelle instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode bxj r2" in {
         BranchExchangeJazelle(R2).encodeByte should be(Hex.msb("e12fff22"))

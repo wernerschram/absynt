@@ -34,7 +34,7 @@ trait FarPointer[OffsetSize<:WordDoubleSize](pointer: OperandWithOperandSizePref
   self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =
-    super.allOperands + OperandInfo.pointer(pointer.operand, destination)(pointer.operandSizePrefixRequirement)
+    super.allOperands + OperandInfo.pointer(pointer.operand, destination)(using pointer.operandSizePrefixRequirement)
 
   override def displacementBytes: Seq[Byte] = pointer.operand.encodeByte
 }
@@ -45,17 +45,17 @@ trait NearPointer[Size<:ValueSize](pointer: OperandWithOperandSizePrefixInfo[Nea
   override def displacementBytes: Seq[Byte] = pointer.operand.encodeBytes
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =
-    super.allOperands + OperandInfo.relative(pointer.operand, pointerOrder)(pointer.operandSizePrefixRequirement)
+    super.allOperands + OperandInfo.relative(pointer.operand, pointerOrder)(using pointer.operandSizePrefixRequirement)
 }
 
 trait MemoryLocation[Size<:ValueSize](location: OperandWithSizePrefixInfo[MemoryLocationType & Size], offsetOrder: OperandOrder) extends DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =
-    super.allOperands + OperandInfo.memoryOffset(location.operand, offsetOrder)(location.operandSizePrefixRequirement, location.addressSizePrefixRequirement)
+    super.allOperands + OperandInfo.memoryOffset(location.operand, offsetOrder)(using location.operandSizePrefixRequirement, location.addressSizePrefixRequirement)
 
   override def displacementBytes: Seq[Byte] = location.operand.displacement.toSeq.flatMap(_.encodedValue)
 
-  def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] =
-    location.operand.addressOperands(location.addressSizePrefixRequirement)
+  def addressOperands(using AddressSizePrefixRequirement): Set[AddressOperandInfo] =
+    location.operand.addressOperands(using location.addressSizePrefixRequirement)
 }

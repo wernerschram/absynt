@@ -32,7 +32,7 @@ abstract class ModRM[Size<:ValueSize](val operandRM: ModRMEncodableOperand & Siz
                      val rValue: Byte,
                      override val mnemonic: String,
                      val operandRMOrder: OperandOrder,
-                     includeRexW: Boolean = true)(implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
+                     includeRexW: Boolean = true)(using OperandSizePrefixRequirement, AddressSizePrefixRequirement)
   extends X86Operation(code), ModRMBytes {
 
   self: DisplacementBytes & ImmediateBytes =>
@@ -48,7 +48,7 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister & Size,
                                 override val code: Seq[Byte],
                                 override val mnemonic: String,
                                 override val operandRMOrder: OperandOrder)
-                               (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
+                               (using OperandSizePrefixRequirement, AddressSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerOrMemoryModeCode, mnemonic, operandRMOrder), NoDisplacement, NoImmediate {
 
   def operandROrder: OperandOrder =
@@ -63,7 +63,7 @@ class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
                                              override val code: Seq[Byte],
                                              override val mnemonic: String,
                                              override val operandRMOrder: OperandOrder)
-                                            (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement, addressSizePrefixRequirement: AddressSizePrefixRequirement)
+                                            (using OperandSizePrefixRequirement, AddressSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerCode, mnemonic, operandRMOrder) {
   self: X86Operation & DisplacementBytes & ImmediateBytes =>
 

@@ -17,6 +17,7 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
+import scala.language.implicitConversions
 
 object IO {
 

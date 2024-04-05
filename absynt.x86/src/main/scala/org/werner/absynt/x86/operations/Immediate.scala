@@ -14,7 +14,9 @@
 package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.operands.{ImmediateValue, ValueSize}
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{*, given}
+
+import scala.language.implicitConversions
 
 sealed trait ImmediateBytes {
   self: X86Operation & ModRMBytes & DisplacementBytes =>
@@ -31,7 +33,7 @@ trait Immediate[Size<:ValueSize](val immediate: OperandWithOperandSizePrefixInfo
   self: X86Operation & ModRMBytes & DisplacementBytes =>
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =
-    super.allOperands + OperandInfo.immediate(immediate.operand, immediateOrder)(immediate.operandSizePrefixRequirement)
+    super.allOperands + OperandInfo.immediate(immediate.operand, immediateOrder)(using immediate.operandSizePrefixRequirement)
 
   override def immediateBytes: Seq[Byte] = immediate.operand.encodedValue
 }

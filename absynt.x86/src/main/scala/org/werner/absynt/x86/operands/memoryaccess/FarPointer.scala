@@ -27,23 +27,22 @@ sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateVa
 }
 
 object FarPointer {
-  abstract class FarPointerForSize[OffsetSize<:WordDoubleSize] {
-    def instance(segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & OffsetSize): FarPointer[OffsetSize] & FarPointerSize[OffsetSize]
-  }
+  trait FarPointerForSize[OffsetSize<:WordDoubleSize]:
+    extension (segment: ImmediateValue[Short] & WordSize) def instance(offset: ImmediateValue[?] & OffsetSize): FarPointer[OffsetSize] & FarPointerSize[OffsetSize]
 
   trait I8086Implicits {
-    implicit def FarPointerForWord: FarPointerForSize[WordSize] =
-      (segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & WordSize) =>
+    given FarPointerForSize[WordSize] with
+      extension (segment: ImmediateValue[Short] & WordSize) override def instance(offset: ImmediateValue[?] & WordSize): FarPointer[WordSize] & FarPointerSize[WordSize] =
         new FarPointer[WordSize](segment, offset) with FarWordSize
   }
 
 
   trait I386Implicits {
-    implicit def FarPointerForDoubleWord: FarPointerForSize[DoubleWordSize] =
-      (segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & DoubleWordSize) =>
+    given FarPointerForSize[DoubleWordSize] with
+      extension (segment: ImmediateValue[Short] & WordSize) override def instance(offset: ImmediateValue[?] & DoubleWordSize) =
         new FarPointer[DoubleWordSize](segment, offset) with FarDoubleWordSize
   }
 
   def apply[Size<:WordDoubleSize: FarPointerForSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size): FarPointer[Size] & FarPointerSize[Size] =
-    implicitly[FarPointerForSize[Size]].instance(segment, offset)
+    segment.instance(offset)
 }

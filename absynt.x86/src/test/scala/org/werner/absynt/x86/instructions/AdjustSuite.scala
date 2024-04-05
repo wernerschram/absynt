@@ -24,7 +24,7 @@ class AdjustSuite extends AnyWordSpec with Matchers {
   "an Adjust instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode in aaa" in {
         AdjustAfterAddition.ascii(AL).encodeByte should be(Hex.lsb("37"))
@@ -84,7 +84,7 @@ class AdjustSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
       "correctly encode in aaa" in {
         AdjustAfterAddition.ascii(AL).encodeByte should be(Hex.lsb("37"))
       }

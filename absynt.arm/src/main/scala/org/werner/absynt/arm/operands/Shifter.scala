@@ -89,7 +89,8 @@ case class RightRotateImmediate private[operands](immediate: Byte, rotateValue: 
 
 object Shifter {
   trait A32Shifter {
-    implicit def shifter(register: GeneralRegister): Shifter = new Shifter() {
+
+    given Conversion[GeneralRegister, Shifter] = register => new Shifter() {
       override val encode: Int = register.registerCode.toInt
 
       override def toString = s"$register"
@@ -146,16 +147,18 @@ object Shifter {
         RightRotateImmediate(immediate, 0)
     }
 
-    implicit def rightRotateImmediate(immediate: Byte): RightRotateImmediate =
-      RightRotateImmediate(immediate, 0)
+    given Conversion[Byte, RightRotateImmediate] =
+      immediate => RightRotateImmediate(immediate, 0)
 
-    implicit def shifterForImmediate(immediate: Int): RightRotateImmediate = {
-      val rotateValue = Range.inclusive(0, 30, 2).find { x => (Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x) }
-      assume(rotateValue.isDefined)
 
-      val rotate = rotateValue.get.toByte
-      RightRotateImmediate(Integer.rotateLeft(immediate, rotate).toByte, rotate)
-    }
+    given Conversion[Int, RightRotateImmediate] =
+      immediate => {
+        val rotateValue = Range.inclusive(0, 30, 2).find { x => (Integer.rotateLeft(immediate, x) & 0xFF) == Integer.rotateLeft(immediate, x) }
+        assume(rotateValue.isDefined)
+
+        val rotate = rotateValue.get.toByte
+        RightRotateImmediate(Integer.rotateLeft(immediate, rotate).toByte, rotate)
+      }
 
     private def immediateShifters(value: Int, minRotate: Int): Seq[RightRotateImmediate] = {
       if value == 0 then
@@ -168,6 +171,6 @@ object Shifter {
       RightRotateImmediate((intermediateValue & 0xFF).toByte, rotate) +:  immediateShifters(value & (0xFFFFFF00 << shift), shift)
     }
 
-    implicit def immediateShifter(immediate: Int): Seq[RightRotateImmediate] =  immediateShifters(immediate, 0)
+    given immediateShifter: Conversion[Int, Seq[RightRotateImmediate]] = immediate => immediateShifters(immediate, 0)
   }
 }

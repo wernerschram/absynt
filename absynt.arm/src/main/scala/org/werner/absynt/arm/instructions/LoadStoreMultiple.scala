@@ -22,7 +22,7 @@ object LoadStoreMultiple {
   trait A32Operations {
     self: Condition.ARMCondition =>
     object LoadMultiple {
-      implicit val opcode: String = "ldm"
+      val opcode: String = "ldm"
 
       def apply(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Condition.Always): LoadStoreMultipleOperation =
         Immed(condition, registers, baseRegister, addressingMode)
@@ -59,7 +59,7 @@ object LoadStoreMultiple {
     }
 
     object StoreMultiple {
-      implicit val opcode: String = "stm"
+      val opcode: String = "stm"
 
       def apply(registers: Seq[GeneralRegister], baseRegister: GeneralRegister, addressingMode: UpdateMode, condition: Condition = Condition.Always): LoadStoreMultipleOperation =
         Immed(condition, registers, baseRegister, addressingMode)
@@ -88,7 +88,7 @@ object LoadStoreMultiple {
     }
 
     object ReturnFromException {
-      implicit val opcode: String = "rfe"
+      val opcode: String = "rfe"
 
       def apply(baseRegister: GeneralRegister, addressingMode: UpdateMode): ReturnFromExceptionOperation =
         Immed(baseRegister, addressingMode, updateBase = false)

@@ -26,7 +26,7 @@ class LoopSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode loop 0x10" in {
         Loop(shortPointer(0x10.toByte)).encodeByte should be(Hex.lsb("E2 10"))
@@ -105,7 +105,7 @@ class LoopSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "Encode a simple program with an indirect backward short loope instruction" in {
         val targetLabel = Label.unique
@@ -163,7 +163,7 @@ class LoopSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "Encode a simple program with an indirect backward short loopne instruction" in {
         val targetLabel = Label.unique

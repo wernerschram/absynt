@@ -31,7 +31,7 @@ object Boot extends App {
 
   case class Color(r: Byte, g: Byte, b: Byte)
 
-  import ProcessorMode.Real._
+  import ProcessorMode.Real.{given, *}
 
   def setColor(col: Color): List[Resource] =
     Move(0x3c9.toShort, DX) ::

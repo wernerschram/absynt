@@ -26,7 +26,7 @@ class StackSuite extends AnyWordSpec with Matchers {
   "a Push instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode push WORD PTR [0x0001]" in {
         Push(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("FF 36 01 00"))
@@ -55,7 +55,7 @@ class StackSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode push eax" in {
         Push(EAX).encodeByte should be(Hex.lsb("50"))
@@ -141,7 +141,7 @@ class StackSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode push QWORD PTR [rax]" in {
         Push(RegisterMemoryLocation[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 FF 30"))
@@ -169,7 +169,7 @@ class StackSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode pusha" in {
         PushAll().encodeByte should be(Hex.lsb("60"))
@@ -184,7 +184,7 @@ class StackSuite extends AnyWordSpec with Matchers {
   "a PushFlags instruction" when {
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode pushf" in {
         PushFlags().encodeByte should be(Hex.lsb("9C"))
@@ -195,7 +195,7 @@ class StackSuite extends AnyWordSpec with Matchers {
   "a Pop instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode pop WORD PTR [0x0001]" in {
         Pop(MemoryAddress[WordSize](0x0001.toShort)).encodeByte should be(Hex.lsb("8F 36 01 00"))
@@ -301,7 +301,7 @@ class StackSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode popa" in {
         PopAll().encodeByte should be(Hex.lsb("61"))
@@ -316,7 +316,7 @@ class StackSuite extends AnyWordSpec with Matchers {
   "a PopFlags instruction" when {
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode popf" in {
         PopFlags().encodeByte should be(Hex.lsb("9D"))

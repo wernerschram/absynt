@@ -32,7 +32,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       val combinations = Table[String, (NearPointer & ByteWordDoubleSize) => X86Operation, String, String, String](
         ("Mnemonic", "Instruction", "Short (0x10)", "Word (0x2030)", "Double (0x20304050)"),
@@ -529,7 +529,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       val combinations = Table[String, (NearPointer & ByteWordDoubleSize) => X86Operation, String, String, String](
         ("Mnemonic", "Instruction", "Short (0x10)", "Word (0x2030)", "Double (0x20304050)"),
@@ -715,7 +715,7 @@ class JumpSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       val combinations = Table[String, (NearPointer & ByteDoubleSize) => X86Operation, String, String](
         ("Mnemonic", "Instruction", "Short (0x10)", "Long (0x20304050)"),

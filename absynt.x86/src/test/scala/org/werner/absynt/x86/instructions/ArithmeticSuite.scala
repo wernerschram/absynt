@@ -29,7 +29,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an AddCarry instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encodeByte adc al, 0x40" in {
         AddCarry(0x40.toByte, AL).encodeByte should be(Hex.lsb("14 40"))
@@ -44,7 +44,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an Add instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode add al, 0x40" in {
         Add(0x40.toByte, AL).encodeByte should be(Hex.lsb("04 40"))
@@ -59,7 +59,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an And instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode and al, 0x40" in {
         And(0x40.toByte, AL).encodeByte should be(Hex.lsb("24 40"))
@@ -74,7 +74,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an Compare instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode cmp al, 0x40" in {
         Compare(0x40.toByte, AL).encodeByte should be(Hex.lsb("3C 40"))
@@ -90,7 +90,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
 
     "in legacy mode" should {
 
-      import ProcessorMode.Legacy._
+      import ProcessorMode.Legacy.{given, *}
 
       "correctly encode not BYTE PTR [0x01]" in {
         Not(MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("F6 16 01 00"))
@@ -103,7 +103,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode not BYTE PTR [0x01]" in {
         Not(MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("F6 16 01 00"))
@@ -115,7 +115,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
     }
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode not eax" in {
         Not(EAX).encodeByte should be(Hex.lsb("F7 D0"))
@@ -124,7 +124,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode not QWORD PTR [rax]" in {
         Not(RegisterMemoryLocation[QuadWordSize](RAX)).encodeByte should be(Hex.lsb("48 F7 10"))
@@ -135,7 +135,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an Or instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode or al, 0x40" in {
         Or(0x40.toByte, AL).encodeByte should be(Hex.lsb("0C 40"))
@@ -150,7 +150,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an SubtractBorrow instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode sbb al, 0x40" in {
         SubtractBorrow(0x40.toByte, AL).encodeByte should be(Hex.lsb("1C 40"))
@@ -165,7 +165,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an Subtract instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode sub al, 0x40" in {
         Subtract(0x40.toByte, AL).encodeByte should be(Hex.lsb("2C 40"))
@@ -180,7 +180,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
   "an Xor instruction" when {
 
     "in legacy mode" should {
-      import ProcessorMode.Legacy._
+      import ProcessorMode.Legacy.{given, *}
 
       "correctly encode xor bl, 0x40" in {
         Xor(0x40.toByte, BL).encodeByte should be(Hex.lsb("80 F3 40"))
@@ -191,7 +191,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode xor al, 0x40" in {
         Xor(0x40.toByte, AL).encodeByte should be(Hex.lsb("34 40"))
@@ -276,7 +276,7 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode xor DWORD PTR [0x11111111], 0x44332211" in {
         Xor(0x44332211, MemoryAddress[DoubleWordSize](0x11111111)).encodeByte should be(Hex.lsb("81 35 11 11 11 11 11 22 33 44"))
@@ -314,19 +314,19 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode xor QWORD PTR [0x11111111], 0x44332211" in {
-        Xor(0x44332211, MemoryAddress[QuadWordSize](doubleWordImm(0x11111111))).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
+        Xor(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).encodeByte should be(Hex.lsb("67 48 81 35 11 11 11 11 11 22 33 44"))
       }
 
       "correctly represent xor QWORD PTR [0x11111111], 0x44332211 as a string" in {
-        Xor(0x44332211, MemoryAddress[QuadWordSize](doubleWordImm(0x11111111))).toString shouldBe "xor QWORD PTR [286331153], 1144201745"
+        Xor(0x44332211, MemoryAddress[QuadWordSize](0x11111111)).toString shouldBe "xor QWORD PTR [286331153], 1144201745"
       }
 
       "throw an AssertionError for xor WORD PTR [0x11111111], 0x44332211" in {
         an[AssertionError] should be thrownBy {
-          Xor(0x44332211, MemoryAddress[WordSize](doubleWordImm(0x11111111)))
+          Xor(0x44332211, MemoryAddress[WordSize](0x11111111))
         }
       }
 

@@ -28,13 +28,13 @@ object Exchange {
       new RegisterEncoded(destination, 0x90.toByte :: Nil, OperandOrder.destination, mnemonic)
         with NoDisplacement 
         with NoImmediate 
-        with ExtraOperands(OperandInfo.implicitOperand(source, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(source, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
     private def R16ToAX[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: AccumulatorRegister & Size): X86Operation =
       new RegisterEncoded(source, 0x90.toByte :: Nil, OperandOrder.source, mnemonic) 
         with NoDisplacement 
         with NoImmediate 
-        with ExtraOperands(OperandInfo.implicitOperand(destination, OperandOrder.destination)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(destination, OperandOrder.destination)(using noOperandSizePrefixRequirement))
 
     private def R16ToRM16[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size) =
       new ModRRM(source, destination, 0x86.toByte :: Nil, mnemonic, OperandOrder.destination)

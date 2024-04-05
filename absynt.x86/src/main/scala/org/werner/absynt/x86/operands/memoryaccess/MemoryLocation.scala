@@ -19,7 +19,7 @@ import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRe
 abstract class MemoryLocation(val displacement: Option[ImmediateValue[?]], val segment: SegmentRegister)
   extends ModRMEncodableOperand {
 
-  def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo]
+  def addressOperands(using AddressSizePrefixRequirement): Set[AddressOperandInfo]
 
   def defaultSegment: SegmentRegister
   lazy val segmentOverride: Option[SegmentRegister] = if segment == defaultSegment then None else Some(segment)

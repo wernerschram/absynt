@@ -23,7 +23,7 @@ class ConvertSuite extends AnyWordSpec with Matchers {
   "an Convert instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode cbw" in {
         Convert.ScaleUp(AL).encodeByte should be(Hex.lsb("98"))
@@ -41,7 +41,7 @@ class ConvertSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
       "correctly encode cbw" in {
         Convert.ScaleUp(AL).encodeByte should be(Hex.lsb("66 98"))
       }
@@ -73,7 +73,7 @@ class ConvertSuite extends AnyWordSpec with Matchers {
   }
 
   "in long mode" should {
-    import ProcessorMode.Long._
+    import ProcessorMode.Long.{given, *}
     "correctly encode cbw" in {
       Convert.ScaleUp(AL).encodeByte should be(Hex.lsb("66 98"))
     }

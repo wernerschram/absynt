@@ -16,6 +16,7 @@ package org.werner.absynt.arm.operations
 import org.werner.absynt.arm.operands.Condition
 
 import scala.language.implicitConversions
+import scala.language.implicitConversions
 
 class Miscellaneous(val code: Byte, override val opcode: String, value: Short, condition: Condition)
   extends ARMOperation {
@@ -64,15 +65,17 @@ object InterruptDisableFlags extends Enumeration {
 
   val none: ValueSet = ValueSet.empty
 
-  implicit def valueToSet(value: Value): ValueSet = ValueSet(value)
+  given Conversion[Value, ValueSet] = ValueSet(_)
 
-  implicit def flagsToString(set: ValueSet): String =
+  def flagsToString(set: ValueSet): String =
     set.foldRight(new StringBuilder)((value, builder) => builder.addAll(value.toString)).result()
 }
 
 class ProcessorState(val code: Byte, val opcode: String, val condition: Condition,
                      iMod: Byte, mMod: Byte, iflags: Int, modeValue: Int, postFixString: String)
   extends Conditional {
+
+  import InterruptDisableFlags.given
 
   def this(code: Byte, opcode: String, mode: ExecutionMode) =
     this(code, opcode, Condition.Unpredictable, 0x00.toByte, 0x01.toByte, 0x00, mode.mode, s" #$mode")
@@ -83,10 +86,11 @@ class ProcessorState(val code: Byte, val opcode: String, val condition: Conditio
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}")
 
   def this(code: Byte, opcode: String, effect: Effect, interruptDisableFlags: InterruptDisableFlags.ValueSet,
-           mode: ExecutionMode) =
+           mode: ExecutionMode) = {
     this(code, opcode, Condition.Unpredictable, effect.iMod, 0x01.toByte,
       interruptDisableFlags.toBitMask(0).toInt << 6, mode.mode,
       s"${effect.mnemonicExtension} ${InterruptDisableFlags.flagsToString(interruptDisableFlags)}, #$mode")
+  }
 
   override def encodeWord: Int =
     super.encodeWord | (code << 20) | (iMod << 18) | (mMod << 17) | iflags | modeValue

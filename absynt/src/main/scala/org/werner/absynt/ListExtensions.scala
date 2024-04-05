@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
 
 object ListExtensions {
 
-  implicit class IntegralEncoder[S:Integral](value: S) {
+  extension [S:Integral](value: S) {
     def encodeLittleEndian : Seq[Byte] =
       value match {
         case v: Byte => v :: Nil
@@ -47,7 +47,7 @@ object ListExtensions {
       }
     }
 
-  implicit class ListToImmediate(value: Seq[Byte]) {
+  extension (value: Seq[Byte]) {
     def decimalString: String = decimal.toString
 
     def bigEndianHexString : String = value.reverseIterator.map("%02X" format _).mkString

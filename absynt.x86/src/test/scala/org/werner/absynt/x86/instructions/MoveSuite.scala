@@ -29,7 +29,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
   "a Move instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode mov bh, al" in {
         Move(AL, BH).encodeByte should be(Hex.lsb("88 C7"))
@@ -365,7 +365,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode mov DWORD PTR [0xDEADBEEF], eax" in {
         Move(EAX, MemoryAddress[DoubleWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("A3 EF BE AD DE"))
@@ -418,7 +418,7 @@ class MoveSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "throw an AssertionError for mov bh, r8l" in {
         an[AssertionError] should be thrownBy {
@@ -538,11 +538,11 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov QWORD PTR [0xDEADBEEF], rax" in {
-        Move(RAX, MemoryAddress[QuadWordSize](doubleWordImm(0xDEADBEEF))).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
+        Move(RAX, MemoryAddress[QuadWordSize](0xDEADBEEF)).encodeByte should be(Hex.lsb("67 48 A3 EF BE AD DE"))
       }
 
       "correctly represent mov QWORD PTR [3735928559], rax as a string" in {
-        Move(RAX, MemoryAddress[QuadWordSize](doubleWordImm(0xDEADBEEF))).toString should be("mov QWORD PTR [3735928559], rax")
+        Move(RAX, MemoryAddress[QuadWordSize](0xDEADBEEF)).toString should be("mov QWORD PTR [3735928559], rax")
       }
 
       "correctly encode mov edx, 0x12" in {
@@ -622,11 +622,11 @@ class MoveSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode mov DWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {
-        Move(doubleWordImm(0x99999999), SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
+        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).encodeByte should be(Hex.lsb("C7 84 58 11 11 11 11 99 99 99 99"))
       }
 
       "correctly represent mov DWORD PTR [rax+rbx*2+286331153], 2576980377 as a string" in {
-        Move(doubleWordImm(0x99999999), SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], -1717986919")
+        Move(0x99999999, SIBMemoryLocation[DoubleWordSize](RBX, RAX, 0x11111111, 2)).toString should be("mov DWORD PTR [rax+rbx*2+286331153], -1717986919")
       }
 
       "correctly encode mov QWORD PTR [rax+rbx*2+0x11111111], 0x99999999" in {

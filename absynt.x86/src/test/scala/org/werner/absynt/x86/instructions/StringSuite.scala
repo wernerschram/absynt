@@ -18,12 +18,13 @@ import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.{ByteSize, DoubleWordSize, QuadWordSize, WordSize}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class StringSuite extends AnyWordSpec with Matchers {
 
   "an InString instruction" when {
     "in real mode" when {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "not repeated" should {
 
@@ -82,7 +83,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" when {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "not repeated" should {
 
@@ -126,7 +127,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" when {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "not repeated" should {
 
@@ -164,7 +165,7 @@ class StringSuite extends AnyWordSpec with Matchers {
   "an MoveString instruction" when {
     "in legacy mode" should {
 
-      import ProcessorMode.Legacy._
+      import ProcessorMode.Legacy.{given, *}
 
       "correctly encode stos BYTE PTR [edi], al" in {
         StoreString(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Hex.lsb("AA"))
@@ -177,7 +178,7 @@ class StringSuite extends AnyWordSpec with Matchers {
 
 
     "in real mode" when {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "not repeated" should {
 
@@ -236,7 +237,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" when {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "not repeated" should {
         s"correctly encode movs WORD PTR [edi], WORD PTR [esi]" in {
@@ -272,7 +273,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" when {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "not repeated" should {
         s"correctly encode movs WORD PTR [rdi], WORD PTR [rsi]" in {
@@ -308,7 +309,7 @@ class StringSuite extends AnyWordSpec with Matchers {
 
   "an OutString outstruction" when {
     "in real mode" when {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "not repeated" should {
 
@@ -367,7 +368,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" when {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "not repeated" should {
 
@@ -411,7 +412,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" when {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "not repeated" should {
 
@@ -449,7 +450,7 @@ class StringSuite extends AnyWordSpec with Matchers {
 
   "an LoadString instruction" when {
     "in real mode" when {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "not repeated" should {
 
@@ -508,7 +509,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" when {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "not repeated" should {
 
@@ -552,7 +553,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" when {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "not repeated" should {
 
@@ -588,7 +589,7 @@ class StringSuite extends AnyWordSpec with Matchers {
 
     "an StoreString instruction" when {
       "in real mode" when {
-        import ProcessorMode.Real._
+        import ProcessorMode.Real.{given, *}
 
         "not repeated" should {
           s"correctly encode stos BYTE PTR [di], al" in {
@@ -645,7 +646,7 @@ class StringSuite extends AnyWordSpec with Matchers {
       }
 
       "in protected mode" when {
-        import ProcessorMode.Protected._
+        import ProcessorMode.Protected.{given, *}
 
         "not repeated" should {
 
@@ -689,7 +690,7 @@ class StringSuite extends AnyWordSpec with Matchers {
       }
 
       "in long mode" when {
-        import ProcessorMode.Long._
+        import ProcessorMode.Long.{given, *}
 
         "not repeated" should {
 
@@ -729,7 +730,7 @@ class StringSuite extends AnyWordSpec with Matchers {
   "an CompareString instruction" when {
     "in legacy mode" should {
 
-      import ProcessorMode.Legacy._
+      import ProcessorMode.Legacy.{given, *}
 
       "correctly encode stos BYTE PTR [edi], al" in {
         StoreString(AL, DestinationReference[ByteSize](DI)).encodeByte should be(Hex.lsb("AA"))
@@ -742,7 +743,7 @@ class StringSuite extends AnyWordSpec with Matchers {
 
 
     "in real mode" when {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "not repeated" should {
 
@@ -822,7 +823,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" when {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "not repeated" should {
         s"correctly encode cmps WORD PTR [edi], WORD PTR [esi]" in {
@@ -872,7 +873,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" when {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "not repeated" should {
         s"correctly encode cmps WORD PTR [rdi], WORD PTR [rsi]" in {
@@ -910,7 +911,7 @@ class StringSuite extends AnyWordSpec with Matchers {
 
   "an ScanString instruction" when {
     "in real mode" when {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "not repeated" should {
         s"correctly encode scas BYTE PTR [di], al" in {
@@ -989,7 +990,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" when {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "not repeated" should {
 
@@ -1055,7 +1056,7 @@ class StringSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" when {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "not repeated" should {
 

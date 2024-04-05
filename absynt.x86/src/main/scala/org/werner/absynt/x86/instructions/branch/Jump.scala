@@ -21,12 +21,13 @@ import org.werner.absynt.x86.operands.memoryaccess._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
 import org.werner.absynt.x86.operations.{ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import scala.language.implicitConversions
 
 object Jump {
   trait Common {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo =>
 
-    sealed abstract class Jump(val shortOpcode: Seq[Byte], implicit val mnemonic: String) {
+    sealed abstract class Jump(val shortOpcode: Seq[Byte], val mnemonic: String) {
 
       protected def Rel8(nearPointer: NearPointer & ByteSize): Static & NearPointerOperation[ByteSize] & NoImmediate =
         new Static(shortOpcode, mnemonic)
@@ -40,7 +41,7 @@ object Jump {
 
       protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
         new Static(0xEA.toByte :: Nil, mnemonic)
-          with FarPointerOperation[Size](operandWithOperandSizePrefixInfo(farPointer))
+          with FarPointerOperation[Size](farPointer)
           with NoImmediate
 
       protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =

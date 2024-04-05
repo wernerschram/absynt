@@ -18,6 +18,7 @@ import org.werner.absynt.x86.operands._
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
+import scala.language.implicitConversions
 
 object Stack {
 
@@ -34,62 +35,62 @@ object Stack {
       protected def StaticCS(): X86Operation = new Static(0x0E.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Code, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Code, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticSS(): X86Operation = new Static(0x16.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticDS(): X86Operation = new Static(0x1E.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticES(): X86Operation = new Static(0x06.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def PrefStaticCS(): X86Operation = new Static(0x0E.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Code, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Code, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticSS(): X86Operation = new Static(0x16.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticDS(): X86Operation = new Static(0x1E.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticES(): X86Operation = new Static(0x06.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA0.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA8.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
 
       protected def Imm16[Size <: ImmExtendedMaxSize](immediateValue: ImmediateValue[?] & Size): X86Operation =
@@ -130,13 +131,13 @@ object Stack {
     }
 
     object PushFlags {
-      implicit val opcode: String = "pushf"
+      val opcode: String = "pushf"
 
       def apply(): Static = new Static(0x9C.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
 
     sealed trait PushAllOperations {
-      implicit val opcode: String = "pusha"
+      val opcode: String = "pusha"
 
       def apply(): Static =
         new Static(0x60.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
@@ -164,52 +165,52 @@ object Stack {
       protected def StaticSS(): X86Operation = new Static(0x17.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticDS(): X86Operation = new Static(0x1F.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticES(): X86Operation = new Static(0x07.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA1.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def StaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA9.toByte :: Nil, mnemonic)
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(noOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
       protected def PrefStaticSS(): X86Operation = new Static(0x17.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Stack, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticDS(): X86Operation = new Static(0x1F.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Data, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticES(): X86Operation = new Static(0x07.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.Extra, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticFS(): X86Operation = new Static(0x0F.toByte :: 0xA1.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.MoreExtra, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       protected def PrefStaticGS(): X86Operation = new Static(0x0F.toByte :: 0xA9.toByte :: Nil, s"${mnemonic}w")
         with NoDisplacement
         with NoImmediate
-        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(alwaysOperandSizePrefixRequirement))
+        with ExtraOperands(OperandInfo.implicitOperand(Segment.StillMoreExtra, OperandOrder.source)(using alwaysOperandSizePrefixRequirement))
 
       def apply(operand: ModRMEncodableOperand & RMMaxSize) =
         RM16(operand)
@@ -219,13 +220,13 @@ object Stack {
     }
 
     object PopFlags {
-      implicit val opcode: String = "popf"
+      val opcode: String = "popf"
 
       def apply(): Static = new Static(0x9D.toByte :: Nil, opcode) with NoDisplacement with NoImmediate
     }
 
     sealed trait PopAllOperations {
-      implicit val opcode: String = "popa"
+      val opcode: String = "popa"
 
       def apply(): Static =
         new Static(0x61.toByte :: Nil, opcode) with NoDisplacement with NoImmediate

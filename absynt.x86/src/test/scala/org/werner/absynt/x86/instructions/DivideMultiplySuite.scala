@@ -25,7 +25,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
   "an IntegerMultiply instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode imul bl" in {
         IntegerMultiply(BL).encodeByte should be(Hex.lsb("F6 EB"))
@@ -38,7 +38,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode imul bl" in {
         IntegerMultiply(BL).encodeByte should be(Hex.lsb("F6 EB"))
@@ -51,7 +51,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode imul bl" in {
         IntegerMultiply(BL).encodeByte should be(Hex.lsb("F6 EB"))
@@ -65,7 +65,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
   "an Multiply instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode mul bl" in {
         Multiply(BL).encodeByte should be(Hex.lsb("F6 E3"))
@@ -78,7 +78,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode mul bl" in {
         Multiply(BL).encodeByte should be(Hex.lsb("F6 E3"))
@@ -91,7 +91,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode mul bl" in {
         Multiply(BL).encodeByte should be(Hex.lsb("F6 E3"))
@@ -105,7 +105,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
   "an IntegerDivide instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode idiv bl" in {
         IntegerDivide(BL).encodeByte should be(Hex.lsb("F6 FB"))
@@ -118,7 +118,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode idiv bl" in {
         IntegerDivide(BL).encodeByte should be(Hex.lsb("F6 FB"))
@@ -131,7 +131,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode idiv bl" in {
         IntegerDivide(BL).encodeByte should be(Hex.lsb("F6 FB"))
@@ -146,7 +146,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode div bl" in {
         Divide(BL).encodeByte should be (Hex.lsb("F6 F3"))
@@ -172,7 +172,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode div bl" in {
         Divide(BL).encodeByte should be(Hex.lsb("F6 F3"))
@@ -198,7 +198,7 @@ class DivideMultiplySuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode div bl" in {
         Divide(BL).encodeByte should be(Hex.lsb("F6 F3"))

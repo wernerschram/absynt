@@ -18,13 +18,14 @@ import org.werner.absynt.arm.ProcessorMode
 import org.werner.absynt.arm.operations.{Effect, ExecutionMode, InterruptDisableFlags}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class MiscellaneousSuite extends AnyWordSpec with Matchers {
 
   "a Breakpoint instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode bkpt 0x00cc" in {
         Breakpoint(0xf15.toShort).encodeByte should be(Hex.msb("e120f175"))
@@ -39,7 +40,7 @@ class MiscellaneousSuite extends AnyWordSpec with Matchers {
   "a Change Processor State instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode cpsie , #31" in {
         ChangeProcessorState(Effect.InterruptEnable, InterruptDisableFlags.none, ExecutionMode.System).encodeByte should be(Hex.msb("f10a001f"))

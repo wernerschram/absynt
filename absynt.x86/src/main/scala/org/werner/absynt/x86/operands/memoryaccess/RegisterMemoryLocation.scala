@@ -21,10 +21,10 @@ import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRe
 import scala.language.implicitConversions
 
 sealed class RegisterMemoryLocation(val reference: RegisterReference, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)
-                                   (implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement)
+                                   (using ValueToByteImmediate, AddressSizePrefixRequirement)
   extends IndirectMemoryLocation(reference.indexCode,
      if reference.onlyWithDisplacement then
-      Some(displacement.getOrElse(byteImmediate(0.toByte)))
+      Some(displacement.getOrElse(0.toByte))
     else
       displacement, segment)
     with ModRMEncodableOperand {
@@ -32,7 +32,7 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
 
   override val defaultSegment: SegmentRegister = reference.defaultSegment
 
-  override def addressOperands(implicit addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] = reference match {
+  override def addressOperands(using addressSizePrefixRequirement: AddressSizePrefixRequirement): Set[AddressOperandInfo] = reference match {
     case bi: BaseIndexReference => Set(AddressOperandInfo.rmBase(bi.base), AddressOperandInfo.rmIndex(bi.index, segmentOverride))
     case o: IndexRegister => Set(AddressOperandInfo.rmIndex(o.asInstanceOf[GeneralPurposeRegister & IndexRegister & ValueSize], segmentOverride))
   }
@@ -53,73 +53,72 @@ sealed class RegisterMemoryLocation(val reference: RegisterReference, displaceme
   override def getExtendedBytes(rValue: Byte): Seq[Byte] = super.getExtendedBytes(rValue) ++ actualDisplacement
 }
 
-class DestinationReference(override val reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement)
+class DestinationReference(override val reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement)
   extends RegisterMemoryLocation(reference, displacement, segment) {
   self: ValueSize =>
 }
 
-class SourceReference(override val reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement)
+class SourceReference(override val reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement)
   extends RegisterMemoryLocation(reference, displacement, segment) {
   self: ValueSize =>
 }
 
 object RegisterMemoryLocation {
+  trait RMForSize[Size <: ValueSize]:
+    extension(reference: RegisterReference) def instance(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & Size
 
-  abstract class RMForSize[Size <: ValueSize] {
-    def instance(reference: RegisterReference, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & Size
+    extension(reference: RegisterReference & DestinationIndex) def destinationReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): DestinationReference & Size
 
-    def DestinationReference(reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size
+    extension(reference: RegisterReference & SourceIndex) def sourceReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): SourceReference & Size
 
-    def SourceReference(reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size
-  }
 
   trait I8086Implicits {
-    implicit def RMforByteSize: RMForSize[ByteSize] = new RMForSize[ByteSize] {
-      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & ByteSize =
+    given RMForSize[ByteSize] with {
+      extension (reference: RegisterReference) override def instance(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & ByteSize =
         new RegisterMemoryLocation(reference, displacement, segment) with ByteSize
 
-      override def DestinationReference(reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & ByteSize =
+      extension (reference: RegisterReference & DestinationIndex) override def destinationReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): DestinationReference & ByteSize =
         new DestinationReference(reference, displacement, segment) with ByteSize
 
-      override def SourceReference(reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & ByteSize =
+      extension (reference: RegisterReference & SourceIndex) override def sourceReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): SourceReference & ByteSize =
         new SourceReference(reference, displacement, segment) with ByteSize
     }
 
-    implicit def RMforWordSize: RMForSize[WordSize] = new RMForSize[WordSize] {
-      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & WordSize =
+    given RMForSize[WordSize] with {
+      extension (reference: RegisterReference) override def instance(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & WordSize =
         new RegisterMemoryLocation(reference, displacement, segment) with WordSize
 
-      override def DestinationReference(reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & WordSize =
+      extension (reference: RegisterReference & DestinationIndex) override def destinationReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): DestinationReference & WordSize =
         new DestinationReference(reference, displacement, segment) with WordSize
 
-      override def SourceReference(reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & WordSize =
+      extension (reference: RegisterReference & SourceIndex) override def sourceReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): SourceReference & WordSize =
         new SourceReference(reference, displacement, segment) with WordSize
     }
   }
 
 
   trait I386Implicits {
-    implicit def RMforDoubleWordSize: RMForSize[DoubleWordSize] = new RMForSize[DoubleWordSize] {
-      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & DoubleWordSize =
+    given RMForSize[DoubleWordSize] with {
+      extension(reference: RegisterReference) override def instance(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & DoubleWordSize =
         new RegisterMemoryLocation(reference, displacement, segment) with DoubleWordSize
 
-      override def DestinationReference(reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & DoubleWordSize =
+      extension (reference: RegisterReference & DestinationIndex) override def destinationReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): DestinationReference & DoubleWordSize =
         new DestinationReference(reference, displacement, segment) with DoubleWordSize
 
-      override def SourceReference(reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & DoubleWordSize =
+      extension (reference: RegisterReference & SourceIndex) override def sourceReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): SourceReference & DoubleWordSize =
         new SourceReference(reference, displacement, segment) with DoubleWordSize
     }
   }
 
   trait X64Implicits {
-    implicit def RMforQuadWordSize: RMForSize[QuadWordSize] = new RMForSize[QuadWordSize] {
-      override def instance(reference: RegisterReference, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & QuadWordSize =
+    given RMForSize[QuadWordSize] with {
+      extension(reference: RegisterReference) override def instance(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & QuadWordSize =
         new RegisterMemoryLocation(reference, displacement, segment) with QuadWordSize
 
-      override def DestinationReference(reference: RegisterReference & DestinationIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & QuadWordSize =
+      extension (reference: RegisterReference & DestinationIndex) override def destinationReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): DestinationReference & QuadWordSize =
         new DestinationReference(reference, displacement, segment) with QuadWordSize
 
-      override def SourceReference(reference: RegisterReference & SourceIndex, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & QuadWordSize =
+      extension (reference: RegisterReference & SourceIndex) override def sourceReference(displacement: Option[ImmediateValue[?] & ByteWordDoubleSize], segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): SourceReference & QuadWordSize =
         new SourceReference(reference, displacement, segment) with QuadWordSize
     }
   }
@@ -127,33 +126,29 @@ object RegisterMemoryLocation {
   trait Operations {
 
     object RegisterMemoryLocation {
-      def apply[Size <: ValueSize : RMForSize](index: RegisterReference)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
-        implicitly[RMForSize[Size]].instance(index, None, index.defaultSegment)
+      def apply[Size <: ValueSize : RMForSize](index: RegisterReference)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
+        index.instance(None, index.defaultSegment)
 
-      def apply[Size <: ValueSize : RMForSize](index: RegisterReference, displacement: ImmediateValue[?] & ByteWordDoubleSize)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
-        implicitly[RMForSize[Size]].instance(index, Some(displacement), index.defaultSegment)
+      def apply[Size <: ValueSize : RMForSize](index: RegisterReference, displacement: ImmediateValue[?] & ByteWordDoubleSize)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
+        index.instance(Some(displacement), index.defaultSegment)
 
       object withSegmentOverride {
-        def apply[Size <: ValueSize : RMForSize](index: RegisterReference, segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
-          implicitly[RMForSize[Size]].instance(index, None, segment)
+        def apply[Size <: ValueSize : RMForSize](index: RegisterReference, segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
+          index.instance(None, segment)
 
-        def apply[Size <: ValueSize : RMForSize](index: RegisterReference, displacement: ImmediateValue[?] & ByteWordDoubleSize, segment: SegmentRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
-          implicitly[RMForSize[Size]].instance(index, Some(displacement), segment)
+        def apply[Size <: ValueSize : RMForSize](index: RegisterReference, displacement: ImmediateValue[?] & ByteWordDoubleSize, segment: SegmentRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): RegisterMemoryLocation & Size =
+          index.instance(Some(displacement), segment)
       }
-
     }
 
     object DestinationReference {
-      implicit def apply[Size <: ValueSize : RMForSize](index: DestinationIndex & IndexRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
-        implicitly[RMForSize[Size]].DestinationReference(index, None, index.defaultSegment)
+      def apply[Size <: ValueSize : RMForSize](index: DestinationIndex & IndexRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): DestinationReference & Size =
+        index.destinationReference(None, index.defaultSegment)
     }
 
     object SourceReference {
-      implicit def apply[Size <: ValueSize : RMForSize](index: SourceIndex & IndexRegister)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
-        implicitly[RMForSize[Size]].SourceReference(index, None, index.defaultSegment)
+      def apply[Size <: ValueSize : RMForSize](index: SourceIndex & IndexRegister)(using ValueToByteImmediate, AddressSizePrefixRequirement): SourceReference & Size =
+        index.sourceReference(None, index.defaultSegment)
     }
-
-
   }
-
 }

@@ -23,10 +23,11 @@ import org.werner.absynt.output.Elf.{Architecture, Executable}
 import org.werner.absynt.output.raw.Raw
 import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
+import scala.language.implicitConversions
 
 object Boot extends App {
 
-  import ProcessorMode.A32._
+  import ProcessorMode.A32.{given, *}
 
   object GPIO {
     val Base = 0x3F200000
@@ -73,7 +74,7 @@ object Boot extends App {
   }
 
   def createFile(): Unit = {
-    import ProcessorMode.A32._
+    import ProcessorMode.A32.{given, *}
 
     val putString: Label = "PutString"
     val text: Label = "Text"

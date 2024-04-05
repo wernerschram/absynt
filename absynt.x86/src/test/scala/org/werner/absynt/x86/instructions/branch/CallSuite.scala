@@ -27,7 +27,7 @@ import scala.language.implicitConversions
 class CallSuite extends AnyWordSpec with Matchers {
   "a Call instruction" when {
     "in real mode" should {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode call 0x10" in {
         Call(wordPointer(0x10.toShort)).encodeByte should be(Hex.lsb("E8 10 00"))
@@ -123,7 +123,7 @@ class CallSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode call 0x10" in {
         Call(wordPointer(0x10.toShort)).encodeByte should be(Hex.lsb("66 E8 10 00"))
@@ -219,7 +219,7 @@ class CallSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" should {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode call 0x10203040" in {
         Call(doubleWordPointer(0x10203040)).encodeByte should be(Hex.lsb("E8 40 30 20 10"))
@@ -296,7 +296,7 @@ class CallSuite extends AnyWordSpec with Matchers {
 
   "a Ret instruction" when {
     "in real mode" should {
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode ret" in {
         Return().encodeByte should be(Hex.lsb("C3"))
@@ -332,7 +332,7 @@ class CallSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode ret" in {
         Return().encodeByte should be(Hex.lsb("C3"))
@@ -367,7 +367,7 @@ class CallSuite extends AnyWordSpec with Matchers {
     }
 
     "in long mode" should {
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode ret" in {
         Return().encodeByte should be(Hex.lsb("C3"))

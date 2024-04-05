@@ -26,7 +26,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a ShiftArithmeticLeft instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode sal BYTE PTR [0x0001], 1" in {
         ShiftArithmeticLeft(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 26 01 00"))
@@ -64,7 +64,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode sal BYTE PTR [0x0001], 1" in {
         ShiftArithmeticLeft(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("67 D0 26 01 00"))
@@ -102,7 +102,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
       "correctly encode sal BYTE PTR [0x0001], 1" in {
         //TODO: this is not allowed in long mode
         ShiftArithmeticLeft(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 26 01 00"))
@@ -141,7 +141,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a ShiftArithmeticRight instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode sar BYTE PTR [0x0001], 1" in {
         ShiftArithmeticRight(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 3E 01 00"))
@@ -156,7 +156,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a ShiftLogicalLeft instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode shl BYTE PTR [0x0001], 1" in {
         ShiftLogicalLeft(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 26 01 00"))
@@ -171,7 +171,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a ShiftLogicalRight instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode shr BYTE PTR [0x0001], 1" in {
         ShiftLogicalRight(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 2E 01 00"))
@@ -186,7 +186,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a RotateCarryLeft instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode rcl BYTE PTR [0x0001], 1" in {
         RotateCarryLeft(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 16 01 00"))
@@ -201,7 +201,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a RotateCarryRight instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode rcr BYTE PTR [0x0001], 1" in {
         RotateCarryRight(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 1E 01 00"))
@@ -216,7 +216,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a RotateLeft instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode rol BYTE PTR [0x0001], 1" in {
         RotateLeft(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 06 01 00"))
@@ -231,7 +231,7 @@ class ShiftSuite extends AnyWordSpec with Matchers {
   "a RotateRight instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode ror BYTE PTR [0x0001], 1" in {
         RotateRight(1.toByte, MemoryAddress[ByteSize](0x0001.toShort)).encodeByte should be(Hex.lsb("D0 0E 01 00"))

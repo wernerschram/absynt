@@ -88,7 +88,7 @@ object String {
 
       private def operands[Size <: MaxValueSize](destination: DestinationReference & Size): Seq[OperandInfo[?]] = Seq(
         OperandInfo.implicitAddress(destination, OperandOrder.destination),
-        OperandInfo.implicitOperand(Data.Word, OperandOrder.source)(noOperandSizePrefixRequirement)
+        OperandInfo.implicitOperand(Data.Word, OperandOrder.source)(using noOperandSizePrefixRequirement)
       )
 
       def apply[Size <: MaxValueSize](register: Data.Word.type, destination: DestinationReference & Size): X86Operation =
@@ -146,7 +146,7 @@ object String {
       private val mnemonic = "outs"
 
       private def operands[Size <: MaxValueSize](source: SourceReference & Size): Seq[OperandInfo[?]] = Seq(
-        OperandInfo.implicitOperand(Data.Word, OperandOrder.destination)(noOperandSizePrefixRequirement),
+        OperandInfo.implicitOperand(Data.Word, OperandOrder.destination)(using noOperandSizePrefixRequirement),
         OperandInfo.implicitAddress(source, OperandOrder.source),
       )
 

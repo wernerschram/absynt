@@ -24,7 +24,7 @@ class ExchangeSuite extends AnyWordSpec with Matchers {
   "a Exchange instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode xchg bx, ax" in {
         Exchange(AX, BX).encodeByte should be(Hex.lsb("93"))
@@ -70,7 +70,7 @@ class ExchangeSuite extends AnyWordSpec with Matchers {
 
     "in protected mode" should {
 
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
       "correctly encode xchg bx, ax" in {
         Exchange(AX, BX).encodeByte should be(Hex.lsb("66 93"))
       }
@@ -116,7 +116,7 @@ class ExchangeSuite extends AnyWordSpec with Matchers {
 
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
       "correctly encode xchg bx, ax" in {
         Exchange(AX, BX).encodeByte should be(Hex.lsb("66 93"))
       }

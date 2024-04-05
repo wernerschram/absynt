@@ -24,7 +24,7 @@ class IOSuite extends AnyWordSpec with Matchers {
   "an Input instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode in al, 0x10" in {
         Input(0x10.toByte, AL).encodeByte should be(Hex.lsb("E4 10"))
@@ -75,7 +75,7 @@ class IOSuite extends AnyWordSpec with Matchers {
       }
     }
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode in al, 0x10" in {
         Input(0x10.toByte, AL).encodeByte should be(Hex.lsb("E4 10"))
@@ -104,7 +104,7 @@ class IOSuite extends AnyWordSpec with Matchers {
     }
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode in al, 0x10" in {
         Input(0x10.toByte, AL).encodeByte should be(Hex.lsb("E4 10"))
@@ -135,7 +135,7 @@ class IOSuite extends AnyWordSpec with Matchers {
   "an Output instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode out 0x10, al" in {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))
@@ -182,7 +182,7 @@ class IOSuite extends AnyWordSpec with Matchers {
       }
     }
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode out 0x10, al" in {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))
@@ -211,7 +211,7 @@ class IOSuite extends AnyWordSpec with Matchers {
     }
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode out 0x10, al" in {
         Output(AL, 0x10.toByte).encodeByte should be(Hex.lsb("E6 10"))

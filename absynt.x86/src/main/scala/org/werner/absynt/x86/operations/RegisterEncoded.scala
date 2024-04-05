@@ -20,7 +20,7 @@ abstract class RegisterEncoded[Size <: ValueSize](register: GeneralPurposeRegist
                                                               rawCode: Seq[Byte],
                                                               registerOrder: OperandOrder,
                                                               override val mnemonic: String)
-                                                             (implicit operandSizePrefixRequirement: OperandSizePrefixRequirement)
+                                                             (using operandSizePrefixRequirement: OperandSizePrefixRequirement)
   extends X86Operation(rawCode.take(rawCode.length - 1) :+ (rawCode.last | register.registerCode).toByte) with NoModRM {
 
   self: DisplacementBytes & ImmediateBytes =>

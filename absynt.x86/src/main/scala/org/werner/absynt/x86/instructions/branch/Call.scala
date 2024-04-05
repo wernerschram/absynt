@@ -21,6 +21,7 @@ import org.werner.absynt.x86.operands.memoryaccess.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
 import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer as FarPointerOperation, NearPointer as NearPointerOperation}
+import scala.language.implicitConversions
 
 object Call {
 
@@ -71,7 +72,7 @@ object Call {
         new Static(0xC3.toByte :: Nil, "ret") with NoDisplacement with NoImmediate
 
       protected def Imm16(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
-        new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), source)
+        new Static(0xC2.toByte :: Nil, "ret") with NoDisplacement with Immediate[WordSize](immediateValue.withSizePrefixRequirement(noOperandSizePrefixRequirement), source)
 
 
       def apply(): X86Operation = Static
@@ -83,7 +84,7 @@ object Call {
           new Static(0xCB.toByte :: Nil, "retf") with NoDisplacement with NoImmediate
 
         protected def Imm16(immediateValue: ImmediateValue[?] & WordSize): X86Operation =
-          new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize](operandWithOperandSizePrefixInfo(immediateValue)(noOperandSizePrefixRequirement), source)
+          new Static(0xCA.toByte :: Nil, "retf") with NoDisplacement with Immediate[WordSize](immediateValue.withSizePrefixRequirement(noOperandSizePrefixRequirement), source)
 
         def apply(): X86Operation = Static
 

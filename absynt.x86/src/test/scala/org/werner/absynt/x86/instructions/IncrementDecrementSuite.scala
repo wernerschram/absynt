@@ -24,7 +24,7 @@ class IncrementDecrementSuite extends AnyWordSpec with Matchers {
   "an Increment instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode inc al" in {
         Increment(AL).encodeByte should be(Hex.lsb("FE C0"))
@@ -63,7 +63,7 @@ class IncrementDecrementSuite extends AnyWordSpec with Matchers {
     }
 
     "in protected mode" should {
-      import ProcessorMode.Protected._
+      import ProcessorMode.Protected.{given, *}
 
       "correctly encode inc bl" in {
         Increment(BL).encodeByte should be(Hex.lsb("FE C3"))
@@ -88,7 +88,7 @@ class IncrementDecrementSuite extends AnyWordSpec with Matchers {
     }
     "in long mode" should {
 
-      import ProcessorMode.Long._
+      import ProcessorMode.Long.{given, *}
 
       "correctly encode inc r8l" in {
         Increment(R8L).encodeByte should be(Hex.lsb("41 FE C0"))

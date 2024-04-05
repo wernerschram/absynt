@@ -19,7 +19,7 @@ import org.werner.absynt.arm.operations.LoadStoreOperation.LoadStoreOperation
 import org.werner.absynt.arm.operations._
 import org.werner.absynt.resource.{RelativeReference, UnlabeledEncodable}
 import org.werner.absynt.{Label, OffsetDirection, RelativeOffsetDirection}
-
+import scala.language.implicitConversions
 abstract class LoadStoreReference(val opcode: String, targetLabel: Label, val condition: Condition)
   extends RelativeReference() with NamedConditional {
   override val target: Label = targetLabel
@@ -32,7 +32,7 @@ abstract class LoadStoreReference(val opcode: String, targetLabel: Label, val co
 }
 
 class LoadStoreRegister(
-    wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(implicit val mnemonic: String) {
+    wordOperation: LoadStoreOperation, byteOperation: LoadStoreOperation)(mnemonic: String) {
 
   private def ImmedWord(condition: Condition, register: GeneralRegister, baseRegister: GeneralRegister,
                         offset: LoadStoreOffset, addressingType: LoadStoreAddressingType) =
@@ -54,7 +54,7 @@ class LoadStoreRegister(
     new LoadStoreReference(mnemonic, targetLabel, Condition.Always) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
         ImmedWord(Condition.Always, destination, GeneralRegister.R15,
-          LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
+          ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort,
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 
@@ -62,7 +62,7 @@ class LoadStoreRegister(
     new LoadStoreReference(mnemonic, targetLabel, condition) {
       override def encodableForDistance(distance: Int, offsetDirection: RelativeOffsetDirection): UnlabeledEncodable =
         ImmedWord(this.condition, destination, GeneralRegister.R15,
-          LoadStoreOffset(ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort),
+          ArmRelativeOffset.positionalOffset(distance)(offsetDirection).offset.toShort,
             LoadStoreAddressingTypeNormal.OffsetNormal)
     }
 

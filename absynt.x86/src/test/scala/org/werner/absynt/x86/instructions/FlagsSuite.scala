@@ -22,7 +22,7 @@ class FlagsSuite extends AnyWordSpec with Matchers {
   "an Increment instruction" when {
     "in real mode" should {
 
-      import ProcessorMode.Real._
+      import ProcessorMode.Real.{given, *}
 
       "correctly encode stc" in {
         SetCarryFlag().encodeByte should be(Hex.lsb("F9"))

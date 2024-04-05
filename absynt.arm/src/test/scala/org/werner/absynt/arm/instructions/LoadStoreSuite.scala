@@ -22,13 +22,14 @@ import org.werner.absynt.resource.Resource
 import org.werner.absynt.sections.Section
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class LoadStoreSuite extends AnyWordSpec with Matchers {
 
   "an LoadRegister instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldr r1, [r2, #10]" in {
         LoadRegister(R1, R2, 10.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e592100a"))
@@ -125,7 +126,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.byte instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrb r1, [r2, #70]" in {
         LoadRegister.byte(R1, R2, 70.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e5d21046"))
@@ -140,7 +141,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.doubleWord instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrd r1, [r2], #-40" in {
         LoadRegister.doubleWord(R1, R2, (-40).toByte, LoadStoreAddressingTypeNormal.PostIndexedNormal).encodeByte should be(Hex.msb("e04212d8"))
@@ -155,7 +156,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.signedByte instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrsb r1, [r2, #50]!" in {
         LoadRegister.signedByte(R1, R2, 50.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e1f213d2"))
@@ -170,7 +171,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.unsignedHalfWord instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrh r1, [r2, #-60]!" in {
         LoadRegister.unsignedHalfWord(R1, R2, (-60).toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e17213bc"))
@@ -185,7 +186,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.signedHalfWord instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrsh r1, [r2, r3]" in {
         LoadRegister.signedHalfWord(R1, R2, R3, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e19210f3"))
@@ -200,7 +201,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.UserMode instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrt r1, [r2], #130" in {
         LoadRegister.UserMode(R1, R2, 130.toShort).encodeByte should be(Hex.msb("e4b21082"))
@@ -223,7 +224,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an LoadRegister.UserMode.byte instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode ldrbt r1, [r2], #150" in {
         LoadRegister.UserMode.byte(R1, R2, 150.toShort).encodeByte should be(Hex.msb("e4f21096"))
@@ -242,7 +243,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an StoreRegister instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode str r1, [r2, #10]" in {
         StoreRegister(R1, R2, 10.toShort, LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e582100a"))
@@ -253,7 +254,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an StoreRegister.halfWord instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode strd r1, [r2, -r1]" in {
         StoreRegister.doubleWord(R1, R2, LoadStoreMiscellaneousOffset(R1, UpdateDirection.Decrement), LoadStoreAddressingTypeNormal.OffsetNormal).encodeByte should be(Hex.msb("e10210f1"))
@@ -264,7 +265,7 @@ class LoadStoreSuite extends AnyWordSpec with Matchers {
   "an StoreRegister.halfWord instruction" when {
     "in a32 mode" should {
 
-      import ProcessorMode.A32._
+      import ProcessorMode.A32.{given, *}
 
       "correctly encode strh r1, [r2, #40]!" in {
         StoreRegister.halfWord(R1, R2, 40.toByte, LoadStoreAddressingTypeNormal.PreIndexedNormal).encodeByte should be(Hex.msb("e1e212b8"))

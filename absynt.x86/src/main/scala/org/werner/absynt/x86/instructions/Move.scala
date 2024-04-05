@@ -21,10 +21,11 @@ import org.werner.absynt.x86.operands.memoryaccess.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 import org.werner.absynt.x86.operations.{ExtraOperands, Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo, RegisterEncoded, Static, X86Operation, MemoryLocation as MemoryLocationOperation}
 import org.werner.absynt.x86.*
+import scala.language.implicitConversions
 
 object Move extends I8086GenericRegisters {
 
-  implicit val mnemonic: String = "mov"
+  val mnemonic: String = "mov"
 
   sealed trait Common {
     self: ArchitectureBounds & ProcessorMode & OperandSizeInfo  =>
@@ -93,8 +94,8 @@ object Move extends I8086GenericRegisters {
           with Immediate[ByteSize](immediateValue, source)
 
       protected def Imm16ToRM16[OperandSize <: MaxWideSize](operand: ModRMEncodableOperand & OperandSize, immediateValue: ImmediateValue[?] & OperandSize) =
-        new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination)
-          with NoDisplacement
+        new ModRM(operand, 0xC7.toByte :: Nil, 0, mnemonic, destination) 
+          with NoDisplacement 
           with Immediate[OperandSize](immediateValue, source)
 
       sealed abstract class MoveForLabel(targetLabel: Label) extends AbsoluteReference(targetLabel) {
@@ -111,6 +112,9 @@ object Move extends I8086GenericRegisters {
       def apply(source: ByteRegister, destination: ModRMEncodableOperand & ByteSize): X86Operation =
         R8ToRM8(source, destination)
 
+      def epply(source: MemoryAddress & ByteSize, accumulator: Accumulator.LowByte.type): X86Operation =
+        MOffs8ToAL(source)
+        
       def apply(source: MemoryAddress & ByteSize, accumulator: Accumulator.LowByte.type): X86Operation =
         MOffs8ToAL(source)
 
@@ -179,7 +183,7 @@ object Move extends I8086GenericRegisters {
           override val size: Int = 3
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, wordImm(distance.toShort))
+            Imm16ToR16(register, distance.toShort)
         }
     }
   }
@@ -193,7 +197,7 @@ object Move extends I8086GenericRegisters {
           override val size: Int = 3
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, wordImm(distance.toShort))
+            Imm16ToR16(register, distance.toShort)
         }
     }
   }
@@ -207,7 +211,7 @@ object Move extends I8086GenericRegisters {
           override val size: Int = 5
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16[DoubleWordSize](register, doubleWordImm(distance))
+            Imm16ToR16[DoubleWordSize](register, distance)
         }
     }
   }
@@ -220,7 +224,7 @@ object Move extends I8086GenericRegisters {
           override val size: Int = 10
 
           override def encodableForDistance(distance: Int): UnlabeledEncodable =
-            Imm16ToR16(register, quadWordImm(distance))
+            Imm16ToR16(register, distance.toLong)
         }
     }
   }
