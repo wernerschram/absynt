@@ -15,7 +15,8 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
 import org.werner.absynt.x86.operands.*
-import org.werner.absynt.x86.operands.memoryaccess.{DestinationReference, SourceReference}
+import org.werner.absynt.x86.operands.memoryaccess.IndirectMemoryLocation
+import org.werner.absynt.x86.operands.memoryaccess.IndirectMemoryLocation.{DestinationReference, SourceReference}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder
 import org.werner.absynt.x86.operations.*
 

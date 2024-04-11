@@ -18,6 +18,7 @@ import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.{ByteSize, WordSize}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.language.implicitConversions
 
 class IncrementDecrementSuite extends AnyWordSpec with Matchers {
 

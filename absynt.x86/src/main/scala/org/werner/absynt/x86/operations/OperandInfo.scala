@@ -170,12 +170,12 @@ sealed class AddressOperandInfo(val operand: Operand & ValueSize, val segmentOve
 }
 
 object AddressOperandInfo {
-  def rmIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & IndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & IndexRegister & ValueSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOperandRM)
     }
 
-  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & BaseRegisterReference & RegisterSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & RealModeBaseRegister & RegisterSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register)
 
   def rmDisplacement(displacement: ImmediateValue[?] & ValueSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =

@@ -223,35 +223,35 @@ class TestSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode test QWORD PTR cs:[eax], 0x44332211" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[QuadWordSize](EAX, segment = CS)).encodeByte should be(Hex.lsb("2e 67 48 F7 00 11 22 33 44"))
+        Test(0x44332211, RegisterMemoryLocation[QuadWordSize](CS/EAX)).encodeByte should be(Hex.lsb("2e 67 48 F7 00 11 22 33 44"))
       }
 
       "correctly represent test QWORD PTR cs:[eax], 0x44332211 as a string" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[QuadWordSize](EAX, segment = CS)).toString shouldBe "test QWORD PTR cs:[eax], 1144201745"
+        Test(0x44332211, RegisterMemoryLocation[QuadWordSize](CS/EAX)).toString shouldBe "test QWORD PTR cs:[eax], 1144201745"
       }
 
       "correctly encode test DWORD PTR cs:[rbx], 0x44332211" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e F7 03 11 22 33 44"))
+        Test(0x44332211, RegisterMemoryLocation[DoubleWordSize](CS/RBX)).encodeByte should be(Hex.lsb("2e F7 03 11 22 33 44"))
       }
 
       "correctly represent test DWORD PTR cs:[rbx], 0x44332211 as a string" in {
-        Test(0x44332211, RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](RBX, segment = CS)).toString shouldBe "test DWORD PTR cs:[rbx], 1144201745"
+        Test(0x44332211, RegisterMemoryLocation[DoubleWordSize](CS/RBX)).toString shouldBe "test DWORD PTR cs:[rbx], 1144201745"
       }
 
       "correctly encode test WORD PTR cs:[rbx], 0x2211" in {
-        Test(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride[WordSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 66 F7 03 11 22"))
+        Test(0x2211.toShort, RegisterMemoryLocation[WordSize](CS/RBX)).encodeByte should be(Hex.lsb("2e 66 F7 03 11 22"))
       }
 
       "correctly represent test WORD PTR cs:[rbx], 0x2211 as a string" in {
-        Test(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride[WordSize](RBX, segment = CS)).toString shouldBe "test WORD PTR cs:[rbx], 8721"
+        Test(0x2211.toShort, RegisterMemoryLocation[WordSize](CS/RBX)).toString shouldBe "test WORD PTR cs:[rbx], 8721"
       }
 
       "correctly encode test BYTE PTR cs:[rbx], 0x11" in {
-        Test(0x11.toByte, RegisterMemoryLocation.withSegmentOverride[ByteSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e F6 03 11"))
+        Test(0x11.toByte, RegisterMemoryLocation[ByteSize](CS/RBX)).encodeByte should be(Hex.lsb("2e F6 03 11"))
       }
 
       "correctly represent test BYTE PTR cs:[rbx], 0x11 as a string" in {
-        Test(0x11.toByte, RegisterMemoryLocation.withSegmentOverride[ByteSize](RBX, segment = CS)).toString shouldBe "test BYTE PTR cs:[rbx], 17"
+        Test(0x11.toByte, RegisterMemoryLocation[ByteSize](CS/RBX)).toString shouldBe "test BYTE PTR cs:[rbx], 17"
       }
 
 

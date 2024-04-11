@@ -70,15 +70,15 @@ object Boot extends App {
       //
       Move(0x0.toByte, AL) ::
       Move((320*67).toShort, CX) ::
-      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
+      StoreString.Repeat[ByteSize](AL, DestinationReference[ByteSize](DI)) ::
       //
       Move(0x1.toByte, AL) ::
       Move((320*66).toShort, CX) ::
-      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
+      StoreString.Repeat[ByteSize](AL, DestinationReference[ByteSize](DI)) ::
       //
       Move(0x2.toByte, AL) ::
       Move((320*67).toShort, CX) ::
-      StoreString.Repeat(AL, DestinationReference[ByteSize](DI)) ::
+      StoreString.Repeat[ByteSize](AL, DestinationReference[ByteSize](DI)) ::
 
       { val label = Label.unique; Jump(label).label(label) } ::
       Nil

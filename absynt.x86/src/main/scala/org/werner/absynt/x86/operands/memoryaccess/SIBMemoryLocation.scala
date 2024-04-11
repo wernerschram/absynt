@@ -22,7 +22,7 @@ sealed class SIBMemoryLocation(
     val index: GeneralPurposeRegister & SIBIndexRegister & DoubleQuadSize,
     val base: GeneralPurposeRegister & SIBBaseRegister & DoubleQuadSize,
     displacement: Option[ImmediateValue[?] & ByteWordDoubleSize] = None, val scale: Int, segment: SegmentRegister)
-  extends IndirectMemoryLocation(0x04, displacement, segment) with ModRMEncodableOperand {
+  extends IndirectMemoryLocationOld(0x04, displacement, segment) with ModRMEncodableOperand {
 
   self: ValueSize =>
 

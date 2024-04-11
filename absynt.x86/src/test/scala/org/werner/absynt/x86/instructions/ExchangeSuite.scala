@@ -18,6 +18,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.werner.absynt.Hex
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.WordSize
+import scala.language.implicitConversions
 
 class ExchangeSuite extends AnyWordSpec with Matchers {
 

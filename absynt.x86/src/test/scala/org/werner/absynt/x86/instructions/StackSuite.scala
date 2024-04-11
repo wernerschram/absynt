@@ -205,7 +205,7 @@ class StackSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode pop DWORD PTR [bx+si]" in {
-        Pop(RegisterMemoryLocation[DoubleWordSize](BX.combinedIndex(SI))).encodeByte should be(Hex.lsb("66 8F 30"))
+        Pop(RegisterMemoryLocation[DoubleWordSize](BX+SI)).encodeByte should be(Hex.lsb("66 8F 30"))
       }
       "correctly represent pop DWORD PTR [bx+si] as a string" in {
         Pop(RegisterMemoryLocation[DoubleWordSize](BX+SI)).toString should be("pop DWORD PTR [bx+si]")

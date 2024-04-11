@@ -777,7 +777,7 @@ class StringSuite extends AnyWordSpec with Matchers {
         }
       }
 
-      "when repeeated" should {
+      "when repeated" should {
         s"correctly encode repe cmps BYTE PTR [di], BYTE PTR [si]" in {
           CompareString.RepeatEqual(SourceReference[ByteSize](SI), DestinationReference[ByteSize](DI)).encodeByte should be(Hex.lsb("F3 A6"))
         }

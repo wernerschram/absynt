@@ -34,8 +34,6 @@ sealed trait ArchitectureBounds {
 sealed abstract class ProcessorMode
 extends ImmediateValue.I8086Implicits
   with MemoryAddress.I8086Implicits
-  with RegisterMemoryLocation.I8086Implicits
-  with RegisterMemoryLocation.Operations
   with FarPointer.I8086Implicits
 {
 
@@ -55,7 +53,8 @@ object ProcessorMode {
   object Legacy extends ProcessorMode
     with OperandSizeInfo
     with LegacyBounds
-    with I8086Registers
+    with Register.I8086Registers
+    with IndirectMemoryLocation.LegacyOperations
     with Move.LegacyOperations
     with BasicInteraction.LegacyOperations
     with DivideMultiply.Operations
@@ -94,9 +93,9 @@ object ProcessorMode {
     with OperandSizeInfo
     with I386Bounds
     with Register.I386Registers
+    with IndirectMemoryLocation.RealOperations
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
-    with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
@@ -140,9 +139,9 @@ object ProcessorMode {
     with OperandSizeInfo
     with I386Bounds
     with Register.I386Registers
+    with IndirectMemoryLocation.ProtectedOperations
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
-    with RegisterMemoryLocation.I386Implicits
     with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
@@ -192,12 +191,11 @@ object ProcessorMode {
     with OperandSizeInfo
     with LongBounds
     with Register.X64Registers
+    with IndirectMemoryLocation.LongOperations
     with ImmediateValue.I386Implicits
     with ImmediateValue.X64Implicits
     with MemoryAddress.I386Implicits
     with MemoryAddress.X64Implicits
-    with RegisterMemoryLocation.I386Implicits
-    with RegisterMemoryLocation.X64Implicits
     with SIBMemoryLocation.LongOperations
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters

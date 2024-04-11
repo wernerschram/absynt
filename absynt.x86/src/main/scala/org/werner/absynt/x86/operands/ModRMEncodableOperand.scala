@@ -16,8 +16,8 @@ package org.werner.absynt.x86.operands
 import org.werner.absynt.x86.RexRequirement
 
 trait ModRMEncodableOperand extends Operand {
-  val modValue: Byte
-  val registerOrMemoryModeCode: Byte
+  def modValue: Byte
+  def registerOrMemoryModeCode: Byte
 
   def getExtendedBytes(rValue: Byte): Seq[Byte] = Seq(getModRM(rValue))
 

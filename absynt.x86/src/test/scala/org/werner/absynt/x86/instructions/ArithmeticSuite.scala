@@ -303,11 +303,11 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xor esi, DWORD PTR gs:[eax+0x12]" in {
-        Xor(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](EAX, 0x12.toByte, GS), ESI).encodeByte should be(Hex.lsb("65 33 70 12"))
+        Xor(RegisterMemoryLocation[DoubleWordSize](GS/EAX+0x12), ESI).encodeByte should be(Hex.lsb("65 33 70 12"))
       }
 
       "correctly represent xor esi, DWORD PTR gs:[eax+0x12] as a string" in {
-        Xor(RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](EAX, 0x12.toByte, GS), ESI).toString shouldBe "xor esi, DWORD PTR gs:[eax+18]"
+        Xor(RegisterMemoryLocation[DoubleWordSize](GS/EAX+0x12), ESI).toString shouldBe "xor esi, DWORD PTR gs:[eax+18]"
       }
 
     }
@@ -412,35 +412,35 @@ class ArithmeticSuite extends AnyWordSpec with Matchers {
       }
 
       "correctly encode xor QWORD PTR cs:[eax], 0x44332211" in {
-        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride[QuadWordSize](EAX, segment = CS)).encodeByte should be(Hex.lsb("2e 67 48 81 30 11 22 33 44"))
+        Xor(0x44332211, RegisterMemoryLocation[QuadWordSize](CS/EAX)).encodeByte should be(Hex.lsb("2e 67 48 81 30 11 22 33 44"))
       }
 
       "correctly represent xor QWORD PTR cs:[eax], 0x44332211 as a string" in {
-        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride[QuadWordSize](EAX, segment = CS)).toString shouldBe "xor QWORD PTR cs:[eax], 1144201745"
+        Xor(0x44332211, RegisterMemoryLocation[QuadWordSize](CS/EAX)).toString shouldBe "xor QWORD PTR cs:[eax], 1144201745"
       }
 
       "correctly encode xor DWORD PTR cs:[rbx], 0x44332211" in {
-        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 81 33 11 22 33 44"))
+        Xor(0x44332211, RegisterMemoryLocation[DoubleWordSize](CS/RBX)).encodeByte should be(Hex.lsb("2e 81 33 11 22 33 44"))
       }
 
       "correctly represent xor DWORD PTR cs:[rbx], 0x44332211 as a string" in {
-        Xor(0x44332211, RegisterMemoryLocation.withSegmentOverride[DoubleWordSize](RBX, segment = CS)).toString shouldBe "xor DWORD PTR cs:[rbx], 1144201745"
+        Xor(0x44332211, RegisterMemoryLocation[DoubleWordSize](CS/RBX)).toString shouldBe "xor DWORD PTR cs:[rbx], 1144201745"
       }
 
       "correctly encode xor WORD PTR cs:[rbx], 0x2211" in {
-        Xor(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride[WordSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 66 81 33 11 22"))
+        Xor(0x2211.toShort, RegisterMemoryLocation[WordSize](CS/RBX)).encodeByte should be(Hex.lsb("2e 66 81 33 11 22"))
       }
 
       "correctly represent xor WORD PTR cs:[rbx], 0x2211 as a string" in {
-        Xor(0x2211.toShort, RegisterMemoryLocation.withSegmentOverride[WordSize](RBX, segment = CS)).toString shouldBe "xor WORD PTR cs:[rbx], 8721"
+        Xor(0x2211.toShort, RegisterMemoryLocation[WordSize](CS/RBX)).toString shouldBe "xor WORD PTR cs:[rbx], 8721"
       }
 
       "correctly encode xor BYTE PTR cs:[rbx], 0x11" in {
-        Xor(0x11.toByte, RegisterMemoryLocation.withSegmentOverride[ByteSize](RBX, segment = CS)).encodeByte should be(Hex.lsb("2e 80 33 11"))
+        Xor(0x11.toByte, RegisterMemoryLocation[ByteSize](CS/RBX)).encodeByte should be(Hex.lsb("2e 80 33 11"))
       }
 
       "correctly represent xor BYTE PTR cs:[rbx], 0x11 as a string" in {
-        Xor(0x11.toByte, RegisterMemoryLocation.withSegmentOverride[ByteSize](RBX, segment = CS)).toString shouldBe "xor BYTE PTR cs:[rbx], 17"
+        Xor(0x11.toByte, RegisterMemoryLocation[ByteSize](CS/RBX)).toString shouldBe "xor BYTE PTR cs:[rbx], 17"
       }
 
 

@@ -18,6 +18,7 @@ import org.werner.absynt.resource.AbsoluteReference
 import org.werner.absynt.sections.Section
 import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.ByteSize
+import org.werner.absynt.x86.operands.memoryaccess.IndirectMemoryLocation
 import org.werner.absynt.{EncodedString, Label}
 
 import java.io.FileOutputStream
