@@ -51,7 +51,7 @@ abstract class IndirectMemoryLocation(
 object IndirectMemoryLocation {
 
   class DestinationReference(
-                              reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize,
+                              reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize),
                               segment: SegmentRegister,
                             )(using AddressSizePrefixRequirement) extends IndirectMemoryLocation(
     if reference.isInstanceOf[WordSize] then 6.toByte else 7.toByte,
@@ -68,7 +68,7 @@ object IndirectMemoryLocation {
   }
 
   class SourceReference(
-                         reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize,
+                         reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize),
                          segment: SegmentRegister,
                        )(using AddressSizePrefixRequirement) extends IndirectMemoryLocation(
     if reference.isInstanceOf[WordSize] then 5.toByte else 6.toByte,
@@ -90,10 +90,10 @@ object IndirectMemoryLocation {
                   referenceBuilder: ReferenceBuilder
                 ): IndirectMemoryLocation & Size
 
-    def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize,
+    def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize),
                     segment: SegmentRegister): DestinationReference & Size
 
-    def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize,
+    def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize),
                segment: SegmentRegister): SourceReference & Size
 
 
@@ -301,9 +301,9 @@ object IndirectMemoryLocation {
     }
 
     sealed abstract class ProtectedModeReferenceBuilder extends ReferenceBuilder {
-      def base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize]
+      def base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)]
 
-      def index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize]
+      def index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)]
 
       def displacement: Int
 
@@ -402,19 +402,19 @@ object IndirectMemoryLocation {
     }
 
     case class ProtectedBaseReferenceBuilder(
-                                              baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize,
+                                              baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize),
                                               override val segment: SegmentRegister
                                             ) extends ProtectedModeReferenceBuilder {
-      override def base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize] = None
+      override def base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)] = None
 
-      override def index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize] = Some(baseRegister)
+      override def index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)] = Some(baseRegister)
 
       override def displacement: Int = 0
 
       override def multiplier: Int = 1
 
       @targetName("withIndex")
-      def +(indexRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize): ProtectedBaseIndexReferenceBuilder =
+      def +(indexRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)): ProtectedBaseIndexReferenceBuilder =
         ProtectedBaseIndexReferenceBuilder(baseRegister, indexRegister, segment)
 
       @targetName("withIndex")
@@ -436,13 +436,13 @@ object IndirectMemoryLocation {
     }
 
     case class ProtectedBaseIndexReferenceBuilder(
-                                                   baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize,
-                                                   indexRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize,
+                                                   baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize),
+                                                   indexRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize),
                                                    override val segment: SegmentRegister
                                                  ) extends ProtectedModeReferenceBuilder {
-      override def base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize] = Some(baseRegister)
+      override def base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)] = Some(baseRegister)
 
-      override def index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize] = Some(indexRegister)
+      override def index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)] = Some(indexRegister)
 
       override def displacement: Int = 0
 
@@ -454,8 +454,8 @@ object IndirectMemoryLocation {
     }
 
     case class ProtectedMultipliedReferenceBuilder(
-                                                    base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize],
-                                                    index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize],
+                                                    base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)],
+                                                    index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)],
                                                     override val segment: SegmentRegister,
                                                     override val multiplier: Int,
                                                   ) extends ProtectedModeReferenceBuilder {
@@ -467,8 +467,8 @@ object IndirectMemoryLocation {
     }
 
     case class ProtectedDisplacementReferenceBuilder(
-                                                      base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize],
-                                                      index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize],
+                                                      base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)],
+                                                      index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)],
                                                       override val segment: SegmentRegister,
                                                       override val displacement: Int,
                                                       override val multiplier: Int,
@@ -477,7 +477,7 @@ object IndirectMemoryLocation {
 
 
     @targetName("asReference")
-    given Conversion[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize, ProtectedBaseReferenceBuilder] =
+    given Conversion[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize), ProtectedBaseReferenceBuilder] =
       baseRegister => ProtectedBaseReferenceBuilder(baseRegister, baseRegister.defaultSegment)
   }
 
@@ -488,10 +488,10 @@ object IndirectMemoryLocation {
       override def instance(referenceBuilder: ReferenceBuilder): IndirectMemoryLocation & ByteSize =
         new RealIndirectMemoryLocation(referenceBuilder.asInstanceOf[RealModeReferenceBuilder]) with ByteSize
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & ByteSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & ByteSize =
         new DestinationReference(reference, segment) with ByteSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & ByteSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & ByteSize =
         new SourceReference(reference, segment) with ByteSize
 
     }
@@ -500,10 +500,10 @@ object IndirectMemoryLocation {
       override def instance(referenceBuilder: ReferenceBuilder): IndirectMemoryLocation & WordSize =
         new RealIndirectMemoryLocation(referenceBuilder.asInstanceOf[RealModeReferenceBuilder]) with WordSize
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & WordSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & WordSize =
         new DestinationReference(reference, segment) with WordSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & WordSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & WordSize =
         new SourceReference(reference, segment) with WordSize
     }
 
@@ -538,10 +538,10 @@ object IndirectMemoryLocation {
             new ProtectedIndirectMemoryLocation(ref) with ByteSize
         }
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & ByteSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & ByteSize =
         new DestinationReference(reference, segment) with ByteSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & ByteSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & ByteSize =
         new SourceReference(reference, segment) with ByteSize
     }
 
@@ -554,10 +554,10 @@ object IndirectMemoryLocation {
             new ProtectedIndirectMemoryLocation(ref) with WordSize
         }
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & WordSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & WordSize =
         new DestinationReference(reference, segment) with WordSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & WordSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & WordSize =
         new SourceReference(reference, segment) with WordSize
     }
 
@@ -570,10 +570,10 @@ object IndirectMemoryLocation {
             new ProtectedIndirectMemoryLocation(ref) with DoubleWordSize
         }
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & DoubleWordSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & DoubleWordSize =
         new DestinationReference(reference, segment) with DoubleWordSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & DoubleWordSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & DoubleWordSize =
         new SourceReference(reference, segment) with DoubleWordSize
     }
 
@@ -587,7 +587,7 @@ object IndirectMemoryLocation {
         RealIndexReferenceBuilder(indexRegister, seg)
 
       @targetName("prefixes")
-      def /(baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize): ProtectedBaseReferenceBuilder =
+      def /(baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)): ProtectedBaseReferenceBuilder =
         ProtectedBaseReferenceBuilder(baseRegister, seg)
 
     def RegisterMemoryLocation[Size <: ValueSize : IndirectMemoryLocationForSize](reference: ReferenceBuilder)(using AddressSizePrefixRequirement): IndirectMemoryLocation & Size =
@@ -610,10 +610,10 @@ object IndirectMemoryLocation {
       override def instance(referenceBuilder: ReferenceBuilder): IndirectMemoryLocation & ByteSize =
         new ProtectedIndirectMemoryLocation(referenceBuilder.asInstanceOf[ProtectedModeReferenceBuilder]) with ByteSize
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & ByteSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & ByteSize =
         new DestinationReference(reference, segment) with ByteSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & ByteSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & ByteSize =
         new SourceReference(reference, segment) with ByteSize
     }
 
@@ -621,10 +621,10 @@ object IndirectMemoryLocation {
       override def instance(referenceBuilder: ReferenceBuilder): IndirectMemoryLocation & WordSize =
         new ProtectedIndirectMemoryLocation(referenceBuilder.asInstanceOf[ProtectedModeReferenceBuilder]) with WordSize
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & WordSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & WordSize =
         new DestinationReference(reference, segment) with WordSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & WordSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & WordSize =
         new SourceReference(reference, segment) with WordSize
     }
 
@@ -632,10 +632,10 @@ object IndirectMemoryLocation {
       override def instance(referenceBuilder: ReferenceBuilder): IndirectMemoryLocation & DoubleWordSize =
         new ProtectedIndirectMemoryLocation(referenceBuilder.asInstanceOf[ProtectedModeReferenceBuilder]) with DoubleWordSize
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & DoubleWordSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & DoubleWordSize =
         new DestinationReference(reference, segment) with DoubleWordSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & DoubleWordSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & DoubleWordSize =
         new SourceReference(reference, segment) with DoubleWordSize
     }
 
@@ -643,25 +643,25 @@ object IndirectMemoryLocation {
       override def instance(referenceBuilder: ReferenceBuilder): IndirectMemoryLocation & QuadWordSize =
         new ProtectedIndirectMemoryLocation(referenceBuilder.asInstanceOf[ProtectedModeReferenceBuilder]) with QuadWordSize
 
-      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): DestinationReference & QuadWordSize =
+      override def destination(reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): DestinationReference & QuadWordSize =
         new DestinationReference(reference, segment) with QuadWordSize
 
-      override def source(reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize, segment: SegmentRegister): SourceReference & QuadWordSize =
+      override def source(reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize | QuadWordSize), segment: SegmentRegister): SourceReference & QuadWordSize =
         new SourceReference(reference, segment) with QuadWordSize
     }
 
     extension (seg: SegmentRegister)
       @targetName("prefixes")
-      def /(baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize): ProtectedBaseReferenceBuilder =
+      def /(baseRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & (DoubleWordSize | QuadWordSize)): ProtectedBaseReferenceBuilder =
         ProtectedBaseReferenceBuilder(baseRegister, seg)
 
     def RegisterMemoryLocation[Size <: ValueSize : IndirectMemoryLocationForSize](reference: ProtectedModeReferenceBuilder)(using AddressSizePrefixRequirement): IndirectMemoryLocation & Size =
       summon[IndirectMemoryLocationForSize[Size]].instance(reference)
 
-    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & DoubleQuadSize, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
+    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & (DoubleWordSize | QuadWordSize), displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].destination(reference, segment.getOrElse(reference.defaultSegment))
 
-    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & DoubleQuadSize, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
+    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & (DoubleWordSize | QuadWordSize), displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].source(reference, segment.getOrElse(reference.defaultSegment))
   }
 }

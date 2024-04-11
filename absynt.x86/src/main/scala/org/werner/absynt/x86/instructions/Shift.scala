@@ -42,8 +42,8 @@ object Shift {
         with NoDisplacement
         with Immediate[ByteSize](immediateValue, OperandOrder.source)
 
-    protected def OneToRM16(operand: ModRMEncodableOperand & WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[WordDoubleQuadSize](operand, 0xD1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+    protected def OneToRM16(operand: ModRMEncodableOperand & (WordSize | DoubleWordSize | QuadWordSize), extensionCode: Byte, mnemonic: String): X86Operation =
+      new ModRM[WordSize | DoubleWordSize | QuadWordSize](operand, 0xD1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
         with NoDisplacement
         with NoImmediate
         with ExtraOperands(OperandInfo.implicitOperand(1.toByte, OperandOrder.source)(using noOperandSizePrefixRequirement))
@@ -55,8 +55,8 @@ object Shift {
         with NoImmediate
         with ExtraOperands(OperandInfo.implicitOperand(Count.LowByte, OperandOrder.source)(using noOperandSizePrefixRequirement))
 
-    protected def Imm8ToRM16(immediateValue: ImmediateValue[Byte] & ByteSize, operand: ModRMEncodableOperand & WordDoubleQuadSize, extensionCode: Byte, mnemonic: String): X86Operation =
-      new ModRM[WordDoubleQuadSize](operand, 0xC1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
+    protected def Imm8ToRM16(immediateValue: ImmediateValue[Byte] & ByteSize, operand: ModRMEncodableOperand & (WordSize | DoubleWordSize | QuadWordSize), extensionCode: Byte, mnemonic: String): X86Operation =
+      new ModRM[WordSize | DoubleWordSize | QuadWordSize](operand, 0xC1.toByte :: Nil, extensionCode, mnemonic, OperandOrder.destination, true)
         with NoDisplacement
         with Immediate[ByteSize](immediateValue, OperandOrder.source)
 
@@ -65,7 +65,7 @@ object Shift {
         val value = immediateValue.value
         destination match {
           case d: ByteSize if value == 1 => OneToRM8(d, extensionCode, mnemonic)
-          case d: WordDoubleQuadSize if value == 1 => OneToRM16(d, extensionCode, mnemonic)
+          case d: (WordSize | DoubleWordSize | QuadWordSize) if value == 1 => OneToRM16(d, extensionCode, mnemonic)
           case d: ByteSize => Imm8ToRM8((value & 7).toByte, d, extensionCode, mnemonic)
           case d: WordSize => Imm8ToRM16((value & 15).toByte, d, extensionCode, mnemonic)
           case d: DoubleWordSize => Imm8ToRM16((value & 31).toByte, d, extensionCode, mnemonic)

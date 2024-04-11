@@ -127,16 +127,16 @@ object Move extends I8086GenericRegisters {
         apply(source, destination.asInstanceOf[ModRMEncodableOperand & ByteSize])
       }
 
-      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand & Size, destination: SegmentRegister) =
+      def apply[Size <: MaxWideSize](source: ModRMEncodableOperand & Size, destination: SegmentRegister): X86Operation =
         RM16ToSReg(destination, source)
 
-      def apply[Size <: MaxWideSize](source: SegmentRegister, destination: ModRMEncodableOperand & Size) =
+      def apply[Size <: MaxWideSize](source: SegmentRegister, destination: ModRMEncodableOperand & Size): X86Operation =
         SRegToRM16(source, destination)
 
       def apply[Size <: MaxWideSize](accumulator: AccumulatorRegister & Size, destination: MemoryAddress & Size): X86Operation =
         AXToMOffs16(accumulator, destination)
 
-      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size) =
+      def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: ModRMEncodableOperand & Size): X86Operation =
         R16ToRM16(source, destination)
 
       def apply[Size <: MaxWideSize](source: GeneralPurposeRegister & Size, destination: GeneralPurposeRegister & Size): X86Operation =
@@ -154,11 +154,11 @@ object Move extends I8086GenericRegisters {
       def apply(source: ImmediateValue[?] & ByteSize, destination: ByteRegister): X86Operation =
         Imm8ToR8(destination, source)
 
-      def apply[Size <: MaxValueSize](source: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size) = {
+      def apply[Size <: MaxValueSize](source: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size): X86Operation = {
         source match {
           case s: ByteSize =>
             Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand & ByteSize], source.asInstanceOf[ImmediateValue[?] & ByteSize])
-          case s: WordDoubleQuadSize =>
+          case s: (WordSize | DoubleWordSize | QuadWordSize) =>
             Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand & MaxWideSize], source.asInstanceOf[ImmediateValue[?] & MaxWideSize])
         }
       }

@@ -44,7 +44,7 @@ object Call {
           with NearPointerOperation[DoubleWordSize](nearPointer, destination) 
           with NoImmediate
 
-      protected def RM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
+      protected def RM16[Size <: WordSize | DoubleWordSize | QuadWordSize](operand: ModRMEncodableOperand & Size): ModRM[ModRMEncodableOperand & Size] & NoDisplacement & NoImmediate =
         new ModRM(operand, 0xff.toByte :: Nil, 2, mnemonic, destination, false) 
           with NoDisplacement 
           with NoImmediate
@@ -54,7 +54,7 @@ object Call {
           with FarPointerOperation[Size](farPointer)
           with NoImmediate
 
-      protected def M1616(operand: MemoryLocation & WordDoubleQuadSize): ModRM[MemoryLocation & WordDoubleQuadSize] & NoDisplacement & NoImmediate =
+      protected def M1616(operand: MemoryLocation & (WordSize | DoubleWordSize | QuadWordSize)): ModRM[MemoryLocation & (WordSize | DoubleWordSize | QuadWordSize)] & NoDisplacement & NoImmediate =
         new ModRM(operand, 0xFF.toByte :: Nil, 3, s"$mnemonic FAR", destination) 
           with NoDisplacement 
           with NoImmediate

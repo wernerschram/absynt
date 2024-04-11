@@ -124,7 +124,7 @@ object Stack {
         immediate match {
           case i: ByteSize => 
             Imm8(immediate.asInstanceOf[ImmediateValue[?] & ByteSize])
-          case i: WordDoubleQuadSize =>
+          case i: (WordSize | DoubleWordSize | QuadWordSize) =>
             Imm16(immediate.asInstanceOf[ImmediateValue[?] & ImmExtendedMaxSize])
         }
       }
@@ -323,7 +323,7 @@ object Stack {
   trait LongOperations extends PushCommon with PopCommon {
     self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo  =>
 
-    type RMMaxSize = WordQuadSize
+    type RMMaxSize = WordSize | QuadWordSize
     override type ImmMaxSize = ByteSize | WordSize | DoubleWordSize
     override type ImmExtendedMaxSize = WordSize | DoubleWordSize
 

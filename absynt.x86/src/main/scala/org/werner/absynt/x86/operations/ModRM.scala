@@ -58,12 +58,12 @@ class ModRRM[Size <: ValueSize](val register: GeneralPurposeRegister & Size,
     super.allOperands + OperandInfo.rmRegister(register, operandROrder)
 }
 
-class ModSegmentRM[Size<:WordDoubleQuadSize](val register: SegmentRegister,
-                                             operandRM: ModRMEncodableOperand & Size,
-                                             override val code: Seq[Byte],
-                                             override val mnemonic: String,
-                                             override val operandRMOrder: OperandOrder)
-                                            (using OperandSizePrefixRequirement, AddressSizePrefixRequirement)
+class ModSegmentRM[Size <: WordSize | DoubleWordSize | QuadWordSize](val register: SegmentRegister,
+                                                                    operandRM: ModRMEncodableOperand & Size,
+                                                                    override val code: Seq[Byte],
+                                                                    override val mnemonic: String,
+                                                                    override val operandRMOrder: OperandOrder)
+                                                                   (using OperandSizePrefixRequirement, AddressSizePrefixRequirement)
   extends ModRM(operandRM, code, register.registerCode, mnemonic, operandRMOrder) {
   self: X86Operation & DisplacementBytes & ImmediateBytes =>
 

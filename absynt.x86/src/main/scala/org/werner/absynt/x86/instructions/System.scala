@@ -14,7 +14,7 @@
 package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.x86.{ArchitectureBounds, ProcessorMode}
-import org.werner.absynt.x86.operands.{DoubleQuadSize, ReturnMode}
+import org.werner.absynt.x86.operands.{DoubleWordSize, QuadWordSize, ReturnMode}
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
 import org.werner.absynt.x86.operations._
 
@@ -29,7 +29,7 @@ object System {
         with NoImmediate
 
 
-    def staticExit(returnMode: ReturnMode & DoubleQuadSize): Static =
+    def staticExit(returnMode: ReturnMode & (DoubleWordSize | QuadWordSize)): Static =
       new Static(0x0F.toByte :: 0x35.toByte :: Nil, "sysexit")
         with NoDisplacement
         with NoImmediate
@@ -40,7 +40,7 @@ object System {
     }
 
     object SystemExit {
-      def apply(returnMode: ReturnMode & DoubleQuadSize): Static = staticExit(returnMode)
+      def apply(returnMode: ReturnMode & (DoubleWordSize | QuadWordSize)): Static = staticExit(returnMode)
     }
   }
 
@@ -57,7 +57,7 @@ object System {
         with NoDisplacement
         with NoImmediate
 
-    def staticReturn(returnMode: ReturnMode & DoubleQuadSize): Static =
+    def staticReturn(returnMode: ReturnMode & (DoubleWordSize | QuadWordSize)): Static =
       new Static(0x0F.toByte :: 0x07.toByte :: Nil, "sysret")
         with NoDisplacement
         with NoImmediate
@@ -68,7 +68,7 @@ object System {
     }
 
     object SystemReturn {
-      def apply(returnMode: ReturnMode & DoubleQuadSize): Static = staticReturn(returnMode)
+      def apply(returnMode: ReturnMode & (DoubleWordSize | QuadWordSize)): Static = staticReturn(returnMode)
     }
   }
 }

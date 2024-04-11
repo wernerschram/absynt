@@ -14,7 +14,7 @@
 package org.werner.absynt.x86.operands
 
 sealed abstract class ReturnMode extends Operand {
-  self: DoubleQuadSize =>
+  self: DoubleWordSize | QuadWordSize =>
 }
 
 object ReturnMode {

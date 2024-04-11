@@ -24,7 +24,7 @@ import scala.language.implicitConversions
 sealed trait ArchitectureBounds {
   self: ProcessorMode =>
   type MaxValueSize <: ValueSize
-  type MaxWideSize <: WordDoubleQuadSize
+  type MaxWideSize <: WordSize | DoubleWordSize | QuadWordSize
 
   given operandSizePrefixRequirement: OperandSizePrefixRequirement
   given addressSizePrefixRequirement: AddressSizePrefixRequirement
@@ -37,7 +37,7 @@ extends ImmediateValue.I8086Implicits
   with FarPointer.I8086Implicits
 {
 
-  def pointer(location: Long): ImmediateValue[?] & WordDoubleQuadSize
+  def pointer(location: Long): ImmediateValue[?] & (WordSize | DoubleWordSize | QuadWordSize)
   def shortPointer(location: Byte): NearPointer & ByteSize = ShortPointer(location)
   def wordPointer(location: Int): NearPointer & WordSize = LongPointer.realMode(location)
   def doubleWordPointer(location: Int): NearPointer & DoubleWordSize = LongPointer.protectedMode(location)
@@ -80,7 +80,7 @@ object ProcessorMode {
 
     given addressSizePrefixRequirement: AddressSizePrefixRequirement = _ => false
 
-    override def pointer(location: Long): ImmediateValue[Short] & WordDoubleQuadSize = location.toShort
+    override def pointer(location: Long): ImmediateValue[Short] & (WordSize | DoubleWordSize | QuadWordSize) = location.toShort
   }
 
   sealed trait I386Bounds extends ArchitectureBounds {
@@ -131,7 +131,7 @@ object ProcessorMode {
 
     given addressSizePrefixRequirement: AddressSizePrefixRequirement = _.isInstanceOf[DoubleWordSize]
 
-    override def pointer(location: Long): ImmediateValue[Short] & WordDoubleQuadSize = location.toShort
+    override def pointer(location: Long): ImmediateValue[Short] & (WordSize | DoubleWordSize | QuadWordSize) = location.toShort
   }
 
   object Protected extends ProcessorMode
@@ -176,13 +176,13 @@ object ProcessorMode {
 
     given addressSizePrefixRequirement: AddressSizePrefixRequirement = _.isInstanceOf[WordSize]
 
-    override def pointer(location: Long): ImmediateValue[Int] & WordDoubleQuadSize = location.toInt
+    override def pointer(location: Long): ImmediateValue[Int] & (WordSize | DoubleWordSize | QuadWordSize) = location.toInt
   }
   sealed trait LongBounds extends ArchitectureBounds {
     self: ProcessorMode =>
 
     type MaxValueSize = ValueSize
-    type MaxWideSize = WordDoubleQuadSize
+    type MaxWideSize = WordSize | DoubleWordSize | QuadWordSize
   }
 
   object Long extends ProcessorMode
@@ -229,6 +229,6 @@ object ProcessorMode {
 
     given addressSizePrefixRequirement: AddressSizePrefixRequirement = _.isInstanceOf[DoubleWordSize]
 
-    override def pointer(location: Long): ImmediateValue[Long] & WordDoubleQuadSize = location
+    override def pointer(location: Long): ImmediateValue[Long] & (WordSize | DoubleWordSize | QuadWordSize) = location
   }
 }

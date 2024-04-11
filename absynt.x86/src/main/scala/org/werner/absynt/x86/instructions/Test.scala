@@ -55,7 +55,7 @@ object Test {
         with Immediate[ByteSize](immediateValue, source)
 
 
-    protected def Imm16ToRM16[Size <: WordDoubleQuadSize](operand: ModRMEncodableOperand & Size, immediateValue: ImmediateValue[?] & Size) =
+    protected def Imm16ToRM16[Size <: WordSize | DoubleWordSize | QuadWordSize](operand: ModRMEncodableOperand & Size, immediateValue: ImmediateValue[?] & Size) =
       new ModRM(operand, 0xF7.toByte :: Nil, 0x00.toByte, mnemonic, destination)
         with NoDisplacement
         with Immediate[Size](immediateValue, source)
@@ -63,7 +63,7 @@ object Test {
     protected def R8ToRM8(operand1: ByteRegister, operand2: ModRMEncodableOperand & ByteSize): X86Operation =
       new ModRRM(operand1, operand2, 0x84.toByte :: Nil, mnemonic, destination)
 
-    protected def R16ToRM16[Size <: WordDoubleQuadSize](operand1: GeneralPurposeRegister & Size, operand2: ModRMEncodableOperand & Size): X86Operation =
+    protected def R16ToRM16[Size <: WordSize | DoubleWordSize | QuadWordSize](operand1: GeneralPurposeRegister & Size, operand2: ModRMEncodableOperand & Size): X86Operation =
       new ModRRM(operand1, operand2, 0x85.toByte :: Nil, mnemonic, destination)
 
     sealed abstract class TestBase {

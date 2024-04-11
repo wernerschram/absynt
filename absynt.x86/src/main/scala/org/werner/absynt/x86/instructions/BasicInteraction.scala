@@ -198,9 +198,9 @@ object BasicInteraction {
       def apply(immediate: ImmediateValue[?] & DoubleWordSize, destination: Accumulator.QuadWord.type): X86Operation =
         Imm32ToRAX(immediate, opcodeBase, mnemonic)
 
-      def apply[ImmediateSize <: (ByteSize | WordSize | DoubleWordSize), DestinationSize <: MaxValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize): X86Operation =
+      def apply[ImmediateSize <: ByteSize | WordSize | DoubleWordSize, DestinationSize <: MaxValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize): X86Operation =
         (immediate, destination) match {
-          case (imm: ByteSize, d: WordDoubleQuadSize) =>
+          case (imm: ByteSize, d: (WordSize | DoubleWordSize | QuadWordSize)) =>
             Imm8ToRM16(d, imm, extensionCode, mnemonic)
           case (imm: ByteSize, d: ByteSize) =>
             Imm8ToRM8(d, imm, extensionCode, mnemonic)
