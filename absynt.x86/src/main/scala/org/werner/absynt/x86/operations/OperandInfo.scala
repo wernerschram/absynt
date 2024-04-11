@@ -175,8 +175,10 @@ object AddressOperandInfo {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceOperandRM)
     }
 
-  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & RealModeBaseRegister & RegisterSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
-    new AddressOperandInfo(register)
+  def rmBase[RegisterSize<:ValueSize](register: GeneralPurposeRegister & ReferenceBaseRegister & RegisterSize)(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+    new AddressOperandInfo(register) {
+      override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceBase)
+    }
 
   def rmDisplacement(displacement: ImmediateValue[?] & ValueSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(displacement, segmentOverride)
@@ -186,7 +188,7 @@ object AddressOperandInfo {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceBase)
     }
 
-  def SIBIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & SIBIndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
+  def SIBIndex[RegisterSize<:ValueSize](register: GeneralPurposeRegister & ProtectedModeIndexRegister & RegisterSize, segmentOverride: Option[SegmentRegister])(using addressSizePrefixRequirement: AddressSizePrefixRequirement): AddressOperandInfo =
     new AddressOperandInfo(register, segmentOverride) {
       override def rexRequirements: Set[RexRequirement] = register.rexRequirements(RexRequirement.instanceIndex)
     }

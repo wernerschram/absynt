@@ -51,9 +51,9 @@ abstract class IndirectMemoryLocation(
 object IndirectMemoryLocation {
 
   class DestinationReference(
-    reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize,
-    segment: SegmentRegister,
-  )(using AddressSizePrefixRequirement) extends IndirectMemoryLocation(
+                              reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize,
+                              segment: SegmentRegister,
+                            )(using AddressSizePrefixRequirement) extends IndirectMemoryLocation(
     if reference.isInstanceOf[WordSize] then 6.toByte else 7.toByte,
     0.toByte,
     None,
@@ -68,9 +68,9 @@ object IndirectMemoryLocation {
   }
 
   class SourceReference(
-    reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize,
-    segment: SegmentRegister,
-  )(using AddressSizePrefixRequirement) extends IndirectMemoryLocation(
+                         reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleQuadSize,
+                         segment: SegmentRegister,
+                       )(using AddressSizePrefixRequirement) extends IndirectMemoryLocation(
     if reference.isInstanceOf[WordSize] then 5.toByte else 6.toByte,
     0.toByte,
     None,
@@ -87,8 +87,8 @@ object IndirectMemoryLocation {
   trait IndirectMemoryLocationForSize[Size <: ValueSize](using AddressSizePrefixRequirement):
 
     def instance(
-        referenceBuilder: ReferenceBuilder
-               ): IndirectMemoryLocation & Size
+                  referenceBuilder: ReferenceBuilder
+                ): IndirectMemoryLocation & Size
 
     def destination(reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleQuadSize,
                     segment: SegmentRegister): DestinationReference & Size
@@ -201,9 +201,9 @@ object IndirectMemoryLocation {
       displacement => RealDisplacementReferenceBuilder(None, None, Segment.Data, displacement)
 
     case class RealBaseReferenceBuilder(
-                                     baseRegister: GeneralPurposeRegister & RealModeBaseRegister & WordSize,
-                                     override val segment: SegmentRegister
-                                   ) extends RealModeReferenceBuilder {
+                                         baseRegister: GeneralPurposeRegister & RealModeBaseRegister & WordSize,
+                                         override val segment: SegmentRegister
+                                       ) extends RealModeReferenceBuilder {
       override def base: Option[GeneralPurposeRegister & RealModeBaseRegister & WordSize] = Some(baseRegister)
 
       override def index: Option[GeneralPurposeRegister & RealModeIndexRegister & WordSize] = None
@@ -220,9 +220,9 @@ object IndirectMemoryLocation {
     }
 
     case class RealIndexReferenceBuilder(
-                                      indexRegister: GeneralPurposeRegister & RealModeIndexRegister & WordSize,
-                                      override val segment: SegmentRegister,
-                                    ) extends RealModeReferenceBuilder {
+                                          indexRegister: GeneralPurposeRegister & RealModeIndexRegister & WordSize,
+                                          override val segment: SegmentRegister,
+                                        ) extends RealModeReferenceBuilder {
       override def base: Option[GeneralPurposeRegister & RealModeBaseRegister & WordSize] = None
 
       override def index: Option[GeneralPurposeRegister & RealModeIndexRegister & WordSize] = Some(indexRegister)
@@ -235,10 +235,10 @@ object IndirectMemoryLocation {
     }
 
     case class RealBaseIndexReferenceBuilder(
-                                          baseRegister: GeneralPurposeRegister & RealModeBaseRegister & WordSize,
-                                          indexRegister: GeneralPurposeRegister & RealModeIndexRegister & WordSize,
-                                          override val segment: SegmentRegister
-                                        ) extends RealModeReferenceBuilder {
+                                              baseRegister: GeneralPurposeRegister & RealModeBaseRegister & WordSize,
+                                              indexRegister: GeneralPurposeRegister & RealModeIndexRegister & WordSize,
+                                              override val segment: SegmentRegister
+                                            ) extends RealModeReferenceBuilder {
       override def base: Option[GeneralPurposeRegister & RealModeBaseRegister & WordSize] = Some(baseRegister)
 
       override def index: Option[GeneralPurposeRegister & RealModeIndexRegister & WordSize] = Some(indexRegister)
@@ -251,12 +251,11 @@ object IndirectMemoryLocation {
     }
 
     case class RealDisplacementReferenceBuilder(
-                                             override val base: Option[GeneralPurposeRegister & RealModeBaseRegister & WordSize],
-                                             override val index: Option[GeneralPurposeRegister & RealModeIndexRegister & WordSize],
-                                             override val segment: SegmentRegister,
-                                             override val displacement: Int = 0
-                                           ) extends RealModeReferenceBuilder
-
+                                                 override val base: Option[GeneralPurposeRegister & RealModeBaseRegister & WordSize],
+                                                 override val index: Option[GeneralPurposeRegister & RealModeIndexRegister & WordSize],
+                                                 override val segment: SegmentRegister,
+                                                 override val displacement: Int = 0
+                                               ) extends RealModeReferenceBuilder
 
 
   }
@@ -356,30 +355,42 @@ object IndirectMemoryLocation {
           case (None, Some(index)) if multiplier != 1 =>
             Some((scaleValue << 6 + index.registerOrMemoryModeCode << 3 + 6).toByte)
           case (Some(base), indexOption) =>
-            Some((scaleValue << 6 + indexOption.map(i => i.registerOrMemoryModeCode << 3).getOrElse(5) + base.registerOrMemoryModeCode).toByte)
+            Some(((scaleValue << 6) + indexOption.map(i => i.registerOrMemoryModeCode << 3).getOrElse(5) + base.registerOrMemoryModeCode).toByte)
           case _ =>
             None
         }
 
       private[I386Operations] def addressOperands(using AddressSizePrefixRequirement) =
-        base.map(b => AddressOperandInfo.SIBBase(b)).toSet ++
-          index.map(i => AddressOperandInfo.rmIndex(i, Option.when(segment != defaultSegment)(segment))).toSet
+        (base, index) match {
+          case (None, Some(index)) if multiplier != 1 =>
+            Set(AddressOperandInfo.SIBIndex(index, Option.when(segment != defaultSegment)(segment)))
+          case (None, Some(index)) =>
+            Set(AddressOperandInfo.rmIndex(index, Option.when(segment != defaultSegment)(segment)))
+          case (Some(base), None) =>
+            Set(AddressOperandInfo.rmBase(base))
+          case (Some(base), Some(index)) =>
+            Set(AddressOperandInfo.SIBBase(base),
+              AddressOperandInfo.SIBIndex(index, Option.when(segment != defaultSegment)(segment)))
+          case _ =>
+            Set.empty
+        }
 
       override def toString: String = {
         val seg = if segment != defaultSegment then s"$segment:" else ""
+        val mult = if multiplier > 1 then s"*$multiplier" else ""
         val baseIndex = (base, index) match {
           case (Some(base), Some(index)) if displacement == 0 =>
-            s"$base+$index"
+            s"$base+$index$mult"
           case (Some(base), Some(index)) =>
-            s"$base+$index+$displacement"
+            s"$base+$index$mult+$displacement"
           case (Some(base), None) if displacement == 0 =>
             s"$base"
           case (Some(base), None) =>
             s"$base+$displacement"
           case (None, Some(index)) if displacement == 0 =>
-            s"$index"
+            s"$index$mult"
           case (None, Some(index)) =>
-            s"$index+$displacement"
+            s"$index$mult+$displacement"
           case (None, None) if displacement == 0 =>
             s""
           case (None, None) =>
@@ -402,9 +413,25 @@ object IndirectMemoryLocation {
 
       override def multiplier: Int = 1
 
+      @targetName("withIndex")
+      def +(indexRegister: GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize): ProtectedBaseIndexReferenceBuilder =
+        ProtectedBaseIndexReferenceBuilder(baseRegister, indexRegister, segment)
+
+      @targetName("withIndex")
+      def +(other: ProtectedMultipliedReferenceBuilder): ProtectedMultipliedReferenceBuilder =
+        ProtectedMultipliedReferenceBuilder(Some(baseRegister), other.index, segment, other.multiplier)
+
+      @targetName("withIndex")
+      def +(other: ProtectedDisplacementReferenceBuilder): ProtectedDisplacementReferenceBuilder =
+        ProtectedDisplacementReferenceBuilder(Some(baseRegister), other.index, segment, other.multiplier, other.displacement)
+
       @targetName("withDisplacement")
       def +(displacementValue: Int): ProtectedDisplacementReferenceBuilder =
-        ProtectedDisplacementReferenceBuilder(base, index, segment, 1, displacementValue)
+        ProtectedDisplacementReferenceBuilder(base, index, segment, displacementValue, 1)
+
+      def *(multiplier: Int): ProtectedMultipliedReferenceBuilder =
+        ProtectedMultipliedReferenceBuilder(base, index, segment, multiplier)
+
     }
 
     case class ProtectedBaseIndexReferenceBuilder(
@@ -425,20 +452,31 @@ object IndirectMemoryLocation {
         ProtectedDisplacementReferenceBuilder(base, index, segment, 1, displacementValue)
     }
 
+    case class ProtectedMultipliedReferenceBuilder(
+                                                    base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize],
+                                                    index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize],
+                                                    override val segment: SegmentRegister,
+                                                    override val multiplier: Int,
+                                                  ) extends ProtectedModeReferenceBuilder {
+      override def displacement: Int = 0
+
+      def +(displacementValue: Int): ProtectedDisplacementReferenceBuilder =
+        ProtectedDisplacementReferenceBuilder(base, index, segment, displacementValue, multiplier)
+    }
+
     case class ProtectedDisplacementReferenceBuilder(
-                                              base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize],
-                                              index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize],
-                                              override val segment: SegmentRegister,
-                                              override val multiplier: Int,
-                                              override val displacement: Int,
-                                            ) extends ProtectedModeReferenceBuilder
+                                                      base: Option[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize],
+                                                      index: Option[GeneralPurposeRegister & ProtectedModeIndexRegister & DoubleQuadSize],
+                                                      override val segment: SegmentRegister,
+                                                      override val displacement: Int,
+                                                      override val multiplier: Int,
+                                                    ) extends ProtectedModeReferenceBuilder
 
 
 
     @targetName("asReference")
     given Conversion[GeneralPurposeRegister & SIBBaseRegister & ProtectedModeIndexRegister & DoubleQuadSize, ProtectedBaseReferenceBuilder] =
       baseRegister => ProtectedBaseReferenceBuilder(baseRegister, baseRegister.defaultSegment)
-
   }
 
   trait LegacyOperations extends I8086Operations {

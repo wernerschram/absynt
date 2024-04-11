@@ -42,11 +42,15 @@ sealed trait IndexRegister extends RegisterReference {
   self: GeneralPurposeRegister & ValueSize =>
 }
 
+sealed trait ReferenceBaseRegister extends RegisterReference {
+  self: GeneralPurposeRegister & ValueSize =>
+}
+
 sealed trait RealModeIndexRegister extends IndexRegister {
   self: GeneralPurposeRegister & ValueSize =>
 }
 
-sealed trait RealModeBaseRegister extends RegisterReference {
+sealed trait RealModeBaseRegister extends ReferenceBaseRegister {
   self: GeneralPurposeRegister & ValueSize =>
 }
 
@@ -59,7 +63,8 @@ sealed trait SIBIndexRegister extends ModRMEncodableOperand {
   val SIBIndexCode: Byte = registerOrMemoryModeCode
 }
 
-sealed trait SIBBaseRegister extends ModRMEncodableOperand {
+sealed trait SIBBaseRegister extends ReferenceBaseRegister {
+  self: GeneralPurposeRegister & ValueSize =>
   val SIBBaseCode: Byte = registerOrMemoryModeCode
 }
 

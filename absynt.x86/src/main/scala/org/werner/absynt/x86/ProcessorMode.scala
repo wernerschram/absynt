@@ -96,7 +96,6 @@ object ProcessorMode {
     with IndirectMemoryLocation.RealOperations
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
-    with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
     with Move.RealOperations
@@ -142,7 +141,6 @@ object ProcessorMode {
     with IndirectMemoryLocation.ProtectedOperations
     with ImmediateValue.I386Implicits
     with MemoryAddress.I386Implicits
-    with SIBMemoryLocation.I386Operations
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
     with Move.ProtectedOperations
@@ -196,7 +194,6 @@ object ProcessorMode {
     with ImmediateValue.X64Implicits
     with MemoryAddress.I386Implicits
     with MemoryAddress.X64Implicits
-    with SIBMemoryLocation.LongOperations
     with FarPointer.I386Implicits
     with Register.I386GenericRegisters
     with Register.X64GenericRegisters
