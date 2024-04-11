@@ -46,7 +46,7 @@ extends ImmediateValue.I8086Implicits
 object ProcessorMode {
   trait LegacyBounds extends ArchitectureBounds {
     self: ProcessorMode =>
-    type MaxValueSize = ByteWordSize
+    type MaxValueSize = ByteSize | WordSize
     type MaxWideSize = WordSize
   }
 

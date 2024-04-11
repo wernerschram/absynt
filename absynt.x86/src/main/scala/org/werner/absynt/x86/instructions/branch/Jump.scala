@@ -89,7 +89,7 @@ object Jump {
 
     sealed abstract class ShortOrLongRelativeJumpLegacy(shortOpcode: Seq[Byte], val longOpcode: Seq[Byte], mnemonic: String)
       extends Jump(shortOpcode, mnemonic) {
-      def apply(nearPointer: NearPointer & ByteWordSize): X86Operation =
+      def apply(nearPointer: NearPointer & (ByteSize | WordSize)): X86Operation =
         nearPointer match {
           case p: ByteSize =>
             Rel8(p)
@@ -341,7 +341,7 @@ object Jump {
 
     abstract class ShortOrLongRelativeJumpLong(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic) {
-      def apply(nearPointer: NearPointer & ByteDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & (ByteSize | DoubleWordSize)): X86Operation =
         nearPointer match {
           case p: ByteSize =>
             Rel8(p)

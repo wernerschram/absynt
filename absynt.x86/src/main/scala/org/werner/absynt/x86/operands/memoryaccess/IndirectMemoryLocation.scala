@@ -517,10 +517,10 @@ object IndirectMemoryLocation {
     def RegisterMemoryLocation[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RealModeReferenceBuilder)(using AddressSizePrefixRequirement): IndirectMemoryLocation & Size =
       summon[IndirectMemoryLocationForSize[Size]].instance(reference)
 
-    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & WordSize, displacement: Option[ImmediateValue[?] & ByteWordSize] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
+    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & WordSize, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].destination(reference, segment.getOrElse(reference.defaultSegment))
 
-    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & WordSize, displacement: Option[ImmediateValue[?] & ByteWordSize] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
+    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & WordSize, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].source(reference, segment.getOrElse(reference.defaultSegment))
   }
 
@@ -656,10 +656,10 @@ object IndirectMemoryLocation {
     def RegisterMemoryLocation[Size <: ValueSize : IndirectMemoryLocationForSize](reference: ProtectedModeReferenceBuilder)(using AddressSizePrefixRequirement): IndirectMemoryLocation & Size =
       summon[IndirectMemoryLocationForSize[Size]].instance(reference)
 
-    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & DoubleQuadSize, displacement: Option[ImmediateValue[?] & ByteWordSize] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
+    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & DoubleQuadSize, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].destination(reference, segment.getOrElse(reference.defaultSegment))
 
-    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & DoubleQuadSize, displacement: Option[ImmediateValue[?] & ByteWordSize] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
+    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & DoubleQuadSize, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].source(reference, segment.getOrElse(reference.defaultSegment))
   }
 }

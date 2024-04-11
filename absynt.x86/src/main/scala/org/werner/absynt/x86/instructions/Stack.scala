@@ -238,7 +238,7 @@ object Stack {
     self: ProcessorMode.LegacyBounds & ProcessorMode & OperandSizeInfo  =>
 
     override type RMMaxSize = WordSize
-    override type ImmMaxSize = ByteWordSize
+    override type ImmMaxSize = ByteSize | WordSize
     override type ImmExtendedMaxSize = WordSize
 
     object Push extends PushOperations {

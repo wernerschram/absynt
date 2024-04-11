@@ -87,7 +87,7 @@ object Test {
 
     object Test extends TestBase  {
 
-      def apply[Size <: ByteWordSize](immediate: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size) = {
+      def apply[Size <: (ByteSize | WordSize)](immediate: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size) = {
         immediate match {
           case i: ByteSize =>
             Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand & ByteSize], immediate.asInstanceOf[ImmediateValue[?] & ByteSize])
