@@ -20,7 +20,8 @@ import org.werner.absynt.x86.operands.*
 import org.werner.absynt.x86.operands.memoryaccess.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
-import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer as FarPointerOperation, NearPointer as NearPointerOperation}
+import org.werner.absynt.x86.operations.{Immediate, ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, Static, X86Operation, FarPointer as FarPointerOperation, NearPointer as NearPointerOperation}
+
 import scala.language.implicitConversions
 
 object Call {
@@ -48,7 +49,7 @@ object Call {
           with NoDisplacement 
           with NoImmediate
 
-      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
+      protected def Ptr1616[Size <: WordSize | DoubleWordSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
         new Static(0x9A.toByte :: Nil, mnemonic) 
           with FarPointerOperation[Size](farPointer)
           with NoImmediate
@@ -103,7 +104,7 @@ object Call {
       def apply(nearPointer: NearPointer & WordSize): X86Operation =
         Rel16(nearPointer)
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
+      def apply[Size <: WordSize | DoubleWordSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
@@ -132,7 +133,7 @@ object Call {
 
     object Call extends BaseCall {
 
-      def apply(nearPointer: NearPointer & WordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & (WordSize | DoubleWordSize)): X86Operation =
         nearPointer match {
           case p: WordSize =>
             Rel16(p)
@@ -140,14 +141,14 @@ object Call {
             Rel32(p)
         }
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
+      def apply[Size <: WordSize | DoubleWordSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
+        def apply[Size <: WordSize | DoubleWordSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & (WordSize | DoubleWordSize)): X86Operation =
           M1616(pointer)
       }
 
@@ -175,7 +176,7 @@ object Call {
 
     object Call extends BaseCall {
 
-      def apply(nearPointer: NearPointer & WordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & (WordSize | DoubleWordSize)): X86Operation =
         nearPointer match {
           case p: WordSize =>
             Rel16(p)
@@ -183,14 +184,14 @@ object Call {
             Rel32(p)
         }
 
-      def apply[Size <: WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
+      def apply[Size <: WordSize | DoubleWordSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
+        def apply[Size <: WordSize | DoubleWordSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & (WordSize | DoubleWordSize)): X86Operation =
           M1616(pointer)
       }
 

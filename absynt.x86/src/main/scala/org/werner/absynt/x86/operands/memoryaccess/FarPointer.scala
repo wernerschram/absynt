@@ -16,7 +16,7 @@ package org.werner.absynt.x86.operands.memoryaccess
 import org.werner.absynt.ListExtensions._
 import org.werner.absynt.x86.operands._
 
-sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size)
+sealed abstract case class FarPointer[Size <: WordSize | DoubleWordSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size)
   extends Operand {
   self: FarPointerSize[Size] =>
 
@@ -27,7 +27,7 @@ sealed abstract case class FarPointer[Size<:WordDoubleSize](segment: ImmediateVa
 }
 
 object FarPointer {
-  trait FarPointerForSize[OffsetSize<:WordDoubleSize]:
+  trait FarPointerForSize[OffsetSize <: WordSize | DoubleWordSize]:
     extension (segment: ImmediateValue[Short] & WordSize) def instance(offset: ImmediateValue[?] & OffsetSize): FarPointer[OffsetSize] & FarPointerSize[OffsetSize]
 
   trait I8086Implicits {
@@ -43,6 +43,6 @@ object FarPointer {
         new FarPointer[DoubleWordSize](segment, offset) with FarDoubleWordSize
   }
 
-  def apply[Size<:WordDoubleSize: FarPointerForSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size): FarPointer[Size] & FarPointerSize[Size] =
+  def apply[Size <: WordSize | DoubleWordSize : FarPointerForSize](segment: ImmediateValue[Short] & WordSize, offset: ImmediateValue[?] & Size): FarPointer[Size] & FarPointerSize[Size] =
     segment.instance(offset)
 }

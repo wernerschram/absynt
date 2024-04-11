@@ -20,7 +20,7 @@ import org.werner.absynt.x86.operations.{AddressOperandInfo, AddressSizePrefixRe
 
 import scala.annotation.targetName
 
-abstract class IndirectMemoryLocationOld(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize] = None,
+abstract class IndirectMemoryLocationOld(val registerOrMemoryModeCode: Byte, displacement: Option[ImmediateValue[?] & (ByteSize | WordSize | DoubleWordSize)] = None,
                                          segment: SegmentRegister)
   extends MemoryLocation(displacement, segment) {
 
@@ -35,7 +35,7 @@ abstract class IndirectMemoryLocationOld(val registerOrMemoryModeCode: Byte, dis
 abstract class IndirectMemoryLocation(
   override val registerOrMemoryModeCode: Byte,
   override val modValue: Byte,
-  displacement: Option[ImmediateValue[?] & ByteWordDoubleSize] = None,
+  displacement: Option[ImmediateValue[?] & (ByteSize | WordSize | DoubleWordSize)] = None,
   sibValue: Option[Byte],
   segment: SegmentRegister,
   val addressOperandSet: Set[AddressOperandInfo],
@@ -180,7 +180,7 @@ object IndirectMemoryLocation {
         else 2.toByte
 
 
-      private[I8086Operations] def displacementValue =
+      private[I8086Operations] def displacementValue: Option[ImmediateValue[?] & (ByteSize | WordSize)] =
         if displacement == 0 then
           if base.contains(BP) && index.isEmpty then Some(byteImmediate(0)) else None
         else if displacement < 256 then Some(byteImmediate(displacement.toByte))
@@ -429,6 +429,7 @@ object IndirectMemoryLocation {
       def +(displacementValue: Int): ProtectedDisplacementReferenceBuilder =
         ProtectedDisplacementReferenceBuilder(base, index, segment, displacementValue, 1)
 
+      @targetName("withMultiplier")
       def *(multiplier: Int): ProtectedMultipliedReferenceBuilder =
         ProtectedMultipliedReferenceBuilder(base, index, segment, multiplier)
 
@@ -460,6 +461,7 @@ object IndirectMemoryLocation {
                                                   ) extends ProtectedModeReferenceBuilder {
       override def displacement: Int = 0
 
+      @targetName("withDisplacement")
       def +(displacementValue: Int): ProtectedDisplacementReferenceBuilder =
         ProtectedDisplacementReferenceBuilder(base, index, segment, displacementValue, multiplier)
     }
@@ -591,10 +593,10 @@ object IndirectMemoryLocation {
     def RegisterMemoryLocation[Size <: ValueSize : IndirectMemoryLocationForSize](reference: ReferenceBuilder)(using AddressSizePrefixRequirement): IndirectMemoryLocation & Size =
       summon[IndirectMemoryLocationForSize[Size]].instance(reference)
 
-    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & WordDoubleSize, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
+    def DestinationReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & DestinationIndex & IndexRegister & (WordSize | DoubleWordSize), displacement: Option[ImmediateValue[?] & (ByteSize | WordSize | DoubleWordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): DestinationReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].destination(reference, segment.getOrElse(reference.defaultSegment))
 
-    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & WordDoubleSize, displacement: Option[ImmediateValue[?] & ByteWordDoubleSize] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
+    def SourceReference[Size <: ValueSize : IndirectMemoryLocationForSize](reference: RegisterReference & SourceIndex & IndexRegister & (WordSize | DoubleWordSize), displacement: Option[ImmediateValue[?] & (ByteSize | WordSize | DoubleWordSize)] = None, segment: Option[SegmentRegister] = None)(implicit byteImmediate: ValueToByteImmediate, addressSizePrefixRequirement: AddressSizePrefixRequirement): SourceReference & Size =
       summon[IndirectMemoryLocationForSize[Size]].source(reference, segment.getOrElse(reference.defaultSegment))
   }
 

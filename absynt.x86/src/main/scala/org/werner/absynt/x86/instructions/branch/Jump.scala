@@ -15,12 +15,13 @@ package org.werner.absynt.x86.instructions.branch
 
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.werner.absynt.x86._
-import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
+import org.werner.absynt.x86.*
+import org.werner.absynt.x86.operands.*
+import org.werner.absynt.x86.operands.memoryaccess.*
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
-import org.werner.absynt.x86.operations.{ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, FarPointer => FarPointerOperation, NearPointer => NearPointerOperation}
+import org.werner.absynt.x86.operations.{ModRM, NoDisplacement, NoImmediate, OperandSizeInfo, Static, X86Operation, FarPointer as FarPointerOperation, NearPointer as NearPointerOperation}
+
 import scala.language.implicitConversions
 
 object Jump {
@@ -39,7 +40,7 @@ object Jump {
           with NoDisplacement
           with NoImmediate
 
-      protected def Ptr1616[Size <: WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
+      protected def Ptr1616[Size <: WordSize | DoubleWordSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] & NoImmediate =
         new Static(0xEA.toByte :: Nil, mnemonic)
           with FarPointerOperation[Size](farPointer)
           with NoImmediate
@@ -172,7 +173,7 @@ object Jump {
 
     sealed abstract class ShortOrLongRelativeJumpReal(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
-      def apply(nearPointer: NearPointer & ByteWordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & (ByteSize | WordSize | DoubleWordSize)): X86Operation =
         nearPointer match {
           case p: ByteSize =>
             Rel8(p)
@@ -206,14 +207,14 @@ object Jump {
 
     object Jump extends ShortOrLongRelativeJumpReal(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
+      def apply[Size <: WordSize | DoubleWordSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
+        def apply[Size <: WordSize | DoubleWordSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & (WordSize | DoubleWordSize)): X86Operation =
           M1616(pointer)
       }
 
@@ -257,7 +258,7 @@ object Jump {
     sealed abstract class ShortOrLongRelativeJumpProtected(shortOpcode: Seq[Byte], longOpcode: Seq[Byte], mnemonic: String)
       extends ShortOrLongRelativeJumpI386(shortOpcode, longOpcode, mnemonic){
 
-      def apply(nearPointer: NearPointer & ByteWordDoubleSize): X86Operation =
+      def apply(nearPointer: NearPointer & (ByteSize | WordSize | DoubleWordSize)): X86Operation =
         nearPointer match {
           case p: ByteSize =>
             Rel8(p)
@@ -291,14 +292,14 @@ object Jump {
 
     object Jump extends ShortOrLongRelativeJumpProtected(0xEB.toByte :: Nil, 0xE9.toByte :: Nil, "jmp") {
 
-      def apply[Size<:WordDoubleSize](operand: ModRMEncodableOperand & Size): X86Operation =
+      def apply[Size <: WordSize | DoubleWordSize](operand: ModRMEncodableOperand & Size): X86Operation =
         RM16(operand)
 
       object Far {
-        def apply[Size<:WordDoubleSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
+        def apply[Size <: WordSize | DoubleWordSize](farPointer: FarPointer[Size] & FarPointerSize[Size]): Static & FarPointerOperation[Size] =
           Ptr1616(farPointer)
 
-        def apply(pointer: MemoryLocation & WordDoubleSize): X86Operation =
+        def apply(pointer: MemoryLocation & (WordSize | DoubleWordSize)): X86Operation =
           M1616(pointer)
       }
 

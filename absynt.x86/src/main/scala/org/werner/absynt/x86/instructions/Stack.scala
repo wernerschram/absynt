@@ -268,9 +268,9 @@ object Stack {
   trait I386Operations extends PushCommon with PopCommon {
     self: ProcessorMode.I386Bounds & ProcessorMode & OperandSizeInfo  =>
 
-    override type RMMaxSize = WordDoubleSize
-    override type ImmMaxSize = ByteWordDoubleSize
-    override type ImmExtendedMaxSize = WordDoubleSize
+    override type RMMaxSize = WordSize | DoubleWordSize
+    override type ImmMaxSize = ByteSize | WordSize | DoubleWordSize
+    override type ImmExtendedMaxSize = WordSize | DoubleWordSize
 
     object Push extends PushOperations {
       def apply(segment: SegmentRegister): X86Operation = segment match {
@@ -324,8 +324,8 @@ object Stack {
     self: ProcessorMode.LongBounds & ProcessorMode & OperandSizeInfo  =>
 
     type RMMaxSize = WordQuadSize
-    override type ImmMaxSize = ByteWordDoubleSize
-    override type ImmExtendedMaxSize = WordDoubleSize
+    override type ImmMaxSize = ByteSize | WordSize | DoubleWordSize
+    override type ImmExtendedMaxSize = WordSize | DoubleWordSize
 
     object Push extends PushOperations {
       def apply(segment: SegmentRegister): X86Operation = segment match {

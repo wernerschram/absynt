@@ -87,7 +87,7 @@ object Test {
 
     object Test extends TestBase  {
 
-      def apply[Size <: (ByteSize | WordSize)](immediate: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size) = {
+      def apply[Size <: ByteSize | WordSize](immediate: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size): X86Operation = {
         immediate match {
           case i: ByteSize =>
             Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand & ByteSize], immediate.asInstanceOf[ImmediateValue[?] & ByteSize])
@@ -111,12 +111,12 @@ object Test {
       def apply(immediate: ImmediateValue[?] & DoubleWordSize, destination: Accumulator.DoubleWord.type): X86Operation =
         Imm32ToEAX(immediate)
 
-      def apply[Size <: ByteWordDoubleSize](immediate: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size) =
+      def apply[Size <: ByteSize | WordSize | DoubleWordSize](immediate: ImmediateValue[?] & Size, destination: ModRMEncodableOperand & Size): X86Operation =
         immediate match {
           case i: ByteSize =>
             Imm8ToRM8(destination.asInstanceOf[ModRMEncodableOperand & ByteSize], immediate.asInstanceOf[ImmediateValue[?] & ByteSize])
-          case i: WordDoubleSize =>
-            Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand & WordDoubleSize], immediate.asInstanceOf[ImmediateValue[?] & WordDoubleSize])
+          case i: (WordSize | DoubleWordSize) =>
+            Imm16ToRM16(destination.asInstanceOf[ModRMEncodableOperand & (WordSize | DoubleWordSize)], immediate.asInstanceOf[ImmediateValue[?] & (WordSize | DoubleWordSize)])
         }
     }
   }
@@ -137,13 +137,13 @@ object Test {
       def apply(immediate: ImmediateValue[?] & DoubleWordSize, destination: Accumulator.QuadWord.type): X86Operation =
         Imm32ToRAX(immediate)
 
-      def apply[ImmediateSize <: ByteWordDoubleSize, DestinationSize <: ValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize) =
+      def apply[ImmediateSize <: ByteSize | WordSize | DoubleWordSize, DestinationSize <: ValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize): X86Operation =
         (immediate, destination) match {
           case (imm: ByteSize, d: ByteSize) =>
             Imm8ToRM8(d, imm)
           case (imm: DoubleWordSize, d: QuadWordSize) =>
             Imm16ToRM16(d, imm)
-          case (imm: WordDoubleSize, d: WordDoubleSize)
+          case (imm: (WordSize | DoubleWordSize), d: (WordSize | DoubleWordSize))
             if d `sizeEquals` imm =>
             Imm16ToRM16(d, imm)
           case _ =>

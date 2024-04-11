@@ -13,9 +13,9 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.operands.memoryaccess.{FarPointer => FarPointerType, MemoryLocation => MemoryLocationType, NearPointer => NearPointerType}
-import org.werner.absynt.x86.operands.{FarPointerSize, ModRMEncodableOperand, ValueSize, WordDoubleSize}
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
+import org.werner.absynt.x86.operands.memoryaccess.{FarPointer as FarPointerType, MemoryLocation as MemoryLocationType, NearPointer as NearPointerType}
+import org.werner.absynt.x86.operands.{DoubleWordSize, FarPointerSize, ValueSize, WordSize}
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 
 sealed trait DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
@@ -30,7 +30,7 @@ trait NoDisplacement extends DisplacementBytes {
   override def displacementBytes: Seq[Byte] = Nil
 }
 
-trait FarPointer[OffsetSize<:WordDoubleSize](pointer: OperandWithOperandSizePrefixInfo[FarPointerType[OffsetSize] & FarPointerSize[OffsetSize]]) extends DisplacementBytes {
+trait FarPointer[OffsetSize <: WordSize | DoubleWordSize](pointer: OperandWithOperandSizePrefixInfo[FarPointerType[OffsetSize] & FarPointerSize[OffsetSize]]) extends DisplacementBytes {
   self: X86Operation & ModRMBytes & ImmediateBytes =>
 
   protected override abstract def allOperands: Set[OperandInfo[?]] =

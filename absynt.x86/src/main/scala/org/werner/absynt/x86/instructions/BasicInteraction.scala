@@ -166,11 +166,11 @@ object BasicInteraction {
 
       def apply[ImmediateSize <: MaxValueSize, DestinationSize <: MaxValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize): X86Operation =
         (immediate, destination) match {
-          case (imm: ByteSize, d: WordDoubleSize) =>
+          case (imm: ByteSize, d: (WordSize | DoubleWordSize)) =>
             Imm8ToRM16(d, imm, extensionCode, mnemonic)
           case (imm: ByteSize, d: ByteSize) =>
             Imm8ToRM8(d, imm, extensionCode, mnemonic)
-          case (imm: WordDoubleSize, d: WordDoubleSize)
+          case (imm: (WordSize | DoubleWordSize), d: (WordSize | DoubleWordSize))
             if d `sizeEquals` imm =>
             Imm16ToRM16(d, imm, extensionCode, mnemonic)
           case _ =>
@@ -198,7 +198,7 @@ object BasicInteraction {
       def apply(immediate: ImmediateValue[?] & DoubleWordSize, destination: Accumulator.QuadWord.type): X86Operation =
         Imm32ToRAX(immediate, opcodeBase, mnemonic)
 
-      def apply[ImmediateSize <: ByteWordDoubleSize, DestinationSize <: MaxValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize): X86Operation =
+      def apply[ImmediateSize <: (ByteSize | WordSize | DoubleWordSize), DestinationSize <: MaxValueSize](immediate: ImmediateValue[?] & ImmediateSize, destination: ModRMEncodableOperand & DestinationSize): X86Operation =
         (immediate, destination) match {
           case (imm: ByteSize, d: WordDoubleQuadSize) =>
             Imm8ToRM16(d, imm, extensionCode, mnemonic)
@@ -206,7 +206,7 @@ object BasicInteraction {
             Imm8ToRM8(d, imm, extensionCode, mnemonic)
           case (imm: DoubleWordSize, d: QuadWordSize) =>
             Imm16ToRM16(d, imm, extensionCode, mnemonic)
-          case (imm: WordDoubleSize, d: WordDoubleSize)
+          case (imm: (WordSize | DoubleWordSize), d: (WordSize | DoubleWordSize))
             if d `sizeEquals` imm =>
             Imm16ToRM16(d, imm, extensionCode, mnemonic)
           case _ =>

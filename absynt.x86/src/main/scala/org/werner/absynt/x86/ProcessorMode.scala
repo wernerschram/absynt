@@ -85,8 +85,8 @@ object ProcessorMode {
 
   sealed trait I386Bounds extends ArchitectureBounds {
     self: ProcessorMode =>
-    type MaxValueSize = ByteWordDoubleSize
-    type MaxWideSize = WordDoubleSize
+    type MaxValueSize = ByteSize | WordSize | DoubleWordSize
+    type MaxWideSize = WordSize | DoubleWordSize
   }
 
   object Real extends ProcessorMode
