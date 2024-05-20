@@ -15,12 +15,13 @@ package org.werner.absynt.x86.instructions.branch
 
 import org.werner.absynt.Label
 import org.werner.absynt.resource.{RelativeReference, Resource, UnlabeledEncodable}
-import org.werner.absynt.x86._
-import org.werner.absynt.x86.operands._
-import org.werner.absynt.x86.operands.memoryaccess._
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder._
+import org.werner.absynt.x86.*
+import org.werner.absynt.x86.operands.*
+import org.werner.absynt.x86.operands.memoryaccess.*
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 import org.werner.absynt.x86.operations.branch.{JumpOption, LabelJumpOperation}
-import org.werner.absynt.x86.operations.{NoImmediate, OperandSizeInfo, OperandWithOperandSizePrefixInfo, Static, X86Operation, NearPointer => NearPointerOperation}
+import org.werner.absynt.x86.operations.{NoImmediate, OperandSizeInfo, Static, X86Operation, NearPointer as NearPointerOperation}
+
 import scala.language.implicitConversions
 
 object Loop {

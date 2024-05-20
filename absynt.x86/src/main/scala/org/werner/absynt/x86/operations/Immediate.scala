@@ -14,7 +14,7 @@
 package org.werner.absynt.x86.operations
 
 import org.werner.absynt.x86.operands.{ImmediateValue, ValueSize}
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{*, given}
+import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
 
 import scala.language.implicitConversions
 

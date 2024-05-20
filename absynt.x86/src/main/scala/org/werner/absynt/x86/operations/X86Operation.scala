@@ -69,7 +69,7 @@ abstract class X86Operation(val code: Seq[Byte]) extends UnlabeledEncodable {
 
   override def toString: String = {
     val operandString = operands.toSeq.sorted.map(_.toString).mkString(", ")
-    s"${optionalRepeatPrefixString}$mnemonic${if operandString.nonEmpty then s" $operandString" else ""}"
+    s"$optionalRepeatPrefixString$mnemonic${if operandString.nonEmpty then s" $operandString" else ""}"
   }
 }
 

@@ -13,7 +13,6 @@
 
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.ProcessorMode
 import org.werner.absynt.x86.operands.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.{OperandOrder, *}
 

@@ -1,7 +1,5 @@
 package org.werner.absynt.x86.operations
 
-import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.destination
-
 
 sealed trait Operands {
   self: X86Operation =>

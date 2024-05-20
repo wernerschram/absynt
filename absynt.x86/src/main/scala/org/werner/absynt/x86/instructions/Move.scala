@@ -15,12 +15,13 @@ package org.werner.absynt.x86.instructions
 
 import org.werner.absynt.*
 import org.werner.absynt.resource.{AbsoluteReference, UnlabeledEncodable}
-import org.werner.absynt.x86.operands.Register.I8086GenericRegisters
+import org.werner.absynt.x86.*
 import org.werner.absynt.x86.operands.*
+import org.werner.absynt.x86.operands.Register.I8086GenericRegisters
 import org.werner.absynt.x86.operands.memoryaccess.*
 import org.werner.absynt.x86.operations.OperandInfo.OperandOrder.*
-import org.werner.absynt.x86.operations.{ExtraOperands, Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, OperandWithOperandSizePrefixInfo, OperandWithSizePrefixInfo, RegisterEncoded, Static, X86Operation, MemoryLocation as MemoryLocationOperation}
-import org.werner.absynt.x86.*
+import org.werner.absynt.x86.operations.{ExtraOperands, Immediate, ModRM, ModRRM, ModSegmentRM, NoDisplacement, NoImmediate, OperandInfo, OperandSizeInfo, RegisterEncoded, Static, X86Operation, MemoryLocation as MemoryLocationOperation}
+
 import scala.language.implicitConversions
 
 object Move extends I8086GenericRegisters {
